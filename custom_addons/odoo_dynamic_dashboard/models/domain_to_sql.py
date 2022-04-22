@@ -31,7 +31,11 @@ def get_query(self, args, operation, field, group_by=False, apply_ir_rules=False
     if apply_ir_rules:
         self._apply_ir_rules(query, 'read')
     if operation and field:
-        data = 'COALESCE(%s("%s".%s),0) AS value' % (operation.upper(), self._table, field.name)
+        if operation != "custom":
+            data = 'COALESCE(%s("%s".%s),0) AS value' % (operation.upper(), self._table, field.name)
+        else:
+            #data = 'COALESCE(%s,0) AS value' % field
+            data = field
         join = ''
         group_by_str = ''
         if group_by:
@@ -50,25 +54,66 @@ def get_query(self, args, operation, field, group_by=False, apply_ir_rules=False
 
     from_clause, where_clause, where_clause_params = query.get_sql()
     where_str = where_clause and (" WHERE %s" % where_clause) or ''
-    if 'company_id' in self._fields:
-        if len(self.env.companies.ids) > 1:
-            operator = 'in'
-            company = str(tuple(self.env.companies.ids))
-        else:
-            operator = '='
-            company = self.env.companies.ids[0]
-        if where_str == '':
-            add = ' where'
-        else:
-            add = ' and'
-        multicompany_condition = '%s "%s".company_id %s %s' % (add, self._table, operator, company)
-    else:
-        multicompany_condition = ''
+    # if 'company_id' in self._fields:
+    #     if len(self.env.companies.ids) > 1:
+    #         operator = 'in'
+    #         company = str(tuple(self.env.companies.ids))
+    #     else:
+    #         operator = '='
+    #         company = self.env.companies.ids[0]
+    #     if where_str == '':
+    #         add = ' where'
+    #     else:
+    #         add = ' and'
+    #     multicompany_condition = '%s "%s".company_id %s %s' % (add, self._table, operator, company)
+    # else:
+    multicompany_condition = ''
 
     query_str = 'SELECT %s FROM ' % data + from_clause + join + where_str + multicompany_condition + group_by_str
     where_clause_params = map(lambda x: "'" + str(x) + "'", where_clause_params)
 
     return query_str % tuple(where_clause_params)
 
+def get_query_custom(self, args, operation, fields_custom=False, join_custom=False, group_by_custom=False, apply_ir_rules=False):
+    """Dashboard block Query Creation"""
+    query = self._where_calc(args)
+    if apply_ir_rules:
+        self._apply_ir_rules(query, 'read')
+    # if operation and fields_custom and join_custom:
+    #     # if operation != "custom":
+    #     #     data = 'COALESCE(%s("%s".%s),0) AS value' % (operation.upper(), self._table, field.name)
+    #     # else:
+    #     #     #data = 'COALESCE(%s,0) AS value' % field
+    #     data = fields_custom
+    #     join = join_custom
+    #     group_by_str = group_by_custom
+    if not (operation and fields_custom and join_custom):
+        raise Exception("Error, the custom query invalid")
+
+    data = fields_custom
+    from_clause, where_clause, where_clause_params = query.get_sql()
+    from_clause = join_custom
+    where_str = where_clause and (" WHERE %s" % where_clause) or ''
+    group_by_str = group_by_custom or ""
+    # if 'company_id' in self._fields:
+    #     if len(self.env.companies.ids) > 1:
+    #         operator = 'in'
+    #         company = str(tuple(self.env.companies.ids))
+    #     else:
+    #         operator = '='
+    #         company = self.env.companies.ids[0]
+    #     if where_str == '':
+    #         add = ' where'
+    #     else:
+    #         add = ' and'
+    #     multicompany_condition = '%s "%s".company_id %s %s' % (add, self._table, operator, company)
+    # else:
+    # multicompany_condition = ''
+
+    query_str = 'SELECT %s ' % data + from_clause + where_str + group_by_str
+    where_clause_params = map(lambda x: "'" + str(x) + "'", where_clause_params)
+
+    return query_str % tuple(where_clause_params)
 
 models.BaseModel.get_query = get_query
+models.BaseModel.get_query_custom = get_query_custom

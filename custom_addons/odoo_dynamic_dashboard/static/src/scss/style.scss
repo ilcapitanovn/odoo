@@ -8,6 +8,7 @@
 .card-header{
     background-color: transparent;
     border: none;
+    min-height: 55px;
 }
 :root {
             /* Colors */
@@ -62,6 +63,8 @@
         .tile-container {
             padding: 3.2rem 1.5rem;
             border-radius: 2rem;
+            min-height: 150px;
+            text-align: center;
         }
 
         .tile-container__icon-container {
@@ -76,10 +79,12 @@
             font-weight: 500;
             font-size: 1.5rem;
             line-height: 1.5rem;
+            cursor: pointer;
         }
 
         .status-container__figures {
             font-family: var(--primary-font);
+            justify-content: center;
         }
 
         .status-container__figures>h3 {
@@ -91,4 +96,48 @@
         .tile-container__setting-icon {
             top: 0.638rem;
             right: 1rem;
+        }
+        .tile-container__date-range {
+            top: 0.638rem;
+            left: 1rem;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+
+        .chart-container__date-range, .table-container__date-range {
+            opacity: 0.5;
+            font-size: 1rem;
+        }
+
+        .table-container {
+            padding: 3.2rem 1.5rem;
+            border-radius: 2rem;
+            min-height: 150px;
+        }
+
+        .col-header {
+            border-top: 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .col-value {
+            color: #0091ae;
+            font-weight: 600;
+        }
+        .col-value.left {
+            text-align: left;
+        }
+        .col-value.right {
+            text-align: right;
+        }
+
+        .col-total {
+            font-weight: 700;
+        }
+        .col-total.left {
+            text-align: left;
+        }
+        .col-total.right {
+            text-align: right;
         }

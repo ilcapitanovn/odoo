@@ -16,7 +16,7 @@ var DynamicDashboard = AbstractAction.extend({
          'click .add_block': '_onClick_add_block',
          'click .add_grapgh': '_onClick_add_grapgh',
          'click .block_setting': '_onClick_block_setting',
-         'click .tile': '_onClick_tile',
+         'click .title-click': '_onClick_tile',
     },
 
     init: function(parent, context) {
@@ -74,11 +74,17 @@ var DynamicDashboard = AbstractAction.extend({
             data: block['y_axis'],
                     backgroundColor: this.get_colors(block['x_axis']),
                     borderColor: 'rgba(200, 200, 200, 0.75)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    maxBarThickness: 100
                   }]
                 };
 
         var options = {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
                   y: {
                     beginAtZero: true
@@ -171,6 +177,9 @@ var DynamicDashboard = AbstractAction.extend({
                 if (block['type'] == 'tile') {
                     self.$('.o_dynamic_dashboard').append(QWeb.render('DynamicDashboardTile', {widget: block}));
                 }
+                else if (block['type'] == 'table') {
+                    self.$('.o_dynamic_table').append(QWeb.render('DynamicDashboardTable', {widget: block}));
+                }
                 else{
                     self.$('.o_dynamic_chart').append(QWeb.render('DynamicDashboardChart', {widget: block}));
                     var element = $('[data-id=' + block['id'] + ']')
@@ -179,7 +188,13 @@ var DynamicDashboard = AbstractAction.extend({
                     }
                     var ctx =self.$('.chart_graphs').last()
                     var type = block['graph_type']
-                    var chart_type = 'self.get_values_' + `${type}(block)`
+                    var chart_type = 'self.get_values_'
+                    if (!type) {
+                        chart_type += 'line' // default is line chart if type is not set
+                    }
+                    else {
+                        chart_type += `${type}(block)`
+                    }
                     var data = eval(chart_type)
                     console.log(data[1],"dyfjjjjjjjjjjjjjjjjjjjjjjj")
                   //create Chart class object
@@ -243,7 +258,7 @@ var DynamicDashboard = AbstractAction.extend({
     _onClick_tile : function(e){
         e.stopPropagation();
         var self = this;
-        var id = $(e.currentTarget).attr('data-id');
+        var id = $(e.currentTarget).closest('.block').attr('data-id');
         ajax.jsonRpc('/tile/details', 'call', {
            'id': id
         }).then(function (result) {
