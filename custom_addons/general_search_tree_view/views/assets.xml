@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Assets -->
+	<record id="general_search_tree_view.assets_backend_js" model="ir.asset">
+		<field name="name">stickyheader_Theme</field>
+		<field name="bundle">web.assets_backend</field>
+		<field name="path">/general_search_tree_view/static/src/js/list_search.js</field>
+	</record>
+	
+	<record id="general_search_tree_view.assets_backend_css" model="ir.asset">
+		<field name="name">stickyheader_Theme</field>
+		<field name="bundle">web.assets_backend</field>
+		<field name="path">/general_search_tree_view/static/src/css/list_search.css</field>
+	</record>
+</odoo>
