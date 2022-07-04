@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_freight_catalog_airline_search" model="ir.ui.view">
+        <field name="name">freight.catalog.airline.search</field>
+        <field name="model">freight.catalog.airline</field>
+        <field name="arch" type="xml">
+            <search string="Freight Catalog Airline Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="name" filter_domain="[('name', 'ilike', self)]" />
+            </search>
+        </field>
+    </record>
+    <record id="view_freight_catalog_airline_form" model="ir.ui.view">
+        <field name="name">freight.catalog.airline.form</field>
+        <field name="model">freight.catalog.airline</field>
+        <field name="arch" type="xml">
+            <form string="Airlines">
+                <header>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <group name="main_left">
+                            <field name="name" />
+                            <field name="country_id" />
+                            <field name="active" />
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                        <group name="main_right">
+                            <field name="code" />
+                            <field name="icao" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_freight_catalog_airline_tree" model="ir.ui.view">
+        <field name="name">freight.catalog.airline.tree</field>
+        <field name="model">freight.catalog.airline</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+                <field name="country_id" />
+                <field name="icao" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+</odoo>

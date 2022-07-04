@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_freight_catalog_port_search" model="ir.ui.view">
+        <field name="name">freight.catalog.port.search</field>
+        <field name="model">freight.catalog.port</field>
+        <field name="arch" type="xml">
+            <search string="Freight Catalog Port Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="name" filter_domain="[('name', 'ilike', self)]" />
+            </search>
+        </field>
+    </record>
+    <record id="view_freight_catalog_port_form" model="ir.ui.view">
+        <field name="name">freight.catalog.port.form</field>
+        <field name="model">freight.catalog.port</field>
+        <field name="arch" type="xml">
+            <form string="Tags">
+                <header>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <group name="main_left">
+                            <field name="name" />
+                            <field name="country_id"
+                                options="{'no_create': True}"/>
+                            <field name="port_type" />
+                            <field name="active" />
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                        <group name="main_right">
+                            <field name="code" />
+                            <field name="state_ids" widget="many2many_tags" domain="[('country_id', '=', country_id)]" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_freight_catalog_port_tree" model="ir.ui.view">
+        <field name="name">freight.catalog.port.tree</field>
+        <field name="model">freight.catalog.port</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+                <field name="country_id" />
+                <field name="state_ids" />
+                <field name="port_type" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+</odoo>

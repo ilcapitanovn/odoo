@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="0">
+        <record id="group_freight_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_freight_category" />
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        </record>
+        <record id="group_freight_manager" model="res.groups">
+            <field name="name">Freight Manager</field>
+            <field name="category_id" ref="module_freight_category" />
+            <field name="implied_ids" eval="[(4, ref('group_freight_user'))]" />
+            <field
+                name="users"
+                eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+            />
+        </record>
+    </data>
+    <data noupdate="1">
+        <record id="freight_booking_user_rule" model="ir.rule">
+            <field name="name">All Bookings</field>
+            <field ref="model_freight_booking" name="model_id" />
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('group_freight_user'))]" />
+        </record>
+        <!-- Company Rules -->
+        <record id="freight_booking_comp_rule" model="ir.rule">
+            <field name="name">Freight Booking Company Rule</field>
+            <field name="model_id" ref="model_freight_booking" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_airline_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Airline Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_airline" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_container_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Container Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_container" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_incoterm_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Incoterm Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_incoterm" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_port_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Port Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_port" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_stage_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Stage Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_stage" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_catalog_vessel_comp_rule" model="ir.rule">
+            <field name="name">Freight Catalog Vessel Company Rule</field>
+            <field name="model_id" ref="model_freight_catalog_vessel" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

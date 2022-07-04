@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_freight_booking_manager,freight.booking.manager,model_freight_booking,group_freight_manager,1,1,1,1
+access_freight_booking_user,freight.booking.user,model_freight_booking,group_freight_user,1,1,1,0
+access_freight_catalog_stage_manager,freight.catalog.stage.manager,model_freight_catalog_stage,group_freight_manager,1,1,1,1
+access_freight_catalog_stage_user,freight.catalog.stage.user,model_freight_catalog_stage,base.group_user,1,0,0,0
+access_freight_catalog_airline_manager,freight.catalog.airline.manager,model_freight_catalog_airline,group_freight_manager,1,1,1,1
+access_freight_catalog_airline_user,freight.catalog.airline.user,model_freight_catalog_airline,base.group_user,1,0,0,0
+access_freight_catalog_container_manager,freight.catalog.container.manager,model_freight_catalog_container,group_freight_manager,1,1,1,1
+access_freight_catalog_container_user,freight.catalog.container.user,model_freight_catalog_container,base.group_user,1,0,0,0
+access_freight_catalog_incoterm_manager,freight.catalog.incoterm.manager,model_freight_catalog_incoterm,group_freight_manager,1,1,1,1
+access_freight_catalog_incoterm_user,freight.catalog.incoterm.user,model_freight_catalog_incoterm,base.group_user,1,0,0,0
+access_freight_catalog_port_manager,freight.catalog.port.manager,model_freight_catalog_port,group_freight_manager,1,1,1,1
+access_freight_catalog_port_user,freight.catalog.port.user,model_freight_catalog_port,base.group_user,1,0,0,0
+access_freight_catalog_vessel_manager,freight.catalog.vessel.manager,model_freight_catalog_vessel,group_freight_manager,1,1,1,1
+access_freight_catalog_vessel_user,freight.catalog.vessel.user,model_freight_catalog_vessel,base.group_user,1,0,0,0

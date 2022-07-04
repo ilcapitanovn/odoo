@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_freight_catalog_container_search" model="ir.ui.view">
+        <field name="name">freight.catalog.container.search</field>
+        <field name="model">freight.catalog.container</field>
+        <field name="arch" type="xml">
+            <search string="Freight Catalog Container Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="name" filter_domain="[('name', 'ilike', self)]" />
+            </search>
+        </field>
+    </record>
+    <record id="view_freight_catalog_container_form" model="ir.ui.view">
+        <field name="name">freight.catalog.container.form</field>
+        <field name="model">freight.catalog.container</field>
+        <field name="arch" type="xml">
+            <form string="Tags">
+                <header>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <group name="main_left">
+                            <field name="name" />
+                            <field name="size" />
+                            <field name="weight" />
+                            <field name="active" />
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                        <group name="main_right">
+                            <field name="code" />
+                            <field name="volume" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_freight_catalog_container_tree" model="ir.ui.view">
+        <field name="name">freight.catalog.container.tree</field>
+        <field name="model">freight.catalog.container</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+                <field name="size" />
+                <field name="volume" />
+                <field name="weight" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_freight_catalog_vessel_search" model="ir.ui.view">
+        <field name="name">freight.catalog.vessel.search</field>
+        <field name="model">freight.catalog.vessel</field>
+        <field name="arch" type="xml">
+            <search string="Freight Catalog Vessel Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="name" filter_domain="[('name', 'ilike', self)]" />
+            </search>
+        </field>
+    </record>
+    <record id="view_freight_catalog_vessel_form" model="ir.ui.view">
+        <field name="name">freight.catalog.vessel.form</field>
+        <field name="model">freight.catalog.vessel</field>
+        <field name="arch" type="xml">
+            <form string="Tags">
+                <header>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <field name="code" />
+                        <field name="name" />
+                        <field name="country_id" />
+                        <field name="active" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_freight_catalog_vessel_tree" model="ir.ui.view">
+        <field name="name">freight.catalog.vessel.tree</field>
+        <field name="model">freight.catalog.vessel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="name" />
+                <field name="country_id" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+</odoo>

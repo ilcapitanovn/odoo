@@ -1,0 +1,249 @@
+from odoo import _, api, fields, models, tools
+from odoo.exceptions import AccessError
+
+
+class FreightBilling(models.Model):
+    _name = "freight.billing"
+    _description = "Freight Billing"
+    _rec_name = "number"
+    _order = "number desc"
+    _mail_post_access = "read"
+    _inherit = ["mail.thread.cc", "mail.activity.mixin"]
+
+    # ==== Business fields ====
+    state = fields.Selection(selection=[
+        ('draft', 'Draft'),
+        ('posted', 'Posted'),
+        ('cancel', 'Cancelled'),
+    ], string='Status', required=True, readonly=True, copy=False, tracking=True,
+        default='draft')
+
+    number = fields.Char(string="Booking number")
+    name = fields.Char(string="Title", required=True)
+    description = fields.Char(translate=True)
+
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Consignee")
+    partner_name = fields.Char()
+    partner_email = fields.Char(string="Email")
+
+    transport_type = fields.Selection(
+        selection=[("ocean", "Ocean"), ("air", "Air"), ("express", "Express")],
+        string="Transport Type", help='Type of Transport')
+
+    shipment_type = fields.Selection(
+        selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
+                   ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
+        string="Shipment Type", help='Type of Shipment')
+
+    container_id = fields.Many2one(
+        comodel_name="freight.catalog.container", string="Container", tracking=True, index=True
+    )
+    stage_id = fields.Many2one(
+        comodel_name="freight.catalog.stage",
+        string="Stage",
+        group_expand="_read_group_stage_ids",
+        default=_get_default_stage_id,
+        tracking=True,
+        ondelete="restrict",
+        index=True,
+        copy=False,
+    )
+    user_id = fields.Many2one(
+        comodel_name="res.users", string="Assigned user", tracking=True, index=True
+    )
+    port_loading_id = fields.Many2one(
+        comodel_name="freight.catalog.port", string="Loading Port", tracking=True, index=True
+    )
+    port_discharge_id = fields.Many2one(
+        comodel_name="freight.catalog.port", string="Discharge Port", tracking=True, index=True
+    )
+    vessel_id = fields.Many2one(
+        comodel_name="freight.catalog.vessel", string="Vessel", tracking=True, index=True
+    )
+    shipping_line = fields.Char(string="Shipping Line")
+    commodity = fields.Char(string="Commodity")
+    quantity = fields.Integer(string="Quantity")
+    temperature = fields.Char(string="Temperature (C)")
+    ventilation = fields.Char(string="Ventilation")
+    voyage_number = fields.Char(string="Voyage No.")
+    etd = fields.Datetime(string="ETD", store=True, tracking=True)
+    eta = fields.Datetime(string="ETA", store=True, tracking=True)
+
+    last_stage_update = fields.Datetime(default=fields.Datetime.now)
+    closing_time = fields.Datetime(string="Closing Time", store=True, tracking=True)
+    issued_date = fields.Datetime(string="Issued Date", store=True, tracking=True)
+    approved_date = fields.Datetime(string="Approved Date", store=True, tracking=True)
+    completed_date = fields.Datetime(string="Completed Date", store=True, tracking=True)
+    completed = fields.Boolean(related="stage_id.completed")
+
+    company_id = fields.Many2one(
+        comodel_name="res.company",
+        string="Company",
+        required=True,
+        default=lambda self: self.env.company,
+    )
+
+    color = fields.Integer(string="Color Index")
+    kanban_state = fields.Selection(
+        selection=[
+            ("normal", "Default"),
+            ("done", "Ready for next stage"),
+            ("blocked", "Blocked")
+        ],
+    )
+    active = fields.Boolean(default=True)
+
+    def name_get(self):
+        res = []
+        for rec in self:
+            # res.append((rec.id, rec.number + " - " + rec.name))
+            res.append((rec.id, rec.name))
+        return res
+
+    def assign_to_me(self):
+        self.write({"user_id": self.env.user.id})
+
+    @api.onchange("partner_id")
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            self.partner_name = self.partner_id.name
+            self.partner_email = self.partner_id.email
+
+    # @api.onchange("user_id")
+    # def _onchange_dominion_user_id(self):
+    #     if self.user_id: # and self.user_ids:
+    #         self.update({"user_id": False})
+    #         return {"domain": {"user_id": []}}
+    #     # if self.team_id:
+    #     #     return {"domain": {"user_id": [("id", "in", self.user_ids.ids)]}}
+    #     else:
+    #         return {"domain": {"user_id": []}}
+
+    # ---------------------------------------------------
+    # CRUD
+    # ---------------------------------------------------
+
+    @api.model
+    def create(self, vals):
+        if vals.get("number", "/") == "/":
+            vals["number"] = self._prepare_freight_booking_number(vals)
+        return super().create(vals)
+
+    def copy(self, default=None):
+        self.ensure_one()
+        if default is None:
+            default = {}
+        if "number" not in default:
+            default["number"] = self._prepare_freight_booking_number(default)
+        res = super().copy(default)
+        return res
+
+    def write(self, vals):
+        for _ticket in self:
+            now = fields.Datetime.now()
+            if vals.get("stage_id"):
+                stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
+                vals["last_stage_update"] = now
+                if stage.completed:
+                    vals["completed_date"] = now
+            if vals.get("user_id"):
+                vals["issued_date"] = now
+        return super().write(vals)
+
+    def action_duplicate_freight_booking(self):
+        for booking in self.browse(self.env.context["active_ids"]):
+            booking.copy()
+
+    def _prepare_freight_booking_number(self, values):
+        seq = self.env["ir.sequence"]
+        if "company_id" in values:
+            seq = seq.with_company(values["company_id"])
+        return seq.next_by_code("freight.billing.sequence") or "/"
+
+    # ---------------------------------------------------
+    # Mail gateway
+    # ---------------------------------------------------
+
+    def _track_template(self, tracking):
+        res = super()._track_template(tracking)
+        freight_booking = self[0]
+        if "stage_id" in tracking and freight_booking.stage_id.mail_template_id:
+            res["stage_id"] = (
+                freight_booking.stage_id.mail_template_id,
+                {
+                    "auto_delete_message": True,
+                    "subtype_id": self.env["ir.model.data"]._xmlid_to_res_id(
+                        "mail.mt_note"
+                    ),
+                    "email_layout_xmlid": "mail.mail_notification_light",
+                },
+            )
+        return res
+
+    @api.model
+    def message_new(self, msg, custom_values=None):
+        """Override message_new from mail gateway so we can set correct
+        default values.
+        """
+        if custom_values is None:
+            custom_values = {}
+        defaults = {
+            "name": msg.get("subject") or _("No Subject"),
+            "description": msg.get("body"),
+            "partner_email": msg.get("from"),
+            "partner_id": msg.get("author_id"),
+        }
+        defaults.update(custom_values)
+
+        # Write default values coming from msg
+        freight_booking = super().message_new(msg, custom_values=defaults)
+
+        # Use mail gateway tools to search for partners to subscribe
+        email_list = tools.email_split(
+            (msg.get("to") or "") + "," + (msg.get("cc") or "")
+        )
+        partner_ids = [
+            p.id
+            for p in self.env["mail.thread"]._mail_find_partner_from_emails(
+                email_list, records=freight_booking, force_create=False
+            )
+            if p
+        ]
+        freight_booking.message_subscribe(partner_ids)
+
+        return freight_booking
+
+    def message_update(self, msg, update_vals=None):
+        """Override message_update to subscribe partners"""
+        email_list = tools.email_split(
+            (msg.get("to") or "") + "," + (msg.get("cc") or "")
+        )
+        partner_ids = [
+            p.id
+            for p in self.env["mail.thread"]._mail_find_partner_from_emails(
+                email_list, records=self, force_create=False
+            )
+            if p
+        ]
+        self.message_subscribe(partner_ids)
+        return super().message_update(msg, update_vals=update_vals)
+
+    def _message_get_suggested_recipients(self):
+        recipients = super()._message_get_suggested_recipients()
+        try:
+            for booking in self:
+                if booking.partner_id:
+                    booking._message_add_suggested_recipient(
+                        recipients, partner=booking.partner_id, reason=_("Customer")
+                    )
+                elif booking.partner_email:
+                    booking._message_add_suggested_recipient(
+                        recipients,
+                        email=booking.partner_email,
+                        reason=_("Customer Email"),
+                    )
+        except AccessError:
+            # no read access rights -> just ignore suggested recipients because this
+            # imply modifying followers
+            return recipients
+        return recipients

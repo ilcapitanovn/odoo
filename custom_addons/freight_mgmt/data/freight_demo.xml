@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Ports -->
+        <record id="freight_catalog_port_1" model="freight.catalog.port">
+            <field name="code">AEDXB</field>
+            <field name="name">Dubai</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="active">True</field>
+        </record>
+        <record id="freight_catalog_port_2" model="freight.catalog.port">
+            <field name="code">AIAXA</field>
+            <field name="name">Anguilla</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="active">True</field>
+        </record>
+        <record id="freight_catalog_port_3" model="freight.catalog.port">
+            <field name="code">AMEVN</field>
+            <field name="name">Yerevan</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="active">True</field>
+        </record>
+        <!-- Vessels -->
+        <record id="freight_catalog_vessel_1" model="freight.catalog.vessel">
+            <field name="code">8671575</field>
+            <field name="name">Bermuda QUEEN MARY 2</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_vessel_2" model="freight.catalog.vessel">
+            <field name="code">8671572</field>
+            <field name="name">Eclipse</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_vessel_3" model="freight.catalog.vessel">
+            <field name="code">8671573</field>
+            <field name="name">VOYAGE</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_vessel_4" model="freight.catalog.vessel">
+            <field name="code">8671574</field>
+            <field name="name">Wizard</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <!-- Containers -->
+        <record id="freight_catalog_container_1" model="freight.catalog.container">
+            <field name="code">20FTG</field>
+            <field name="name">20FT General</field>
+            <field name="size">20</field>
+            <field name="volume">33</field>
+            <field name="weight">21700</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_container_2" model="freight.catalog.container">
+            <field name="code">20FTHC</field>
+            <field name="name">20FT High Cube</field>
+            <field name="size">20</field>
+            <field name="volume">37</field>
+            <field name="weight">21700</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_container_3" model="freight.catalog.container">
+            <field name="code">40FTG</field>
+            <field name="name">40FT General</field>
+            <field name="size">40</field>
+            <field name="volume">66</field>
+            <field name="weight">26500</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_container_4" model="freight.catalog.container">
+            <field name="code">40FTHC</field>
+            <field name="name">40FT High Cube</field>
+            <field name="size">40</field>
+            <field name="volume">76</field>
+            <field name="weight">26500</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+		<!-- Bookings -->
+        <record id="freight_booking_1" model="freight.booking">
+            <field name="number">ASC0308402</field>
+            <field name="name">CNC NEPTUNE 0HB3SN1NC</field>
+            <field name="description">CNC NEPTUNE 0HB3SN1NC</field>
+            <field name="transport_type">ocean</field>
+            <field name="shipment_type">fcl-exp</field>
+            <field name="commodity">FRESH DRAGON FRUITS</field>
+            <field name="quantity">4</field>
+            <field name="temperature">2C</field>
+            <field name="ventilation">30M3/H</field>
+            <field name="voyage_number">2207N</field>
+            <field name="container_id" ref="freight_catalog_container_1" />
+            <field name="user_id" ref="base.user_root" />
+            <field name="stage_id" ref="freight_catalog_stage_new" />
+            <field name="port_discharge_id" ref="freight_catalog_port_1" />
+            <field name="vessel_id" ref="freight_catalog_vessel_1" />
+        </record>
+        <record id="freight_booking_2" model="freight.booking">
+            <field name="number">ASC0309108</field>
+            <field name="name">NORDPUMA / 0AR52N1NC</field>
+            <field name="description">NORDPUMA / 0AR52N1NC</field>
+            <field name="transport_type">ocean</field>
+            <field name="shipment_type">lcl-exp</field>
+            <field name="commodity">FRESH BANANA</field>
+            <field name="quantity">3</field>
+            <field name="temperature">14C</field>
+            <field name="ventilation">30CBM/H</field>
+            <field name="voyage_number">N028</field>
+            <field name="container_id" ref="freight_catalog_container_2" />
+            <field name="user_id" ref="base.user_root" />
+            <field name="stage_id" ref="freight_catalog_stage_new" />
+            <field name="port_discharge_id" ref="freight_catalog_port_2" />
+            <field name="vessel_id" ref="freight_catalog_vessel_2" />
+        </record>
+    </data>
+</odoo>
