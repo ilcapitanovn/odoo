@@ -13,3 +13,7 @@ access_freight_catalog_port_manager,freight.catalog.port.manager,model_freight_c
 access_freight_catalog_port_user,freight.catalog.port.user,model_freight_catalog_port,base.group_user,1,0,0,0
 access_freight_catalog_vessel_manager,freight.catalog.vessel.manager,model_freight_catalog_vessel,group_freight_manager,1,1,1,1
 access_freight_catalog_vessel_user,freight.catalog.vessel.user,model_freight_catalog_vessel,base.group_user,1,0,0,0
+access_freight_billing_manager,freight.billing.manager,model_freight_billing,group_freight_manager,1,1,1,1
+access_freight_billing_user,freight.billing.user,model_freight_billing,group_freight_user,1,1,1,0
+access_freight_billing_line_manager,freight.billing.line.manager,model_freight_billing_line,group_freight_manager,1,1,1,1
+access_freight_billing_line_user,freight.billing.line.user,model_freight_billing_line,group_freight_user,1,1,1,0

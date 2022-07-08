@@ -255,9 +255,23 @@
         <record id="freight_booking_sequence" model="ir.sequence">
             <field name="name">Freight Booking Sequence</field>
             <field name="code">freight.booking.sequence</field>
-            <field name="prefix">HT</field>
-            <field name="padding">5</field>
+            <field name="prefix">BKNO</field>
+            <field name="padding">3</field>
             <field name="company_id" />
+        </record>
+        <record id="freight_billing_sequence" model="ir.sequence">
+            <field name="name">Freight Billing Sequence</field>
+            <field name="code">freight.billing.sequence</field>
+            <field name="prefix">VITOSGN%(y)s%(month)s</field>
+            <field name="padding">3</field>
+            <field name="number_next">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" />
+        </record>
+        <record id="freight_billing_sequence_date_range" model="ir.sequence.date_range">
+            <field name="date_from">2022-07-01</field>
+            <field name="date_to">2022-07-31</field>
+            <field name="sequence_id" eval="ref('freight_mgmt.freight_billing_sequence')"/>
         </record>
         <!-- Stages -->
         <record id="freight_catalog_stage_new" model="freight.catalog.stage">

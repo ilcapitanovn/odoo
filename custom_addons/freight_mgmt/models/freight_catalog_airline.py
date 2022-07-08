@@ -7,6 +7,7 @@ class FreightCatalogAirline(models.Model):
 
     name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
+    description = fields.Char(translate=True)
     country_id = fields.Many2one('res.country', 'Country', readonly=True)
     icao = fields.Char(string="ICAO")
     active = fields.Boolean(default=True)

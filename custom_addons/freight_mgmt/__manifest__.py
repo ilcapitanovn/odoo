@@ -34,6 +34,7 @@
         "security/freight_security.xml",
         "security/ir.model.access.csv",
         "views/freight_booking_views.xml",
+        "views/freight_billing_views.xml",
         "views/freight_catalog_airline_views.xml",
         "views/freight_catalog_container_views.xml",
         "views/freight_catalog_incoterm_views.xml",
@@ -41,7 +42,8 @@
         "views/freight_catalog_stage_views.xml",
         "views/freight_catalog_vessel_views.xml",
         "views/freight_menu.xml",
-        "views/res_partner_views.xml"
+        "views/res_partner_views.xml",
+        "report/freight_billing_report.xml"
     ],
     'images': ['static/description/banner.png'],
     'license': "AGPL-3",

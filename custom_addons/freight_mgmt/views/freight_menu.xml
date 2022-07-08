@@ -7,6 +7,12 @@
         <field name="res_model">freight.booking</field>
         <field name="view_mode">kanban,tree,form,pivot</field>
     </record>
+    <record id="freight_billing_action" model="ir.actions.act_window">
+        <field name="name">Billings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.billing</field>
+        <field name="view_mode">kanban,tree,form,pivot</field>
+    </record>
     <!--
     <record id="freight_catalog_reporting_action" model="ir.actions.act_window">
         <field name="name">Reporting</field>
@@ -139,7 +145,7 @@
         id="freight_executive_bills_menu"
         name="Bills"
         parent="freight_mgmt_executive_menu"
-        action="freight_booking_action"
+        action="freight_billing_action"
         sequence="15"
     />
 

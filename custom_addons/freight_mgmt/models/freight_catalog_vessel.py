@@ -7,6 +7,7 @@ class FreightCatalogVessel(models.Model):
 
     name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
+    description = fields.Char(translate=True)
     country_id = fields.Many2one('res.country', 'Country', readonly=True)
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(

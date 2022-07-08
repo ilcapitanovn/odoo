@@ -1,4 +1,6 @@
 from . import freight_booking
+from . import freight_billing
+from . import freight_billing_line
 from . import freight_catalog_airline
 from . import freight_catalog_container
 from . import freight_catalog_incoterm

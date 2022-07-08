@@ -7,6 +7,7 @@ class FreightCatalogContainer(models.Model):
 
     name = fields.Char()
     code = fields.Char(required=True)
+    description = fields.Char(translate=True)
     size = fields.Integer(string="Size (ft)")
     volume = fields.Integer(string="Volume (cbm)")
     weight = fields.Integer(string="Weight (kg)")

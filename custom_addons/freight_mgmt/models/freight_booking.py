@@ -166,18 +166,18 @@ class FreightBooking(models.Model):
 
     def _track_template(self, tracking):
         res = super()._track_template(tracking)
-        freight_booking = self[0]
-        if "stage_id" in tracking and freight_booking.stage_id.mail_template_id:
-            res["stage_id"] = (
-                freight_booking.stage_id.mail_template_id,
-                {
-                    "auto_delete_message": True,
-                    "subtype_id": self.env["ir.model.data"]._xmlid_to_res_id(
-                        "mail.mt_note"
-                    ),
-                    "email_layout_xmlid": "mail.mail_notification_light",
-                },
-            )
+        # freight_booking = self[0]
+        # if "stage_id" in tracking and freight_booking.stage_id.mail_template_id:
+        #     res["stage_id"] = (
+        #         freight_booking.stage_id.mail_template_id,
+        #         {
+        #             "auto_delete_message": True,
+        #             "subtype_id": self.env["ir.model.data"]._xmlid_to_res_id(
+        #                 "mail.mt_note"
+        #             ),
+        #             "email_layout_xmlid": "mail.mail_notification_light",
+        #         },
+        #     )
         return res
 
     @api.model

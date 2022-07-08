@@ -40,6 +40,13 @@
                             <field name="state_ids" widget="many2many_tags" domain="[('country_id', '=', country_id)]" />
                         </group>
                     </group>
+                    <group>
+                        <notebook>
+                            <page string="Description" name="description">
+                                <field name="description" widget="html" />
+                            </page>
+                        </notebook>
+                    </group>
                 </sheet>
             </form>
         </field>

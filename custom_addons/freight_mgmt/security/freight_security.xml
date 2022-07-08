@@ -23,10 +23,32 @@
             <field name="domain_force">[(1,'=',1)]</field>
             <field name="groups" eval="[(4, ref('group_freight_user'))]" />
         </record>
+        <record id="freight_billing_user_rule" model="ir.rule">
+            <field name="name">All Billings</field>
+            <field ref="model_freight_billing" name="model_id" />
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('group_freight_user'))]" />
+        </record>
         <!-- Company Rules -->
         <record id="freight_booking_comp_rule" model="ir.rule">
             <field name="name">Freight Booking Company Rule</field>
             <field name="model_id" ref="model_freight_booking" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_billing_comp_rule" model="ir.rule">
+            <field name="name">Freight Billing Company Rule</field>
+            <field name="model_id" ref="model_freight_billing" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_billing_line_comp_rule" model="ir.rule">
+            <field name="name">Freight Billing Line Company Rule</field>
+            <field name="model_id" ref="model_freight_billing_line" />
             <field name="global" eval="True" />
             <field
                 name="domain_force"
