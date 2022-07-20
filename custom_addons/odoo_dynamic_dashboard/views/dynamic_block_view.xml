@@ -14,16 +14,17 @@
                     </group>
                     <group>
                         <group>
-                            <field name="model_id" attrs="{'required':[('edit_mode','=', True)]}"/>
+                            <field name="model_id" groups="base.group_no_one" attrs="{'required':[('edit_mode','=', True)]}"/>
                             <field name="client_action" invisible="1"/>
                             <field name="model_name" invisible="1"/>
                             <field name="edit_mode" invisible="1"/>
-                            <field name="operation" attrs="{'required':[('edit_mode','=', True)]}"/>
-                            <field name="measured_field" domain="[('model_id','=',model_id), ('ttype','!=','one2many'), ('store', '=', True)]"
+                            <field name="operation" groups="base.group_no_one" attrs="{'required':[('edit_mode','=', True)]}"/>
+                            <field name="measured_field" groups="base.group_no_one" domain="[('model_id','=',model_id), ('ttype','!=','one2many'), ('store', '=', True)]"
                                    attrs="{'required':[('edit_mode','=', True)]}"/>
-                            <field name="x_measured_custom" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
-                            <field name="x_join_custom" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
-                            <field name="filter" widget="domain" options="{'model': 'model_name'}"/>
+                            <field name="x_measured_custom" groups="base.group_no_one" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
+                            <field name="x_join_custom" groups="base.group_no_one" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
+                            <field name="filter" groups="base.group_no_one" widget="domain" options="{'model': 'model_name'}"/>
+                            <field name="date_field" groups="base.group_no_one"/>
                             <field name="x_date_range"/>
                             <field name="x_compared_to" attrs="{'invisible': [('type', 'not in', 'tile')]}"/>
                         </group>
@@ -31,17 +32,17 @@
                     <group string="Block Information">
                         <group>
                             <field name="sequence" invisible="1"/>
-                            <field name="type" required="1"/>
+                            <field name="type" groups="base.group_no_one" required="1"/>
                             <field name="graph_type" attrs="{'invisible': [('type','not in', 'graph')]}"/>
                             <field name="graph_size" attrs="{'invisible': [('type','not in', ['graph','table'])]}"/>
                             <field name="fa_icon" attrs="{'invisible': [('type','not in', 'tile')]}"/>
-                            <field name="group_by" attrs="{'invisible': [('type','not in', 'graph')], 'required':[('edit_mode','=', True),('type','=','graph')]}"
+                            <field name="group_by" groups="base.group_no_one" attrs="{'invisible': [('type','not in', 'graph')], 'required':[('edit_mode','=', True),('type','=','graph')]}"
                                    domain="[('model_id','=',model_id), ('ttype','!=','one2many'), ('store', '=', True)]"/>
                             <field name="tile_color" attrs="{'invisible': [('type','not in', 'tile')]}"
                                    widget="color"/>
                             <field name="text_color" attrs="{'invisible': [('type','not in', 'tile')]}"
                                    widget="color"/>
-                            <field name="x_group_by" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
+                            <field name="x_group_by" groups="base.group_no_one" attrs="{'invisible': [('operation', '!=', 'custom')]}"/>
                         </group>
                     </group>
                 </sheet>

@@ -68,6 +68,7 @@ class DashboardBlock(models.Model):
     text_color = fields.Char(string="Text Color", help='Text Color of Tile')
     fa_color = fields.Char(string="Icon Color", help='Icon Color of Tile')
     filter = fields.Char(string="Filter")
+    date_field = fields.Char(string="Date field")
     x_date_range = fields.Selection(
         selection=[("all", "All data"), ("today", "Today"), ("yesterday", "Yesterday"), ("this_week", "This week"),
                    ("last_week", "Last week"), ("next_week", "Next week"), ("this_month", "This month"), ("last_month", "Last month"),
@@ -86,16 +87,21 @@ class DashboardBlock(models.Model):
     sequence = fields.Integer(string="Sequence")
     edit_mode = fields.Boolean(default=False, invisible=True)
 
+    active = fields.Boolean(default=True)
+
     def get_comparison_field(self, param_rec):
         result = ""
-        if param_rec.model_name == "crm.lead":
-            result = "date_deadline"
-        elif param_rec.model_name == "res.partner":
-            result = "create_date"
-        elif param_rec.model_name == "mail.activity":
-            result = "date_deadline"
-        elif param_rec.model_name == "sale.order":
-            result = "date_order"
+        if param_rec.date_field:
+            result = param_rec.date_field
+        else:
+            if param_rec.model_name == "crm.lead":
+                result = "date_deadline"
+            elif param_rec.model_name == "res.partner":
+                result = "create_date"
+            elif param_rec.model_name == "mail.activity":
+                result = "date_deadline"
+            elif param_rec.model_name == "sale.order":
+                result = "date_order"
 
         return result
 

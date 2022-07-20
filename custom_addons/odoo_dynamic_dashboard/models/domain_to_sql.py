@@ -94,7 +94,7 @@ def get_query_custom(self, args, operation, fields_custom=False, join_custom=Fal
     from_clause, where_clause, where_clause_params = query.get_sql()
     from_clause = join_custom
     where_str = where_clause and (" WHERE %s" % where_clause) or ''
-    group_by_str = group_by_custom or ""
+    group_by_str = " " + group_by_custom or " "
     # if 'company_id' in self._fields:
     #     if len(self.env.companies.ids) > 1:
     #         operator = 'in'
