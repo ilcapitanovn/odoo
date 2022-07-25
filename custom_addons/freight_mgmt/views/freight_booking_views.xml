@@ -40,34 +40,34 @@
                     domain="[('message_is_follower', '=', True)]"
                 />
                 <separator />
-                <filter
-                    name="last_week"
-                    string="Last Week"
-                    domain="[('create_date','&gt;', (context_today() - datetime.timedelta(weeks=1)).strftime('%%Y-%%m-%%d') )]"
-                />
-                <separator />
-                <filter
-                    string="My Activities"
-                    name="activities_my"
-                    domain="[('activity_ids.user_id', '=', uid)]"
-                />
-                <filter
-                    string="Late Activities"
-                    name="activities_overdue"
-                    domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                    help="Show all records which has next action date is before today"
-                />
-                <filter
-                    string="Today Activities"
-                    name="activities_today"
-                    domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"
-                />
-                <filter
-                    string="Future Activities"
-                    name="activities_upcoming_all"
-                    domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
-                  ]"
-                />
+<!--                <filter-->
+<!--                    name="last_week"-->
+<!--                    string="Last Week"-->
+<!--                    domain="[('create_date','&gt;', (context_today() - datetime.timedelta(weeks=1)).strftime('%%Y-%%m-%%d') )]"-->
+<!--                />-->
+<!--                <separator />-->
+<!--                <filter-->
+<!--                    string="My Activities"-->
+<!--                    name="activities_my"-->
+<!--                    domain="[('activity_ids.user_id', '=', uid)]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="Late Activities"-->
+<!--                    name="activities_overdue"-->
+<!--                    domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"-->
+<!--                    help="Show all records which has next action date is before today"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="Today Activities"-->
+<!--                    name="activities_today"-->
+<!--                    domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="Future Activities"-->
+<!--                    name="activities_upcoming_all"-->
+<!--                    domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))-->
+<!--                  ]"-->
+<!--                />-->
                 <group expand="0" string="Group By">
                     <!--
                     <filter
@@ -105,12 +105,12 @@
         <field name="arch" type="xml">
             <form string="Freight Booking">
                 <header>
-                    <button
-                        string="Assign to me"
-                        name="assign_to_me"
-                        type="object"
-                        attrs="{'invisible' : [('user_id', '!=', False)]}"
-                    />
+<!--                    <button-->
+<!--                        string="Assign to me"-->
+<!--                        name="assign_to_me"-->
+<!--                        type="object"-->
+<!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
+<!--                    />-->
                     <field
                         name="stage_id"
                         widget="statusbar"
@@ -139,26 +139,16 @@
                             <field name="active" invisible="1" />
                             <field name="transport_type" />
                             <field name="user_id" />
-                            <field name="port_loading_id" />
                             <field
                                 name="company_id"
                                 options="{'no_create': True}"
                                 groups="base.group_multi_company"
                             />
-                            <field name="vessel_id" />
-                            <field name="shipping_line" />
-                            <field name="commodity" />
-                            <field name="quantity" />
-                            <field name="create_date" readonly="1" />
+                            <field name="create_date" readonly="1" attrs="{'invisible' : [('create_date', '=', False)]}" />
                         </group>
                         <group>
                             <field name="shipment_type" />
                             <field name="partner_id" />
-                            <field name="port_discharge_id" />
-                            <field name="etd"/>
-                            <field name="voyage_number" />
-                            <field name="temperature"/>
-                            <field name="ventilation" />
                         </group>
                     </group>
                     <group>
@@ -166,11 +156,40 @@
                             <page string="Description" name="description">
                                 <field name="description" widget="html" />
                             </page>
+                            <page string="Routing &amp; Vessel" name="routing_vessel">
+                                <group colspan="2">
+                                    <group>
+                                        <field name="port_loading_id" />
+                                        <field name="port_discharge_id" />
+                                        <field name="vessel_id" />
+                                    </group>
+                                    <group>
+                                        <field name="closing_time"/>
+                                        <field name="etd"/>
+                                        <field name="eta"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Cargo Details" name="cargo_details">
+                                <group colspan="2">
+                                    <group>
+                                        <field name="commodity" />
+                                        <field name="quantity" />
+                                        <field name="gross_weight" />
+                                        <field name="shipping_line" />
+                                    </group>
+                                    <group>
+                                        <field name="voyage_number" />
+                                        <field name="temperature"/>
+                                        <field name="ventilation" />
+                                    </group>
+                                </group>
+                            </page>
                             <page string="Other Information" name="other_info">
                                 <group>
                                     <field name="last_stage_update" readonly="1" />
-                                    <field name="issued_date" readonly="1" />
-                                    <field name="approved_date" readonly="1" />
+                                    <field name="issued_date" />
+                                    <field name="approved_date" />
                                 </group>
                             </page>
                         </notebook>
@@ -195,12 +214,12 @@
             <tree>
                 <field name="number" />
                 <field name="name" />
-                <field name="transport_type" />
-                <field name="shipment_type" />
+<!--                <field name="transport_type" />-->
+<!--                <field name="shipment_type" />-->
                 <field name="user_id" />
-                <field name="stage_id" />
                 <field name="port_discharge_id" />
                 <field name="vessel_id" />
+                <field name="stage_id" />
                 <field name="last_stage_update" />
             </tree>
         </field>
@@ -325,12 +344,12 @@
             action = model.action_duplicate_freight_booking()
         </field>
     </record>
-    <record id="model_freight_booking_action_share" model="ir.actions.server">
-        <field name="name">Share</field>
-        <field name="model_id" ref="freight_mgmt.model_freight_booking" />
-        <field name="binding_model_id" ref="freight_mgmt.model_freight_booking" />
-        <field name="binding_view_types">form</field>
-        <field name="state">code</field>
-        <field name="code">action = records.action_share()</field>
-    </record>
+<!--    <record id="model_freight_booking_action_share" model="ir.actions.server">-->
+<!--        <field name="name">Share</field>-->
+<!--        <field name="model_id" ref="freight_mgmt.model_freight_booking" />-->
+<!--        <field name="binding_model_id" ref="freight_mgmt.model_freight_booking" />-->
+<!--        <field name="binding_view_types">form</field>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">action = records.action_share()</field>-->
+<!--    </record>-->
 </odoo>

@@ -8,7 +8,7 @@ class FreightCatalogPort(models.Model):
     name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
     description = fields.Char(translate=True)
-    country_id = fields.Many2one('res.country', 'Country', readonly=True)
+    country_id = fields.Many2one('res.country', 'Country')
     state_ids = fields.Many2many('res.country.state', string='Federal States')
     port_type = fields.Selection(
         selection=[("air", "Air"), ("ocean", "Ocean")],

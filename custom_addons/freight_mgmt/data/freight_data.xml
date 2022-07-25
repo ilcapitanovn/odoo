@@ -280,15 +280,15 @@
             <field name="completed">False</field>
             <field name="company_id" />
         </record>
-        <record id="freight_catalog_stage_in_progress" model="freight.catalog.stage">
+        <record id="freight_catalog_stage_awaiting" model="freight.catalog.stage">
             <field name="sequence">2</field>
-            <field name="name">Approved</field>
+            <field name="name">Submitted</field>
             <field name="completed">False</field>
             <field name="company_id" />
         </record>
-        <record id="freight_catalog_stage_awaiting" model="freight.catalog.stage">
+        <record id="freight_catalog_stage_in_progress" model="freight.catalog.stage">
             <field name="sequence">3</field>
-            <field name="name">Submitted</field>
+            <field name="name">Confirmed</field>
             <field name="completed">False</field>
             <field name="company_id" />
         </record>

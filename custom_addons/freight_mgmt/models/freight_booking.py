@@ -22,7 +22,9 @@ class FreightBooking(models.Model):
     name = fields.Char(string="Title", required=True)
     description = fields.Char(translate=True)
 
-    partner_id = fields.Many2one(comodel_name="res.partner", string="Consignee")
+    partner_id = fields.Many2one(comodel_name="res.partner",
+                                 domain=[("category_id.name", "=", "Consignee")],
+                                 string="Consignee")
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
 
@@ -64,15 +66,16 @@ class FreightBooking(models.Model):
     commodity = fields.Char(string="Commodity")
     quantity = fields.Integer(string="Quantity")
     temperature = fields.Char(string="Temperature (C)")
-    ventilation = fields.Char(string="Ventilation")
+    ventilation = fields.Char(string="Ventilation (CBM/H)")
     voyage_number = fields.Char(string="Voyage No.")
-    etd = fields.Datetime(string="ETD", store=True, tracking=True)
-    eta = fields.Datetime(string="ETA", store=True, tracking=True)
+    gross_weight = fields.Float(string='Gross Weight (KGS)')
+    etd = fields.Datetime(string="Est. Time Departure", store=True, tracking=True)
+    eta = fields.Datetime(string="Est. Time Arrival", store=True, tracking=True)
 
     last_stage_update = fields.Datetime(default=fields.Datetime.now)
-    closing_time = fields.Datetime(string="Closing Time", store=True, tracking=True)
+    closing_time = fields.Datetime(string="SI Cut Off Time", store=True, tracking=True)
     issued_date = fields.Datetime(string="Issued Date", store=True, tracking=True)
-    approved_date = fields.Datetime(string="Approved Date", store=True, tracking=True)
+    approved_date = fields.Datetime(string="Confirmed Date", store=True, tracking=True)
     completed_date = fields.Datetime(string="Completed Date", store=True, tracking=True)
     completed = fields.Boolean(related="stage_id.completed")
 

@@ -121,8 +121,7 @@ class FreightBilling(models.Model):
         ('draft', 'Draft'),
         ('posted', 'Posted'),
         ('cancel', 'Cancelled'),
-    ], string='Status', required=True, readonly=True, copy=False, tracking=True,
-        default='draft')
+    ], string='Status', copy=False, tracking=True, default='draft', group_expand='_expand_states')
 
     color = fields.Integer(string="Color Index")
     kanban_state = fields.Selection(
@@ -231,6 +230,16 @@ class FreightBilling(models.Model):
         # if self.journal_id.refund_sequence and self.move_type in ('out_refund', 'in_refund'):
         #     starting_sequence = "R" + starting_sequence
         return starting_sequence
+
+    def _expand_states(self, states, domain, order):
+        return [key for key, dummy in type(self).state.selection]
+
+    @api.onchange("booking_id")
+    def _onchange_booking_id(self):
+        if self.booking_id:
+            self.port_loading_id = self.booking_id.port_loading_id
+            self.port_discharge_id = self.booking_id.port_discharge_id
+            self.vessel_id = self.booking_id.vessel_id
 
     @api.onchange("shipper_id")
     def _onchange_shipper_id(self):

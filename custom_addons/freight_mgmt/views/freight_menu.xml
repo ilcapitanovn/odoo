@@ -5,13 +5,13 @@
         <field name="name">Bookings</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.booking</field>
-        <field name="view_mode">kanban,tree,form,pivot</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
     </record>
     <record id="freight_billing_action" model="ir.actions.act_window">
-        <field name="name">Billings</field>
+        <field name="name">Bills</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.billing</field>
-        <field name="view_mode">kanban,tree,form,pivot</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
     </record>
     <!--
     <record id="freight_catalog_reporting_action" model="ir.actions.act_window">

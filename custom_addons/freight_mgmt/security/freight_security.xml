@@ -24,7 +24,7 @@
             <field name="groups" eval="[(4, ref('group_freight_user'))]" />
         </record>
         <record id="freight_billing_user_rule" model="ir.rule">
-            <field name="name">All Billings</field>
+            <field name="name">All Bills</field>
             <field ref="model_freight_billing" name="model_id" />
             <field name="domain_force">[(1,'=',1)]</field>
             <field name="groups" eval="[(4, ref('group_freight_user'))]" />

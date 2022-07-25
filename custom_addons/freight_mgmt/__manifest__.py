@@ -43,8 +43,14 @@
         "views/freight_catalog_vessel_views.xml",
         "views/freight_menu.xml",
         "views/res_partner_views.xml",
+        "report/report_paperformat.xml",
         "report/freight_billing_report.xml"
     ],
+    "assets": {
+        'web.assets_backend': [
+            'freight_mgmt/static/src/scss/freight_mgmt.scss',
+        ]
+    },
     'images': ['static/description/banner.png'],
     'license': "AGPL-3",
     'installable': True,

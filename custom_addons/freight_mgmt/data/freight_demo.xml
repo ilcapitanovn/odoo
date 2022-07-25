@@ -3,20 +3,20 @@
     <data noupdate="1">
         <!-- Ports -->
         <record id="freight_catalog_port_1" model="freight.catalog.port">
-            <field name="code">AEDXB</field>
-            <field name="name">Dubai</field>
+            <field name="code">HCMP</field>
+            <field name="name">HO CHI MINH PORT, VIETNAM</field>
             <field name="company_id" ref="base.main_company" />
             <field name="active">True</field>
         </record>
         <record id="freight_catalog_port_2" model="freight.catalog.port">
-            <field name="code">AIAXA</field>
-            <field name="name">Anguilla</field>
+            <field name="code">KWPS</field>
+            <field name="name">KWANGYANG PORT, SOUTH KOREA</field>
             <field name="company_id" ref="base.main_company" />
             <field name="active">True</field>
         </record>
         <record id="freight_catalog_port_3" model="freight.catalog.port">
-            <field name="code">AMEVN</field>
-            <field name="name">Yerevan</field>
+            <field name="code">SHPC</field>
+            <field name="name">SHANGHAI PORT, CHINA</field>
             <field name="company_id" ref="base.main_company" />
             <field name="active">True</field>
         </record>
@@ -42,6 +42,12 @@
         <record id="freight_catalog_vessel_4" model="freight.catalog.vessel">
             <field name="code">8671574</field>
             <field name="name">Wizard</field>
+            <field name="active">True</field>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+        <record id="freight_catalog_vessel_5" model="freight.catalog.vessel">
+            <field name="code">8671575</field>
+            <field name="name">KMTC PUSAN 2112N</field>
             <field name="active">True</field>
             <field name="company_id" ref="base.main_company" />
         </record>
