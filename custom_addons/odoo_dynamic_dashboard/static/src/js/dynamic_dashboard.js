@@ -80,15 +80,23 @@ var DynamicDashboard = AbstractAction.extend({
                 };
 
         var options = {
-                plugins: {
+                plugins: {      // Chart v3.0+
                     legend: {
                         display: false
                     }
                 },
+                legend: {       // Chart v2.0
+                    display: false
+                },
                 scales: {
-                  y: {
-                    beginAtZero: true
-                  }
+                    y: {    // Chart v3.0+
+                        beginAtZero: true
+                    },
+                    yAxes: [{   // Chart v2.0
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
                 }
             },
         bar_data = [data,options]
@@ -262,13 +270,19 @@ var DynamicDashboard = AbstractAction.extend({
         ajax.jsonRpc('/tile/details', 'call', {
            'id': id
         }).then(function (result) {
+
+                var domain_filter = result['filter'];
+                if (result['date_range']) {
+                    domain_filter = result['date_range'].replace(/\(/g,'[').replace(/\)/g,']');
+                }
+
                 self.do_action({
                 name : result['model_name'],
                 type: 'ir.actions.act_window',
                 res_model:result['model'] ,
                 view_mode: 'tree,form',
                 views: [[false, 'list'], [false, 'form']],
-                domain: result['filter']
+                domain: domain_filter
                 });
         });
     },

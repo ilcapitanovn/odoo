@@ -51,5 +51,7 @@ class DynamicDashboard(http.Controller):
         tile_id = request.env['dashboard.block'].sudo().search([('id', '=', kw.get('id'))])
         if tile_id:
             # model_name = dict(request.env['dashboard.block'].fields_get(allfields=['model_id'])['model_id']['selection'])[tile_id.model_id]
-            return {'model': tile_id.model_id.model, 'filter': tile_id.filter, 'model_name': tile_id.model_id.name}
+            filter_field = request.env['dashboard.block'].get_comparison_field(tile_id.date_field, tile_id.model_name)
+            dic_date_range = request.env['dashboard.block'].get_date_range_filter(tile_id.x_date_range, filter_field)
+            return {'model': tile_id.model_id.model, 'filter': tile_id.filter, 'date_range': str(dic_date_range['filter_conditions']), 'model_name': tile_id.model_id.name}
         return False

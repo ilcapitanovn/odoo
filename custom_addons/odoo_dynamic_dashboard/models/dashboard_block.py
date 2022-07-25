@@ -89,23 +89,23 @@ class DashboardBlock(models.Model):
 
     active = fields.Boolean(default=True)
 
-    def get_comparison_field(self, param_rec):
+    def get_comparison_field(self, date_field, model_name):
         result = ""
-        if param_rec.date_field:
-            result = param_rec.date_field
+        if date_field:
+            result = date_field
         else:
-            if param_rec.model_name == "crm.lead":
+            if model_name == "crm.lead":
                 result = "date_deadline"
-            elif param_rec.model_name == "res.partner":
+            elif model_name == "res.partner":
                 result = "create_date"
-            elif param_rec.model_name == "mail.activity":
+            elif model_name == "mail.activity":
                 result = "date_deadline"
-            elif param_rec.model_name == "sale.order":
+            elif model_name == "sale.order":
                 result = "date_order"
 
         return result
 
-    def get_date_range_filter(self, param_rec, filter_field):
+    def get_date_range_filter(self, x_date_range, filter_field):
         dic_date_range = {
             "from_date": "",
             "to_date": "",
@@ -116,75 +116,75 @@ class DashboardBlock(models.Model):
 
         from_date = to_date = ""
         new_conditions = []
-        if param_rec.x_date_range == "today":
+        if x_date_range == "today":
             from_date = to_date = today.strftime('%Y-%m-%d 00:00:00')
             new_conditions = [(filter_field, '=', from_date)]
 
-        elif param_rec.x_date_range == "yesterday":
+        elif x_date_range == "yesterday":
             from_date = to_date = (today - relativedelta(days=1)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = [(filter_field, '=', from_date)]
 
-        elif param_rec.x_date_range == "this_week":
+        elif x_date_range == "this_week":
             from_date = (today + relativedelta(weeks=-1, days=1, weekday=0)).strftime('%Y-%m-%d 00:00:00')
             to_date = (today + relativedelta(weekday=6)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<=', to_date)]
 
-        elif param_rec.x_date_range == "last_week":
+        elif x_date_range == "last_week":
             from_date = (today + relativedelta(weeks=-2, days=1, weekday=0)).strftime('%Y-%m-%d 00:00:00')
             to_date = (today + relativedelta(weeks=-1, weekday=6)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<=', to_date)]
 
-        elif param_rec.x_date_range == "next_week":
+        elif x_date_range == "next_week":
             from_date = (today + relativedelta(weeks=0, days=1, weekday=0)).strftime('%Y-%m-%d 00:00:00')
             to_date = (today + relativedelta(weeks=1, weekday=6)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<=', to_date)]
 
-        elif param_rec.x_date_range == "this_month":
+        elif x_date_range == "this_month":
             from_date = (today + relativedelta(day=1)).strftime('%Y-%m-%d 00:00:00')
             to_date = (today + relativedelta(day=31)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<=', to_date)]
 
-        elif param_rec.x_date_range == "last_month":
+        elif x_date_range == "last_month":
             from_date = (today - relativedelta(months=1)).strftime('%Y-%m-01 00:00:00')
             to_date = today.strftime('%Y-%m-01 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "next_month":
+        elif x_date_range == "next_month":
             from_date = (today + relativedelta(months=1)).strftime('%Y-%m-01 00:00:00')
             to_date = (today + relativedelta(months=2)).strftime('%Y-%m-01 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "this_quarter":
+        elif x_date_range == "this_quarter":
             current_quarter = int((today.month - 1) / 3 + 1)
             from_date = datetime.datetime(today.year, 3 * current_quarter - 2, 1).strftime('%Y-%m-%d 00:00:00')
             to_date = (from_date + relativedelta(months=3)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "last_quarter":
+        elif x_date_range == "last_quarter":
             previous_3_months = today - relativedelta(months=3)
             last_quarter = int((previous_3_months.month - 1) / 3 + 1)
             from_date = datetime.datetime(previous_3_months.year, 3 * last_quarter - 2, 1)
             to_date = (from_date + relativedelta(months=3)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date.strftime('%Y-%m-%d 00:00:00')), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "next_quarter":
+        elif x_date_range == "next_quarter":
             next_3_months = today + relativedelta(months=3)
             next_quarter = int((next_3_months.month - 1) / 3 + 1)
             from_date = datetime.datetime(next_3_months.year, 3 * next_quarter - 2, 1)
             to_date = (from_date + relativedelta(months=3)).strftime('%Y-%m-%d 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date.strftime('%Y-%m-%d 00:00:00')), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "this_year":
+        elif x_date_range == "this_year":
             from_date = today.strftime('%Y-01-01 00:00:00')
             to_date = (today + relativedelta(years=1)).strftime('%Y-01-01 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "last_year":
+        elif x_date_range == "last_year":
             from_date = (today - relativedelta(years=1)).strftime('%Y-01-01 00:00:00')
             to_date = today.strftime('%Y-01-01 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
 
-        elif param_rec.x_date_range == "next_year":
+        elif x_date_range == "next_year":
             from_date = (today + relativedelta(years=1)).strftime('%Y-01-01 00:00:00')
             to_date = (today + relativedelta(years=2)).strftime('%Y-01-01 00:00:00')
             new_conditions = ['&', (filter_field, '>=', from_date), (filter_field, '<', to_date)]
@@ -201,7 +201,7 @@ class DashboardBlock(models.Model):
     def append_date_range_filter(self, domain, param_rec):
         updated_domain = domain
         if param_rec.x_date_range and param_rec.x_date_range != "all":
-            filter_field = self.get_comparison_field(param_rec)
+            filter_field = self.get_comparison_field(param_rec.date_field, param_rec.model_name)
             if not filter_field:
                 return updated_domain
             # else:
@@ -213,7 +213,7 @@ class DashboardBlock(models.Model):
             #sprint = '%s of from_date = %s and to_date = %s' % param_rec.x_date_range, from_date, to_date
             #print(sprint)
 
-            dic_date_range = self.get_date_range_filter(param_rec, filter_field)
+            dic_date_range = self.get_date_range_filter(param_rec.x_date_range, filter_field)
             new_conditions = dic_date_range["filter_conditions"]
 
             if new_conditions:
@@ -229,7 +229,7 @@ class DashboardBlock(models.Model):
 
         today = fields.Date.context_today(self)
 
-        filter_field = self.get_comparison_field(param_rec)
+        filter_field = self.get_comparison_field(param_rec.date_field, param_rec.model_name)
         if not filter_field:
             return previous_domain
         # else:
@@ -239,7 +239,7 @@ class DashboardBlock(models.Model):
         if not param_rec.x_compared_to:
             return previous_domain
 
-        dic_date_range = self.get_date_range_filter(param_rec, filter_field)
+        dic_date_range = self.get_date_range_filter(param_rec.x_date_range, filter_field)
         from_date = to_date = today
         if dic_date_range["from_date"] and dic_date_range["to_date"]:
             try:
