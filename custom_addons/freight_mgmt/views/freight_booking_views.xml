@@ -105,12 +105,17 @@
         <field name="arch" type="xml">
             <form string="Freight Booking">
                 <header>
+                    <field name="billing_id" invisible='1'/>
 <!--                    <button-->
 <!--                        string="Assign to me"-->
 <!--                        name="assign_to_me"-->
 <!--                        type="object"-->
 <!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
 <!--                    />-->
+                    <button name="create_bill_lading" string="Create B/L" class="oe_highlight"
+                            type="object" data-hotkey="b"
+                            attrs="{'invisible': [('billing_id', '=', False)]}"/>
+
                     <field
                         name="stage_id"
                         widget="statusbar"
@@ -128,27 +133,28 @@
                     </div>
                     <div class="oe_title">
                         <h1 class="oe_title">
-                            <field name="name" placeholder="Title..." />
+                            <field name="number" />
                         </h1>
-                        <h2 class="o_row">
-                            <field name="number" placeholder="Booking number..." />
-                        </h2>
                     </div>
                     <group name="main">
                         <group>
                             <field name="active" invisible="1" />
-                            <field name="transport_type" />
+                            <field name="booking_type" widget="radio" options="{'horizontal': True}" />
+                            <field name="order_id" options="{'no_create': True, 'no_create_edit': True}" />
                             <field name="user_id" />
+                            <field name="partner_id" />
                             <field
                                 name="company_id"
                                 options="{'no_create': True}"
                                 groups="base.group_multi_company"
                             />
-                            <field name="create_date" readonly="1" attrs="{'invisible' : [('create_date', '=', False)]}" />
                         </group>
                         <group>
+                            <field name="vessel_booking_number" />
+                            <field name="vessel_bol_number" />
+                            <field name="transport_type" />
                             <field name="shipment_type" />
-                            <field name="partner_id" />
+                            <field name="create_date" readonly="1" attrs="{'invisible' : [('create_date', '=', False)]}" />
                         </group>
                     </group>
                     <group>
@@ -166,6 +172,7 @@
                                     <group>
                                         <field name="closing_time"/>
                                         <field name="etd"/>
+                                        <field name="etd_revised"/>
                                         <field name="eta"/>
                                     </group>
                                 </group>
@@ -182,6 +189,7 @@
                                         <field name="voyage_number" />
                                         <field name="temperature"/>
                                         <field name="ventilation" />
+                                        <field name="ro" />
                                     </group>
                                 </group>
                             </page>
@@ -211,16 +219,28 @@
         <field name="name">freight.booking.view.tree</field>
         <field name="model">freight.booking</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name="number" />
-                <field name="name" />
+            <tree class="o_booking_tree">
+                <field name="number" string="SHPTMT NO" decoration-bf="1" decoration-info="1" />
+<!--                <field name="name" />-->
 <!--                <field name="transport_type" />-->
 <!--                <field name="shipment_type" />-->
-                <field name="user_id" />
-                <field name="port_discharge_id" />
-                <field name="vessel_id" />
-                <field name="stage_id" />
-                <field name="last_stage_update" />
+                <field name="etd" widget="date" optional="show" />
+                <field name="etd_revised" widget="date" optional="show" />
+                <field name="vessel_booking_number" string="Booking NO" optional="show" />
+                <field name="ro" string="R.O." optional="hide" />
+                <field name="shipping_line" string="Line" optional="hide" />
+                <field name="vessel_bol_number" string="B/L NO" optional="hide" />
+                <field name="order_id" string="Order" decoration-info="1" optional="show" />
+                <field name="partner_id" readonly="1" optional="show"/>
+                <field name="vessel_id" optional="hide" />
+                <field name="voyage_number" string="VESSEL VOY" optional="show" />
+                <field name="port_discharge_id" optional="hide" />
+                <field name="commodity" optional="hide" />
+                <field name="container_id" optional="show" />
+                <field name="quantity" optional="show" />
+                <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
+                <field name="margin" optional="show"/>
+                <field name="stage_id" optional="hide" />
             </tree>
         </field>
     </record>

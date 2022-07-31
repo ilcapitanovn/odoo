@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<odoo>
+        <record id="freight_sale_order_to_bookings_view_tree" model="ir.ui.view">
+                <field name="name">freight.sale.order.to.bookings.view.tree.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_tree"/>
+                <field name="mode">primary</field>
+                <field eval="10" name="priority"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//tree" position="attributes">
+                                <attribute name="decoration-info">(booking_status == 'to booking')</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='invoice_status']" position="before">
+                            <field name="booking_status"
+                                   decoration-success="booking_status == 'booked'"
+                                   decoration-info="booking_status == 'to booking'"
+                                   widget="badge" optional="show"/>
+                        </xpath>
+                        <xpath expr="//field[@name='invoice_status']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                </field>
+        </record>
+
+        <record id="freight_sale_order_to_bookings_view_form" model="ir.ui.view">
+                <field name="name">freight.sale.order.to.bookings.view.form.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field name="mode">primary</field>
+                <field eval="99" name="priority"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//button[@name='payment_action_void']" position="before">
+                                <field name="booking_status" invisible="1"/>
+                                <button name="create_bookings" string="Create Booking"
+                                        type="object" class="btn-primary"
+                                        context="{'default_advance_payment_method': 'percentage'}"
+                                        attrs="{'invisible': [('booking_status', '!=', 'to booking')]}"/>
+                        </xpath>
+                        <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_confirm']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_cancel']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_done']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_unlock']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                        </xpath>
+                </field>
+        </record>
+
+    <record id="freight_sale_order_to_bookings_action_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="12"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="freight_sale_order_to_bookings_view_tree"/>
+        <field name="act_window_id" ref="freight_orders_to_booking_action"/>
+    </record>
+    <record id="freight_sale_order_to_bookings_action_form" model="ir.actions.act_window.view">
+       <field name="sequence" eval="13"/>
+       <field name="view_mode">form</field>
+       <field name="view_id" ref="freight_sale_order_to_bookings_view_form"/>
+       <field name="act_window_id" ref="freight_orders_to_booking_action"/>
+    </record>
+
+<!--    <record id="freight_action_create_bookings" model="ir.actions.act_window">-->
+<!--        <field name="name">Create bookings</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">sale.order</field>-->
+<!--        <field name="view_mode">tree</field>-->
+<!--        <field name="target">new</field>-->
+<!--        <field name="binding_model_id" ref="sale.model_sale_order" />-->
+<!--        <field name="binding_view_types">list</field>-->
+<!--    </record>-->
+
+    <record id="freight_action_create_bookings" model="ir.actions.server">
+        <field name="name">Create Bookings</field>
+        <field name="model_id" ref="model_sale_order" />
+        <field name="binding_model_id" ref="freight_mgmt.model_sale_order" />
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = model.create_bookings()
+        </field>
+    </record>
+
+    <!-- Disable act_window actions - TODO: still not working -->
+<!--    <record id="sale.action_view_sale_advance_payment_inv" model="ir.actions.act_window">-->
+<!--        /// <field name="action_view_sale_advance_payment_inv" eval="False"/>-->
+<!--        <field name="groups_id" eval="[(4,ref('base.group_no_one'))]" />-->
+<!--    </record>-->
+
+</odoo>

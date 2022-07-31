@@ -7,6 +7,14 @@
         <field name="res_model">freight.booking</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
     </record>
+    <record id="freight_orders_to_booking_action" model="ir.actions.act_window">
+        <field name="name">Orders To Booking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="domain">[('booking_status','=','to booking')]</field>
+    </record>
     <record id="freight_billing_action" model="ir.actions.act_window">
         <field name="name">Bills</field>
         <field name="type">ir.actions.act_window</field>
@@ -117,7 +125,7 @@
         name="Catalogue"
         parent="freight_mgmt_main_menu"
         sequence="25"
-        groups="group_freight_manager"
+        groups="group_freight_user"
     />
     <menuitem
         id="freight_mgmt_reporting_menu"
@@ -135,18 +143,25 @@
     />
     <!-- Sub menu items -->
     <menuitem
+        id="freight_executive_orders_to_booking_menu"
+        name="Orders To Booking"
+        parent="freight_mgmt_executive_menu"
+        action="freight_orders_to_booking_action"
+        sequence="5"
+    />
+    <menuitem
         id="freight_executive_bookings_menu"
         name="Bookings"
         parent="freight_mgmt_executive_menu"
         action="freight_booking_action"
-        sequence="5"
+        sequence="15"
     />
     <menuitem
         id="freight_executive_bills_menu"
         name="Bills"
         parent="freight_mgmt_executive_menu"
         action="freight_billing_action"
-        sequence="15"
+        sequence="25"
     />
 
     <menuitem

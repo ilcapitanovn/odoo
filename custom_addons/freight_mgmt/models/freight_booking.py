@@ -1,5 +1,5 @@
 from odoo import _, api, fields, models, tools
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 
 
 class FreightBooking(models.Model):
@@ -18,24 +18,45 @@ class FreightBooking(models.Model):
         stage_ids = self.env["freight.catalog.stage"].search([])
         return stage_ids
 
-    number = fields.Char(string="Booking number")
-    name = fields.Char(string="Title", required=True)
+    number = fields.Char(string="SHPTMT Number", default="#", readonly=True, required=True)
+    name = fields.Char(string="Title")
     description = fields.Char(translate=True)
 
+    vessel_booking_number = fields.Char(string="Booking Number")
+    vessel_bol_number = fields.Char(string="B/L Number")
+
+    parent_id = fields.Many2one('freight.booking', string='Parent Booking', index=True)
+    child_ids = fields.One2many('freight.booking', 'parent_id', string="Sub-bookings")
+
+    billing_id = fields.One2many('freight.billing', 'booking_id', string='Bill Reference', auto_join=True)
+
     partner_id = fields.Many2one(comodel_name="res.partner",
-                                 domain=[("category_id.name", "=", "Consignee")],
-                                 string="Consignee")
+                                 string="Customer", readonly=True)
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
 
     transport_type = fields.Selection(
         selection=[("ocean", "Ocean"), ("air", "Air"), ("express", "Express")],
-        string="Transport Type", help='Type of Transport')
+        string="Transport Type", default="ocean", help='Type of Transport')
 
     shipment_type = fields.Selection(
         selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
                    ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
-        string="Shipment Type", help='Type of Shipment')
+        string="Shipment Type", default="fcl-exp", help='Type of Shipment')
+
+    order_id = fields.Many2one(
+        comodel_name="sale.order", string="Sale Order Reference",
+        domain="['|', ('invoice_status','=','to invoice'), ('invoice_status','=','invoiced')]",
+        tracking=True, index=True
+    )
+    currency_id = fields.Many2one("res.currency", string="Currency", readonly=True)
+    margin = fields.Monetary(related="order_id.margin", string="Profit",
+                             currency_field="currency_id", readonly=True, store=False)
+
+    booking_type = fields.Selection([
+        ('forwarding', 'Forwarding'),
+        ('trading', 'Trading'),
+    ], string='Booking Type', default='forwarding', required=True, tracking=True)
 
     container_id = fields.Many2one(
         comodel_name="freight.catalog.container", string="Container", tracking=True, index=True
@@ -59,24 +80,27 @@ class FreightBooking(models.Model):
     port_discharge_id = fields.Many2one(
         comodel_name="freight.catalog.port", string="Discharge Port", tracking=True, index=True
     )
+    place_of_delivery = fields.Char(string="Destination")
     vessel_id = fields.Many2one(
         comodel_name="freight.catalog.vessel", string="Vessel", tracking=True, index=True
     )
     shipping_line = fields.Char(string="Shipping Line")
+    ro = fields.Char(string="R.O.")
     commodity = fields.Char(string="Commodity")
     quantity = fields.Integer(string="Quantity")
     temperature = fields.Char(string="Temperature (C)")
     ventilation = fields.Char(string="Ventilation (CBM/H)")
     voyage_number = fields.Char(string="Voyage No.")
     gross_weight = fields.Float(string='Gross Weight (KGS)')
-    etd = fields.Datetime(string="Est. Time Departure", store=True, tracking=True)
-    eta = fields.Datetime(string="Est. Time Arrival", store=True, tracking=True)
+    etd = fields.Datetime(string="Original ETD", store=True)
+    etd_revised = fields.Datetime(string="Revised ETD", store=True)
+    eta = fields.Datetime(string="Est. Time Arrival", store=True)
 
     last_stage_update = fields.Datetime(default=fields.Datetime.now)
-    closing_time = fields.Datetime(string="SI Cut Off Time", store=True, tracking=True)
-    issued_date = fields.Datetime(string="Issued Date", store=True, tracking=True)
-    approved_date = fields.Datetime(string="Confirmed Date", store=True, tracking=True)
-    completed_date = fields.Datetime(string="Completed Date", store=True, tracking=True)
+    closing_time = fields.Datetime(string="SI Cut Off Time", store=True)
+    issued_date = fields.Datetime(string="Issued Date", store=True)
+    approved_date = fields.Datetime(string="Confirmed Date", store=True)
+    completed_date = fields.Datetime(string="Completed Date", store=True)
     completed = fields.Boolean(related="stage_id.completed")
 
     company_id = fields.Many2one(
@@ -100,11 +124,92 @@ class FreightBooking(models.Model):
         res = []
         for rec in self:
             # res.append((rec.id, rec.number + " - " + rec.name))
-            res.append((rec.id, rec.name))
+            res.append((rec.id, rec.number))
         return res
 
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
+
+    def create_bill_lading(self):
+        active_ids = self._context.get('active_ids', [])
+        if not active_ids:
+            active_ids = self.id
+
+        #bookings = self.env['freight.booking'].browse(active_ids)
+
+        #new_bills = self._create_bills()
+
+            # 1) Create bookings.
+            bill_vals_list = []
+            for booking in self:
+                # booking = booking.with_company(booking.company_id)
+                bill_vals = self._prepare_bill_values(booking)
+
+                bill_vals_list.append(bill_vals)
+
+            if not bill_vals_list:
+                raise self._nothing_to_invoice_error()
+
+            new_bills = self.env['freight.billing'].sudo().with_context().create(bill_vals_list)
+
+            if new_bills:
+                # for order in sale_orders:
+                #     order.booking_status = 'booked'
+
+                return self._open_view_billing(new_bills)
+
+    def _open_view_billing(self, new_bills):
+        billing_form = self.env.ref('freight_mgmt.freight_billing_view_form', False)
+
+        if isinstance(new_bills.ids, list):
+            new_bill_id = new_bills.ids[0]
+        else:
+            new_bill_id = new_bills.id
+
+        if billing_form and new_bill_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'freight.billing',
+                'view_type': 'form',
+                'view_mode': 'tree,form',
+                'target': 'current',
+                'views': [(billing_form.id, 'form')],
+                'view_id': billing_form.id,
+                'res_id': new_bill_id,
+            }
+
+    def _prepare_bill_values(self, booking):
+        bill_vals = {
+            'booking_id': booking.id,
+            'port_loading_id': booking.port_loading_id.id,
+            'port_discharge_id': booking.port_discharge_id.id,
+            'port_loading_id': booking.port_loading_id.id,
+            'vessel_id': booking.vessel_id.id,
+            'order_id': booking.order_id.id,
+            'user_id': booking.order_id.user_id.id,
+            'partner_id': booking.partner_id.id,
+        }
+
+        return bill_vals
+
+    @api.model
+    def _nothing_to_invoice_error(self):
+        return UserError(_(
+            "There is nothing to booking!\n\n"
+            "Reason(s) of this behavior could be:\n"
+            "- You should invoice your orders before booking them: Click on the \"truck\" icon "
+            "(top-right of your screen) and follow instructions.\n"
+            "- You should modify the booking policy of your order: Open the Freight, go to the "
+            "\"Configuration\" tab and modify booking policy from \"Orders\" to \"Invoiced\"."
+            " For Services, you should modify the Service Booking Policy to "
+            "'Prepaid'."
+        ))
+
+    @api.onchange("order_id")
+    def _onchange_order_id(self):
+        if self.order_id:
+            self.user_id = self.order_id.user_id
+            self.partner_id = self.order_id.partner_id
 
     @api.onchange("partner_id")
     def _onchange_partner_id(self):
@@ -128,8 +233,8 @@ class FreightBooking(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get("number", "/") == "/":
-            vals["number"] = self._prepare_freight_booking_number(vals)
+        if vals.get("number", "#") == "#":
+            vals["number"] = self._prepare_freight_booking_shptmt_number(vals)
         return super().create(vals)
 
     def copy(self, default=None):
@@ -137,7 +242,7 @@ class FreightBooking(models.Model):
         if default is None:
             default = {}
         if "number" not in default:
-            default["number"] = self._prepare_freight_booking_number(default)
+            default["number"] = self._prepare_freight_booking_shptmt_number(default)
         res = super().copy(default)
         return res
 
@@ -157,11 +262,11 @@ class FreightBooking(models.Model):
         for booking in self.browse(self.env.context["active_ids"]):
             booking.copy()
 
-    def _prepare_freight_booking_number(self, values):
+    def _prepare_freight_booking_shptmt_number(self, values):
         seq = self.env["ir.sequence"]
         if "company_id" in values:
             seq = seq.with_company(values["company_id"])
-        return seq.next_by_code("freight.booking.sequence") or "/"
+        return seq.next_by_code("freight.booking.sequence") or "#"
 
     # ---------------------------------------------------
     # Mail gateway

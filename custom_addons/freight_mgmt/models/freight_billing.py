@@ -23,11 +23,11 @@ class FreightBilling(models.Model):
             return _('Terms & Conditions: %s', baseurl)
         return use_invoice_terms and self.env.company.invoice_terms or ''
 
-    def _default_billing_number(self):
-        seq = self.env["ir.sequence"]
-        # if "company_id" in values:
-        #     seq = seq.with_company(values["company_id"])
-        return seq.next_by_code("freight.billing.sequence") or "Draft"
+    # def _default_billing_number(self):
+    #     seq = self.env["ir.sequence"]
+    #     # if "company_id" in values:
+    #     #     seq = seq.with_company(values["company_id"])
+    #     return seq.next_by_code("freight.billing.sequence") or "Draft"
 
     def _get_default_currency_id(self):
         return self.env.company.currency_id.id
@@ -41,9 +41,8 @@ class FreightBilling(models.Model):
         default='draft')
 
     # number = fields.Char(string="Bill number")
-    name = fields.Char(string='Bill Number', copy=False, readonly=False, store=True, index=True,
-                       tracking=True, required=True, default=_default_billing_number)
-    bill_ref = fields.Char(string="Bill reference")
+    name = fields.Char(string='Bill Number', default="#", readonly=True, store=True, index=True, required=True)
+    vessel_bol_number = fields.Char(string="B/L Number")
     description = fields.Char(translate=True)
 
     shipper_id = fields.Many2one(comodel_name="res.partner",
@@ -72,9 +71,25 @@ class FreightBilling(models.Model):
 
     note = fields.Html('Terms and conditions', default=_default_note)
 
-    booking_id = fields.Many2one(
-        comodel_name="freight.booking", string="Booking", tracking=True, index=True
+    billing_type = fields.Selection([
+        ('mbl', 'Master B/L'),
+        ('hbl', 'House B/L'),
+    ], string='B/L Type', default='mbl', required=True, tracking=True)
+
+    order_id = fields.Many2one(
+        comodel_name="sale.order", string="Sale Order Reference",
+        domain="['|', ('invoice_status','=','to invoice'), ('invoice_status','=','invoiced')]",
+        tracking=True, index=True
     )
+    partner_id = fields.Many2one(comodel_name="res.partner",
+                                 string="Customer", readonly=True)
+
+    booking_id = fields.Many2one(
+        comodel_name="freight.booking", string="Booking",
+        tracking=True, index=True
+    )
+    vessel_booking_number = fields.Char(related="booking_id.vessel_booking_number",
+                                        string="Booking Number", readonly=True, store=False)
     port_loading_id = fields.Many2one(
         comodel_name="freight.catalog.port", string="Port of loading", tracking=True, index=True
     )
@@ -88,7 +103,7 @@ class FreightBilling(models.Model):
     delivery_place = fields.Char(string="Place of delivery")
     final_destination = fields.Char(string="Final destination")
 
-    billing_line = fields.One2many('freight.billing.line', 'billing_id', string='Billing Lines',
+    billing_line = fields.One2many('freight.billing.line', 'billing_id', string='Item Lines',
                                  states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True,
                                  auto_join=True)
 
@@ -234,6 +249,12 @@ class FreightBilling(models.Model):
     def _expand_states(self, states, domain, order):
         return [key for key, dummy in type(self).state.selection]
 
+    @api.onchange("order_id")
+    def _onchange_order_id(self):
+        if self.order_id:
+            self.user_id = self.order_id.user_id
+            self.partner_id = self.order_id.partner_id
+
     @api.onchange("booking_id")
     def _onchange_booking_id(self):
         if self.booking_id:
@@ -285,16 +306,16 @@ class FreightBilling(models.Model):
 
     @api.model
     def create(self, vals):
-        # if vals.get("number", "/") == "/":
-        #     vals["number"] = self._prepare_freight_booking_number(vals)
+        if vals.get("name", "#") == "#":
+            vals["name"] = self._prepare_freight_billing_number(vals)
         return super().create(vals)
 
     def copy(self, default=None):
         self.ensure_one()
         if default is None:
             default = {}
-        # if "number" not in default:
-        #     default["number"] = self._prepare_freight_booking_number(default)
+        if "name" not in default:
+            default["nam"] = self._prepare_freight_billing_number(default)
         res = super().copy(default)
         return res
 
@@ -314,11 +335,11 @@ class FreightBilling(models.Model):
     #     for booking in self.browse(self.env.context["active_ids"]):
     #         booking.copy()
 
-    # def _prepare_freight_booking_number(self, values):
-    #     seq = self.env["ir.sequence"]
-    #     if "company_id" in values:
-    #         seq = seq.with_company(values["company_id"])
-    #     return seq.next_by_code("freight.billing.sequence") or "/"
+    def _prepare_freight_billing_number(self, values):
+        seq = self.env["ir.sequence"]
+        if "company_id" in values:
+            seq = seq.with_company(values["company_id"])
+        return seq.next_by_code("freight.billing.sequence") or "#"
 
     # ---------------------------------------------------
     # Mail gateway

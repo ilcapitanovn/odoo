@@ -90,7 +90,7 @@
         </record>
 		<!-- Bookings -->
         <record id="freight_booking_1" model="freight.booking">
-            <field name="number">ASC0308402</field>
+            <field name="number">LOG0122-001</field>
             <field name="name">CNC NEPTUNE 0HB3SN1NC</field>
             <field name="description">CNC NEPTUNE 0HB3SN1NC</field>
             <field name="transport_type">ocean</field>
@@ -107,7 +107,7 @@
             <field name="vessel_id" ref="freight_catalog_vessel_1" />
         </record>
         <record id="freight_booking_2" model="freight.booking">
-            <field name="number">ASC0309108</field>
+            <field name="number">LOG0122-002</field>
             <field name="name">NORDPUMA / 0AR52N1NC</field>
             <field name="description">NORDPUMA / 0AR52N1NC</field>
             <field name="transport_type">ocean</field>
