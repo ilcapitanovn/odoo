@@ -1,5 +1,39 @@
 <?xml version="1.0"?>
 <odoo>
+        <record id="freight_sale_order_view_form_inherited" model="ir.ui.view">
+                <field name="name">freight.sale.order.view.form.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_form"/>
+                <field eval="39" name="priority"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='payment_term_id']" position="before">
+                            <field name="order_type" />
+                        </xpath>
+                </field>
+        </record>
+
+        <record id="freight_sale_order_view_tree_inherited" model="ir.ui.view">
+                <field name="name">freight.sale.order.view.tree.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_order_tree"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='activity_ids']" position="before">
+                            <field name="order_type" optional="hide" />
+                        </xpath>
+                </field>
+        </record>
+
+        <record id="freight_sale_order_view_quotation_tree_inherited" model="ir.ui.view">
+                <field name="name">freight.sale.order.view.quotation.tree.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="sale.view_quotation_tree"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='activity_ids']" position="before">
+                            <field name="order_type" optional="hide" />
+                        </xpath>
+                </field>
+        </record>
+
         <record id="freight_sale_order_to_bookings_view_tree" model="ir.ui.view">
                 <field name="name">freight.sale.order.to.bookings.view.tree.inherited</field>
                 <field name="model">sale.order</field>

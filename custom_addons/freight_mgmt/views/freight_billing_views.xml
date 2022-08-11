@@ -52,6 +52,9 @@
                         type="object"
                         attrs="{'invisible' : [('user_id', '!=', False)]}"
                     />
+                    <!-- Preview (only customer debit note) -->
+                    <button name="preview_debit_note" type="object" string="Debit Note" data-hotkey="d"
+                            title="Preview Debit Note"/>
                     <field
                         name="state"
                         widget="statusbar"
@@ -146,8 +149,10 @@
                                     <tree editable="bottom" class="o_billing_lines">
                                         <field name="billing_id" invisible="1"/>
                                         <field name="sequence" widget="handle"/>
+                                        <field name="container_no" widget="section_and_note_text" optional="show" />
                                         <field name="seal_nos" widget="section_and_note_text" optional="show" />
-                                        <field name="number_packages" />
+                                        <field name="number_packages" string="No. of Pkgs" />
+                                        <field name="package_types" string="Kind of Pkgs" />
                                         <field name="description" widget="section_and_note_text" optional="show" />
                                         <field name="gross_weight" />
                                         <field name="measurement" />

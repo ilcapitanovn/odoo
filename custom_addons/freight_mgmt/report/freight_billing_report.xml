@@ -12,6 +12,18 @@
         <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_bol"/>
     </record>
 
+    <record id="freight_debit_note_report" model="ir.actions.report">
+        <field name="name">Debit Note</field>
+        <field name="model">freight.billing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">freight_mgmt.report_print_debit_note_template</field>
+        <field name="report_file">freight_mgmt.report_print_debit_note_template</field>
+        <field name="print_report_name">'Debit Note - %s' % (object.name).replace('/', '')</field>
+        <field name="binding_model_id" ref="model_freight_billing"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_bol"/>
+    </record>
+
     <template id="report_print_bill_lading_template">
         <t t-call="web.basic_layout">
             <div class="page">
@@ -225,6 +237,161 @@
                     <footer>
                         TERMS OF BILL OF LADING ARE CONTINUED ON THE BACK SIDE
                     </footer>
+                </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_print_debit_note_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/freight_mgmt/static/src/css/debit_note.css"/>
+
+                <t t-foreach="docs" t-as="doc">
+
+                <t t-set="partner_name" t-value="doc.partner_id.display_name"/>
+                <t t-set="partner_address" t-value="doc.partner_id.contact_address"/>
+                <t t-set="bill_no" t-value="doc.vessel_bol_number"/>
+                <t t-set="pol" t-value="doc.port_loading_id.name"/>
+                <t t-set="pod" t-value="doc.port_discharge_id.name"/>
+                <t t-set="volume" t-value="'%sx%s' % (doc.booking_id.quantity, doc.booking_id.container_id.code)"/>
+                <t t-set="exchange_info" t-value="doc.get_amount_vnd()"/>
+                <t t-set="amount_vnd" t-value="exchange_info['amount_vnd']"/>
+                <t t-set="rate_date" t-value="exchange_info['rate_date']"/>
+                <t t-set="exchange_rate" t-value="exchange_info['exchange_rate']"/>
+                <t t-set="bank_info" t-value="doc.get_bank_info()"/>
+                <t t-set="bank_name" t-value="bank_info['bank_name']"/>
+                <t t-set="bank_acc_name" t-value="bank_info['bank_acc_name']"/>
+                <t t-set="bank_acc_no" t-value="bank_info['bank_acc_no']"/>
+
+                <div id="quote_content" class="col-12 col-lg justify-content-end">
+                    <div id="company-logo">
+                        <img t-if="doc.partner_id.lang == 'vi_VN'" t-att-src="'web/static/img/report_header_logo_vn.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
+                        <img t-if="doc.partner_id.lang != 'vi_VN'" t-att-src="'web/static/img/report_header_logo_en.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
+                    </div>
+
+                    <div id="introduction" t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}">
+                        <h2 class="my-0">
+                            <!--<t t-esc="sale_order.type_name"/>-->
+                            <!--<em t-esc="sale_order.name"/>-->
+                            DEBIT NOTE
+                        </h2>
+                        <div id="exchange_rate">
+                            <table id="exchange-table">
+                                <tr>
+                                    <td>Date:</td>
+                                    <td><span t-esc="rate_date.strftime('%d-%B-%Y')"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Exchange rate:</td>
+                                    <td><span t-esc="'{:,}'.format(exchange_rate)"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <table class="table no-spacing" id="address-table">
+                      <tr>
+                        <td width="15%">To:</td>
+                        <td><b><span t-esc="partner_name"/></b></td>
+                      </tr>
+                      <tr>
+                        <td>Address:</td>
+                        <td><span t-esc="partner_address"/></td>
+                      </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="bill-table">
+                      <tr>
+                        <td width="15%">BL NO</td>
+                        <td class="bill-no"><span t-esc="bill_no"/></td>
+                      </tr>
+                      <tr>
+                        <td>POL</td>
+                        <td><span t-esc="pol"/></td>
+                      </tr>
+                      <tr>
+                        <td>POD</td>
+                        <td><span t-esc="pod"/></td>
+                      </tr>
+                      <tr>
+                        <td>ETD</td>
+                        <t t-if="doc.booking_id.etd_revised">
+                            <td><span t-esc="doc.booking_id.etd_revised.strftime('%d-%B-%y')"/></td>
+                        </t>
+                        <t t-if="not doc.booking_id.etd_revised">
+                            <td></td>
+                        </t>
+                      </tr>
+                      <tr>
+                        <td>VOLUME</td>
+                        <td><span t-esc="volume"/></td>
+                      </tr>
+                    </table>
+
+                    <table class="table no-spacing" id="order-table">
+                      <tr>
+                        <th width="7%">NO</th>
+                        <th width="20%">TYPE</th>
+                        <th width="7%">QTY</th>
+                        <th width="12%">UNIT OF <br></br> MEASURE</th>
+                        <th width="14%">UNIT RATE</th>
+                        <th width="12%">CUR</th>
+                        <th width="12%">VAT TAX</th>
+                        <th>AMOUNT<br></br>(INCL. TAX)</th>
+                      </tr>
+                        <t t-set="i" t-value="1"/>
+                        <t t-foreach="doc.order_id.order_line" t-as="line">
+                          <tr>
+                            <td><span t-esc="i"/></td>
+                            <td><span t-field="line.name"/></td>
+                            <td class="text-right">
+                                <div id="quote_qty">
+                                    <span t-field="line.product_uom_qty"/>
+                                </div>
+                            </td>
+                            <td><span t-field="line.product_uom.display_name"/></td>
+                            <td class="text-right"><span t-field="line.price_unit"/></td>
+                            <td><span t-field="line.currency_id.display_name"/></td>
+                            <td><span t-esc="line.tax_id.amount" t-options='{"widget": "float", "precision": 0}'/>%</td>
+                            <td class="text-right"><span t-field="line.price_total"/></td>
+                          </tr>
+                          <t t-set="i" t-value="i+1"/>
+                        </t>
+                      <tr>
+                        <td colspan="4" class="no-bordered"></td>
+                        <td class="total">TOTAL</td>
+                        <td class="total">USD</td>
+                        <td></td>
+                        <td class="total text-right"><span t-field="doc.order_id.amount_total"/></td>
+                      </tr>
+                      <tr>
+                        <td colspan="4" class="no-bordered"></td>
+                        <td class="total">TOTAL</td>
+                        <td class="total">VND</td>
+                        <td></td>
+                        <td class="total text-right"><span t-esc="'{:,}'.format(amount_vnd)"/></td>
+                      </tr>
+                    </table>
+
+                    <div id="apply-payment">Please apply VietcomBank's selling ex-rate based on payment date.</div>
+                    <table class="table no-spacing" id="payment-table">
+                      <tr>
+                        <td width="30%">BENEFICIARY BANK:</td>
+                        <td><span t-esc="bank_name"/></td>
+                      </tr>
+                      <tr>
+                        <td>BENEFICIARY:</td>
+                        <td><b><span t-esc="bank_acc_name"/></b></td>
+                      </tr>
+                      <tr>
+                        <td>ACCOUNT NUMBER: (VND)</td>
+                        <td><span t-esc="bank_acc_no"/></td>
+                      </tr>
+                    </table>
+
+                    <div id="remark">Remark: only collect freight by T/T, If there is any payment by cash, invoice will be added 8% VAT, pls note!</div>
                 </div>
                 </t>
             </div>

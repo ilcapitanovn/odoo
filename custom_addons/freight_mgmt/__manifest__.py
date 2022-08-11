@@ -27,7 +27,7 @@
     'author': 'Tuan Huynh',
     'company': 'Bao Thinh Software Ltd.',
     'maintainer': 'Bao Thinh Software Ltd.',
-    'depends': ['mail', 'sale', 'sale_margin', 'base'],
+    'depends': ['mail', 'sale', 'sale_margin', 'portal', 'base'],
     "data": [
         "data/freight_data.xml",
         "data/freight_demo.xml",
@@ -42,10 +42,15 @@
         "views/freight_catalog_stage_views.xml",
         "views/freight_catalog_vessel_views.xml",
         "views/freight_menu.xml",
+        "views/billing_portal_template.xml",
         "views/res_partner_views.xml",
         "views/sale_order_views.xml",
         "report/report_paperformat.xml",
         "report/freight_billing_report.xml"
+    ],
+    'web.assets_frontend': [
+        'sale/static/src/scss/sale_portal.scss',
+        'sale/static/src/js/sale_portal_sidebar.js'
     ],
     "assets": {
         'web.assets_backend': [

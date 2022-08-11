@@ -13,7 +13,17 @@ class FreightBilling(models.Model):
     _rec_name = "name"
     _order = "name desc"
     _mail_post_access = "read"
-    _inherit = ["mail.thread.cc", "mail.activity.mixin"]
+    _inherit = ["portal.mixin", "mail.thread.cc", "mail.activity.mixin"]
+
+    def _compute_access_url(self):
+        super(FreightBilling, self)._compute_access_url()
+        for order in self:
+            order.access_url = '/my/notes/%s' % (order.id)
+
+    def _get_portal_return_action(self):
+        """ Return the action used to display bills when returning from customer portal. """
+        self.ensure_one()
+        return self.env.ref('freight_mgmt.freight_billing_action')
 
     @api.model
     def _default_note(self):
@@ -158,7 +168,49 @@ class FreightBilling(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
+    def preview_debit_note(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': self.get_portal_url(),
+        }
 
+    def get_amount_vnd(self):
+        usd = self.env['res.currency'].search([('name', '=', 'USD')])
+        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
+        company = self.order_id.company_id
+        now = fields.Datetime.now()
+        amount_vnd = usd._convert(self.order_id.amount_total, vnd, company, now)
+        rate_date = vnd.date
+        exchange_rate = vnd.rate
+
+        exchange_info = {
+            'amount_vnd': amount_vnd,
+            'rate_date': rate_date,
+            'exchange_rate': exchange_rate
+        }
+        return exchange_info
+
+    def get_bank_info(self):
+        bank_name = ""
+        bank_acc_no = ""
+        bank_acc_name = ""
+        swift_code = ""
+        for bnk in self.company_id.bank_ids:
+            if not bank_name:
+                bank_name = bnk.bank_name
+                bank_acc_no = bnk.acc_number
+                bank_acc_name = bnk.acc_holder_name
+                swift_code = bnk.bank_bic
+
+        bank_info = {
+            'bank_name': bank_name,
+            'bank_acc_no': bank_acc_no,
+            'bank_acc_name': bank_acc_name,
+            'swift_code': swift_code
+        }
+        return bank_info
 
     # @api.depends('state', 'date')
     # def _compute_name(self):
@@ -248,6 +300,10 @@ class FreightBilling(models.Model):
 
     def _expand_states(self, states, domain, order):
         return [key for key, dummy in type(self).state.selection]
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return '%s' % (self.display_name)
 
     @api.onchange("order_id")
     def _onchange_order_id(self):

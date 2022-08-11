@@ -1,0 +1,104 @@
+#quote_content {
+    background-color: white;
+    font-weight: 500;
+    font-family: Serif;
+}
+#company-logo {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 50px;
+}
+
+#introduction {
+    text-align: center;
+}
+
+#exchange_rate {
+    color: red;
+    display: flex;
+    display: -webkit-box; /* wkhtmltopdf uses this one */
+    justify-content: flex-end;
+    -webkit-box-pack: end; /* wkhtmltopdf uses this one */
+}
+#exchange-table td:nth-child(odd) {
+    text-align: left;
+}
+#exchange-table td:nth-child(even) {
+    padding-left: 5px;
+    text-align: left;
+}
+
+#address-table td {
+    border: none;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+}
+#address-table td:nth-child(odd) {
+    font-weight: bold;
+}
+
+#bill-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: 1px solid black;
+}
+#bill-table .table-bordered {
+    border: 1px solid black;
+}
+
+.bill-no {
+    font-weight: 700;
+    color: #203764;
+}
+
+#order-table {
+    margin-top: 40px;
+}
+
+#order-table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    background-color: #FCE4D6;
+    color: #203764;
+    font-weight: 700;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+#order-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+#order-table .no-bordered {
+    border: 0;
+}
+#order-table .total {
+    font-weight: 700;
+    color: #203764;
+}
+
+#apply-payment {
+    margin-top: 100px;
+}
+#payment-table {
+    border: 3px solid #305496;
+    margin-top: 10px;
+}
+#payment-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: 1px solid black;
+    color: #203764;
+}
+
+#remark {
+    margin-top: 30px;
+    font-weight: 700;
+}

@@ -58,6 +58,11 @@ class FreightBooking(models.Model):
         ('trading', 'Trading'),
     ], string='Booking Type', default='forwarding', required=True, tracking=True)
 
+    order_type = fields.Selection([
+        ('freehand', 'Freehand'),
+        ('nominated', 'Nominated'),
+    ], string='Order Type')
+
     container_id = fields.Many2one(
         comodel_name="freight.catalog.container", string="Container", tracking=True, index=True
     )
@@ -192,6 +197,14 @@ class FreightBooking(models.Model):
 
         return bill_vals
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super(FreightBooking, self).default_get(fields_list)
+        res.update({
+            'order_type': 'freehand' or False
+        })
+        return res
+    
     @api.model
     def _nothing_to_invoice_error(self):
         return UserError(_(

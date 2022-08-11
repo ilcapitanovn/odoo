@@ -14,6 +14,11 @@ class SaleOrder(models.Model):
         ('no', 'Nothing to Booking')
     ], string='Booking Status', compute='_get_booking_status', store=True)
 
+    order_type = fields.Selection([
+        ('freehand', 'Freehand'),
+        ('nominated', 'Nominated'),
+    ], string='Order Type')
+
     def create_bookings(self):
         """
         Create one or multi bookings from tree view when
@@ -77,9 +82,18 @@ class SaleOrder(models.Model):
             'order_id': order.id,
             'user_id': order.user_id.id,
             'partner_id': order.partner_id.id,
+            'order_type': order.order_type
         }
 
         return booking_vals
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super(SaleOrder, self).default_get(fields_list)
+        res.update({
+            'order_type': 'freehand' or False
+        })
+        return res
 
     @api.model
     def _nothing_to_invoice_error(self):

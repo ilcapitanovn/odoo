@@ -248,8 +248,10 @@ class FreightBillingLine(models.Model):
 
     # discount = fields.Float(string='Discount (%)', digits='Discount', default=0.0)
 
-    seal_nos = fields.Text(string='Seal NOS.')
+    container_no = fields.Text(string='Container No.')
+    seal_nos = fields.Text(string='Seal No.')
     number_packages = fields.Text(string='Number of Packages')
+    package_types = fields.Text(string='Package Types')
     description = fields.Text(string='Description')
     gross_weight = fields.Float(string='Gross Weight (KGS)')
     measurement = fields.Text(string='Measurement')
