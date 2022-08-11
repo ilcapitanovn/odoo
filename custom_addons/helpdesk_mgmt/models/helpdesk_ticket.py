@@ -20,7 +20,7 @@ class HelpdeskTicket(models.Model):
 
     number = fields.Char(string="Ticket number", default="/", readonly=True)
     name = fields.Char(string="Title", required=True)
-    description = fields.Html(required=True, sanitize_style=True)
+    description = fields.Html(required=True, sanitize_style=True, default="Commodity: <br/>ETD: <br/>Volume per month: <br/>Service: (Direct/ Indirect): <br/>Competitors: <br/>Free time at origin: <br/>Free time at destination: <br/>Others:<br/>Explanation:")
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
     )
@@ -164,18 +164,18 @@ class HelpdeskTicket(models.Model):
 
     def _track_template(self, tracking):
         res = super()._track_template(tracking)
-        ticket = self[0]
-        if "stage_id" in tracking and ticket.stage_id.mail_template_id:
-            res["stage_id"] = (
-                ticket.stage_id.mail_template_id,
-                {
-                    "auto_delete_message": True,
-                    "subtype_id": self.env["ir.model.data"]._xmlid_to_res_id(
-                        "mail.mt_note"
-                    ),
-                    "email_layout_xmlid": "mail.mail_notification_light",
-                },
-            )
+        # ticket = self[0]
+        # if "stage_id" in tracking and ticket.stage_id.mail_template_id:
+        #     res["stage_id"] = (
+        #         ticket.stage_id.mail_template_id,
+        #         {
+        #             "auto_delete_message": True,
+        #             "subtype_id": self.env["ir.model.data"]._xmlid_to_res_id(
+        #                 "mail.mt_note"
+        #             ),
+        #             "email_layout_xmlid": "mail.mail_notification_light",
+        #         },
+        #     )
         return res
 
     @api.model
@@ -225,6 +225,13 @@ class HelpdeskTicket(models.Model):
         ]
         self.message_subscribe(partner_ids)
         return super().message_update(msg, update_vals=update_vals)
+
+    # def _message_post_after_hook(self, message, msg_vals):
+    #     res = super(HelpdeskTicket, self)._message_post_after_hook(message, msg_vals)
+    #     for this in self:
+    #         for follower in this.message_follower_ids:
+    #             follower.unlink()
+    #     return res
 
     def _message_get_suggested_recipients(self):
         recipients = super()._message_get_suggested_recipients()
