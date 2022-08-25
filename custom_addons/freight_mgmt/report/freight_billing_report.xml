@@ -14,12 +14,12 @@
 
     <record id="freight_debit_note_report" model="ir.actions.report">
         <field name="name">Debit Note</field>
-        <field name="model">freight.billing</field>
+        <field name="model">freight.debit.note</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">freight_mgmt.report_print_debit_note_template</field>
         <field name="report_file">freight_mgmt.report_print_debit_note_template</field>
         <field name="print_report_name">'Debit Note - %s' % (object.name).replace('/', '')</field>
-        <field name="binding_model_id" ref="model_freight_billing"/>
+        <field name="binding_model_id" ref="model_freight_debit_note"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_bol"/>
     </record>
@@ -250,20 +250,20 @@
 
                 <t t-foreach="docs" t-as="doc">
 
-                <t t-set="partner_name" t-value="doc.partner_id.display_name"/>
-                <t t-set="partner_address" t-value="doc.partner_id.contact_address"/>
-                <t t-set="bill_no" t-value="doc.vessel_bol_number"/>
-                <t t-set="pol" t-value="doc.port_loading_id.name"/>
-                <t t-set="pod" t-value="doc.port_discharge_id.name"/>
-                <t t-set="volume" t-value="'%sx%s' % (doc.booking_id.quantity, doc.booking_id.container_id.code)"/>
-                <t t-set="exchange_info" t-value="doc.get_amount_vnd()"/>
-                <t t-set="amount_vnd" t-value="exchange_info['amount_vnd']"/>
-                <t t-set="rate_date" t-value="exchange_info['rate_date']"/>
-                <t t-set="exchange_rate" t-value="exchange_info['exchange_rate']"/>
-                <t t-set="bank_info" t-value="doc.get_bank_info()"/>
-                <t t-set="bank_name" t-value="bank_info['bank_name']"/>
-                <t t-set="bank_acc_name" t-value="bank_info['bank_acc_name']"/>
-                <t t-set="bank_acc_no" t-value="bank_info['bank_acc_no']"/>
+                <t t-set="partner_name" t-value="doc.partner_name"/>
+                <t t-set="partner_address" t-value="doc.partner_address"/>
+                <t t-set="partner_vat" t-value="doc.partner_vat"/>
+                <t t-set="bill_no" t-value="doc.bill_no"/>
+                <t t-set="pol" t-value="doc.pol"/>
+                <t t-set="pod" t-value="doc.pod"/>
+                <t t-set="etd" t-value="doc.etd_formatted"/>
+                <t t-set="volume" t-value="doc.volume"/>
+                <t t-set="amount_vnd" t-value="doc.amount_total_vnd"/>
+                <t t-set="rate_date" t-value="doc.debit_date"/>
+                <t t-set="exchange_rate" t-value="doc.exchange_rate"/>
+                <t t-set="bank_name" t-value="doc.bank_name"/>
+                <t t-set="bank_acc_no" t-value="doc.bank_acc_no"/>
+                <t t-set="bank_acc_name" t-value="doc.bank_acc_name"/>
 
                 <div id="quote_content" class="col-12 col-lg justify-content-end">
                     <div id="company-logo">
@@ -283,10 +283,12 @@
                                     <td>Date:</td>
                                     <td><span t-esc="rate_date.strftime('%d-%B-%Y')"/></td>
                                 </tr>
+                                <t t-if="exchange_rate &gt; 0">
                                 <tr>
                                     <td>Exchange rate:</td>
-                                    <td><span t-esc="'{:,}'.format(exchange_rate)"/></td>
+                                    <td><span t-esc="'{:,.0f}'.format(exchange_rate)"/></td>
                                 </tr>
+                                </t>
                             </table>
                         </div>
                     </div>
@@ -299,6 +301,10 @@
                       <tr>
                         <td>Address:</td>
                         <td><span t-esc="partner_address"/></td>
+                      </tr>
+                      <tr>
+                        <td>MST:</td>
+                        <td><span t-esc="partner_vat"/></td>
                       </tr>
                     </table>
 
@@ -317,12 +323,7 @@
                       </tr>
                       <tr>
                         <td>ETD</td>
-                        <t t-if="doc.booking_id.etd_revised">
-                            <td><span t-esc="doc.booking_id.etd_revised.strftime('%d-%B-%y')"/></td>
-                        </t>
-                        <t t-if="not doc.booking_id.etd_revised">
-                            <td></td>
-                        </t>
+                        <td><span t-esc="etd"/></td>
                       </tr>
                       <tr>
                         <td>VOLUME</td>
@@ -335,44 +336,56 @@
                         <th width="7%">NO</th>
                         <th width="20%">TYPE</th>
                         <th width="7%">QTY</th>
-                        <th width="12%">UNIT OF <br></br> MEASURE</th>
+                        <th width="12%">UNIT OF <br/> MEASURE</th>
                         <th width="14%">UNIT RATE</th>
                         <th width="12%">CUR</th>
                         <th width="12%">VAT TAX</th>
-                        <th>AMOUNT<br></br>(INCL. TAX)</th>
+                        <th>AMOUNT<br/>(INCL. TAX)</th>
                       </tr>
                         <t t-set="i" t-value="1"/>
-                        <t t-foreach="doc.order_id.order_line" t-as="line">
+                        <t t-foreach="doc.debit_items" t-as="line">
                           <tr>
                             <td><span t-esc="i"/></td>
-                            <td><span t-field="line.name"/></td>
+                            <t t-if="'OCEAN FREIGHT' in line.name">
+                                <td>OCEAN FREIGHT</td>
+                            </t>
+                            <t t-else="">
+                                <td><span t-field="line.name"/></td>
+                            </t>
                             <td class="text-right">
                                 <div id="quote_qty">
-                                    <span t-field="line.product_uom_qty"/>
+                                    <span t-field="line.quantity"/>
                                 </div>
                             </td>
-                            <td><span t-field="line.product_uom.display_name"/></td>
-                            <td class="text-right"><span t-field="line.price_unit"/></td>
+                            <td><span t-field="line.uom"/></td>
+                            <td class="text-right"><span t-field="line.unit_price"/></td>
                             <td><span t-field="line.currency_id.display_name"/></td>
-                            <td><span t-esc="line.tax_id.amount" t-options='{"widget": "float", "precision": 0}'/>%</td>
+                            <t t-if="not line.tax_id">
+                                <td>x</td>
+                            </t>
+                            <t t-else="">
+                                <td><span t-esc="line.tax_amount" t-options='{"widget": "float", "precision": 0}'/>%</td>
+                            </t>
                             <td class="text-right"><span t-field="line.price_total"/></td>
                           </tr>
                           <t t-set="i" t-value="i+1"/>
                         </t>
                       <tr>
-                        <td colspan="4" class="no-bordered"></td>
+                        <td colspan="4" class="no-bordered"/>
                         <td class="total">TOTAL</td>
                         <td class="total">USD</td>
-                        <td></td>
-                        <td class="total text-right"><span t-field="doc.order_id.amount_total"/></td>
+                        <td/>
+                        <td class="total text-right"><span t-esc="'{:,.2f}'.format(doc.amount_total)"/></td>
                       </tr>
+                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
                       <tr>
-                        <td colspan="4" class="no-bordered"></td>
+                        <td colspan="4" class="no-bordered"/>
                         <td class="total">TOTAL</td>
                         <td class="total">VND</td>
-                        <td></td>
-                        <td class="total text-right"><span t-esc="'{:,}'.format(amount_vnd)"/></td>
+                        <td/>
+                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
                       </tr>
+                      </t>
                     </table>
 
                     <div id="apply-payment">Please apply VietcomBank's selling ex-rate based on payment date.</div>

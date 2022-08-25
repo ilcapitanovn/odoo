@@ -10,6 +10,7 @@ class FreightCatalogStage(models.Model):
     description = fields.Html(translate=True, sanitize_style=True)
     sequence = fields.Integer(default=1)
     active = fields.Boolean(default=True)
+    confirmed = fields.Boolean()
     completed = fields.Boolean()
     mail_template_id = fields.Many2one(
         comodel_name="mail.template",

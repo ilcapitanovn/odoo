@@ -53,8 +53,14 @@
                         attrs="{'invisible' : [('user_id', '!=', False)]}"
                     />
                     <!-- Preview (only customer debit note) -->
-                    <button name="preview_debit_note" type="object" string="Debit Note" data-hotkey="d"
-                            title="Preview Debit Note"/>
+<!--                    <button name="preview_debit_note" type="object" string="Debit Note" data-hotkey="d"-->
+<!--                            title="Preview Debit Note"/>-->
+                    <button name="create_debit_note" string="Create Debit Note"
+                            type="object" data-hotkey="b"
+                            attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('debit_count', '&gt;', 0)]}"/>
+                    <button name="create_credit_note" string="Create Credit Note"
+                            type="object" data-hotkey="b"
+                            attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('credit_count', '&gt;', 0)]}"/>
                     <field
                         name="state"
                         widget="statusbar"
@@ -74,8 +80,22 @@
                         bg_color="bg-danger"
                         attrs="{'invisible': [('active', '=', True)]}"
                     />
-<!--                    <div class="oe_button_box" name="button_box">-->
-<!--                    </div>-->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_debit_note"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('debit_count', '=', 0)]}">
+                            <field name="debit_count" widget="statinfo" string="Debit Notes"/>
+                        </button>
+                        <button name="action_view_credit_note"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('credit_count', '=', 0)]}">
+                            <field name="credit_count" widget="statinfo" string="Credit Notes"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1 class="oe_title">
                             <field name="name" />
@@ -90,12 +110,12 @@
                         />
                         <group>
                             <field name="billing_type" widget="radio" options="{'horizontal': True}" />
-                            <field name="order_id" options="{'no_create': True, 'no_create_edit': True}" />
+                            <field name="booking_id" />
                             <field name="user_id" />
+                            <field name="order_id" options="{'no_create': True, 'no_create_edit': True}" />
                             <field name="partner_id" />
                         </group>
                         <group>
-                            <field name="booking_id" />
                             <field name="vessel_booking_number" />
                             <field name="vessel_bol_number" />
                             <field name="bill_date" />
@@ -152,7 +172,7 @@
                                         <field name="container_no" widget="section_and_note_text" optional="show" />
                                         <field name="seal_nos" widget="section_and_note_text" optional="show" />
                                         <field name="number_packages" string="No. of Pkgs" />
-                                        <field name="package_types" string="Kind of Pkgs" />
+                                        <field name="product_uom" string="Kind of Pkgs" options="{'no_create': True, 'no_create_edit': True}"/>
                                         <field name="description" widget="section_and_note_text" optional="show" />
                                         <field name="gross_weight" />
                                         <field name="measurement" />

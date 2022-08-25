@@ -89,14 +89,14 @@ class FreightBilling(models.Model):
     order_id = fields.Many2one(
         comodel_name="sale.order", string="Sale Order Reference",
         domain="['|', ('invoice_status','=','to invoice'), ('invoice_status','=','invoiced')]",
-        tracking=True, index=True
+        tracking=True, index=True, readonly=True
     )
     partner_id = fields.Many2one(comodel_name="res.partner",
                                  string="Customer", readonly=True)
 
     booking_id = fields.Many2one(
         comodel_name="freight.booking", string="Booking",
-        tracking=True, index=True
+        tracking=True, index=True, required=True
     )
     vessel_booking_number = fields.Char(related="booking_id.vessel_booking_number",
                                         string="Booking Number", readonly=True, store=False)
@@ -128,6 +128,9 @@ class FreightBilling(models.Model):
     bill_date = fields.Datetime(string="Bill Date", default=fields.Datetime.now)
     due_date = fields.Datetime(string="Due Date")
 
+    debit_count = fields.Integer("Debit Count", compute='_compute_debit_count')
+    credit_count = fields.Integer("Credit Count", compute='_compute_credit_count')
+
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
     )
@@ -138,6 +141,11 @@ class FreightBilling(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+
+    debit_note_ids = fields.One2many('freight.debit.note', 'bill_id', string='Debit Note',
+                                     copy=True, auto_join=True)
+    credit_note_ids = fields.One2many('freight.credit.note', 'bill_id', string='Credit Note',
+                                      copy=True, auto_join=True)
 
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
     sequence = fields.Integer(default=16)
@@ -168,6 +176,94 @@ class FreightBilling(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
+    # ---------------------------------------------------
+    # Create Debit Note Action
+    # ---------------------------------------------------
+
+    def create_debit_note(self):
+        # 1) Create debit notes.
+        debit_vals_list = []
+        for billing in self:
+            debit_vals = self._prepare_debit_values(billing)
+
+            debit_vals_list.append(debit_vals)
+
+        if not debit_vals_list:
+            raise self._nothing_to_debit_error()
+
+        new_debits = self.env['freight.debit.note'].sudo().with_context().create(debit_vals_list)
+
+        if new_debits:
+            return self._open_view_debit_note(new_debits)
+
+    def _open_view_debit_note(self, new_debits):
+        debit_form = self.env.ref('freight_mgmt.freight_debit_note_view_form', False)
+
+        if isinstance(new_debits.ids, list):
+            new_debit_id = new_debits.ids[0]
+        else:
+            new_debit_id = new_debits.id
+
+        if debit_form and new_debit_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'freight.debit.note',
+                'view_type': 'form',
+                'view_mode': 'tree,form',
+                'target': 'current',
+                'views': [(debit_form.id, 'form')],
+                'view_id': debit_form.id,
+                'res_id': new_debit_id,
+            }
+
+    def _prepare_debit_values(self, billing):
+        debit_vals = {
+            'bill_id': billing.id,
+            'booking_id': billing.booking_id,
+            'order_id': billing.order_id,
+        }
+
+        if billing.order_id and billing.order_id.partner_id:
+            partner_id = billing.order_id.partner_id
+            debit_vals['partner_vat'] = partner_id.vat
+
+            # invoice_partner_id = billing.order_id.partner_id.address_get(
+            #     adr_pref=['invoice']).get('invoice', billing.order_id.partner_id)
+
+            # if invoice_partner_id:
+            partner_name = partner_id.commercial_company_name
+
+            address = partner_id.contact_address
+            if address and partner_name and partner_name in address:
+                address = address.replace(partner_name, '')
+
+            debit_vals['partner_name'] = partner_name
+            debit_vals['partner_address'] = address
+
+        debit_items = []
+        if billing.order_id:
+            for item in billing.order_id.order_line:
+                vals = {
+                    # "debit_id": self.id,
+                    "external_id": item.id,
+                    "sequence": item.sequence,
+                    # "state": item.state,
+                    "name": item.name,
+                    "quantity": item.product_uom_qty,
+                    "uom": item.product_uom.display_name,
+                    "unit_price": item.price_unit,
+                    "tax_id": item.tax_id,
+                    "price_subtotal": item.price_subtotal,
+                    "price_tax": item.price_tax,
+                    "price_total": item.price_total,
+                }
+                debit_items.append((0, 0, vals))
+
+        if debit_items:
+            debit_vals['debit_items'] = debit_items
+
+        return debit_vals
+
     def preview_debit_note(self):
         self.ensure_one()
         return {
@@ -176,117 +272,138 @@ class FreightBilling(models.Model):
             'url': self.get_portal_url(),
         }
 
-    def get_amount_vnd(self):
-        usd = self.env['res.currency'].search([('name', '=', 'USD')])
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
-        company = self.order_id.company_id
-        now = fields.Datetime.now()
-        amount_vnd = usd._convert(self.order_id.amount_total, vnd, company, now)
-        rate_date = vnd.date
-        exchange_rate = vnd.rate
+    # ---------------------------------------------------
+    # Create Credit Note Action
+    # ---------------------------------------------------
 
-        exchange_info = {
-            'amount_vnd': amount_vnd,
-            'rate_date': rate_date,
-            'exchange_rate': exchange_rate
+    def create_credit_note(self):
+        # 1) Create credit notes.
+        credit_vals_list = []
+        for billing in self:
+            credit_vals = self._prepare_credit_values(billing)
+
+            credit_vals_list.append(credit_vals)
+
+        if not credit_vals_list:
+            raise self._nothing_to_debit_error()
+
+        new_credits = self.env['freight.credit.note'].sudo().with_context().create(credit_vals_list)
+
+        if new_credits:
+            return self._open_view_credit_note(new_credits)
+
+    def _open_view_credit_note(self, new_credits):
+        credit_form = self.env.ref('freight_mgmt.freight_credit_note_view_form', False)
+
+        if isinstance(new_credits.ids, list):
+            new_credit_id = new_credits.ids[0]
+        else:
+            new_credit_id = new_credits.id
+
+        if credit_form and new_credit_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'freight.credit.note',
+                'view_type': 'form',
+                'view_mode': 'tree,form',
+                'target': 'current',
+                'views': [(credit_form.id, 'form')],
+                'view_id': credit_form.id,
+                'res_id': new_credit_id,
+            }
+
+    def _prepare_credit_values(self, billing):
+        credit_vals = {
+            'bill_id': billing.id,
+            'booking_id': billing.booking_id,
+            'sale_order_id': billing.order_id,
         }
-        return exchange_info
 
-    def get_bank_info(self):
-        bank_name = ""
-        bank_acc_no = ""
-        bank_acc_name = ""
-        swift_code = ""
-        for bnk in self.company_id.bank_ids:
-            if not bank_name:
-                bank_name = bnk.bank_name
-                bank_acc_no = bnk.acc_number
-                bank_acc_name = bnk.acc_holder_name
-                swift_code = bnk.bank_bic
+        purchase_order_id = None
+        if billing.order_id:
+            purchase_orders = billing.order_id._get_purchase_orders()
+            if purchase_orders:
+                for rec in purchase_orders:
+                    purchase_order_id = rec
 
-        bank_info = {
-            'bank_name': bank_name,
-            'bank_acc_no': bank_acc_no,
-            'bank_acc_name': bank_acc_name,
-            'swift_code': swift_code
+        if purchase_order_id:
+            credit_vals['purchase_order_id'] = purchase_order_id.id
+
+            if purchase_order_id.partner_id:
+                partner_id = purchase_order_id.partner_id
+                credit_vals['partner_vat'] = partner_id.vat
+
+                partner_name = partner_id.commercial_company_name
+
+                address = partner_id.contact_address
+                if address and partner_name and partner_name in address:
+                    address = address.replace(partner_name, '')
+
+                credit_vals['partner_name'] = partner_name
+                credit_vals['partner_address'] = address
+
+            credit_items = []
+            for item in purchase_order_id.order_line:
+                vals = {
+                    # "credit_id": self.id,
+                    "external_id": item.id,
+                    "sequence": item.sequence,
+                    # "state": item.state,
+                    "name": item.name,
+                    "quantity": item.product_uom_qty,
+                    "uom": item.product_uom.display_name,
+                    "unit_price": item.price_unit,
+                    "tax_id": item.taxes_id,
+                    "price_subtotal": item.price_subtotal,
+                    "price_tax": item.price_tax,
+                    "price_total": item.price_total,
+                }
+                credit_items.append((0, 0, vals))
+
+            if credit_items:
+                credit_vals['credit_items'] = credit_items
+
+        return credit_vals
+
+    @api.model
+    def _nothing_to_debit_error(self):
+        return UserError(_(
+            "There is nothing to create debit note! Contact administrator for details.\n\n"
+        ))
+
+    def action_view_debit_note(self):
+        self.ensure_one()
+        debit_notes = self.env['freight.debit.note'].search([
+            ('bill_id', '=', self.id)
+        ])
+        result = {
+            "type": "ir.actions.act_window",
+            "res_model": "freight.debit.note",
+            "domain": [['id', 'in', debit_notes.ids]],
+            "name": "Debit Notes",
+            'view_mode': 'tree,form',
         }
-        return bank_info
+        if len(debit_notes) == 1:
+            result['view_mode'] = 'form'
+            result['res_id'] = debit_notes.id
+        return result
 
-    # @api.depends('state', 'date')
-    # def _compute_name(self):
-    #     def journal_key(move):
-    #         return (move.journal_id, move.journal_id.refund_sequence and move.move_type)
-    #
-    #     def date_key(move):
-    #         return (move.date.year, move.date.month)
-    #
-    #     grouped = defaultdict(  # key: journal_id, move_type
-    #         lambda: defaultdict(  # key: first adjacent (date.year, date.month)
-    #             lambda: {
-    #                 'records': self.env['account.move'],
-    #                 'format': False,
-    #                 'format_values': False,
-    #                 'reset': False
-    #             }
-    #         )
-    #     )
-    #     self = self.sorted(lambda m: (m.date, m.ref or '', m.id))
-    #     highest_name = self[0]._get_last_sequence() if self else False
-    #
-    #     # Group the moves by journal and month
-    #     for move in self:
-    #         if not highest_name and move == self[0] and move.date:
-    #             # In the form view, we need to compute a default sequence so that the user can edit
-    #             # it. We only check the first move as an approximation (enough for new in form view)
-    #             pass
-    #         elif (move.name and move.name != '/') or move.state != 'posted':
-    #             try:
-    #                 # if not move.posted_before:
-    #                 move._constrains_date_sequence()
-    #                 # Has already a name or is not posted, we don't add to a batch
-    #                 continue
-    #             except ValidationError:
-    #                 # Has never been posted and the name doesn't match the date: recompute it
-    #                 pass
-    #         group = grouped[journal_key(move)][date_key(move)]
-    #         if not group['records']:
-    #             # Compute all the values needed to sequence this whole group
-    #             move._set_next_sequence()
-    #             group['format'], group['format_values'] = move._get_sequence_format_param(move.name)
-    #             group['reset'] = move._deduce_sequence_number_reset(move.name)
-    #         group['records'] += move
-    #
-    #     # Fusion the groups depending on the sequence reset and the format used because `seq` is
-    #     # the same counter for multiple groups that might be spread in multiple months.
-    #     final_batches = []
-    #     for journal_group in grouped.values():
-    #         journal_group_changed = True
-    #         for date_group in journal_group.values():
-    #             if (
-    #                     journal_group_changed
-    #                     or final_batches[-1]['format'] != date_group['format']
-    #                     or dict(final_batches[-1]['format_values'], seq=0) != dict(date_group['format_values'], seq=0)
-    #             ):
-    #                 final_batches += [date_group]
-    #                 journal_group_changed = False
-    #             elif date_group['reset'] == 'never':
-    #                 final_batches[-1]['records'] += date_group['records']
-    #             elif (
-    #                     date_group['reset'] == 'year'
-    #                     and final_batches[-1]['records'][0].date.year == date_group['records'][0].date.year
-    #             ):
-    #                 final_batches[-1]['records'] += date_group['records']
-    #             else:
-    #                 final_batches += [date_group]
-    #
-    #     # Give the name based on previously computed values
-    #     for batch in final_batches:
-    #         for move in batch['records']:
-    #             move.name = batch['format'].format(**batch['format_values'])
-    #             batch['format_values']['seq'] += 1
-    #         batch['records']._compute_split_sequence()
-    #
-    #     self.filtered(lambda m: not m.name).name = '/'
+    def action_view_credit_note(self):
+        self.ensure_one()
+        credit_notes = self.env['freight.credit.note'].search([
+            ('bill_id', '=', self.id)
+        ])
+        result = {
+            "type": "ir.actions.act_window",
+            "res_model": "freight.credit.note",
+            "domain": [['id', 'in', credit_notes.ids]],
+            "name": "Credit Notes",
+            'view_mode': 'tree,form',
+        }
+        if len(credit_notes) == 1:
+            result['view_mode'] = 'form'
+            result['res_id'] = credit_notes.id
+        return result
 
     def _get_starting_sequence(self):
         self.ensure_one()
@@ -305,11 +422,27 @@ class FreightBilling(models.Model):
         self.ensure_one()
         return '%s' % (self.display_name)
 
-    @api.onchange("order_id")
-    def _onchange_order_id(self):
-        if self.order_id:
-            self.user_id = self.order_id.user_id
-            self.partner_id = self.order_id.partner_id
+    def _compute_debit_count(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for bill in self:
+            bill.debit_count = self.env['freight.debit.note'].search_count([
+                ('bill_id', '=', bill.id)
+            ])
+
+    def _compute_credit_count(self):
+        for bill in self:
+            bill.credit_count = self.env['freight.credit.note'].search_count([
+                ('bill_id', '=', bill.id)
+            ])
+
+    # @api.onchange("order_id")
+    # def _onchange_order_id(self):
+    #     if self.order_id:
+    #         self.user_id = self.order_id.user_id
+    #         self.partner_id = self.order_id.partner_id
 
     @api.onchange("booking_id")
     def _onchange_booking_id(self):

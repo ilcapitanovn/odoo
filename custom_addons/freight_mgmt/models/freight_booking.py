@@ -23,12 +23,15 @@ class FreightBooking(models.Model):
     description = fields.Char(translate=True)
 
     vessel_booking_number = fields.Char(string="Booking Number")
-    vessel_bol_number = fields.Char(string="B/L Number")
 
     parent_id = fields.Many2one('freight.booking', string='Parent Booking', index=True)
     child_ids = fields.One2many('freight.booking', 'parent_id', string="Sub-bookings")
 
     billing_id = fields.One2many('freight.billing', 'booking_id', string='Bill Reference', auto_join=True)
+    billing_count = fields.Integer(
+        "Number of BL",
+        compute='_compute_billing_count')
+    vessel_bol_no = fields.Char(string="B/L Number", related="billing_id.vessel_bol_number", readonly=True)
 
     partner_id = fields.Many2one(comodel_name="res.partner",
                                  string="Customer", readonly=True)
@@ -62,6 +65,8 @@ class FreightBooking(models.Model):
         ('freehand', 'Freehand'),
         ('nominated', 'Nominated'),
     ], string='Order Type')
+
+    booking_volumes = fields.One2many('freight.booking.volume', 'booking_id', string="Booking volumes")
 
     container_id = fields.Many2one(
         comodel_name="freight.catalog.container", string="Container", tracking=True, index=True
@@ -106,6 +111,7 @@ class FreightBooking(models.Model):
     issued_date = fields.Datetime(string="Issued Date", store=True)
     approved_date = fields.Datetime(string="Confirmed Date", store=True)
     completed_date = fields.Datetime(string="Completed Date", store=True)
+    confirmed = fields.Boolean(related="stage_id.confirmed")
     completed = fields.Boolean(related="stage_id.completed")
 
     company_id = fields.Many2one(
@@ -135,33 +141,40 @@ class FreightBooking(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
+    def action_confirm(self):
+        if not self.vessel_booking_number:
+            raise UserError(_("A Booking Number is required in order to confirm the booking."))
+
+        stage = self.env["freight.catalog.stage"].search([('confirmed', '=', True)], limit=1)
+        if stage and stage.id:
+            self.write({'stage_id': stage.id})
+
+    def action_view_billing(self):
+        if not self.billing_id:
+            raise UserError(_("The selected booking and its related bill is invalid to view."))
+
+        action = self._open_view_billing(self.billing_id)
+        return action
+
     def create_bill_lading(self):
-        active_ids = self._context.get('active_ids', [])
-        if not active_ids:
-            active_ids = self.id
+        # 1) Create bills.
+        bill_vals_list = []
+        for booking in self:
+            # booking = booking.with_company(booking.company_id)
+            bill_vals = self._prepare_bill_values(booking)
 
-        #bookings = self.env['freight.booking'].browse(active_ids)
+            bill_vals_list.append(bill_vals)
 
-        #new_bills = self._create_bills()
+        if not bill_vals_list:
+            raise self._nothing_to_invoice_error()
 
-            # 1) Create bookings.
-            bill_vals_list = []
-            for booking in self:
-                # booking = booking.with_company(booking.company_id)
-                bill_vals = self._prepare_bill_values(booking)
+        new_bills = self.env['freight.billing'].sudo().with_context().create(bill_vals_list)
 
-                bill_vals_list.append(bill_vals)
+        if new_bills:
+            # for order in sale_orders:
+            #     order.booking_status = 'booked'
 
-            if not bill_vals_list:
-                raise self._nothing_to_invoice_error()
-
-            new_bills = self.env['freight.billing'].sudo().with_context().create(bill_vals_list)
-
-            if new_bills:
-                # for order in sale_orders:
-                #     order.booking_status = 'booked'
-
-                return self._open_view_billing(new_bills)
+            return self._open_view_billing(new_bills)
 
     def _open_view_billing(self, new_bills):
         billing_form = self.env.ref('freight_mgmt.freight_billing_view_form', False)
@@ -197,6 +210,17 @@ class FreightBooking(models.Model):
 
         return bill_vals
 
+    @api.depends('billing_id')
+    def _compute_billing_count(self):
+        for rec in self:
+            rec.billing_count = len(rec.billing_id)
+
+    @api.depends('billing_id')
+    def _compute_vessel_bol_number(self):
+        for rec in self:
+            if rec.billing_id:
+                rec.vessel_bol_number = rec.billing_id.vessel_bol_number
+
     @api.model
     def default_get(self, fields_list):
         res = super(FreightBooking, self).default_get(fields_list)
@@ -217,6 +241,11 @@ class FreightBooking(models.Model):
             " For Services, you should modify the Service Booking Policy to "
             "'Prepaid'."
         ))
+
+    @api.onchange("etd")
+    def _onchange_original_etd(self):
+        if self.etd and (not self.etd_revised or self.etd_revised < self.etd):
+            self.etd_revised = self.etd
 
     @api.onchange("order_id")
     def _onchange_order_id(self):
@@ -368,3 +397,16 @@ class FreightBooking(models.Model):
             # imply modifying followers
             return recipients
         return recipients
+
+class FreightBookingVolume(models.Model):
+    _name = 'freight.booking.volume'
+    _description = 'Freight Booking Volume'
+    _order = 'booking_id, sequence, id'
+    _check_company_auto = True
+
+    booking_id = fields.Many2one('freight.booking', string='Booking', index=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    quantity = fields.Integer(string="Quantity")
+    container_id = fields.Many2one(
+        comodel_name="freight.catalog.container", string="Container", ondelete="restrict", tracking=True, index=True
+    )

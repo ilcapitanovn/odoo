@@ -9,3 +9,7 @@ from . import freight_catalog_stage
 from . import freight_catalog_vessel
 from . import res_partner
 from . import sale_order
+from . import freight_debit_note
+from . import freight_debit_note_item
+from . import freight_credit_note
+from . import freight_credit_note_item

@@ -54,6 +54,22 @@
                 name="domain_force"
             >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
         </record>
+        <record id="freight_debit_note_comp_rule" model="ir.rule">
+            <field name="name">Freight Debit Note Company Rule</field>
+            <field name="model_id" ref="model_freight_debit_note" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+        <record id="freight_credit_note_comp_rule" model="ir.rule">
+            <field name="name">Freight Credit Note Company Rule</field>
+            <field name="model_id" ref="model_freight_credit_note" />
+            <field name="global" eval="True" />
+            <field
+                name="domain_force"
+            >['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
         <record id="freight_catalog_airline_comp_rule" model="ir.rule">
             <field name="name">Freight Catalog Airline Company Rule</field>
             <field name="model_id" ref="model_freight_catalog_airline" />

@@ -17,3 +17,13 @@ access_freight_billing_manager,freight.billing.manager,model_freight_billing,gro
 access_freight_billing_user,freight.billing.user,model_freight_billing,group_freight_user,1,1,1,0
 access_freight_billing_line_manager,freight.billing.line.manager,model_freight_billing_line,group_freight_manager,1,1,1,1
 access_freight_billing_line_user,freight.billing.line.user,model_freight_billing_line,group_freight_user,1,1,1,0
+access_freight_debit_note_manager,freight.debit.note.manager,model_freight_debit_note,group_freight_manager,1,1,1,1
+access_freight_debit_note_user,freight.debit.note.user,model_freight_debit_note,group_freight_user,1,1,1,0
+access_freight_debit_note_item_manager,freight.debit.note.item.manager,model_freight_debit_note_item,group_freight_manager,1,1,1,1
+access_freight_debit_note_item_user,freight.debit.note.item.user,model_freight_debit_note_item,group_freight_user,1,1,1,0
+access_freight_booking_volume_manager,freight.booking.volume.manager,model_freight_booking_volume,group_freight_manager,1,1,1,1
+access_freight_booking_volume_user,freight.booking.volume.user,model_freight_booking_volume,group_freight_user,1,1,1,0
+access_freight_credit_note_manager,freight.credit.note.manager,model_freight_credit_note,group_freight_manager,1,1,1,1
+access_freight_credit_note_user,freight.credit.note.user,model_freight_credit_note,group_freight_user,1,1,1,0
+access_freight_credit_note_item_manager,freight.credit.note.item.manager,model_freight_credit_note_item,group_freight_manager,1,1,1,1
+access_freight_credit_note_item_user,freight.credit.note.item.user,model_freight_credit_note_item,group_freight_user,1,1,1,0

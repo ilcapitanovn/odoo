@@ -105,7 +105,9 @@
         <field name="arch" type="xml">
             <form string="Freight Booking">
                 <header>
-                    <field name="billing_id" invisible='1'/>
+                    <field name="billing_count" invisible='1'/>
+                    <field name="confirmed" invisible='1'/>
+                    <field name="completed" invisible='1'/>
 <!--                    <button-->
 <!--                        string="Assign to me"-->
 <!--                        name="assign_to_me"-->
@@ -114,8 +116,10 @@
 <!--                    />-->
                     <button name="create_bill_lading" string="Create B/L" class="oe_highlight"
                             type="object" data-hotkey="b"
-                            attrs="{'invisible': [('billing_id', '=', False)]}"/>
-
+                            attrs="{'invisible': ['|', ('billing_count', '&gt;', 0), ('confirmed', '=', False)]}"/>
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            string="Confirm" type="object" data-hotkey="v"
+                            attrs="{'invisible': ['|', '|', ('stage_id', '=', False), ('confirmed', '=', True), ('completed', '=', True)]}"/>
                     <field
                         name="stage_id"
                         widget="statusbar"
@@ -130,6 +134,13 @@
                         attrs="{'invisible': [('active', '=', True)]}"
                     />
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_billing"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('billing_count', '=', 0)]}">
+                            <field name="billing_count" widget="statinfo" string="Bills"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <h1 class="oe_title">
@@ -152,7 +163,7 @@
                         </group>
                         <group>
                             <field name="vessel_booking_number" />
-                            <field name="vessel_bol_number" />
+                            <field name="vessel_bol_no" attrs="{'invisible' : [('vessel_bol_no', '=', False)]}" />
                             <field name="transport_type" />
                             <field name="shipment_type" />
                             <field name="create_date" readonly="1" attrs="{'invisible' : [('create_date', '=', False)]}" />
@@ -181,19 +192,31 @@
                             <page string="Cargo Details" name="cargo_details">
                                 <group colspan="2">
                                     <group>
-                                        <field name="container_id" />
-                                        <field name="quantity" />
+<!--                                        <field name="container_id" />-->
+<!--                                        <field name="quantity" />-->
                                         <field name="commodity" />
                                         <field name="gross_weight" />
                                         <field name="shipping_line" />
+                                        <field name="ro" />
                                     </group>
                                     <group>
                                         <field name="voyage_number" />
                                         <field name="temperature"/>
                                         <field name="ventilation" />
-                                        <field name="ro" />
                                     </group>
                                 </group>
+                            </page>
+                            <page string="Volumes" name="volumes">
+                                <field name="booking_volumes"
+                                    widget="section_and_note_one2many"
+                                    mode="tree">
+                                    <tree editable="bottom" class="o_booking_volume_tree">
+                                        <field name="booking_id" invisible="1"/>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="quantity" widget="integer" />
+                                        <field name="container_id" />
+                                    </tree>
+                                </field>
                             </page>
                             <page string="Other Information" name="other_info">
                                 <group>
@@ -231,7 +254,7 @@
                 <field name="vessel_booking_number" string="Booking NO" optional="show" />
                 <field name="ro" string="R.O." optional="hide" />
                 <field name="shipping_line" string="Line" optional="hide" />
-                <field name="vessel_bol_number" string="B/L NO" optional="hide" />
+                <field name="vessel_bol_no" string="B/L NO" optional="hide" />
                 <field name="order_id" string="Order" decoration-info="1" optional="show" />
                 <field name="partner_id" readonly="1" optional="show"/>
                 <field name="vessel_id" optional="hide" />

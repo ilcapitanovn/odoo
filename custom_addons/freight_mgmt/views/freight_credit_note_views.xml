@@ -1,0 +1,327 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<odoo>
+    
+    <record id="freight_credit_note_view_search" model="ir.ui.view">
+        <field name="name">freight.credit.note.view.search</field>
+        <field name="model">freight.credit.note</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id" />
+                <filter
+                    string="My Credit Notes"
+                    name="my_credit_notes"
+                    domain="[('user_id','=',uid)]"
+                />
+                <separator />
+                <group expand="0" string="Group By">
+                    <!--
+                    <filter
+                        string="Team"
+                        name="group_team"
+                        domain="[]"
+                        context="{'group_by':'team_id'}"
+                    />
+                    -->
+                    <filter
+                        string="User"
+                        name="group_user"
+                        domain="[]"
+                        context="{'group_by':'user_id'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="freight_credit_note_view_form" model="ir.ui.view">
+        <field name="name">freight.credit.note.view.form</field>
+        <field name="model">freight.credit.note</field>
+        <field name="arch" type="xml">
+            <form string="Freight Credit Note">
+                <header>
+<!--                    <button-->
+<!--                        string="Assign to me"-->
+<!--                        name="assign_to_me"-->
+<!--                        type="object"-->
+<!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
+<!--                    />-->
+<!--                    <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"-->
+<!--                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}" data-hotkey="q"/>-->
+                    <button name="action_create_invoice" string="Create Bill" type="object" class="oe_highlight"
+                            context="{'create_bill':True}" data-hotkey="w"
+                            attrs="{'invisible': ['|', '|', ('sale_state', 'not in', ('purchase', 'done')), ('state', '!=', 'posted'), ('invoice_status', 'in', ('no', 'invoiced'))]}"/>
+                    <!-- Preview (only customer credit note) -->
+<!--                    <button name="preview_credit_note" type="object" string="Preview" data-hotkey="d"-->
+<!--                            title="Preview Credit Note"/>-->
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,posted,cancel"
+                        options="{'clickable': '1', 'fold_field': 'fold'}"
+                    />
+                    <field name="invoice_status" invisible="1"/>
+                    <field name="sale_state" invisible="1"/>
+                </header>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object"  name="action_view_invoice"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o" attrs="{'invisible':['|', ('invoice_count', '=', 0), ('state', 'in', ('draft','sent','to approve'))]}">
+                            <field name="invoice_count" widget="statinfo" string="Vendor Bills"/>
+                            <field name='invoice_ids' invisible="1"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1 class="oe_title">
+                            <field name="number" />
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <field name="active" invisible="1" />
+                        <field name="partner_id" invisible="1" />
+                        <field name="is_purchase_order_empty" invisible="1" />
+                        <field name="origin_name" invisible="1" />
+                        <field
+                            name="company_id"
+                            options="{'no_create': True}"
+                            groups="base.group_multi_company"
+                        />
+                        <group>
+                            <field name="bill_id" options="{'no_create': True, 'no_create_edit': True}" />
+                            <field name="booking_id" />
+                            <field name="pol" />
+                            <field name="pod" />
+                            <field name="etd_formatted" />
+                            <field name="volume" />
+                        </group>
+                        <group>
+<!--                                attrs="{'readonly': ['|', ('bill_id', '=', False), ('is_purchase_order_empty', '=', True)]}"-->
+                            <field name="purchase_order_id" options="{'no_create': True, 'no_create_edit': True}"
+                                attrs="{'readonly': [('bill_id', '=', False)]}" />
+                            <field name="sale_order_id" />
+                            <field name="user_id" />
+                            <field name="supplier_id" domain="[('id', '=', partner_id)]"
+                                options="{'no_create': True, 'no_create_edit': True}"/>
+                            <label for="exchange_rate" />
+                            <div class="o_row">
+                                <field name="exchange_rate" digits="[12,0]" />
+                                <button name="update_exchange_rate" type="object"
+                                        string=" Refresh"
+                                        help="Recompute exchange rate"
+                                        class="btn-link mb-1 px-0" icon="fa-refresh"
+                                        confirm="This will update exchange and re-calculate total amount in VND." />
+                            </div>
+                            <field name="credit_date" widget="date" />
+                        </group>
+                    </group>
+                    <group>
+                        <notebook>
+                            <page string="Items" name="credit_items">
+                                <field name="credit_items"
+                                    widget="section_and_note_one2many"
+                                    mode="tree">
+                                    <tree editable="bottom" class="o_billing_lines" delete="false" create="false">
+                                        <field name="credit_id" invisible="1"/>
+                                        <field name="external_id" invisible="1"/>
+                                        <field name="tax_id" invisible="1"/>
+                                        <field name="price_subtotal" invisible="1"/>
+                                        <field name="price_tax" invisible="1"/>
+                                        <field name="sequence" string="NO" widget="handle"/>
+                                        <field name="name" string="TYPE" widget="section_and_note_text" />
+                                        <field name="quantity" string="QTY" digits="[12,0]" readonly="1" force_save="1"/>
+                                        <field name="uom" string="UNIT OF MEASURE" readonly="1" force_save="1"/>
+                                        <field name="unit_price" string="UNIT RATE" readonly="1" force_save="1"/>
+                                        <field name="currency_id" string="CUR" readonly="1" force_save="1"/>
+                                        <field name="tax_amount_percent" string="VAT TAX" readonly="1" force_save="1"/>
+                                        <field name="price_total" string="AMOUNT (INCL. TAX)" readonly="1" force_save="1"/>
+                                    </tree>
+                                </field>
+                                <group name="note_group" class="mt-2 mt-md-0">
+                                    <group class="oe_subtotal_footer oe_right mr-3" name="sale_total">
+                                        <field name="amount_total" string="Total (USD)" />
+                                        <field name="amount_total_vnd" string="Total (VND)"
+                                            attrs="{'invisible': [('exchange_rate', '=', 0)]}"/>
+                                    </group>
+                                    <div class="oe_clear"/>
+                                </group>
+                            </page>
+                            <page string="Invoice Address" name="invoice_address">
+                                <group>
+                                    <group>
+                                        <field name="invoice_partner_id" invisible="1" />
+                                        <field name="partner_name"/>
+                                        <field name="partner_address" />
+                                        <field name="partner_vat" />
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Bank Information" name="bank_information">
+                                <group>
+                                    <group>
+                                        <field name="bank_name" />
+                                        <field name="bank_acc_no"/>
+                                        <field name="bank_acc_name" />
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field
+                        name="message_ids"
+                        widget="mail_thread"
+                        options="{'post_refresh': 'recipients', 'open_attachments': True}"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="freight_credit_note_view_tree" model="ir.ui.view">
+        <field name="name">freight.credit.note.view.tree</field>
+        <field name="model">freight.credit.note</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="number" string="Credit No." decoration-bf="1" decoration-info="1" />
+                <field name="bill_id" string="Bill Ref" />
+<!--                <field name="vessel_booking_number" string="Booking NO" optional="show" />-->
+<!--                <field name="vessel_bol_number" optional="show" />-->
+                <field name="purchase_order_id" string="Purchase Order" decoration-info="1" optional="show" />
+                <field name="supplier_id" readonly="1" optional="show"/>
+                <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
+                <field name="credit_date" widget="date" optional="show" />
+                <field name="state" optional="show" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_freight_credit_note_kanban" model="ir.ui.view">
+        <field name="name">freight.credit.note.kanban</field>
+        <field name="model">freight.credit.note</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="state">
+                <field name="number" />
+                <field name="active" />
+                <field name="user_id" />
+                <field name="color" />
+                <field name="state" />
+                <field name="credit_date" />
+                <progressbar
+                    field="activity_state"
+                    colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}"
+                />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div
+                            t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_content oe_kanban_global_click"
+                        >
+                            <div
+                                class="o_dropdown_kanban dropdown"
+                                groups="base.group_user"
+                            >
+                                <a
+                                    class="dropdown-toggle btn"
+                                    role="button"
+                                    data-toggle="dropdown"
+                                    href="#"
+                                    title="Toggle dropdown"
+                                >
+                                    <span class="fa fa-ellipsis-v" aria-hidden="true" />
+                                </a>
+                                <ul
+                                    class="dropdown-menu"
+                                    role="menu"
+                                    aria-labelledby="dLabel"
+                                >
+                                    <li t-if="widget.editable">
+                                        <a type="edit">Edit</a>
+                                    </li>
+                                    <li t-if="widget.deletable">
+                                        <a type="delete">Delete</a>
+                                    </li>
+                                    <li class="divider" />
+                                    <li>
+                                        <ul
+                                            class="oe_kanban_colorpicker"
+                                            data-field="color"
+                                        />
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+<!--                                    <field name="name" />-->
+                                    <div class="o_kanban_record_title text-muted">
+                                        <field name="number"  />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body" />
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+<!--                                    <field name="priority" widget="priority" />-->
+                                    <field
+                                        name="activity_ids"
+                                        widget="kanban_activity"
+                                        related="activity_state"
+                                    />
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+<!--                                    <field-->
+<!--                                        name="kanban_state"-->
+<!--                                        widget="state_selection"-->
+<!--                                    />-->
+                                    <field name="activity_state" invisible="1" />
+                                    <img
+                                        t-att-src="kanban_image('res.users', 'image_128', record.user_id.raw_value)"
+                                        t-att-title="record.user_id.value"
+                                        width="24"
+                                        height="24"
+                                        class="oe_kanban_avatar o_image_24_cover float-right"
+                                        t-att-alt="record.user_id.value"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!--
+    <record id="freight_credit_note_views_pivot" model="ir.ui.view">
+        <field name="name">freight.credit.note.view.pivot</field>
+        <field name="model">freight.credit.note</field>
+        <field name="arch" type="xml">
+            <pivot string="Pivot Analysis" disable_linking="True">
+                <field name="team_id" type="row" />
+                <field name="issued_date" type="col" />
+            </pivot>
+        </field>
+    </record>
+    -->
+<!--    <record id="action_duplicate_freight_credit_note" model="ir.actions.server">-->
+<!--        <field name="name">Duplicate</field>-->
+<!--        <field name="model_id" ref="model_freight_credit_note" />-->
+<!--        <field name="binding_model_id" ref="freight_mgmt.model_freight_credit_note" />-->
+<!--        <field name="binding_view_types">list</field>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">-->
+<!--            action = model.action_duplicate_freight_credit_note()-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="model_freight_credit_note_action_share" model="ir.actions.server">-->
+<!--        <field name="name">Share</field>-->
+<!--        <field name="model_id" ref="freight_mgmt.model_freight_credit_note" />-->
+<!--        <field name="binding_model_id" ref="freight_mgmt.model_freight_credit_note" />-->
+<!--        <field name="binding_view_types">form</field>-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">action = records.action_share()</field>-->
+<!--    </record>-->
+</odoo>

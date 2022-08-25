@@ -21,6 +21,18 @@
         <field name="res_model">freight.billing</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
     </record>
+    <record id="freight_debit_note_action" model="ir.actions.act_window">
+        <field name="name">Debit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.debit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+    </record>
+    <record id="freight_credit_note_action" model="ir.actions.act_window">
+        <field name="name">Credit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.credit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+    </record>
     <!--
     <record id="freight_catalog_reporting_action" model="ir.actions.act_window">
         <field name="name">Reporting</field>
@@ -162,6 +174,20 @@
         parent="freight_mgmt_executive_menu"
         action="freight_billing_action"
         sequence="25"
+    />
+    <menuitem
+        id="freight_executive_debit_notes_menu"
+        name="Debit Notes"
+        parent="freight_mgmt_executive_menu"
+        action="freight_debit_note_action"
+        sequence="35"
+    />
+    <menuitem
+        id="freight_executive_credit_notes_menu"
+        name="Credit Notes"
+        parent="freight_mgmt_executive_menu"
+        action="freight_credit_note_action"
+        sequence="45"
     />
 
     <menuitem

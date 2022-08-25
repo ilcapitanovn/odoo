@@ -17,7 +17,7 @@ class SaleOrder(models.Model):
     order_type = fields.Selection([
         ('freehand', 'Freehand'),
         ('nominated', 'Nominated'),
-    ], string='Order Type')
+    ], string='Order Type', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
     def create_bookings(self):
         """

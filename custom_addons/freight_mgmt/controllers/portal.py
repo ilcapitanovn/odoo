@@ -5,10 +5,8 @@ import binascii
 
 from odoo import fields, http, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, MissingError, ValidationError
-from odoo.fields import Command
 from odoo.http import request
-
-from odoo.addons.portal.controllers.mail import _message_post_helper
+from odoo.tools import float_round
 from odoo.addons.portal.controllers import portal
 from odoo.addons.portal.controllers.portal import pager as portal_pager, get_records_pager
 
@@ -87,28 +85,29 @@ class CustomerPortal(portal.CustomerPortal):
         })
         return request.render("sale.portal_my_orders", values)
 
-    @http.route(['/my/notes/<int:billing_id>'], type='http', auth="public", website=True)
-    def portal_billing_page(self, billing_id, report_type=None, access_token=None, message=False, download=False, **kw):
+    @http.route(['/my/notes/<int:debit_id>'], type='http', auth="public", website=True)
+    def portal_debit_note_page(self, debit_id, report_type=None, access_token=None, message=False, download=False, **kw):
         try:
-            billing_sudo = self._document_check_access('freight.billing', billing_id, access_token=access_token)
-            order_sudo = billing_sudo.order_id
-            order_id = order_sudo.id
+            debit_sudo = self._document_check_access('freight.debit.note', debit_id, access_token=access_token)
+            order_sudo = debit_sudo.order_id
+            #order_id = order_sudo.id
         except (AccessError, MissingError):
             return request.redirect('/my')
 
         if report_type in ('html', 'pdf', 'text'):
-            return self._show_report(model=billing_sudo, report_type=report_type, report_ref='freight_mgmt.freight_debit_note_report', download=download)
+            return self._show_report(model=debit_sudo, report_type=report_type,
+                                     report_ref='freight_mgmt.freight_debit_note_report', download=download)
 
         # use sudo to allow accessing/viewing orders for public user
         # only if he knows the private token
         # Log only once a day
-        if order_sudo:
+        if debit_sudo:
             # store the date as a string in the session to allow serialization
             now = fields.Date.today().isoformat()
-            session_obj_date = request.session.get('view_quote_%s' % order_sudo.id)
+            session_obj_date = request.session.get('view_debit_%s' % debit_sudo.id)
             if session_obj_date != now and request.env.user.share and access_token:
-                request.session['view_quote_%s' % order_sudo.id] = now
-                #body = _('Quotation viewed by customer %s', order_sudo.partner_id.name)
+                request.session['view_debit_%s' % debit_sudo.id] = now
+                # body = _('Quotation viewed by customer %s', order_sudo.partner_id.name)
                 # _message_post_helper(
                 #     "sale.order",
                 #     order_sudo.id,
@@ -119,107 +118,49 @@ class CustomerPortal(portal.CustomerPortal):
                 #     partner_ids=order_sudo.user_id.sudo().partner_id.ids,
                 # )
 
-        usd = request.env['res.currency'].search([('name', '=', 'USD')])
-        vnd = request.env['res.currency'].search([('name', '=', 'VND')])
-        company = order_sudo.company_id
-        now = fields.Datetime.now()
-        amount_vnd = usd._convert(order_sudo.amount_total, vnd, company, now)
-        rate_date = vnd.date
-        exchange_rate = vnd.rate
-
         etd = ''
-        if billing_sudo.booking_id.etd_revised:
-            etd = billing_sudo.booking_id.etd_revised.strftime('%d-%B-%y')
+        if debit_sudo.etd:
+            etd = debit_sudo.etd.strftime('%d-%B-%y')
 
-        volume = ""
-        if billing_sudo.booking_id.quantity > 0 and billing_sudo.booking_id.container_id.code:
-            volume = "%sx%s" % (billing_sudo.booking_id.quantity, billing_sudo.booking_id.container_id.code)
-
-        bank_name = ""
-        bank_acc_no = ""
-        bank_acc_name = ""
-        swift_code = ""
-        for bnk in billing_sudo.company_id.bank_ids:
-            if not bank_name:
-                bank_name = bnk.bank_name
-                bank_acc_no = bnk.acc_number
-                bank_acc_name = bnk.acc_holder_name
-                swift_code = bnk.bank_bic
+        # volume = ""
+        # if debit_sudo.booking_id.quantity > 0 and debit_sudo.booking_id.container_id.code:
+        #     volume = "%sx%s" % (debit_sudo.booking_id.quantity, debit_sudo.booking_id.container_id.code)
 
         values = {
-            'billing_sudo': billing_sudo,
+            'debit_sudo': debit_sudo,
             'sale_order': order_sudo,
-            'partner_id': order_sudo.partner_id.id,
-            'partner_name': order_sudo.partner_id.display_name,
-            'partner_address': order_sudo.partner_id.contact_address,
-            'bill_no': billing_sudo.vessel_bol_number,
-            'pol': billing_sudo.port_loading_id.name,
-            'pod': billing_sudo.port_discharge_id.name,
+            'partner_id': debit_sudo.partner_id,
+            'partner_name': debit_sudo.partner_name,
+            'partner_address': debit_sudo.partner_address,
+            'partner_vat': debit_sudo.partner_vat,
+            'bill_no': debit_sudo.bill_no,
+            'pol': debit_sudo.pol,
+            'pod': debit_sudo.pod,
             'etd': etd,
-            'volume': volume,
-            'bank_name': bank_name,
-            'bank_acc_no': bank_acc_no,
-            'bank_acc_name': bank_acc_name,
-            'swift_code': swift_code,
-            'amount_vnd': amount_vnd,
-            'rate_date': rate_date,
-            'exchange_rate': exchange_rate,
-            'vnd_currency': vnd,
+            'volume': debit_sudo.volume,
+            'bank_name': debit_sudo.bank_name,
+            'bank_acc_no': debit_sudo.bank_acc_no,
+            'bank_acc_name': debit_sudo.bank_acc_name,
+            'swift_code': debit_sudo.swift_code,
+            'amount_total': debit_sudo.amount_total,
+            'amount_vnd': debit_sudo.amount_total_vnd,
+            'rate_date': debit_sudo.debit_date,
+            'exchange_rate': debit_sudo.exchange_rate,
+            #'vnd_currency': vnd,
             'message': message,
             'token': access_token,
-            'landing_route': '/shop/payment/validate',
             'bootstrap_formatting': True,
-            'partner_id': order_sudo.partner_id.id,
             'report_type': 'html',
-            'action': billing_sudo._get_portal_return_action(),
+            'action': debit_sudo._get_portal_return_action(),
         }
-        if order_sudo.company_id:
-            values['res_company'] = order_sudo.company_id
+        if debit_sudo.company_id:
+            values['res_company'] = debit_sudo.company_id
 
-        # Payment values
-        # if order_sudo.has_to_be_paid():
-        #     logged_in = not request.env.user._is_public()
-        #     acquirers_sudo = request.env['payment.acquirer'].sudo()._get_compatible_acquirers(
-        #         order_sudo.company_id.id,
-        #         order_sudo.partner_id.id,
-        #         currency_id=order_sudo.currency_id.id,
-        #         sale_order_id=order_sudo.id,
-        #     )  # In sudo mode to read the fields of acquirers and partner (if not logged in)
-        #     tokens = request.env['payment.token'].search([
-        #         ('acquirer_id', 'in', acquirers_sudo.ids),
-        #         ('partner_id', '=', order_sudo.partner_id.id)
-        #     ]) if logged_in else request.env['payment.token']
-        #     fees_by_acquirer = {
-        #         acquirer: acquirer._compute_fees(
-        #             order_sudo.amount_total,
-        #             order_sudo.currency_id,
-        #             order_sudo.partner_id.country_id,
-        #         ) for acquirer in acquirers_sudo.filtered('fees_active')
-        #     }
-        #     # Prevent public partner from saving payment methods but force it for logged in partners
-        #     # buying subscription products
-        #     show_tokenize_input = logged_in \
-        #         and not request.env['payment.acquirer'].sudo()._is_tokenization_required(
-        #             sale_order_id=order_sudo.id
-        #         )
-        #
-        #     values.update({
-        #         'acquirers': acquirers_sudo,
-        #         'tokens': tokens,
-        #         'fees_by_acquirer': fees_by_acquirer,
-        #         'show_tokenize_input': show_tokenize_input,
-        #         'amount': order_sudo.amount_total,
-        #         'currency': order_sudo.pricelist_id.currency_id,
-        #         'access_token': order_sudo.access_token,
-        #         'transaction_route': order_sudo.get_portal_url(suffix='/transaction'),
-        #         'landing_route': order_sudo.get_portal_url(),
-        #     })
-
-        if order_sudo.state in ('draft', 'sent', 'cancel'):
-            history = request.session.get('my_quotations_history', [])
-        else:
-            history = request.session.get('my_orders_history', [])
-        values.update(get_records_pager(history, order_sudo))
+        # if order_sudo.state in ('draft', 'sent', 'cancel'):
+        #     history = request.session.get('my_quotations_history', [])
+        # else:
+        #     history = request.session.get('my_orders_history', [])
+        # values.update(get_records_pager(history, order_sudo))
 
         return request.render('freight_mgmt.debit_note_portal_template', values)
 

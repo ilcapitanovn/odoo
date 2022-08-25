@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <odoo>
-    <!-- Complete page of the sale_order -->
+    <!-- Complete page of the debit note -->
     <template id="debit_note_portal_template" name="Debit Note Portal Template" inherit_id="portal.portal_sidebar" primary="True">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
             <link rel="stylesheet" href="/freight_mgmt/static/src/css/debit_note.css"/>
 
             <t t-set="o_portal_fullwidth_alert" groups="sales_team.group_sale_salesman">
                 <t t-call="portal.portal_back_in_edit_mode">
-                    <t t-set="backend_url" t-value="'/web#model=%s&amp;id=%s&amp;action=%s&amp;view_type=form' % (billing_sudo._name, billing_sudo.id, action.id)"/>
+                    <t t-set="backend_url" t-value="'/web#model=%s&amp;id=%s&amp;action=%s&amp;view_type=form' % (debit_sudo._name, debit_sudo.id, action.id)"/>
                 </t>
             </t>
 
@@ -17,23 +17,23 @@
                     <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>
 
                     <t t-set="title">
-                        <h2 class="mb-0"><b t-field="sale_order.amount_total" data-id="total_amount"/> </h2>
+                        <h2 class="mb-0"><b t-esc="'{:,.2f}'.format(amount_total)" data-id="total_amount"/> </h2>
                     </t>
                     <t t-set="entries">
                         <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">
                             <li class="list-group-item flex-grow-1">
-                                <a t-if="sale_order.has_to_be_signed(True)" role="button" class="btn btn-primary btn-block mb8" data-toggle="modal" data-target="#modalaccept" href="#">
-                                    <i class="fa fa-check"/><t t-if="sale_order.has_to_be_paid(True)"> Sign &amp; Pay</t><t t-else=""> Accept &amp; Sign</t>
+                                <a t-if="sale_order and sale_order.has_to_be_signed(True)" role="button" class="btn btn-primary btn-block mb8" data-toggle="modal" data-target="#modalaccept" href="#">
+                                    <i class="fa fa-check"/><t t-if="sale_order and sale_order.has_to_be_paid(True)"> Sign &amp; Pay</t><t t-else=""> Accept &amp; Sign</t>
                                 </a>
-                                <a t-elif="sale_order.has_to_be_paid(True)" role="button" id="o_sale_portal_paynow" data-toggle="modal" data-target="#modalaccept" href="#" t-att-class="'btn-block mb8 %s' % ('btn btn-light' if sale_order.transaction_ids else 'btn btn-primary')" >
-                                    <i class="fa fa-check"/> <t t-if="not sale_order.signature">Accept &amp; Pay</t><t t-else="">Pay Now</t>
+                                <a t-elif="sale_order and sale_order.has_to_be_paid(True)" role="button" id="o_sale_portal_paynow" data-toggle="modal" data-target="#modalaccept" href="#" t-att-class="'btn-block mb8 %s' % ('btn btn-light' if sale_order.transaction_ids else 'btn btn-primary')" >
+                                    <i class="fa fa-check"/> <t t-if="sale_order and not sale_order.signature">Accept &amp; Pay</t><t t-else="">Pay Now</t>
                                 </a>
                                 <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
                                     <div class="btn-group flex-grow-1 mr-1 mb-1">
-                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="billing_sudo.get_portal_url(report_type='pdf', download=True)" title="Download"><i class="fa fa-download"/> Download</a>
+                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="debit_sudo.get_portal_url(report_type='pdf', download=True)" title="Download"><i class="fa fa-download"/> Download</a>
                                     </div>
                                     <div class="btn-group flex-grow-1 mb-1">
-                                        <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print" t-att-href="billing_sudo.get_portal_url(report_type='pdf')" id="print_invoice_report" title="Print" target="_blank"><i class="fa fa-print"/> Print</a>
+                                        <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print" t-att-href="debit_sudo.get_portal_url(report_type='pdf')" id="print_invoice_report" title="Print" target="_blank"><i class="fa fa-print"/> Print</a>
                                     </div>
                                 </div>
                             </li>
@@ -42,7 +42,7 @@
                                 <ul class="nav flex-column bs-sidenav"></ul>
                             </li>
 
-                            <t t-if="not sale_order.is_expired and sale_order.state in ['draft', 'sent']">
+                            <t t-if="sale_order and not sale_order.is_expired and sale_order.state in ['draft', 'sent']">
                                 <li t-if="sale_order.validity_date" class="list-group-item">
                                     <small><b class="text-muted">This offer expires on</b></small>
                                     <div t-field="sale_order.validity_date"></div>
@@ -66,14 +66,14 @@
                                 </li>
                             </t>
 
-                            <li t-if="sale_order.user_id" class="list-group-item flex-grow-1">
+                            <li t-if="debit_sudo.user_id" class="list-group-item flex-grow-1">
                                 <div class="small mb-1"><strong class="text-muted">Salesperson</strong></div>
                                 <div class="row flex-nowrap">
                                     <div class="col flex-grow-0 pr-2">
-                                        <img class="rounded-circle mr4 float-left o_portal_contact_img" t-att-src="image_data_uri(sale_order.user_id.avatar_1024)" alt="Contact"/>
+                                        <img class="rounded-circle mr4 float-left o_portal_contact_img" t-att-src="image_data_uri(debit_sudo.user_id.avatar_1024)" alt="Contact"/>
                                     </div>
                                     <div class="col pl-0" style="min-width: 150px">
-                                        <span t-field="sale_order.user_id" t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True}'/>
+                                        <span t-field="debit_sudo.user_id" t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True}'/>
 <!--                                        <a href="#discussion" class="small"><i class="fa fa-comment"></i> Send message</a>-->
                                     </div>
                                 </div>
@@ -96,10 +96,12 @@
                                     <td>Date:</td>
                                     <td><span t-esc="rate_date.strftime('%d-%B-%Y')"/></td>
                                 </tr>
+                                <t t-if="exchange_rate &gt; 0">
                                 <tr>
                                     <td>Exchange rate:</td>
-                                    <td><span t-esc="'{:,}'.format(exchange_rate)"/></td>
+                                    <td><span t-esc="'{:,.0f}'.format(exchange_rate)"/></td>
                                 </tr>
+                                </t>
                             </table>
                         </div>
                     </div>
@@ -112,6 +114,10 @@
                       <tr>
                         <td>Address:</td>
                         <td><span t-esc="partner_address"/></td>
+                      </tr>
+                      <tr>
+                        <td>MST:</td>
+                        <td><span t-esc="partner_vat"/></td>
                       </tr>
                     </table>
 
@@ -143,44 +149,60 @@
                         <th width="7%">NO</th>
                         <th width="20%">TYPE</th>
                         <th width="7%">QTY</th>
-                        <th width="12%">UNIT OF <br></br> MEASURE</th>
+                        <th width="12%">UNIT OF 2<br></br> MEASURE</th>
                         <th width="14%">UNIT RATE</th>
                         <th width="12%">CUR</th>
                         <th width="12%">VAT TAX</th>
                         <th>AMOUNT<br></br>(INCL. TAX)</th>
                       </tr>
-                        <t t-set="i" t-value="1"/>
-                        <t t-foreach="sale_order.order_line" t-as="line">
-                          <tr>
-                            <td><span t-esc="i"/></td>
-                            <td><span t-field="line.name"/></td>
-                            <td class="text-right">
-                                <div id="quote_qty">
-                                    <span t-field="line.product_uom_qty"/>
-                                </div>
-                            </td>
-                            <td><span t-field="line.product_uom.display_name"/></td>
-                            <td class="text-right"><span t-field="line.price_unit"/></td>
-                            <td><span t-field="line.currency_id.display_name"/></td>
-                            <td><span t-esc="line.tax_id.amount" t-options='{"widget": "float", "precision": 0}'/>%</td>
-                            <td class="text-right"><span t-field="line.price_total"/></td>
-                          </tr>
-                          <t t-set="i" t-value="i+1"/>
+                        <t t-if="debit_sudo">
+                            <t t-set="i" t-value="1"/>
+                            <t t-foreach="debit_sudo.debit_items" t-as="line">
+                              <tr>
+                                <td><span t-esc="i"/></td>
+                                <t t-if="'OCEAN FREIGHT' in line.name">
+                                    <td>OCEAN FREIGHT</td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-field="line.name"/></td>
+                                </t>
+                                <td class="text-right">
+                                    <div id="quote_qty">
+                                        <span t-field="line.quantity"/>
+                                    </div>
+                                </td>
+                                <td><span t-field="line.uom"/></td>
+                                <td class="text-right"><span t-field="line.unit_price"/></td>
+                                <td><span t-field="line.currency_id.display_name"/></td>
+                                <t t-if="not line.tax_id">
+                                    <td>x</td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-esc="line.tax_amount" t-options='{"widget": "float", "precision": 0}'/>%</td>
+                                </t>
+                                <td class="text-right"><span t-field="line.price_total"/></td>
+                              </tr>
+                              <t t-set="i" t-value="i+1"/>
+                            </t>
                         </t>
                       <tr>
                         <td colspan="4" class="no-bordered"></td>
                         <td class="total">TOTAL</td>
                         <td class="total">USD</td>
                         <td></td>
-                        <td class="total text-right"><span t-field="sale_order.amount_total"/></td>
+                        <td class="total text-right"><span t-esc="'{:,.2f}'.format(amount_total)"/></td>
                       </tr>
+
+                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
                       <tr>
                         <td colspan="4" class="no-bordered"></td>
                         <td class="total">TOTAL</td>
                         <td class="total">VND</td>
                         <td></td>
-                        <td class="total text-right"><span t-esc="amount_vnd" t-options="{'widget': 'monetary', 'display_currency': vnd_currency}"/></td>
+<!--                        <td class="total text-right"><span t-esc="amount_vnd" t-options="{'widget': 'monetary', 'display_currency': vnd_currency}"/></td>-->
+                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
                       </tr>
+                      </t>
                     </table>
 
                     <div id="apply-payment">Please apply VietcomBank's selling ex-rate based on payment date.</div>

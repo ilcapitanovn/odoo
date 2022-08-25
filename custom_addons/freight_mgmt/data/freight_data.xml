@@ -275,6 +275,24 @@
             <field name="date_to">2022-07-31</field>
             <field name="sequence_id" eval="ref('freight_mgmt.freight_billing_sequence')"/>
         </record>
+        <record id="freight_debit_note_sequence" model="ir.sequence">
+            <field name="name">Freight Debit Note Sequence</field>
+            <field name="code">freight.debit.note.sequence</field>
+            <field name="prefix">DE%(y)s%(month)s</field>
+            <field name="padding">3</field>
+            <field name="number_next">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" />
+        </record>
+        <record id="freight_credit_note_sequence" model="ir.sequence">
+            <field name="name">Freight Credit Note Sequence</field>
+            <field name="code">freight.credit.note.sequence</field>
+            <field name="prefix">CE%(y)s%(month)s</field>
+            <field name="padding">3</field>
+            <field name="number_next">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" />
+        </record>
         <!-- Stages -->
         <record id="freight_catalog_stage_new" model="freight.catalog.stage">
             <field name="sequence">1</field>
@@ -291,6 +309,7 @@
         <record id="freight_catalog_stage_in_progress" model="freight.catalog.stage">
             <field name="sequence">3</field>
             <field name="name">Confirmed</field>
+            <field name="confirmed">True</field>
             <field name="completed">False</field>
             <field name="company_id" />
         </record>

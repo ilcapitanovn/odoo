@@ -39,6 +39,7 @@
                             />
                         </group>
                         <group name="main_right">
+                            <field name="confirmed" />
                             <field name="completed" />
                             <field name="active" />
                         </group>
