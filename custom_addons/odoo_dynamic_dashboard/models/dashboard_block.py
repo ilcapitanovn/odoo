@@ -70,7 +70,7 @@ class DashboardBlock(models.Model):
     filter = fields.Char(string="Filter")
     date_field = fields.Char(string="Date field")
     x_date_range = fields.Selection(
-        selection=[("all", "All data"), ("today", "Today"), ("yesterday", "Yesterday"), ("this_week", "This week"),
+        selection=[("today", "Today"), ("yesterday", "Yesterday"), ("this_week", "This week"),
                    ("last_week", "Last week"), ("next_week", "Next week"), ("this_month", "This month"), ("last_month", "Last month"),
                    ("next_month", "Next month"), ("this_quarter", "This quarter"), ("last_quarter", "Last quarter"),
                    ("next_quarter", "Next quarter"), ("this_year", "This year"), ("last_year", "Last year"), ("next_year", "Next year")],
@@ -200,7 +200,7 @@ class DashboardBlock(models.Model):
 
     def append_date_range_filter(self, domain, param_rec):
         updated_domain = domain
-        if param_rec.x_date_range and param_rec.x_date_range != "all":
+        if param_rec.x_date_range:
             filter_field = self.get_comparison_field(param_rec.date_field, param_rec.model_name)
             if not filter_field:
                 return updated_domain

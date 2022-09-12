@@ -35,10 +35,21 @@
         <field name="res_model">dashboard.menu</field>
         <field name="view_mode">tree,form</field>
     </record>
+
+    <record id="action_dashboard_configuration_update" model="ir.actions.act_window">
+        <field name="name">Update Date Range</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dashboard.configuration.update.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
     <menuitem name="Configuration" id="menu_dynamic_dashboard_configuration" parent="odoo_dynamic_dashboard.menu_dashboard"
               sequence="3"/>
     <menuitem name="Dashboards" id="menu_dynamic_dashboard_menu" parent="odoo_dynamic_dashboard.menu_dynamic_dashboard_configuration"
-              sequence="3" action="action_dashboard_menu"/>
+              sequence="3" action="action_dashboard_menu" groups="base.group_no_one"/>
+    <menuitem name="Date Range" id="menu_dynamic_dashboard_configuration_period" parent="odoo_dynamic_dashboard.menu_dynamic_dashboard_configuration"
+              sequence="6" action="action_dashboard_configuration_update"/>
 
 
 </odoo>

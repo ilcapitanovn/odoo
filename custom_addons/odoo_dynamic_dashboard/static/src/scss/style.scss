@@ -24,6 +24,10 @@
         overflow:auto;
         }
 
+        .o-dropdown.show > .o-popper-position {
+            position: fixed !important;
+        }
+
         .bg-green {
             background-color: var(--green);
         }
