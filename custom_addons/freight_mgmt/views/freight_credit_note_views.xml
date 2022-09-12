@@ -197,7 +197,7 @@
                 <field name="supplier_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="credit_date" widget="date" optional="show" />
-                <field name="state" optional="show" />
+                <field name="state" decoration-success="state == 'posted'" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

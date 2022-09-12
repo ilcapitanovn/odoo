@@ -12,6 +12,11 @@
                 />
                 <separator />
                 <field name="name" filter_domain="[('name', 'ilike', self)]" />
+                <field name="code" filter_domain="[('code', 'ilike', self)]" />
+                <field name="country_id" filter_domain="['|', ('country_id.code', 'ilike', self), ('country_id.name', 'ilike', self)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="country_id" context="{'group_by':'country_id'}"/>
+                </group>
             </search>
         </field>
     </record>

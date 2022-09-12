@@ -260,6 +260,8 @@
             <field name="number_next">1</field>
             <field name="use_date_range">True</field>
             <field name="company_id" />
+            <!-- TODO: Remember to install module OCA sequence_reset-period before enable this field -->
+<!--            <field name="range_reset">monthly</field>-->
         </record>
         <record id="freight_billing_sequence" model="ir.sequence">
             <field name="name">Freight Billing Sequence</field>
@@ -269,6 +271,8 @@
             <field name="number_next">1</field>
             <field name="use_date_range">True</field>
             <field name="company_id" />
+            <!-- TODO: Remember to install module OCA sequence_reset-period before enable this field -->
+<!--            <field name="range_reset">monthly</field>-->
         </record>
         <record id="freight_billing_sequence_date_range" model="ir.sequence.date_range">
             <field name="date_from">2022-07-01</field>

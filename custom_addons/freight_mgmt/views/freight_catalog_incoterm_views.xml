@@ -12,6 +12,7 @@
                 />
                 <separator />
                 <field name="name" filter_domain="[('name', 'ilike', self)]" />
+                <field name="code" filter_domain="[('code', 'ilike', self)]" />
             </search>
         </field>
     </record>

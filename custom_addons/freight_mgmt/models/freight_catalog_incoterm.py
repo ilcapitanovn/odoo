@@ -14,3 +14,9 @@ class FreightCatalogIncoterm(models.Model):
         string="Company",
         default=lambda self: self.env.company,
     )
+
+    def name_get(self):
+        result = []
+        for rec in self:
+            result.append((rec.id, rec.code + " - " + rec.name))
+        return result

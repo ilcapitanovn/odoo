@@ -174,7 +174,7 @@
                             <page string="Description" name="description">
                                 <field name="description" widget="html" />
                             </page>
-                            <page string="Routing &amp; Vessel" name="routing_vessel">
+                            <page string="Routing &amp; Line" name="routing_vessel">
                                 <group colspan="2">
                                     <group>
                                         <field name="port_loading_id" />
@@ -245,6 +245,9 @@
         <field name="model">freight.booking</field>
         <field name="arch" type="xml">
             <tree class="o_booking_tree">
+                <field name="confirmed" invisible="1"/>
+                <field name="completed" invisible="1"/>
+                <field name="stage_name" invisible="1"/>
                 <field name="number" string="SHPTMT NO" decoration-bf="1" decoration-info="1" />
 <!--                <field name="name" />-->
 <!--                <field name="transport_type" />-->
@@ -261,12 +264,13 @@
                 <field name="voyage_number" string="VESSEL VOY" optional="show" />
                 <field name="port_discharge_id" optional="hide" />
                 <field name="commodity" optional="hide" />
-                <field name="container_id" optional="show" />
-                <field name="quantity" optional="show" />
+<!--                <field name="container_id" optional="show" />-->
+<!--                <field name="quantity" optional="show" />-->
+                <field name="volumes_display" optional="show" />
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="order_type" optional="show"/>
                 <field name="margin" optional="show"/>
-                <field name="stage_id" optional="hide" />
+                <field name="stage_id" decoration-success="confirmed or completed" decoration-info="stage_name == 'Draft' or stage_name == 'Submitted'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

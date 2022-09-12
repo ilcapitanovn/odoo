@@ -1,5 +1,5 @@
 from odoo import _, api, fields, models, tools
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 
 class FreightBooking(models.Model):
@@ -18,7 +18,7 @@ class FreightBooking(models.Model):
         stage_ids = self.env["freight.catalog.stage"].search([])
         return stage_ids
 
-    number = fields.Char(string="SHPTMT Number", default="#", readonly=True, required=True)
+    number = fields.Char(string="SHPTMT Number", default="#", readonly=True, tracking=True, required=True)
     name = fields.Char(string="Title")
     description = fields.Char(translate=True)
 
@@ -67,7 +67,9 @@ class FreightBooking(models.Model):
     ], string='Order Type')
 
     booking_volumes = fields.One2many('freight.booking.volume', 'booking_id', string="Booking volumes")
+    volumes_display = fields.Char(compute="_compute_volumes_display", string="Volumes", store=False)
 
+    # TODO: Should delete this field since it's replaced by o2m booking_volumes
     container_id = fields.Many2one(
         comodel_name="freight.catalog.container", string="Container", tracking=True, index=True
     )
@@ -92,18 +94,18 @@ class FreightBooking(models.Model):
     )
     place_of_delivery = fields.Char(string="Destination")
     vessel_id = fields.Many2one(
-        comodel_name="freight.catalog.vessel", string="Vessel", tracking=True, index=True
+        comodel_name="freight.catalog.vessel", string="Line", tracking=True, index=True
     )
-    shipping_line = fields.Char(string="Shipping Line")
+    shipping_line = fields.Char(string="Shipping Line")     # TODO: Possible duplicate with vessel_id, need to check
     ro = fields.Char(string="R.O.")
     commodity = fields.Char(string="Commodity")
-    quantity = fields.Integer(string="Quantity")
+    quantity = fields.Integer(string="Quantity")    # TODO: Should delete this field since it's replaced by o2m
     temperature = fields.Char(string="Temperature (C)")
     ventilation = fields.Char(string="Ventilation (CBM/H)")
     voyage_number = fields.Char(string="Voyage No.")
     gross_weight = fields.Float(string='Gross Weight (KGS)')
     etd = fields.Datetime(string="Original ETD", store=True)
-    etd_revised = fields.Datetime(string="Revised ETD", store=True)
+    etd_revised = fields.Datetime(string="Revised ETD", tracking=True, store=True)
     eta = fields.Datetime(string="Est. Time Arrival", store=True)
 
     last_stage_update = fields.Datetime(default=fields.Datetime.now)
@@ -113,6 +115,7 @@ class FreightBooking(models.Model):
     completed_date = fields.Datetime(string="Completed Date", store=True)
     confirmed = fields.Boolean(related="stage_id.confirmed")
     completed = fields.Boolean(related="stage_id.completed")
+    stage_name = fields.Char(related="stage_id.name", readonly=True, store=False)
 
     company_id = fields.Many2one(
         comodel_name="res.company",
@@ -221,6 +224,19 @@ class FreightBooking(models.Model):
             if rec.billing_id:
                 rec.vessel_bol_number = rec.billing_id.vessel_bol_number
 
+    @api.depends('booking_volumes')
+    def _compute_volumes_display(self):
+        for rec in self:
+            if rec.booking_volumes:
+                for item in rec.booking_volumes:
+                    if item.container_id:
+                        if rec.volumes_display:
+                            rec.volumes_display += ', %sx%s' % (item.quantity, item.container_id.code)
+                        else:
+                            rec.volumes_display = '%sx%s' % (item.quantity, item.container_id.code)
+            else:
+                rec.volumes_display = ''
+
     @api.model
     def default_get(self, fields_list):
         res = super(FreightBooking, self).default_get(fields_list)
@@ -269,6 +285,12 @@ class FreightBooking(models.Model):
     #     else:
     #         return {"domain": {"user_id": []}}
 
+    @api.constrains('etd', 'etd_revised')
+    def _check_etd_revised_time(self):
+        for booking in self:
+            if booking.etd_revised and booking.etd and booking.etd_revised < booking.etd:
+                raise ValidationError(_('The revised ETD cannot be earlier than the original ETD.'))
+
     # ---------------------------------------------------
     # CRUD
     # ---------------------------------------------------
@@ -289,7 +311,7 @@ class FreightBooking(models.Model):
         return res
 
     def write(self, vals):
-        for _ticket in self:
+        for booking in self:
             now = fields.Datetime.now()
             if vals.get("stage_id"):
                 stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
@@ -298,6 +320,15 @@ class FreightBooking(models.Model):
                     vals["completed_date"] = now
             if vals.get("user_id"):
                 vals["issued_date"] = now
+
+            """ Reset the sequence number if etd_revised changed to another month
+            """
+            if vals.get("etd_revised"):
+                current_date = fields.Datetime.context_timestamp(self, booking.etd_revised) if booking.etd_revised else False
+                new_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['etd_revised']))
+                if current_date and new_date and new_date.month != current_date.month or not current_date:
+                    vals["number"] = self._prepare_freight_booking_shptmt_number(vals)
+
         return super().write(vals)
 
     def action_duplicate_freight_booking(self):
@@ -308,7 +339,26 @@ class FreightBooking(models.Model):
         seq = self.env["ir.sequence"]
         if "company_id" in values:
             seq = seq.with_company(values["company_id"])
-        return seq.next_by_code("freight.booking.sequence") or "#"
+
+        seq_date = None
+        if 'etd_revised' in values:
+            seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(values['etd_revised']))
+
+        result = seq.next_by_code("freight.booking.sequence", sequence_date=seq_date) or "#"
+
+        """ Update sequence month prefix if the month of the revised ETD is difference the current month
+        Because automated sequence is always returned current month
+        """
+        if seq_date:
+            now = fields.Datetime.context_timestamp(self, fields.Datetime.now())    # now in local time zone
+            if seq_date.month != now.month:
+                new_seq = result.split('-')
+                if new_seq and len(new_seq) > 1:
+                    seq_next = new_seq[1]
+                    seq_prefix_new = seq_date.strftime('LOG%m%y-')
+                    result = seq_prefix_new + seq_next
+
+        return result
 
     # ---------------------------------------------------
     # Mail gateway

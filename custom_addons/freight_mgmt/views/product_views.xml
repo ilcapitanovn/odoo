@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<odoo>
+        <record id="freight_product_template_form_view_inherit" model="ir.ui.view">
+            <field name="name">freight.product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="priority">9</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <page name="general_information" position="after">
+                    <page string="Routing &amp; Line" name="routing_vessel">
+                        <group colspan="2">
+                            <group>
+                                <field name="port_loading_id" />
+                                <field name="port_discharge_id" />
+                                <field name="container_id" />
+                                <field name="vessel_id" />
+                            </group>
+                            <group></group>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+        <record id="freight_product_template_search_view" model="ir.ui.view">
+            <field name="name">freight.product.template.search.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='pricelist_id']" position="after">
+                    <separator/>
+                    <field name="port_loading_id" filter_domain="['|', ('port_loading_id.code', 'ilike', self), ('port_loading_id.name', 'ilike', self)]"/>
+                    <field name="port_discharge_id" filter_domain="['|', ('port_discharge_id.code', 'ilike', self), ('port_discharge_id.name', 'ilike', self)]"/>
+                    <field name="container_id" filter_domain="['|', ('container_id.code', 'ilike', self), ('container_id.name', 'ilike', self)]"/>
+                    <field name="vessel_id" filter_domain="['|', ('vessel_id.code', 'ilike', self), ('vessel_id.name', 'ilike', self)]"/>
+                </xpath>
+                <xpath expr="//group/filter[@name='categ_id']" position="after">
+                    <separator/>
+                    <filter name="port_loading_id" context="{'group_by':'port_loading_id'}"/>
+                    <filter name="port_discharge_id" context="{'group_by':'port_discharge_id'}"/>
+                    <filter name="container_id" context="{'group_by':'container_id'}"/>
+                    <filter name="vessel_id" context="{'group_by':'vessel_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

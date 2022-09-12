@@ -13,3 +13,5 @@ from . import freight_debit_note
 from . import freight_debit_note_item
 from . import freight_credit_note
 from . import freight_credit_note_item
+from . import product
+from . import product_pricelist

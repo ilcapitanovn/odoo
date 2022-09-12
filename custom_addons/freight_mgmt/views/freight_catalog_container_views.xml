@@ -12,6 +12,10 @@
                 />
                 <separator />
                 <field name="name" filter_domain="[('name', 'ilike', self)]" />
+                <field name="code" filter_domain="[('code', 'ilike', self)]" />
+                <group expand="0" string="Group By">
+                    <filter name="size" context="{'group_by':'size'}"/>
+                </group>
             </search>
         </field>
     </record>
