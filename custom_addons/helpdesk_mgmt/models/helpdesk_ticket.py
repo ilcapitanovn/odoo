@@ -20,7 +20,7 @@ class HelpdeskTicket(models.Model):
 
     number = fields.Char(string="Ticket number", default="/", readonly=True)
     name = fields.Char(string="Title", required=True)
-    description = fields.Html(required=True, sanitize_style=True, default="Commodity: <br/>ETD: <br/>Volume per month: <br/>Service: (Direct/ Indirect): <br/>Competitors: <br/>Free time at origin: <br/>Free time at destination: <br/>Others:<br/>Explanation:")
+    description = fields.Html(required=True, sanitize_style=True, default="Commodity: <br/>ETD: <br/>Volume per month: <br/>Service: (Direct/ Indirect): <br/>Competitors: <br/>Free time at origin: <br/>Free time at destination: <br/>Requested rates: <br/>Others:<br/>Explanation:")
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
     )
