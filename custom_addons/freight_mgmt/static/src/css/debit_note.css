@@ -82,6 +82,10 @@
     font-weight: 700;
     color: #203764;
 }
+#order-table .total_amount {
+    font-weight: 700;
+    color: #D70000;
+}
 
 #apply-payment {
     margin-top: 100px;

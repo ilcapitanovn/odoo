@@ -252,6 +252,7 @@ class FreightBilling(models.Model):
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
                     "unit_price": item.price_unit,
+                    "currency_id": item.currency_id.id if item.currency_id else False,
                     "tax_id": item.tax_id,
                     "price_subtotal": item.price_subtotal,
                     "price_tax": item.price_tax,
@@ -327,6 +328,11 @@ class FreightBilling(models.Model):
                     purchase_order_id = rec
 
         if purchase_order_id:
+            if purchase_order_id.state != 'purchase' and purchase_order_id.state != 'done':
+                raise UserError(_(
+                    "The Purchase Order must be confirmed in order to create a credit note.\n\n"
+                ))
+
             credit_vals['purchase_order_id'] = purchase_order_id.id
 
             if purchase_order_id.partner_id:
@@ -353,6 +359,7 @@ class FreightBilling(models.Model):
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
                     "unit_price": item.price_unit,
+                    "currency_id": item.currency_id.id if item.currency_id else False,
                     "tax_id": item.taxes_id,
                     "price_subtotal": item.price_subtotal,
                     "price_tax": item.price_tax,

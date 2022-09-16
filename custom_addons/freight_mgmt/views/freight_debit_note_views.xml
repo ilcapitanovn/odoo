@@ -56,15 +56,10 @@
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />
                     <field name="invoice_status" invisible="1"/>
+                    <field name="payment_state" invisible="1"/>
                     <field name="sale_state" invisible="1"/>
                 </header>
                 <sheet>
-                    <widget
-                        name="web_ribbon"
-                        title="Archived"
-                        bg_color="bg-danger"
-                        attrs="{'invisible': [('active', '=', True)]}"
-                    />
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_invoice"
                             type="object"
@@ -74,6 +69,15 @@
                             <field name="invoice_count" widget="statinfo" string="Invoices"/>
                         </button>
                     </div>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <widget name="web_ribbon"
+                            title="Paid"
+                            attrs="{'invisible': ['|', ('payment_state', '!=', 'paid'), ('active', '=', False)]}"/>
                     <div class="oe_title">
                         <h1 class="oe_title">
                             <field name="number" />
@@ -128,8 +132,8 @@
                                         <field name="name" string="TYPE" widget="section_and_note_text" />
                                         <field name="quantity" string="QTY" digits="[12,0]" readonly="1" force_save="1"/>
                                         <field name="uom" string="UNIT OF MEASURE" readonly="1" force_save="1"/>
-                                        <field name="unit_price" string="UNIT RATE" readonly="1" force_save="1"/>
-                                        <field name="currency_id" string="CUR" readonly="1" force_save="1"/>
+                                        <field name="unit_price" string="UNIT RATE" force_save="1"/>
+                                        <field name="currency_id" string="CUR" force_save="1"/>
                                         <field name="tax_amount_percent" string="VAT TAX" readonly="1" force_save="1"/>
                                         <field name="price_total" string="AMOUNT (INCL. TAX)" readonly="1" force_save="1"/>
                                     </tree>
@@ -137,7 +141,9 @@
                                 <group name="note_group" class="mt-2 mt-md-0">
                                     <group class="oe_subtotal_footer oe_right mr-3" name="sale_total">
                                         <field name="amount_total" string="Total (USD)" />
-                                        <field name="amount_total_vnd" string="Total (VND)"
+                                        <field name="amount_subtotal_vnd" string="Total (VND)"
+                                            attrs="{'invisible': [('amount_subtotal_vnd', '=', 0)]}"/>
+                                        <field name="amount_total_vnd" string="Total Amount (VND)"
                                             attrs="{'invisible': [('exchange_rate', '=', 0)]}"/>
                                     </group>
                                     <div class="oe_clear"/>
@@ -190,6 +196,13 @@
                 <field name="customer_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="debit_date" widget="date" optional="show" />
+                <field name="payment_state"
+                       widget="badge"
+                       decoration-danger="payment_state == 'not_paid'"
+                       decoration-warning="payment_state in ('partial', 'in_payment')"
+                       decoration-success="payment_state in ('paid', 'reversed')"
+                       attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
+                       optional="show"/>
                 <field name="state" decoration-success="state == 'posted'" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>

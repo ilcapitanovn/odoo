@@ -4,6 +4,15 @@ from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import html_keep_url, float_round
 
+PAYMENT_STATE_SELECTION = [
+        ('not_paid', 'Not Paid'),
+        ('in_payment', 'In Payment'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('reversed', 'Reversed'),
+        ('invoicing_legacy', 'Invoicing App Legacy'),
+]
+
 
 class FreightCreditNote(models.Model):
     _name = "freight.credit.note"
@@ -83,7 +92,9 @@ class FreightCreditNote(models.Model):
 
     credit_items = fields.One2many('freight.credit.note.item', 'credit_id', string='Credit Note Items',
                                   store=True, copy=True, auto_join=True)
-    amount_total = fields.Monetary(related="purchase_order_id.amount_total", string="Total", readonly=True, store=True)
+    # amount_total = fields.Monetary(related="purchase_order_id.amount_total", string="Total", readonly=True, store=True)
+    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
+    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True)
 
     # user_id = fields.Many2one(
@@ -110,6 +121,9 @@ class FreightCreditNote(models.Model):
 
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
     sequence = fields.Integer(default=16)
+
+    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status",
+                                     readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
 
     state = fields.Selection(selection=[
         ('draft', 'Draft'),
@@ -168,29 +182,6 @@ class FreightCreditNote(models.Model):
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
 
-    # @api.depends('sale_order_id.order_line.purchase_line_ids.order_id')
-    # # @api.depends('bill_id')
-    # def _compute_filter_purchase_orders(self):
-    #     filter_purchase_orders = self.sale_order_id._get_purchase_orders()
-    #     if filter_purchase_orders:
-    #         self.update({'filter_purchase_order_id': [6, 0, filter_purchase_orders]})
-    #     else:
-    #         # self.update({'filter_purchase_order_id': [5, 0, 0]})
-    #         self.filter_purchase_order_id = [(0, 0, {})]
-    #     print("finish - remove after debug")
-    #     # filtered_order_id = self.sale_order_id._get_purchase_orders()
-    #     #
-    #     # if filtered_order_id:
-    #     #     self.is_purchase_order_empty = False
-    #     #     # res = {}
-    #     #     # res['domain'] = {'purchase_order_id': [('id', 'in', filtered_order_id)]}
-    #     #     # return res
-    #     #     self.update({'purchase_order_id': [(5, 0, 0)]})
-    #     #     self.update({'purchase_order_id': [6, 0, filtered_order_id]})
-    #     #     # self.purchase_order_id = filtered_order_id
-    #     # else:
-    #     #     self.is_purchase_order_empty = True
-
     @api.depends('purchase_order_id')
     def _compute_is_purchase_order_empty(self):
         if self.purchase_order_id:
@@ -227,36 +218,37 @@ class FreightCreditNote(models.Model):
             else:
                 rec.volume = ''
 
+    @api.depends('credit_items.price_total')
+    def _compute_subtotal(self):
+        """
+        Compute the total amounts of the SO.
+        """
+        for credit in self:
+            amount_subtotal_usd = amount_subtotal_vnd = 0.0
+            for item in credit.credit_items:
+                if item.currency_id and item.currency_id.name == 'USD':
+                    amount_subtotal_usd += item.price_total
+                elif item.currency_id and item.currency_id.name == 'VND':
+                    amount_subtotal_vnd += item.price_total
+            credit.update({
+                'amount_total': amount_subtotal_usd,
+                'amount_subtotal_vnd': amount_subtotal_vnd,
+            })
+
     @api.depends('amount_total', 'exchange_rate')
     def _compute_amount_total_vnd(self):
         for rec in self:
             rec.amount_total_vnd = float_round(rec.amount_total * rec.exchange_rate, precision_digits=0)
+            if rec.amount_subtotal_vnd > 0:
+                rec.amount_total_vnd += rec.amount_subtotal_vnd
 
-    # @api.depends('purchase_order_id')
-    # def _compute_credit_items(self):
-    #     items = []
-    #     if self.purchase_order_id:
-    #         for item in self.purchase_order_id.order_line:
-    #             vals = {
-    #                 "credit_id": self.id,
-    #                 "sequence": item.sequence,
-    #                 "name": item.name,
-    #                 "quantity": item.product_uom_qty,
-    #                 "uom": item.product_uom.display_name,
-    #                 "unit_price": item.price_unit,
-    #                 "currency_id": item.currency_id,
-    #                 "tax_id": item.taxes_id,
-    #                 "tax_amount": item.tax_amount,
-    #                 "price_subtotal": item.price_subtotal,
-    #                 "price_tax": item.price_tax,
-    #                 "price_total": item.price_total,
-    #                 "company_id": item.company_id,
-    #                 "state": item.state,
-    #             }
-    #             items.append(vals)
-    #
-    #     if items:
-    #         self.update({'credit_items': [6, 0, items]})
+    def _compute_payment_state(self):
+        for rec in self:
+            if rec.purchase_order_id and rec.purchase_order_id.invoice_ids:
+                for invoice in rec.purchase_order_id.invoice_ids:
+                    rec.payment_state = invoice.payment_state
+            else:
+                rec.payment_state = 'not_paid'
 
     def _get_partner_name(self):
         if self.invoice_partner_id:
@@ -314,6 +306,7 @@ class FreightCreditNote(models.Model):
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
                     "unit_price": item.price_unit,
+                    "currency_id": item.currency_id.id if item.currency_id else False,
                     "tax_id": item.taxes_id,
                     "price_subtotal": item.price_subtotal,
                     "price_tax": item.price_tax,

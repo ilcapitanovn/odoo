@@ -143,6 +143,7 @@ class CustomerPortal(portal.CustomerPortal):
             'bank_acc_name': debit_sudo.bank_acc_name,
             'swift_code': debit_sudo.swift_code,
             'amount_total': debit_sudo.amount_total,
+            'amount_subtotal_vnd': debit_sudo.amount_subtotal_vnd,
             'amount_vnd': debit_sudo.amount_total_vnd,
             'rate_date': debit_sudo.debit_date,
             'exchange_rate': debit_sudo.exchange_rate,

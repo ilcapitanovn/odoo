@@ -4,6 +4,16 @@ from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import html_keep_url, float_round
 
+PAYMENT_STATE_SELECTION = [
+        ('not_paid', 'Not Paid'),
+        ('in_payment', 'In Payment'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('reversed', 'Reversed'),
+        ('invoicing_legacy', 'Invoicing App Legacy'),
+]
+
+
 class FreightDebitNote(models.Model):
     _name = "freight.debit.note"
     _description = "Freight Debit Note"
@@ -91,7 +101,9 @@ class FreightDebitNote(models.Model):
 
     debit_items = fields.One2many('freight.debit.note.item', 'debit_id', string='Debit Note Items',
                                   store=True, copy=True, auto_join=True)
-    amount_total = fields.Monetary(related="order_id.amount_total", string="Total", readonly=True, store=True)
+    # amount_total = fields.Monetary(related="order_id.amount_total", string="Total", readonly=True, store=True)
+    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
+    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True)
 
     # user_id = fields.Many2one(
@@ -118,6 +130,9 @@ class FreightDebitNote(models.Model):
 
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
     sequence = fields.Integer(default=16)
+
+    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status",
+                                     readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
 
     state = fields.Selection(selection=[
         ('draft', 'Draft'),
@@ -210,37 +225,40 @@ class FreightDebitNote(models.Model):
             else:
                 rec.volume = ''
 
+    @api.depends('debit_items.price_total')
+    def _compute_subtotal(self):
+        """
+        Compute the total amounts of the SO.
+        """
+        for debit in self:
+            # amount_untaxed = amount_tax = 0.0
+            amount_subtotal_usd = amount_subtotal_vnd = 0.0
+            for item in debit.debit_items:
+                # amount_untaxed += item.price_subtotal
+                # amount_tax += item.price_tax
+                if item.currency_id and item.currency_id.name == 'USD':
+                    amount_subtotal_usd += item.price_total
+                elif item.currency_id and item.currency_id.name == 'VND':
+                    amount_subtotal_vnd += item.price_total
+            debit.update({
+                'amount_total': amount_subtotal_usd,
+                'amount_subtotal_vnd': amount_subtotal_vnd,
+            })
+
     @api.depends('amount_total', 'exchange_rate')
     def _compute_amount_total_vnd(self):
         for rec in self:
             rec.amount_total_vnd = float_round(rec.amount_total * rec.exchange_rate, precision_digits=0)
+            if rec.amount_subtotal_vnd > 0:
+                rec.amount_total_vnd += rec.amount_subtotal_vnd
 
-    # @api.depends('order_id')
-    # def _compute_debit_items(self):
-    #     #for rec in self:
-    #     items = []
-    #     if self.order_id:
-    #         for item in self.order_id.order_line:
-    #             vals = {
-    #                 "debit_id": self.id,
-    #                 "sequence": item.sequence,
-    #                 "name": item.name,
-    #                 "quantity": item.product_uom_qty,
-    #                 "uom": item.product_uom.display_name,
-    #                 "unit_price": item.price_unit,
-    #                 "currency_id": item.currency_id,
-    #                 "tax_id": item.tax_id,
-    #                 "tax_amount": item.tax_amount,
-    #                 "price_subtotal": item.price_subtotal,
-    #                 "price_tax": item.price_tax,
-    #                 "price_total": item.price_total,
-    #                 "company_id": item.company_id,
-    #                 "state": item.state,
-    #             }
-    #             items.append(vals)
-    #
-    #     if items:
-    #         self.update({'debit_items': [6, 0, items]})
+    def _compute_payment_state(self):
+        for rec in self:
+            if rec.order_id and rec.order_id.invoice_ids:
+                for invoice in rec.order_id.invoice_ids:
+                    rec.payment_state = invoice.payment_state
+            else:
+                rec.payment_state = 'not_paid'
 
     def _get_partner_name(self):
         if self.invoice_partner_id:
@@ -283,6 +301,7 @@ class FreightDebitNote(models.Model):
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
                     "unit_price": item.price_unit,
+                    "currency_id": item.currency_id.id if item.currency_id else False,
                     "tax_id": item.tax_id,
                     "price_subtotal": item.price_subtotal,
                     "price_tax": item.price_tax,

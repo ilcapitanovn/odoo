@@ -19,9 +19,10 @@ class FreightDebitNoteItem(models.Model):
     name = fields.Text(string='Item Name')
     quantity = fields.Float(string="Quantity")
     uom = fields.Text(string='Unit Of Measure')
-    unit_price = fields.Text(string='Price')
-    currency_id = fields.Many2one(related='debit_id.currency_id', depends=['debit_id.currency_id'], store=True,
-                                  string='Currency')
+    unit_price = fields.Float(string='Price')
+    # currency_id = fields.Many2one(related='debit_id.currency_id', depends=['debit_id.currency_id'], store=True,
+    #                               string='Currency')
+    currency_id = fields.Many2one("res.currency", store=True, string='Currency')
     tax_id = fields.Many2many('account.tax', string='Taxes', context={'active_test': False}, store=True)
     tax_amount = fields.Float(related="tax_id.amount", string="Tax Amount")
     tax_amount_percent = fields.Char(compute="_format_tax_amount", string="VAT TAX")
@@ -34,11 +35,34 @@ class FreightDebitNoteItem(models.Model):
     state = fields.Selection(
         related='debit_id.state', string='Debit Status', copy=False, store=True)
 
-    @api.depends('quantity', 'unit_price', 'tax_id')
+    @api.depends('quantity', 'tax_id')
     def _compute_amount(self):
         """
         Compute the amounts of the SO/Debit item.
         """
+        self._calculate_totals()
+
+    @api.depends('tax_id')
+    def _format_tax_amount(self):
+        for rec in self:
+            if rec.tax_id:
+                rec.tax_amount_percent = '%s%%' % float_round(rec.tax_id.amount, precision_digits=0)
+            else:
+                rec.tax_amount_percent = ''
+
+    @api.onchange("unit_price")
+    def _onchange_unit_price(self):
+        self._calculate_totals()
+
+    @api.onchange("currency_id")
+    def _onchange_currency_id(self):
+        if self.debit_id.exchange_rate:
+            if self.currency_id and self.currency_id.name == 'VND':
+                self.unit_price = float_round(self.unit_price * self.debit_id.exchange_rate, precision_digits=0)
+            elif self.currency_id and self.currency_id.name == 'USD':
+                self.unit_price = float_round(self.unit_price / self.debit_id.exchange_rate, precision_digits=2)
+
+    def _calculate_totals(self):
         for item in self:
             price = item.unit_price
             taxes = item.tax_id.compute_all(price, item.debit_id.currency_id, item.quantity)
@@ -48,11 +72,3 @@ class FreightDebitNoteItem(models.Model):
                 'price_total': taxes['total_included'],
                 'price_subtotal': taxes['total_excluded'],
             })
-
-    @api.depends('tax_id')
-    def _format_tax_amount(self):
-        for rec in self:
-            if rec.tax_id:
-                rec.tax_amount_percent = '%s%%' % float_round(rec.tax_id.amount, precision_digits=0)
-            else:
-                rec.tax_amount_percent = ''

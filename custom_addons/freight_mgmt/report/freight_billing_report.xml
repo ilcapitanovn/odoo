@@ -18,7 +18,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">freight_mgmt.report_print_debit_note_template</field>
         <field name="report_file">freight_mgmt.report_print_debit_note_template</field>
-        <field name="print_report_name">'Debit Note - %s' % (object.name).replace('/', '')</field>
+        <field name="print_report_name">'Debit Note - %s' % (object.number).replace('/', '')</field>
         <field name="binding_model_id" ref="model_freight_debit_note"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_bol"/>
@@ -258,6 +258,7 @@
                 <t t-set="pod" t-value="doc.pod"/>
                 <t t-set="etd" t-value="doc.etd_formatted"/>
                 <t t-set="volume" t-value="doc.volume"/>
+                <t t-set="amount_subtotal_vnd" t-value="doc.amount_subtotal_vnd"/>
                 <t t-set="amount_vnd" t-value="doc.amount_total_vnd"/>
                 <t t-set="rate_date" t-value="doc.debit_date"/>
                 <t t-set="exchange_rate" t-value="doc.exchange_rate"/>
@@ -377,13 +378,20 @@
                         <td/>
                         <td class="total text-right"><span t-esc="'{:,.2f}'.format(doc.amount_total)"/></td>
                       </tr>
-                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <t t-if="amount_subtotal_vnd &gt; 0">
                       <tr>
                         <td colspan="4" class="no-bordered"/>
                         <td class="total">TOTAL</td>
                         <td class="total">VND</td>
                         <td/>
-                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
+                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_subtotal_vnd)"/></td>
+                      </tr>
+                      </t>
+                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <tr>
+                        <td colspan="4" class="no-bordered"/>
+                        <td colspan="3" class="total_amount">TOTAL AMOUNT (VND)</td>
+                        <td class="total_amount text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
                       </tr>
                       </t>
                     </table>

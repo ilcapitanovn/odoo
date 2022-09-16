@@ -193,14 +193,22 @@
                         <td class="total text-right"><span t-esc="'{:,.2f}'.format(amount_total)"/></td>
                       </tr>
 
-                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <t t-if="amount_subtotal_vnd &gt; 0">
                       <tr>
                         <td colspan="4" class="no-bordered"></td>
                         <td class="total">TOTAL</td>
                         <td class="total">VND</td>
                         <td></td>
+                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_subtotal_vnd)"/></td>
+                      </tr>
+                      </t>
+
+                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <tr>
+                        <td colspan="4" class="no-bordered"></td>
+                        <td colspan="3" class="total_amount">TOTAL AMOUNT (VND)</td>
 <!--                        <td class="total text-right"><span t-esc="amount_vnd" t-options="{'widget': 'monetary', 'display_currency': vnd_currency}"/></td>-->
-                        <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
+                        <td class="total_amount text-right"><span t-esc="'{:,.0f}'.format(amount_vnd)"/></td>
                       </tr>
                       </t>
                     </table>
