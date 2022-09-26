@@ -8,6 +8,17 @@ import werkzeug.urls
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    @api.model
+    def default_get(self, fields):
+        result = super(ResPartner, self).default_get(fields)
+        # Two ways to update a property in object
+        # result.update({
+        #     'user_id': self.env.uid or False
+        # })
+        result['user_id'] = self.env.uid or False
+
+        return result
+
     has_edit_salesperson = fields.Boolean(compute="_compute_has_edit_salesperson")
 
     def _compute_has_edit_salesperson(self):
@@ -20,8 +31,8 @@ class ResPartner(models.Model):
                 rec.has_edit_salesperson = True
                 return
 
-    def _default_category(self):
-        existing_tags = self.env['res.partner.category'].search([('name', '=like', 'Shipper')])
-        # default_tag = self._context.get('default_category_id')
-        return [(6, 0, existing_tags.ids)]
-        # return self.env['res.partner.category'].browse(self._context.get('category_id'))
+    # def _default_category(self):
+    #     existing_tags = self.env['res.partner.category'].search([('name', '=like', 'Shipper')])
+    #     # default_tag = self._context.get('default_category_id')
+    #     return [(6, 0, existing_tags.ids)]
+    #     # return self.env['res.partner.category'].browse(self._context.get('category_id'))
