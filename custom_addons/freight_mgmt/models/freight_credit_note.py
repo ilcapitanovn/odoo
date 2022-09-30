@@ -55,7 +55,7 @@ class FreightCreditNote(models.Model):
         tracking=True, index=True, required=True
     )
 
-    credit_date = fields.Datetime(string="Credit date", readonly=True, default=fields.Datetime.now)
+    credit_date = fields.Datetime(string="Credit date", default=fields.Datetime.now)
     exchange_rate = fields.Float(string='Exchange rate', default=_get_default_exchange_rate, readonly=False,
                         help='The rate of the currency to the currency of rate 1.', store=True)
 
@@ -341,15 +341,15 @@ class FreightCreditNote(models.Model):
         return res
 
     def write(self, vals):
-        for _ticket in self:
-            now = fields.Datetime.now()
-            # if vals.get("stage_id"):
-            #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
-            #     vals["last_stage_update"] = now
-            #     if stage.completed:
-            #         vals["completed_date"] = now
-            if not vals.get("credit_date"):
-                vals["credit_date"] = now
+        # for _ticket in self:
+        #     now = fields.Datetime.now()
+        #     # if vals.get("stage_id"):
+        #     #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
+        #     #     vals["last_stage_update"] = now
+        #     #     if stage.completed:
+        #     #         vals["completed_date"] = now
+        #     if not vals.get("credit_date"):
+        #         vals["credit_date"] = now
         return super().write(vals)
 
     def _prepare_freight_credit_note_number(self, values):

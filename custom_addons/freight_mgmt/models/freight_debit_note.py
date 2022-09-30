@@ -70,7 +70,7 @@ class FreightDebitNote(models.Model):
         tracking=True, index=True, required=True
     )
 
-    debit_date = fields.Datetime(string="Debit date", readonly=True, default=fields.Datetime.now)
+    debit_date = fields.Datetime(string="Debit date", default=fields.Datetime.now)
     exchange_rate = fields.Float(string='Exchange rate', default=_get_default_exchange_rate, readonly=False,
                         help='The rate of the currency to the currency of rate 1.', store=True)
 
@@ -337,15 +337,15 @@ class FreightDebitNote(models.Model):
         return res
 
     def write(self, vals):
-        for _ticket in self:
-            now = fields.Datetime.now()
-            # if vals.get("stage_id"):
-            #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
-            #     vals["last_stage_update"] = now
-            #     if stage.completed:
-            #         vals["completed_date"] = now
-            if not vals.get("debit_date"):
-                vals["debit_date"] = now
+        # for _ticket in self:
+        #     now = fields.Datetime.now()
+        #     # if vals.get("stage_id"):
+        #     #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
+        #     #     vals["last_stage_update"] = now
+        #     #     if stage.completed:
+        #     #         vals["completed_date"] = now
+        #     if not vals.get("debit_date"):
+        #         vals["debit_date"] = now
         return super().write(vals)
 
     # def action_duplicate_freight_booking(self):
