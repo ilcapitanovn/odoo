@@ -219,13 +219,12 @@ class FreightBilling(models.Model):
     def _prepare_debit_values(self, billing):
         debit_vals = {
             'bill_id': billing.id,
-            'booking_id': billing.booking_id,
-            'order_id': billing.order_id,
+            # 'booking_id': billing.booking_id,
+            # 'order_id': billing.order_id,
         }
 
         if billing.order_id and billing.order_id.partner_id:
             partner_id = billing.order_id.partner_id
-            debit_vals['partner_vat'] = partner_id.vat
 
             # invoice_partner_id = billing.order_id.partner_id.address_get(
             #     adr_pref=['invoice']).get('invoice', billing.order_id.partner_id)
@@ -337,7 +336,7 @@ class FreightBilling(models.Model):
 
             if purchase_order_id.partner_id:
                 partner_id = purchase_order_id.partner_id
-                credit_vals['partner_vat'] = partner_id.vat
+                # credit_vals['partner_vat'] = partner_id.vat
 
                 partner_name = partner_id.commercial_company_name
 
