@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Bao Thinh Software - Tuan Huynh
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Hide all commissions in invoice lines at this time. It can be unhidden later if needed. -->
+    <record id="view_account_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.form.agent.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="sale_commission.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='recompute_lines_agents']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_edit_agents']" position="attributes">
+                <attribute name="attrs">{'invisible': 1}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='commission_status']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='commission_total']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

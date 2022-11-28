@@ -19,6 +19,20 @@ class ProductTemplate(models.Model):
         comodel_name="freight.catalog.vessel", string="Shipping Line"
     )
 
+    @api.onchange('seller_ids')
+    def _onchange_supplier_price(self):
+        if not self.seller_ids:
+            return
+
+        if len(self.seller_ids) > 1:
+            variant_prices = self.mapped('seller_ids.price')
+            new_price = min(variant_prices)
+        else:
+            new_price = self.seller_ids.price
+
+        if new_price > 0:
+            self.standard_price = new_price
+
 
 class ProductProduct(models.Model):
     _inherit = "product.product"

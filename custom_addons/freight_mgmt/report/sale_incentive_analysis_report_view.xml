@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+<!--    <record id="view_sale_profit_forwarder_analysis_pivot" model="ir.ui.view">-->
+<!--        <field name="name">sale.profit.forwarder.analysis.pivot</field>-->
+<!--        <field name="model">sale.profit.forwarder.analysis.report</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <pivot string="Sale Profit Forwarder Report">-->
+<!--                <field name="agent_id" type="row" />-->
+<!--                <field name="date_invoice" interval="month" type="col" />-->
+<!--                <field name="amount" type="measure" />-->
+<!--            </pivot>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="view_sale_profit_forwarder_analysis_graph" model="ir.ui.view">-->
+<!--        <field name="name">sale.profit.forwarder.analysis.graph</field>-->
+<!--        <field name="model">sale.profit.forwarder.analysis.report</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <graph string="Sale Profit Forwarder Report">-->
+<!--                <field name="agent_id" />-->
+<!--                <field name="amount" type="measure" />-->
+<!--            </graph>-->
+<!--        </field>-->
+<!--    </record>-->
+    <record id="view_sale_incentive_analysis_search" model="ir.ui.view">
+        <field name="name">sale.incentive.analysis.search</field>
+        <field name="model">sale.incentive.analysis.report</field>
+        <field name="arch" type="xml">
+            <search string="Sales Incentive Report">
+<!--                <field name="date_order" />-->
+<!--                <filter-->
+<!--                    string="This Month"-->
+<!--                    name="year"-->
+<!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-%%m-28')),('date_order','&gt;=',time.strftime('%%Y-%%m-01'))]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="This Year"-->
+<!--                    name="year"-->
+<!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    name="Draft"-->
+<!--                    string="Draft"-->
+<!--                    domain="[('invoice_state','=','draft')]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    name="Invoiced"-->
+<!--                    string="Invoiced"-->
+<!--                    domain="[('invoice_state','not in',('draft', 'cancel'))]"-->
+<!--                />-->
+                <separator />
+                <field name="user_id" invisible="1" />
+                <field name="partner_id" />
+                <field name="incentive_id" />
+<!--                <group expand="0" string="Extended Filters">-->
+<!--                    <field-->
+<!--                        name="categ_id"-->
+<!--                        filter_domain="[('categ_id', 'child_of', self)]"-->
+<!--                    />-->
+<!--                    <field name="company_id" groups="base.group_multi_company" />-->
+<!--                </group>-->
+                <group expand="1" string="Group By">
+                    <filter
+                        string="Employee"
+                        name="Employee"
+                        context="{'group_by':'partner_id'}"
+                    />
+                    <filter
+                        string="Incentive"
+                        name="group_by_incentive"
+                        context="{'group_by':'incentive_name'}"
+                    />
+<!--                    <filter-->
+<!--                        string="Status"-->
+<!--                        name="group_by_status"-->
+<!--                        context="{'group_by':'invoice_state'}"-->
+<!--                    />-->
+<!--                    <filter-->
+<!--                        string="Company"-->
+<!--                        name="group_by_company"-->
+<!--                        groups="base.group_multi_company"-->
+<!--                        context="{'group_by':'company_id'}"-->
+<!--                    />-->
+<!--                    <separator />-->
+<!--                    <filter-->
+<!--                        string="Order Month"-->
+<!--                        name="group_by_order_month"-->
+<!--                        context="{'group_by':'date_order:month'}"-->
+<!--                    />-->
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_sale_incentive_analysis_view_list" model="ir.ui.view">
+        <field name="name">sale.incentive.analysis.view.list</field>
+        <field name="model">sale.incentive.analysis.report</field>
+        <field name="arch" type="xml">
+            <tree string="Incentives"
+                  default_order = 'partner_id desc'
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  duplicate="false"
+                  import="false">
+                <field name="user_id" invisible="1"/>
+<!--                <field name="currency_id" invisible="1"/>-->
+                <field name="incentive_name" optional="hide"/>
+                <field name="partner_id" widget="many2one_avatar"/>
+                <field name="display_target_sales" />
+                <field name="display_sum_freehand" />
+                <field name="display_sum_nominated" />
+                <field name="display_sum_activities"/>
+                <field name="display_sum_all" />
+                <field name="incentive" />
+                <field name="incentive_tax_amount" />
+                <field name="incentive_after_tax" />
+<!--                <field name="currency_id" invisible="1"/>-->
+<!--                <field name="state"-->
+<!--                       widget="badge"-->
+<!--                       decoration-info="state == 'draft'"-->
+<!--                       decoration-warning="state == 'close'"-->
+<!--                       decoration-success="state == 'open'"/>-->
+<!--                <field name="contract_count"/>-->
+            </tree>
+        </field>
+    </record>
+<!--    <record id="action_sale_incentive_analysis_report" model="ir.actions.act_window">-->
+<!--        <field name="name">Sales Incentive Report</field>-->
+<!--        <field name="res_model">sale.incentive.analysis.report</field>-->
+<!--        <field name="view_mode">tree</field>-->
+<!--        <field name="binding_view_types">list</field>-->
+<!--        <field name="context">{'search_default_group_by_incentive': 1}</field>-->
+<!--        <field name="search_view_id" ref="view_sale_incentive_analysis_search" />-->
+<!--        <field name="view_id" ref="view_sale_incentive_analysis_view_list" />-->
+<!--        <field-->
+<!--            name="help"-->
+<!--        >This report performs analysis on sale's incentive by month. You can check the amount and incentive based on total have been calculated. Use this report to perform analysis on incentive not beeing posted yet.</field>-->
+<!--    </record>-->
+<!--    <menuitem-->
+<!--        action="action_sale_incentive_analysis_report"-->
+<!--        name="Sales Incentive"-->
+<!--        id="menu_sale_incentive_analysis"-->
+<!--        parent="freight_mgmt.freight_mgmt_reporting_menu"-->
+<!--        sequence="15"-->
+<!--    />-->
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Bao Thinh Software - Tuan Huynh
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_order_agent_form_inherit" model="ir.ui.view">
+        <field name="name">view.order.agent.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_commission.view_order_agent_form_inherit" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_recompute_commission']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="before">
+                <button
+                    name="recompute_lines_agents"
+                    type="object"
+                    string="Recalculate Commission"
+                    states="draft,sent"
+                />
+            </xpath>
+        </field>
+    </record>
+    <!-- This view is needed for proper visualization of the popup / embedded one2many -->
+    <record id="view_sale_order_line_tree_inherit" model="ir.ui.view">
+        <field name="name">sale.order.line.agent.tree.inherit</field>
+        <field name="model">sale.order.line.agent</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_order_line_tree" />
+        <field name="arch" type="xml">
+            <field name="amount" position="after">
+                <field name="amount_custom" widget="monetary"
+                       options="{'currency_field': 'currency_id', 'field_digits': True}" />
+            </field>
+        </field>
+    </record>
+</odoo>

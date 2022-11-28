@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class SaleOrder(models.Model):
@@ -18,6 +18,11 @@ class SaleOrder(models.Model):
         ('freehand', 'Freehand'),
         ('nominated', 'Nominated'),
     ], string='Order Type', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+
+    profit_sharing_percentage = fields.Float(
+        string="Profit Sharing (%)",
+        help="The margin will be shared by this percentage to the nominated order",
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
     def create_bookings(self):
         """
@@ -87,6 +92,24 @@ class SaleOrder(models.Model):
 
         return booking_vals
 
+    @api.onchange("order_type")
+    def _onchange_order_type(self):
+        if self.order_type != 'nominated':
+            self.profit_sharing_percentage = 0
+
+    @api.onchange("profit_sharing_percentage")
+    def _onchange_profit_sharing_percentage(self):
+        if self.order_type == 'nominated':
+            if 0 <= self.profit_sharing_percentage <= 100:
+                super(SaleOrder, self)._compute_margin()
+                # new_margin = self.margin * (100 - self.profit_sharing_percentage) / 100
+                # self.margin = new_margin
+                # self.margin_percent = self.amount_untaxed and self.margin / self.amount_untaxed
+            else:
+                raise ValidationError(_("The input value is invalid. The profit sharing percentage must be 0 to 100%."))
+        else:
+            super(SaleOrder, self)._compute_margin()
+
     @api.model
     def default_get(self, fields_list):
         res = super(SaleOrder, self).default_get(fields_list)
@@ -94,6 +117,11 @@ class SaleOrder(models.Model):
             'order_type': 'freehand' or False
         })
         return res
+
+    # @api.model
+    # def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+    #     # OVERRIDE to remove readonly state of the order_type field if user logged in is manager.
+    #     res = super().fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
 
     @api.model
     def _nothing_to_invoice_error(self):

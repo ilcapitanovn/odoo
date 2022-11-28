@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Bao Thinh Software - Tuan Huynh
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="seenpo_sale_commission_form_inherit" model="ir.ui.view">
+        <field name="name">seenpo.sale.commission.form.inherit</field>
+        <field name="model">sale.commission</field>
+        <field name="inherit_id" ref="sale_commission.sale_commission_form" />
+        <field name="arch" type="xml">
+            <field name="fix_qty" position="after">
+                <field
+                    name="fix_qty_max"
+                    attrs="{'invisible': [('commission_type', '!=', 'fixed')], 'required': [('commission_type', '=', 'fixed')]}"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="seenpo_sale_commission_tree_inherit" model="ir.ui.view">
+        <field name="name">seenpo.sale.commission.tree.inherit</field>
+        <field name="model">sale.commission</field>
+        <field name="inherit_id" ref="sale_commission.sale_commission_tree" />
+        <field name="arch" type="xml">
+            <field name="commission_type" position="after">
+                <field name="fix_qty" />
+                <field name="fix_qty_max" />
+            </field>
+        </field>
+    </record>
+
+    <menuitem
+        name="Commissions Management"
+        id="sale_commission.menu_sale_commissions_management"
+        parent="sale.sale_menu_root"
+        groups="sales_team.group_sale_salesman"
+        sequence="4"
+    />
+</odoo>

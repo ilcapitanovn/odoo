@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+<!--    <record id="view_sale_profit_forwarder_analysis_pivot" model="ir.ui.view">-->
+<!--        <field name="name">sale.profit.forwarder.analysis.pivot</field>-->
+<!--        <field name="model">sale.profit.forwarder.analysis.report</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <pivot string="Sale Profit Forwarder Report">-->
+<!--                <field name="agent_id" type="row" />-->
+<!--                <field name="date_invoice" interval="month" type="col" />-->
+<!--                <field name="amount" type="measure" />-->
+<!--            </pivot>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="view_sale_profit_forwarder_analysis_graph" model="ir.ui.view">-->
+<!--        <field name="name">sale.profit.forwarder.analysis.graph</field>-->
+<!--        <field name="model">sale.profit.forwarder.analysis.report</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <graph string="Sale Profit Forwarder Report">-->
+<!--                <field name="agent_id" />-->
+<!--                <field name="amount" type="measure" />-->
+<!--            </graph>-->
+<!--        </field>-->
+<!--    </record>-->
+    <record id="view_sale_profit_forwarder_analysis_search" model="ir.ui.view">
+        <field name="name">sale.profit.forwarder.analysis.search</field>
+        <field name="model">sale.profit.forwarder.analysis.report</field>
+        <field name="arch" type="xml">
+            <search string="Sales Profit Forwarder Report">
+                <field name="date_order" />
+<!--                <filter-->
+<!--                    string="This Month"-->
+<!--                    name="year"-->
+<!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-%%m-28')),('date_order','&gt;=',time.strftime('%%Y-%%m-01'))]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="This Year"-->
+<!--                    name="year"-->
+<!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
+<!--                />-->
+                <filter name="filter_date" date="date_order"/>
+<!--                <filter-->
+<!--                    name="Draft"-->
+<!--                    string="Draft"-->
+<!--                    domain="[('invoice_state','=','draft')]"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    name="Invoiced"-->
+<!--                    string="Invoiced"-->
+<!--                    domain="[('invoice_state','not in',('draft', 'cancel'))]"-->
+<!--                />-->
+                <separator />
+                <field name="customer_id" />
+                <field name="sale_partner_id" />
+<!--                <group expand="0" string="Extended Filters">-->
+<!--                    <field-->
+<!--                        name="categ_id"-->
+<!--                        filter_domain="[('categ_id', 'child_of', self)]"-->
+<!--                    />-->
+<!--                    <field name="company_id" groups="base.group_multi_company" />-->
+<!--                </group>-->
+                <group expand="1" string="Group By">
+                    <filter
+                        string="Customer"
+                        name="group_by_customer"
+                        context="{'group_by':'customer_id'}"
+                    />
+                    <filter
+                        string="Sale"
+                        name="group_by_sale"
+                        context="{'group_by':'sale_partner_id'}"
+                    />
+<!--                    <filter-->
+<!--                        string="Status"-->
+<!--                        name="group_by_status"-->
+<!--                        context="{'group_by':'invoice_state'}"-->
+<!--                    />-->
+                    <filter
+                        string="Company"
+                        name="group_by_company"
+                        groups="base.group_multi_company"
+                        context="{'group_by':'company_id'}"
+                    />
+                    <separator />
+                    <filter
+                        string="Order Month"
+                        name="group_by_order_month"
+                        context="{'group_by':'date_order:month'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_sale_profit_forwarder_analysis_view_list" model="ir.ui.view">
+        <field name="name">sale.profit.forwarder.analysis.view.list</field>
+        <field name="model">sale.profit.forwarder.analysis.report</field>
+        <field name="arch" type="xml">
+            <tree string="Profits" class="o_report_profits_tree"
+                  default_order = 'customer_id, bill_id desc'
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  duplicate="false"
+                  import="false">
+                <field name="bill_id" invisible="1"/>
+                <field name="sale_partner_id" invisible="1"/>
+<!--                <field name="customer_id" widget="many2one_avatar"/>-->
+                <field name="bill_no"/>
+                <field name="volumes" optional="hide"/>
+                <field name="display_pod" string="POL/D" />
+                <field name="etd" optional="show"/>
+                <field name="display_sale_name" string="Sale" optional="show"/>
+                <field name="order_type" string="F or N" optional="show"/>
+                <field name="po_amount_untaxed" optional="show"/>
+                <field name="po_amount_total" optional="show"/>
+                <field name="po_amount_tax" optional="show"/>
+                <field name="cost_no_vat" optional="show"/>
+                <field name="display_cus" string="CUS" optional="show"/>
+                <field name="so_commission_total" optional="show"/>
+                <field name="so_commission_total_vnd" optional="show"/>
+                <field name="display_line" string="LINE" optional="show"/>
+                <field name="po_commission_total" optional="show"/>
+                <field name="po_commission_total_vnd" optional="show"/>
+                <field name="so_amount_untaxed" optional="show"/>
+                <field name="so_amount_total" optional="show"/>
+                <field name="so_amount_tax" optional="show"/>
+                <field name="revenue_no_vat" optional="show"/>
+                <field name="profit_before_tax_no_vat" string="LN THUE (TT)" optional="show"/>
+                <field name="profit_before_tax_vat" string="LN THUC TE (TT)" optional="show"/>
+                <field name="vat_payable" string="VAT PHAI NOP" optional="show"/>
+                <field name="business_tax_amount" string="THUE TNDN" optional="show"/>
+                <field name="profit_after_tax_no_vat" string="LN THUE (ST)" optional="show"/>
+                <field name="profit_after_tax_vat" string="LN THUC TE (ST)" optional="show"/>
+<!--                <field name="currency_id" invisible="1"/>-->
+<!--                <field name="state"-->
+<!--                       widget="badge"-->
+<!--                       decoration-info="state == 'draft'"-->
+<!--                       decoration-warning="state == 'close'"-->
+<!--                       decoration-success="state == 'open'"/>-->
+<!--                <field name="contract_count"/>-->
+            </tree>
+        </field>
+    </record>
+    <record id="action_sale_profit_forwarder_analysis_report" model="ir.actions.act_window">
+        <field name="name">Profit Forwarder Report</field>
+        <field name="res_model">sale.profit.forwarder.analysis.report</field>
+        <field name="view_mode">tree</field>
+        <field name="binding_view_types">list</field>
+        <field name="context">{'search_default_group_by_customer': 1}</field>
+        <field name="search_view_id" ref="view_sale_profit_forwarder_analysis_search" />
+        <field name="view_id" ref="view_sale_profit_forwarder_analysis_view_list" />
+        <field
+            name="help"
+        >This report performs analysis on profit forwarder by month. You can check the amount and profit based on bills have been posted. Use this report to perform analysis on bills not beeing posted yet.</field>
+    </record>
+    <menuitem
+        action="action_sale_profit_forwarder_analysis_report"
+        name="Profit Forwarder"
+        id="menu_sale_profit_forwarder_analysis"
+        groups="account.group_account_manager"
+        parent="account.account_reports_management_menu"
+        sequence="30"
+    />
+</odoo>

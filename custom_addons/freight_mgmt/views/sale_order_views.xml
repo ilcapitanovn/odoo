@@ -9,8 +9,25 @@
                         <xpath expr="//field[@name='payment_term_id']" position="before">
                             <field name="order_type" />
                         </xpath>
-                        <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">
-                            <attribute name="invisible">1</attribute>
+                        <xpath expr="//field[@name='require_signature']" position="before">
+                            <field name="profit_sharing_percentage"
+                                   attrs="{'invisible': [('order_type', '!=', 'nominated')]}" />
+                        </xpath>
+<!--                        <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">-->
+<!--                            <attribute name="invisible">1</attribute>-->
+<!--                        </xpath>-->
+                </field>
+        </record>
+
+        <!-- Set field form_type editable for managers -->
+        <record id="freight_sale_order_form_type_readonly_inherited" model="ir.ui.view">
+                <field name="name">freight.sale.order.form.type.readonly.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="freight_mgmt.freight_sale_order_view_form_inherited"/>
+                <field name="groups_id" eval="[(6, 0, [ref('base.group_no_one')])]"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='order_type']" position="attributes">
+                            <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
                         </xpath>
                 </field>
         </record>

@@ -52,7 +52,7 @@ class SaleOrderLine(models.Model):
 
     agent_ids = fields.One2many(comodel_name="sale.order.line.agent")
 
-    @api.depends("order_id.partner_id")
+    @api.depends("order_id")
     def _compute_agent_ids(self):
         self.agent_ids = False  # for resetting previous agents
         for record in self.filtered(lambda x: x.order_id.partner_id):

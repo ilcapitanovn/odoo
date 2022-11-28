@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="sale_incentive_tree">
+        <field name="name">Sales incentives tree</field>
+        <field name="model">sale.incentive</field>
+        <field name="arch" type="xml">
+            <tree string="Incentives">
+                <field name="name" />
+                <field name="amount_base_type" />
+                <field name="invoice_state" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="sale_incentive_form">
+        <field name="name">Sales incentives form</field>
+        <field name="model">sale.incentive</field>
+        <field name="arch" type="xml">
+            <form string="Incentive">
+                <header></header>
+                <sheet>
+                    <group string="General information">
+                        <group>
+                            <field name="name" />
+                            <field name="apply_sales_team" />
+                            <field name="tax_id" />
+                        </group>
+                        <group>
+                            <field name="amount_base_type" />
+                            <field name="invoice_state" />
+                            <field name="active" />
+                        </group>
+                    </group>
+                    <group string="Sales Activity Rates">
+                        <field name="target_freehand" />
+                        <field name="target_nominated" />
+                        <field name="target_activities" />
+                    </group>
+                    <group string="Incentive rates definition" colspan="4">
+                        <field
+                            name="section_ids"
+                            widget="one2many_list"
+                            colspan="4"
+                            nolabel="1"
+                        >
+                            <tree string="Sections" editable="bottom">
+                                <field name="percent_from" />
+                                <field name="percent_to" />
+                                <field name="incentive_percent_month" />
+                                <field name="incentive_percent_year" />
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_incentive">
+        <field name="name">Incentive rates</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.incentive</field>
+        <field name="binding_view_types">form,tree</field>
+    </record>
+    <menuitem
+        name="Incentive rates"
+        id="menu_sale_incentive_rates"
+        parent="sale_commission.menu_sale_commissions_management"
+        action="action_incentive"
+        sequence="15"
+    />
+</odoo>
