@@ -77,36 +77,6 @@
         <field name="res_model">freight.catalog.vessel</field>
         <field name="view_mode">tree,form</field>
     </record>
-    <record id="freight_catalog_shipper_action" model="ir.actions.act_window">
-        <field name="name">Shippers</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner</field>
-        <field name="domain">[('category_id.name','=ilike','shipper')]</field>
-        <field name="context" eval="{'default_category_id': [(6,0,[ref('freight_mgmt.res_partner_category_shipper_tag')])] }"/>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Create a new shipper in your address book
-              </p><p>
-                Odoo helps you easily track all activities related to a shipper.
-              </p>
-        </field>
-    </record>
-    <record id="freight_catalog_consignee_action" model="ir.actions.act_window">
-        <field name="name">Consignees</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.partner</field>
-        <field name="domain">[('category_id.name','=ilike','consignee')]</field>
-        <field name="context" eval="{'default_category_id': [(6,0,[ref('freight_mgmt.res_partner_category_consignee_tag')])] }"/>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Create a new consignee in your address book
-              </p><p>
-                Odoo helps you easily track all activities related to a consignee.
-              </p>
-        </field>
-    </record>
 
     <!-- Products Actions -->
     <record id="freight_products_products_action" model="ir.actions.act_window">
