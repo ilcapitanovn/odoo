@@ -463,6 +463,8 @@ class FreightBilling(models.Model):
             self.shipper_name = self.shipper_id.name
             self.shipper_email = self.shipper_id.email
             self.shipper_address = self.shipper_id.contact_address
+            if self.shipper_address:
+                self.shipper_address = self.shipper_address.replace(self.shipper_name, '')
 
     @api.onchange("consignee_id")
     def _onchange_consignee_id(self):
@@ -470,6 +472,8 @@ class FreightBilling(models.Model):
             self.consignee_name = self.consignee_id.name
             self.consignee_email = self.consignee_id.email
             self.consignee_address = self.consignee_id.contact_address
+            if self.consignee_address:
+                self.consignee_address = self.consignee_address.replace(self.consignee_name, '')
 
     @api.onchange("party_id")
     def _onchange_party_id(self):
@@ -477,6 +481,8 @@ class FreightBilling(models.Model):
             self.party_name = self.party_id.name
             self.party_email = self.party_id.email
             self.party_address = self.party_id.contact_address
+            if self.party_address:
+                self.party_address = self.party_address.replace(self.party_name, '')
 
     @api.onchange("contact_id")
     def _onchange_contact_id(self):
@@ -484,6 +490,8 @@ class FreightBilling(models.Model):
             self.contact_name = self.contact_id.name
             self.contact_email = self.contact_id.email
             self.contact_address = self.contact_id.contact_address
+            if self.contact_address:
+                self.contact_address = self.contact_address.replace(self.contact_name, '')
 
     # @api.onchange("user_id")
     # def _onchange_dominion_user_id(self):

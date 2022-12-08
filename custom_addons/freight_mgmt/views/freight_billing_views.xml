@@ -148,14 +148,14 @@
                                     <group>
                                         <field name="shipper_id" />
                                         <field name="shipper_address" />
-                                        <separator />
+
                                         <field name="consignee_id" />
                                         <field name="consignee_address" />
                                     </group>
                                     <group>
                                         <field name="party_id" />
                                         <field name="party_address" />
-                                        <separator />
+
                                         <field name="contact_id" />
                                         <field name="contact_address" />
                                     </group>

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import pytz
+from datetime import datetime
+
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import html_keep_url, float_round
@@ -207,10 +210,43 @@ class FreightDebitNote(models.Model):
     @api.depends('etd')
     def _compute_format_etd(self):
         for rec in self:
-            if rec.etd:
-                rec.etd_formatted = rec.etd.strftime('%d-%B-%Y')
+            etd_local = self._convert_utc_to_local(rec.etd)
+            if etd_local:
+                rec.etd_formatted = etd_local.strftime('%d-%B-%Y')
             else:
                 rec.etd_formatted = ''
+
+    def _convert_utc_to_local(self, utc_date):
+        result = utc_date
+        if result:
+            try:
+                fmt = "%Y-%m-%d %H:%M:%S"
+                utc_date_str = utc_date.strftime(fmt)
+
+                ########################################################
+                # OPTION 1
+                ########################################################
+                # now_utc = datetime.now(pytz.timezone('UTC'))
+                # tz = pytz.timezone(self.env.user.tz)      # Consider get tz correct
+                # now_tz = now_utc.astimezone(tz) or pytz.utc
+                # utc_offset_timedelta = datetime.strptime(now_tz.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+                # # local_date = datetime.strptime(utc_date_str, fmt)
+                # result = utc_date + utc_offset_timedelta
+
+                ########################################################
+                # OPTION 2
+                ########################################################
+                timezone = 'UTC'
+                if self.env.user.tz:
+                    timezone = self.env.user.tz
+                elif self.user_id and self.user_id.partner_id.tz:
+                    timezone = self.user_id.partner_id.tz
+                tz = pytz.timezone(timezone)
+                result = pytz.utc.localize(datetime.strptime(utc_date_str, fmt)).astimezone(tz)
+            except:
+                print("ERROR in _convert_utc_to_local")
+
+            return result
 
     @api.depends('booking_id')
     def _compute_booking_volumes(self):

@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import binascii
+import pytz
+from datetime import datetime
 
 from odoo import fields, http, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, MissingError, ValidationError
@@ -119,8 +121,9 @@ class CustomerPortal(portal.CustomerPortal):
                 # )
 
         etd = ''
-        if debit_sudo.etd:
-            etd = debit_sudo.etd.strftime('%d-%B-%y')
+        etd_local = self._convert_utc_to_local(debit_sudo)
+        if etd_local:
+            etd = etd_local.strftime('%d-%B-%y')
 
         # volume = ""
         # if debit_sudo.booking_id.quantity > 0 and debit_sudo.booking_id.container_id.code:
@@ -164,4 +167,21 @@ class CustomerPortal(portal.CustomerPortal):
         # values.update(get_records_pager(history, order_sudo))
 
         return request.render('freight_mgmt.debit_note_portal_template', values)
+
+    def _convert_utc_to_local(self, debit_sudo):
+        result = debit_sudo.etd
+        if result:
+            try:
+                fmt = "%Y-%m-%d %H:%M:%S"
+                utc_date_str = result.strftime(fmt)
+
+                timezone = 'UTC'
+                if debit_sudo.user_id.partner_id.tz:
+                    timezone = debit_sudo.user_id.partner_id.tz
+                tz = pytz.timezone(timezone)
+                result = pytz.utc.localize(datetime.strptime(utc_date_str, fmt)).astimezone(tz)
+            except:
+                print("ERROR in _convert_utc_to_local")
+
+            return result
 
