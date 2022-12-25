@@ -34,12 +34,18 @@
         <field name="model">mail.activity</field>
         <field name="inherit_id" ref="mail.mail_activity_view_calendar" />
         <field name="arch" type="xml">
-            <field name="res_name" position="before">
-                <field name="related_model_instance" />
+            <field name="date_deadline" position="before">
+                <field name="res_name" string="Document" />
             </field>
-            <field name="res_name" position="attributes">
+            <field name="summary" position="before">
+                <field name="note" />
+            </field>
+            <xpath expr="//field[@name='summary']" position="attributes">
                 <attribute name="invisible">1</attribute>
-            </field>
+            </xpath>
+            <xpath expr="//calendar" position="attributes">
+                <attribute name="event_open_popup">1</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -133,6 +139,9 @@
             </field>
             <field name="res_name" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </field>
+            <field name="date_deadline" position="before">
+                <field name="user_id" />
             </field>
         </field>
     </record>
@@ -312,10 +321,10 @@
         <field
             name="view_ids"
             eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'calendar'}),
                           (0, 0, {'view_mode': 'kanban', 'view_id': ref('mail_activity_view_kanban')}),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('mail_activity_view_tree')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('mail_activity_view_form_board')}),
-                          (0, 0, {'view_mode': 'calendar'}),
                           (0, 0, {'view_mode': 'pivot'}),
                           (0, 0, {'view_mode': 'graph'})]"
         />
@@ -329,9 +338,9 @@ Menus
     <menuitem
         id="board_menu_activities"
         name="Activities"
-        parent="base.menu_board_root"
+        parent="calendar.mail_menu_calendar"
         action="open_boards_activities"
-        sequence="1"
+        sequence="20"
     />
 
 </odoo>
