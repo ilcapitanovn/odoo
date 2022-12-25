@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Bao Thinh Software - Tuan Huynh
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+        <record id="seenpo_commission_product_template_form_view_inherit" model="ir.ui.view">
+            <field name="name">seenpo.commission.product.template.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="priority">99</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='categ_id']" position="before">
+                    <field name="vendor_commission_amount" widget='monetary' />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="seenpo_commission_product_product_tree_view_inherit" model="ir.ui.view">
+            <field name="name">seenpo.commission.product.product.tree.view.inherit</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="standard_price" position="after">
+                    <field name="vendor_commission_amount" optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="seenpo_commission_product_supplierinfo_tree_view_inherit" model="ir.ui.view">
+            <field name="name">seenpo.commission.product.supplierinfo.tree.view.inherit</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="purchase.product_supplierinfo_tree_view2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='delay']" position="attributes">
+                    <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//field[@name='price']" position="after">
+                    <field name="commission_amount" invisible="1" />
+                    <field name="commission_amount_custom" />
+                </xpath>
+            </field>
+        </record>
+</odoo>
