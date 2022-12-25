@@ -200,15 +200,30 @@ class FreightBooking(models.Model):
             }
 
     def _prepare_bill_values(self, booking):
+        port_loading_text = ''
+        port_discharge_text = ''
+
+        if booking.port_loading_id:
+            port_loading_text = booking.port_loading_id.name
+            if booking.port_loading_id.country_id:
+                port_loading_text += ', ' + booking.port_loading_id.country_id.name
+
+        if booking.port_discharge_id:
+            port_discharge_text = booking.port_discharge_id.name
+            if booking.port_discharge_id.country_id:
+                port_discharge_text += ', ' + booking.port_discharge_id.country_id.name
+
         bill_vals = {
             'booking_id': booking.id,
-            'port_loading_id': booking.port_loading_id.id,
-            'port_discharge_id': booking.port_discharge_id.id,
-            'port_loading_id': booking.port_loading_id.id,
-            'vessel_id': booking.vessel_id.id,
+            # 'port_loading_id': booking.port_loading_id.id,
+            # 'port_discharge_id': booking.port_discharge_id.id,
+            # 'port_loading_id': booking.port_loading_id.id,
+            # 'vessel_id': booking.vessel_id.id,
             'order_id': booking.order_id.id,
             'user_id': booking.order_id.user_id.id,
             'partner_id': booking.partner_id.id,
+            'port_loading_text': port_loading_text,
+            'port_discharge_text': port_discharge_text,
         }
 
         return bill_vals

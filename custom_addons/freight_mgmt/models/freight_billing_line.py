@@ -22,13 +22,15 @@ class FreightBillingLine(models.Model):
 
     container_no = fields.Text(string='Container No.')
     seal_nos = fields.Text(string='Seal No.')
-    number_packages = fields.Text(string='Number of Packages')
+    number_packages = fields.Text(string='Number of Packages')     # Deprecated
+    packages_number = fields.Float(string='Number of Packages')
     package_types = fields.Text(string='Package Types')
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure', ondelete="restrict")
     product_uom_readonly = fields.Boolean(compute='_compute_product_uom_readonly')
     description = fields.Text(string='Description')
     gross_weight = fields.Float(string='Gross Weight (KGS)')
-    measurement = fields.Text(string='Measurement')
+    measurement = fields.Text(string='Measurement')     # Deprecated
+    measurement_cbm = fields.Float(string='Measurement (CBM)')
 
     company_id = fields.Many2one(related='billing_id.company_id', string='Company', store=True, index=True)
 

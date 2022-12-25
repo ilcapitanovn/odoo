@@ -21,6 +21,21 @@ class ResPartner(models.Model):
 
     has_edit_salesperson = fields.Boolean(compute="_compute_has_edit_salesperson")
 
+    # @api.model
+    # def autocomplete(self, recs, *args, **kwargs):
+    #     print("_autocomplete_method called")
+    #
+    #     partners = self.search([('name', 'ilike', recs)], limit=20)
+    #     if partners:
+    #         print("existing")
+    #     else:
+    #         print("empty")
+    #
+    #     return [{
+    #         'name': 'Test Auto Complete',
+    #         'logo': ''
+    #     }]
+
     def _compute_has_edit_salesperson(self):
         sale_admins = self.env['res.users'].sudo().with_context(lang='en_US').search(
             [('groups_id.name', 'ilike', 'Administrator'), ('groups_id.category_id.name', 'ilike', 'sale')])

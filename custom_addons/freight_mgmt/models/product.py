@@ -25,8 +25,11 @@ class ProductTemplate(models.Model):
             return
 
         if len(self.seller_ids) > 1:
-            variant_prices = self.mapped('seller_ids.price')
-            new_price = min(variant_prices)
+            # variant_prices = self.mapped('seller_ids.price')
+            # new_price = min(variant_prices)
+            ''' Get the first supplier '''
+            sorted_sellers = sorted(self.seller_ids, key=lambda x: x.sequence)
+            new_price = sorted_sellers[0].price
         else:
             new_price = self.seller_ids.price
 

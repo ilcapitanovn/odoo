@@ -44,7 +44,7 @@
                                             <div class="label">SHIPPER (Name and address)</div>
                                             <div class="value h-address">
 <!--                                                    <p>VIET NAM SUPPLY CO.,LTD<br></br>48/10 TRAN DINH XU STREET, CO GIANG WARD,DISTRICT 1, HOCHIMINH CITY, VIETNAM</p>-->
-                                                <p><span t-field="doc.shipper_id"/><br/><span t-field="doc.shipper_address"/></p>
+                                                <p><span t-field="doc.shipper_id"/><br/><span t-field="doc.shipper_address"/><br/><span t-field="doc.shipper_extra_info"/></p>
                                             </div>
                                         </td>
                                     </tr>
@@ -53,7 +53,7 @@
                                             <div class="label">CONSIGNEE (Non-Negotiable unless consigned "TO ORDER")</div>
                                             <!--<div class="value h-address"><p>TO THE ORDER OF SHINHAN BANK SEOUL</p></div>-->
                                             <div class="value h-address">
-                                              <p><span t-field="doc.consignee_id"/><br/><span t-field="doc.consignee_address"/></p>
+                                              <p><span t-field="doc.consignee_id"/><br/><span t-field="doc.consignee_address"/><br/><span t-field="doc.consignee_extra_info"/></p>
                                             </div>
                                         </td>
                                     </tr>
@@ -62,7 +62,7 @@
                                             <div class="label">NOTIFY PARTY (Name and address)</div>
                                             <!--<div class="value h-address"><p>SGC SOLUTIONS CO., LTD<br/>SONGAHM BLDG., 246, YANGJAE-DAERO, SEOCHO-GU, SEOUL 06792 KOREA</p></div>-->
                                             <div class="value h-address">
-                                              <p><span t-field="doc.party_id"/><br/><span t-field="doc.party_address"/></p>
+                                              <p><span t-field="doc.party_id"/><br/><span t-field="doc.party_address"/><br/><span t-field="doc.party_extra_info"/></p>
                                             </div>
                                         </td>
                                     </tr>
@@ -85,14 +85,14 @@
                                         <td class="content">
                                             <div class="label">Port of loading</div>
                                             <!--<div class="value h-bill-no"><p>HO CHI MINH PORT, VIETNAM</p></div>-->
-                                            <div class="value h-bill-no"><p><span t-field="doc.port_loading_id.name"/></p></div>
+                                            <div class="value h-bill-no"><p><span t-field="doc.port_loading_text"/></p></div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="content">
                                             <div class="label">Port of discharge</div>
                                             <!--<div class="value h-bill-no"><p>KWANGYANG PORT, SOUTH KOREA</p></div>-->
-                                            <div class="value h-bill-no"><p><span t-field="doc.port_discharge_id.name"/></p></div>
+                                            <div class="value h-bill-no"><p><span t-field="doc.port_discharge_text"/></p></div>
                                         </td>
                                         <td class="content">
                                             <div class="label">Place of delivery</div>
@@ -132,7 +132,7 @@
                                             <div class="label">FOR DELIVERY, PLEASE CONTACT:</div>
                                             <!--<div class="value h-address"><p>PIK CORPORATION<br/>3F SEOHYUN BUILDING, #98 WORLD CUP STREET, MAPO-KU, SEOUL, KOREA<br/>TEL: 82-2-333-9616 FAX: 82-2-333-9691, 2-333-9617<br/>Ocean-import@shippingnews.co.kr</p></div>-->
                                             <div class="value h-address">
-                                              <p><span t-field="doc.contact_id"/><br/><span t-field="doc.contact_address"/></p>
+                                              <p><span t-field="doc.contact_id"/><br/><span t-field="doc.contact_address"/><br/><span t-field="doc.contact_extra_info"/></p>
                                             </div>
                                         </td>
                                     </tr>
@@ -151,23 +151,47 @@
 
                     <table class="table table-lines-bordered no-spacing" id="bill-lines-table">
                         <tr>
-                            <th class="bill-lines-bordered border-left-no" width="20%">
+                            <th class="bill-lines-bordered border-left-no" width="25%">
                                 MARKS &amp; NOS.<br/>CONTAINER / SEAL NOS.
                             </th>
                             <th class="bill-lines-bordered" width="12%">NO. OF PKGS<br/> OR CONTAINERS</th>
-                            <th class="bill-lines-bordered" width="40%">DESCRIPTION OF PACKAGES AND GOODS</th>
+                            <th class="bill-lines-bordered" width="35%">DESCRIPTION OF PACKAGES AND GOODS</th>
                             <th class="bill-lines-bordered" width="12%">GROSS WEIGHT</th>
                             <th class="bill-lines-bordered border-right-no" width="12%">MEASUREMENT</th>
                         </tr>
+                        <t t-set="mark_seal_nos" t-value="''"/>
+                        <t t-set="total_desc" t-value="''"/>
+                        <t t-set="total_weight" t-value="0.0"/>
+                        <t t-set="total_measure" t-value="0.0"/>
+                        <t t-set="total_pkgs_dict" t-value="{}"/>
                         <t t-foreach="doc.billing_line" t-as="line">
-                            <tr>
-                                <td class="bill-lines-bordered border-left-no"><span t-field="line.seal_nos"/></td>
-                                <td class="bill-lines-bordered"><span t-field="line.number_packages"/></td>
-                                <td class="bill-lines-bordered"><span t-field="line.description"/></td>
-                                <td class="bill-lines-bordered text-right">(KGS)<br/><span t-field="line.gross_weight"/></td>
-                                <td class="bill-lines-bordered border-right-no"><span t-field="line.measurement"/></td>
-                            </tr>
+                            <t t-if="line.container_no or line.seal_nos">
+                                <t t-if="line.container_no">
+                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.container_no"/>
+                                </t>
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / '"/>
+                                <t t-if="line.seal_nos">
+                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos"/>
+                                </t>
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + '&lt;br/&gt;'"/>
+                            </t>
+                            <t t-set="total_pkgs_dict" t-value="doc.update_total_pkgs_dict(total_pkgs_dict, line.product_uom.display_name, line.packages_number)"/>
+                            <t t-if="line.description">
+                                <t t-set="total_desc" t-value="total_desc + line.description + '&lt;br/&gt; &lt;br/&gt;'"/>
+                            </t>
+                            <t t-set="total_weight" t-value="total_weight + line.gross_weight"/>
+                            <t t-set="total_measure" t-value="total_measure + line.measurement_cbm"/>
                         </t>
+                        <t t-if="doc.shipping_mark">
+                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + '&lt;br/&gt; &lt;br/&gt;SHIPPING MARK:&lt;br/&gt;' + doc.shipping_mark"/>
+                        </t>
+                        <tr>
+                            <td class="bill-lines-bordered border-left-no"><span t-raw="mark_seal_nos"/></td>
+                            <td class="bill-lines-bordered"><span t-raw="doc.generate_no_of_pkgs(total_pkgs_dict)"/></td>
+                            <td class="bill-lines-bordered"><span t-raw="total_desc"/></td>
+                            <td class="bill-lines-bordered text-right">(KGS)<br/><span t-esc="'{:,.2f}'.format(total_weight)"/></td>
+                            <td class="bill-lines-bordered text-right border-right-no">(CBM)<br/><span t-esc="'{:,.2f}'.format(total_measure)"/></td>
+                        </tr>
                         <tr>
                             <td class="border-left-no border-right-no border-bottom-solid h-bill-no no-spacing" colspan="5">
                                 <div class="total-in-word-label">Total no. of packages or container (in word)</div>

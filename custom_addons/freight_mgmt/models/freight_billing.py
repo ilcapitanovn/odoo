@@ -46,9 +46,9 @@ class FreightBilling(models.Model):
     state = fields.Selection(selection=[
         ('draft', 'Draft'),
         ('posted', 'Posted'),
+        ('completed', 'Completed'),
         ('cancel', 'Cancelled'),
-    ], string='Status', required=True, readonly=True, copy=False, tracking=True,
-        default='draft')
+    ], string='Status', copy=False, tracking=True, default='draft', group_expand='_expand_states')
 
     # number = fields.Char(string="Bill number")
     name = fields.Char(string='Bill Number', default="#", readonly=True, store=True, index=True, required=True)
@@ -61,6 +61,7 @@ class FreightBilling(models.Model):
     shipper_name = fields.Char()
     shipper_email = fields.Char(string="Shipper's Email")
     shipper_address = fields.Char(string="Shipper's Address")
+    shipper_extra_info = fields.Char(string="Shipper's Information")
 
     consignee_id = fields.Many2one(comodel_name="res.partner",
                                    domain=[("category_id.name", "=", "Consignee")],
@@ -68,16 +69,19 @@ class FreightBilling(models.Model):
     consignee_name = fields.Char()
     consignee_email = fields.Char(string="Consignee's Email")
     consignee_address = fields.Char(string="Consignee's Address")
+    consignee_extra_info = fields.Char(string="Consignee's Information")
 
     party_id = fields.Many2one(comodel_name="res.partner", string="Party Notification")
     party_name = fields.Char()
     party_email = fields.Char(string="Party's Email")
     party_address = fields.Char(string="Party's Address")
+    party_extra_info = fields.Char(string="Party's Information")
 
     contact_id = fields.Many2one(comodel_name="res.partner", string="Delivery Contact")
     contact_name = fields.Char()
     contact_email = fields.Char(string="Contact's Email")
     contact_address = fields.Char(string="Contact's Address")
+    contact_extra_info = fields.Char(string="Contact's Information")
 
     note = fields.Html('Terms and conditions', default=_default_note)
 
@@ -96,19 +100,23 @@ class FreightBilling(models.Model):
 
     booking_id = fields.Many2one(
         comodel_name="freight.booking", string="Booking",
+        domain="['&',('confirmed', '=', True), ('billing_id', '=', False)]",
         tracking=True, index=True, required=True
     )
     vessel_booking_number = fields.Char(related="booking_id.vessel_booking_number",
                                         string="Booking Number", readonly=True, store=False)
-    port_loading_id = fields.Many2one(
-        comodel_name="freight.catalog.port", string="Port of loading", tracking=True, index=True
-    )
-    port_discharge_id = fields.Many2one(
-        comodel_name="freight.catalog.port", string="Port of discharge", tracking=True, index=True
-    )
-    vessel_id = fields.Many2one(
-        comodel_name="freight.catalog.vessel", string="Ocean vessel", tracking=True, index=True
-    )
+    ''' TODO: FK port_loading_id in database is deprecated, now it uses related field. Consider to drop column in DB '''
+    port_loading_id = fields.Many2one(related="booking_id.port_loading_id", string="Port of loading",
+                                      readonly=False, store=False, tracking=True)
+    port_discharge_id = fields.Many2one(related="booking_id.port_discharge_id", string="Port of discharge",
+                                        readonly=False, store=False, tracking=True)
+    # vessel_id = fields.Many2one(
+    #     comodel_name="freight.catalog.vessel", string="Ocean vessel", tracking=True, index=True
+    # )
+    vessel_id = fields.Many2one(related="booking_id.vessel_id", string="Ocean vessel",
+                                readonly=True, store=False)
+    port_loading_text = fields.Char(string="Port of loading text")
+    port_discharge_text = fields.Char(string="Port of discharge text")
     pre_carriage = fields.Char(string="Pre-carriage by")
     delivery_place = fields.Char(string="Place of delivery")
     final_destination = fields.Char(string="Final destination")
@@ -124,6 +132,7 @@ class FreightBilling(models.Model):
     issue_type = fields.Char(string="Type of issue")
     movement_type = fields.Char(string="Type of movement")
     payable_at = fields.Char(string="Payable at")
+    shipping_mark = fields.Char(string="Shipping mark")
 
     bill_date = fields.Datetime(string="Bill Date", default=fields.Datetime.now)
     due_date = fields.Datetime(string="Due Date")
@@ -149,12 +158,6 @@ class FreightBilling(models.Model):
 
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
     sequence = fields.Integer(default=16)
-
-    state = fields.Selection(selection=[
-        ('draft', 'Draft'),
-        ('posted', 'Posted'),
-        ('cancel', 'Cancelled'),
-    ], string='Status', copy=False, tracking=True, default='draft', group_expand='_expand_states')
 
     color = fields.Integer(string="Color Index")
     kanban_state = fields.Selection(
@@ -450,12 +453,26 @@ class FreightBilling(models.Model):
     #         self.user_id = self.order_id.user_id
     #         self.partner_id = self.order_id.partner_id
 
-    @api.onchange("booking_id")
-    def _onchange_booking_id(self):
-        if self.booking_id:
-            self.port_loading_id = self.booking_id.port_loading_id
-            self.port_discharge_id = self.booking_id.port_discharge_id
-            self.vessel_id = self.booking_id.vessel_id
+    # @api.onchange("booking_id")
+    # def _onchange_booking_id(self):
+    #     if self.booking_id:
+    #         self.port_loading_id = self.booking_id.port_loading_id
+    #         self.port_discharge_id = self.booking_id.port_discharge_id
+    #         self.vessel_id = self.booking_id.vessel_id
+
+    @api.onchange("port_loading_id")
+    def _onchange_port_loading_id(self):
+        if self.port_loading_id:
+            self.port_loading_text = self.port_loading_id.name
+            if self.port_loading_id.country_id:
+                self.port_loading_text += ', ' + self.port_loading_id.country_id.name
+
+    @api.onchange("port_discharge_id")
+    def _onchange_port_discharge_id(self):
+        if self.port_discharge_id:
+            self.port_discharge_text = self.port_discharge_id.name
+            if self.port_discharge_id.country_id:
+                self.port_discharge_text += ', ' + self.port_discharge_id.country_id.name
 
     @api.onchange("shipper_id")
     def _onchange_shipper_id(self):
@@ -466,6 +483,16 @@ class FreightBilling(models.Model):
             if self.shipper_address:
                 self.shipper_address = self.shipper_address.replace(self.shipper_name, '')
 
+            self.shipper_extra_info = ''
+            if self.shipper_id.phone:
+                self.shipper_extra_info += 'TEL: ' + self.shipper_id.phone
+            elif self.shipper_id.mobile:
+                self.shipper_extra_info += 'TEL: ' + self.shipper_id.mobile
+            if self.shipper_email:
+                self.shipper_extra_info += ' - MAIL: ' + self.shipper_email
+            if self.shipper_id.vat:
+                self.shipper_extra_info += ' - VAT: ' + self.shipper_id.vat
+
     @api.onchange("consignee_id")
     def _onchange_consignee_id(self):
         if self.consignee_id:
@@ -474,6 +501,16 @@ class FreightBilling(models.Model):
             self.consignee_address = self.consignee_id.contact_address
             if self.consignee_address:
                 self.consignee_address = self.consignee_address.replace(self.consignee_name, '')
+
+            self.consignee_extra_info = ''
+            if self.consignee_id.phone:
+                self.consignee_extra_info += 'TEL: ' + self.consignee_id.phone
+            elif self.consignee_id.mobile:
+                self.consignee_extra_info += 'TEL: ' + self.consignee_id.mobile
+            if self.consignee_email:
+                self.consignee_extra_info += ' - MAIL: ' + self.consignee_email
+            if self.consignee_id.vat:
+                self.consignee_extra_info += ' - VAT: ' + self.consignee_id.vat
 
     @api.onchange("party_id")
     def _onchange_party_id(self):
@@ -484,6 +521,16 @@ class FreightBilling(models.Model):
             if self.party_address:
                 self.party_address = self.party_address.replace(self.party_name, '')
 
+            self.party_extra_info = ''
+            if self.party_id.phone:
+                self.party_extra_info += 'TEL: ' + self.party_id.phone
+            elif self.party_id.mobile:
+                self.party_extra_info += 'TEL: ' + self.party_id.mobile
+            if self.party_email:
+                self.party_extra_info += ' - MAIL: ' + self.party_email
+            if self.party_id.vat:
+                self.party_extra_info += ' - VAT: ' + self.party_id.vat
+
     @api.onchange("contact_id")
     def _onchange_contact_id(self):
         if self.contact_id:
@@ -492,6 +539,16 @@ class FreightBilling(models.Model):
             self.contact_address = self.contact_id.contact_address
             if self.contact_address:
                 self.contact_address = self.contact_address.replace(self.contact_name, '')
+
+            self.contact_extra_info = ''
+            if self.contact_id.phone:
+                self.contact_extra_info += 'TEL: ' + self.contact_id.phone
+            elif self.contact_id.mobile:
+                self.contact_extra_info += 'TEL: ' + self.contact_id.mobile
+            if self.contact_email:
+                self.contact_extra_info += ' - MAIL: ' + self.contact_email
+            if self.contact_id.vat:
+                self.contact_extra_info += ' - VAT: ' + self.contact_id.vat
 
     # @api.onchange("user_id")
     # def _onchange_dominion_user_id(self):
@@ -502,6 +559,29 @@ class FreightBilling(models.Model):
     #     #     return {"domain": {"user_id": [("id", "in", self.user_ids.ids)]}}
     #     else:
     #         return {"domain": {"user_id": []}}
+
+    def update_total_pkgs_dict(self, dict_to_update, key, value_number):
+        if not value_number:
+            return dict_to_update
+
+        if not key:
+            key = ' '
+
+        if key in dict_to_update:
+            dict_to_update[key] += value_number
+        else:
+            dict_to_update[key] = value_number
+
+        return dict_to_update
+
+    def generate_no_of_pkgs(self, dict_to_concat):
+        res = ''
+        if self.booking_id and self.booking_id.volumes_display:
+            res += self.booking_id.volumes_display.replace(',', '<br/>') + '<br/><br/>'
+        if dict_to_concat:
+            res += ''.join('{:,.2f}'.format(dict_to_concat[key]) + ' ' + key + '<br/>' for key in dict_to_concat.keys())
+
+        return res
 
     # ---------------------------------------------------
     # CRUD

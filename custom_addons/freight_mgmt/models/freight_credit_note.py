@@ -54,7 +54,7 @@ class FreightCreditNote(models.Model):
     number = fields.Char(string='Credit Number', default="#", readonly=True, store=True, index=True, required=True)
     bill_id = fields.Many2one(
         comodel_name="freight.billing", string="Bill Reference",
-        domain="['&',('state', '=', 'posted'), ('credit_note_ids', '=', False)]",
+        domain="['&',('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]",
         tracking=True, index=True, required=True
     )
 
@@ -127,10 +127,12 @@ class FreightCreditNote(models.Model):
 
     payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status",
                                      readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
+    payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
     state = fields.Selection(selection=[
         ('draft', 'Draft'),
         ('posted', 'Posted'),
+        ('completed', 'Completed'),
         ('cancel', 'Cancelled'),
     ], string='Status', copy=False, tracking=True, default='draft', group_expand='_expand_states')
 
@@ -285,6 +287,14 @@ class FreightCreditNote(models.Model):
                     rec.payment_state = invoice.payment_state
             else:
                 rec.payment_state = 'not_paid'
+
+    @api.depends('partner_id')
+    def _compute_payment_term(self):
+        for rec in self:
+            if rec.supplier_id and rec.supplier_id.property_supplier_payment_term_id:
+                rec.payment_term = rec.supplier_id.property_supplier_payment_term_id.display_name
+            else:
+                rec.payment_term = ''
 
     def _get_partner_name(self):
         if self.invoice_partner_id:

@@ -57,14 +57,14 @@
 <!--                            title="Preview Debit Note"/>-->
                     <button name="create_debit_note" string="Create Debit Note"
                             type="object" data-hotkey="b"
-                            attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('debit_count', '&gt;', 0)]}"/>
+                            attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('debit_count', '&gt;', 0)]}"/>
                     <button name="create_credit_note" string="Create Credit Note"
                             type="object" data-hotkey="b"
-                            attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('credit_count', '&gt;', 0)]}"/>
+                            attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('credit_count', '&gt;', 0)]}"/>
                     <field
                         name="state"
                         widget="statusbar"
-                        statusbar_visible="draft,posted,cancel"
+                        statusbar_visible="draft,posted,completed,cancel"
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />
 <!--                    <field-->
@@ -109,15 +109,20 @@
                             groups="base.group_multi_company"
                         />
                         <group>
-                            <field name="billing_type" widget="radio" options="{'horizontal': True}" />
-                            <field name="booking_id" />
+                            <field name="billing_type" widget="radio"
+                                   options="{'horizontal': True}"
+                                   attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                            />
+                            <field name="booking_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
                             <field name="user_id" />
                             <field name="order_id" options="{'no_create': True, 'no_create_edit': True}" />
                             <field name="partner_id" />
                         </group>
                         <group>
                             <field name="vessel_booking_number" />
-                            <field name="vessel_bol_number" />
+                            <field name="vessel_bol_number" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
                             <field name="bill_date" />
                             <field name="due_date" />
                         </group>
@@ -127,19 +132,22 @@
                             <page string="Booking information" name="booking_information">
                                 <group col="2">
                                     <group>
-                                        <field name="booking_id" />
                                         <field name="vessel_id"/>
                                         <field name="pre_carriage" />
+                                        <field name="delivery_place"/>
                                     </group>
                                     <group>
-                                        <field name="port_loading_id" />
-                                        <field name="port_discharge_id" />
-                                        <field name="delivery_place"/>
+                                        <field name="port_loading_id" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
+                                        <field name="port_loading_text" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
+                                        <field name="port_discharge_id" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
+                                        <field name="port_discharge_text" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
                                     </group>
                                 </group>
                                 <separator />
                                 <group name="note_group" col="6" class="mt-2 mt-md-0">
-                                    <field name="note" class="oe-bordered-editor" nolabel="1" placeholder="Terms and conditions..."/>
+                                    <field name="note" class="oe-bordered-editor" nolabel="1"
+                                           attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                                           placeholder="Terms and conditions..."/>
                                     <div class="oe_clear"/>
                                 </group>
                             </page>
@@ -148,16 +156,24 @@
                                     <group>
                                         <field name="shipper_id" />
                                         <field name="shipper_address" />
+                                        <field name="shipper_extra_info" />
+
+                                        <separator colspan="2"/>
 
                                         <field name="consignee_id" />
                                         <field name="consignee_address" />
+                                        <field name="consignee_extra_info" />
                                     </group>
                                     <group>
                                         <field name="party_id" />
                                         <field name="party_address" />
+                                        <field name="party_extra_info" />
+
+                                        <separator colspan="2"/>
 
                                         <field name="contact_id" />
                                         <field name="contact_address" />
+                                        <field name="contact_extra_info" />
                                     </group>
                                 </group>
                             </page>
@@ -165,20 +181,20 @@
                                 <field name="billing_line"
                                     widget="section_and_note_one2many"
                                     mode="tree"
-                                    attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
+                                    attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}">
                                     <tree editable="bottom" class="o_billing_lines">
                                         <field name="billing_id" invisible="1"/>
                                         <field name="sequence" widget="handle"/>
                                         <field name="container_no" widget="section_and_note_text" optional="show" />
                                         <field name="seal_nos" widget="section_and_note_text" optional="show" />
-                                        <field name="number_packages" string="No. of Pkgs" />
-                                        <field name="product_uom" string="Kind of Pkgs" options="{'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="packages_number" string="No. of Pkgs" />
+                                        <field name="product_uom" string="Kind of Pkgs"/>
                                         <field name="description" widget="section_and_note_text" optional="show" />
                                         <field name="gross_weight" />
-                                        <field name="measurement" />
+                                        <field name="measurement_cbm" />
                                     </tree>
                                 </field>
-                                <field name="total_packages_word" />
+                                <field name="total_packages_word" placeholder="Total no. of packages or container (in word)" />
                             </page>
                             <page string="Other Information" name="other_info">
                                 <group col="2">
@@ -192,6 +208,7 @@
                                         <field name="issue_type" />
                                         <field name="movement_type" />
                                         <field name="payable_at" />
+                                        <field name="shipping_mark" />
                                     </group>
                                 </group>
                             </page>
@@ -223,7 +240,7 @@
                 <field name="partner_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="create_date" widget="date" optional="show" />
-                <field name="state" decoration-success="state == 'posted'" decoration-info="state == 'draft'" widget="badge" optional="show" />
+                <field name="state" decoration-success="state in ['posted', 'completed']" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

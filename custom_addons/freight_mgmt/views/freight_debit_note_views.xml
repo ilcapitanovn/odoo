@@ -45,14 +45,14 @@
 <!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
 <!--                    />-->
                     <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"
-                            attrs="{'invisible': ['|', ('invoice_status', '!=', 'to invoice'), ('state', '!=', 'posted')]}" data-hotkey="q"/>
+                            attrs="{'invisible': ['|', ('invoice_status', '!=', 'to invoice'), ('state', 'not in', ['posted', 'completed'])]}" data-hotkey="q"/>
                     <!-- Preview (only customer debit note) -->
                     <button name="preview_debit_note" type="object" string="Preview" data-hotkey="d"
                             title="Preview Debit Note"/>
                     <field
                         name="state"
                         widget="statusbar"
-                        statusbar_visible="draft,posted,cancel"
+                        statusbar_visible="draft,posted,completed,cancel"
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />
                     <field name="invoice_status" invisible="1"/>
@@ -92,7 +92,10 @@
                             groups="base.group_multi_company"
                         />
                         <group>
-                            <field name="bill_id" options="{'no_create': True, 'no_create_edit': True}" />
+                            <field name="bill_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                            />
                             <field name="booking_id" />
                             <field name="pol" />
                             <field name="pod" />
@@ -103,25 +106,35 @@
                             <field name="order_id" />
                             <field name="user_id" />
                             <field name="customer_id" domain="[('id', '=', partner_id)]"
-                                options="{'no_create': True, 'no_create_edit': True}"/>
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                            />
                             <label for="exchange_rate" />
                             <div class="o_row">
-                                <field name="exchange_rate" digits="[12,0]" />
+                                <field name="exchange_rate" digits="[12,0]"
+                                       attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                                />
                                 <button name="update_exchange_rate" type="object"
                                         string=" Refresh"
+                                        attrs="{'invisible': [('state', 'in', ('completed','cancel'))]}"
                                         help="Recompute exchange rate"
                                         class="btn-link mb-1 px-0" icon="fa-refresh"
                                         confirm="This will update exchange and re-calculate total amount in VND." />
                             </div>
-                            <field name="debit_date" widget="date" />
+                            <field name="debit_date" widget="date"
+                                   attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                            />
+                            <field name="payment_term" />
                         </group>
                     </group>
                     <group>
                         <notebook>
                             <page string="Items" name="debit_items">
                                 <field name="debit_items"
-                                    widget="section_and_note_one2many"
-                                    mode="tree">
+                                       widget="section_and_note_one2many"
+                                       mode="tree"
+                                       attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
+                                >
                                     <tree editable="bottom" class="o_billing_lines" delete="false" create="false">
                                         <field name="debit_id" invisible="1"/>
                                         <field name="external_id" invisible="1"/>
@@ -196,6 +209,7 @@
                 <field name="customer_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="debit_date" widget="date" optional="show" />
+                <field name="payment_term" optional="show" />
                 <field name="payment_state"
                        widget="badge"
                        decoration-danger="payment_state == 'not_paid'"
@@ -203,7 +217,7 @@
                        decoration-success="payment_state in ('paid', 'reversed')"
                        attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
                        optional="show"/>
-                <field name="state" decoration-success="state == 'posted'" decoration-info="state == 'draft'" widget="badge" optional="show" />
+                <field name="state" decoration-success="state in ['posted', 'completed']" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>
