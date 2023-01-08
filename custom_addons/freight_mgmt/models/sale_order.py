@@ -143,8 +143,8 @@ class SaleOrder(models.Model):
         Compute the booking status of a SO. Possible statuses:
         - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
           booking. This is also the default value if the conditions of no other status is met.
-        - to booking: if any SO line is 'to booking', the whole SO is 'to booking'
-        - booked: if all SO lines are booked, the SO is booked.
+        - to booking: based on the whole invoice status, the whole SO is 'to booking'
+        - booked: if SO has already created booking and re-confirmed from cancelled SO, the SO is booked.
         """
         unconfirmed_orders = self.filtered(lambda so: so.state not in ['sale', 'done'])
         unconfirmed_orders.booking_status = 'no'
@@ -154,10 +154,14 @@ class SaleOrder(models.Model):
 
         for order in confirmed_orders:
             if order.booking_status != 'booked' and order.booking_status != 'to booking':
-                if order.invoice_status == 'to invoice' or order.invoice_status == 'invoiced':
-                    order.booking_status = 'to booking'
+                if order.booking_id:
+                    # In case of SO re-confirmed from a cancelled SO and it has already created booking
+                    order.booking_status = 'booked'
                 else:
-                    order.booking_status = 'no'
+                    if order.invoice_status == 'to invoice' or order.invoice_status == 'invoiced':
+                        order.booking_status = 'to booking'
+                    else:
+                        order.booking_status = 'no'
             # if order.state not in ('sale', 'done'):
             #     order.booking_status = 'no'
             # elif not order.booking_status:
