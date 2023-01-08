@@ -8,6 +8,7 @@ from odoo.exceptions import UserError, ValidationError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    booking_id = fields.One2many('freight.booking', 'order_id', string='Booking Reference', auto_join=True)
     booking_status = fields.Selection([
         ('booked', 'Booking Created'),
         ('to booking', 'To Booking'),

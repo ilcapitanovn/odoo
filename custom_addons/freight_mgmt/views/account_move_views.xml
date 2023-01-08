@@ -11,6 +11,20 @@
                         <xpath expr="//button[@name='action_reverse']" position="attributes">
                             <attribute name="invisible">1</attribute>
                         </xpath>
+                        <xpath expr="//label[@for='journal_id']" position="before">
+                            <field name="vessel_bol_number"></field>
+                        </xpath>
+                </field>
+        </record>
+
+        <record id="freight_view_move_tree_inherit" model="ir.ui.view">
+                <field name="name">freight.view.move.tree.inherited</field>
+                <field name="model">account.move</field>
+                <field name="inherit_id" ref="account.view_invoice_tree"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//field[@name='name']" position="after">
+                            <field name="vessel_bol_number"></field>
+                        </xpath>
                 </field>
         </record>
 
