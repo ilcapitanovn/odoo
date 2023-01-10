@@ -251,6 +251,94 @@
                 </table>
             </field>
         </record>
+
+        <record id="invoice_created_notification_template" model="mail.template">
+            <field name="name">Invoice: New Invoice Created</field>
+            <field name="model_id" ref="account.model_account_move" />
+<!--            <field name="email_from">{{object.company_id.partner_id.email}}</field>-->
+            <field name="email_cc">{{object.company_id.partner_id.email}}</field>
+            <field name="subject">{{object.company_id.name}} DUYỆT CHUYỂN TIỀN - Công Nợ Nháp (* {{ object.id or 'n/a' }})</field>
+            <field name="partner_to">{{object.company_id.partner_id.email}}</field>
+            <field name="auto_delete" eval="True" />
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;" width="100%"><tbody><tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+<tbody>
+    <!-- HEADER -->
+	<!--
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tbody><tr><td valign="middle">
+                    <span style="font-size: 10px;">Welcome to Odoo</span><br>
+                    <span style="font-size: 20px; font-weight: bold;">
+                        <t t-out="object.name or ''" data-oe-t-inline="true" contenteditable="false">Marc Demo</t>
+                    </span>
+                </td><td valign="middle" align="right">
+                    <img t-attf-src="/logo.png?company={{ object.company_id.id }}" style="border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;" t-att-alt="object.company_id.name" width="80px" height="0">
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+	-->
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tbody><tr><td valign="top" style="font-size: 13px;">
+                    <div style="box-sizing:border-box;font-size:13px;">
+                        Dear Accounting,<br/><br/>
+						Một công nợ nháp (* <t t-out="object.id" data-oe-t-inline="true" contenteditable="false">123</t>) với số tiền là <strong t-out="format_amount(object.amount_total, object.currency_id) or ''">$ 10.00</strong> vừa được tạo cho
+						<t t-if="object.move_type == 'out_invoice'" data-oe-t-inline="true" contenteditable="false">khách hàng </t>
+						<t t-if="object.move_type == 'in_invoice'" data-oe-t-inline="true" contenteditable="false">nhà cung cấp </t>
+						<strong><i><t t-out="object.invoice_partner_display_name or ''" data-oe-t-inline="true" contenteditable="false">CompanyName</t></i></strong>.
+						<br/><br/>
+                        <div style="box-sizing:border-box;font-size:13px;margin: 16px 0px 16px 0px;">
+                            <a t-att-href="'/mail/view?model=account.move%26res_id=' + str(object.id)" style="box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                Xem Công Nợ
+                            </a>
+                        </div>
+                    </div>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
+			<b><t t-out="object.company_id.name or ''" data-oe-t-inline="true" contenteditable="false">YourCompany</t></b>
+            <div style="opacity: 0.7;">
+				<t t-out="object.company_id.phone or ''" data-oe-t-inline="true" contenteditable="false">+1 650-123-4567</t>
+				<t t-if="object.company_id.email" data-oe-t-group-active="true" data-oe-t-group="2" data-oe-t-inline="true">
+					| <a t-att-href="'mailto:%s' % object.company_id.email" style="box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.email or ''" contenteditable="false">info@yourcompany.com</a>
+				</t>
+				<t t-if="object.company_id.website" data-oe-t-group-active="true" data-oe-t-group="3" data-oe-t-inline="true">
+					| <a t-att-href="'%s' % object.company_id.website" style="box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.website or ''" contenteditable="false">http://www.example.com</a>
+				</t>
+            </div>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr><td align="center" style="min-width: 590px;">
+    <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+      <tbody><tr><td style="text-align: center; font-size: 13px;">
+        Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" style="text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;">Odoo</a>
+      </td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>
+            </field>
+        </record>
+
+
         <!-- Sequence -->
         <record id="freight_booking_sequence" model="ir.sequence">
             <field name="name">Freight Booking Sequence</field>
