@@ -8,6 +8,21 @@
               <h2 class="mt16" style="text-align:center">Quotation</h2>
             </div>
         </t>
+        <div class="page">
+            <div class="row">
+                <div class="col-6">
+                    <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;email&quot;], &quot;no_marker&quot;: True}"/>
+                    <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
+                </div>
+                <div t-if="doc.user_id.name" class="col-6">
+                    <strong>Salesperson:</strong>
+                    <p class="m-0" t-field="doc.user_id"/>
+                    <p class="m-0"><t t-esc="doc.user_id.mobile_phone or doc.user_id.work_phone or doc.user_id.phone" /></p>
+                    <p class="m-0" t-field="doc.user_id.email"/>
+                </div>
+            </div>
+        </div>
+        <!--
         <t t-set="address">
             <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;email&quot;], &quot;no_marker&quot;: True}"/>
             <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
@@ -23,6 +38,7 @@
                 </t>
             </t>
         </t>
+        -->
         <div class="page">
             <div class="oe_structure"/>
 
@@ -54,12 +70,6 @@
                 <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col-auto col-3 mw-100 mb-2" name="expiration_date">
                     <strong>Expiration:</strong>
                     <p class="m-0" t-field="doc.validity_date"/>
-                </div>
-                <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
-                    <strong>Salesperson:</strong>
-                    <p class="m-0" t-field="doc.user_id"/>
-                    <p class="m-0" t-field="doc.user_id.phone"/>
-                    <p class="m-0" t-field="doc.user_id.email"/>
                 </div>
             </div>
 
@@ -138,6 +148,7 @@
                 </tbody>
             </table>
 
+            <t t-if="doc.date_order and doc.state not in ['draft','sent']">
             <div class="clearfix" name="so_total_summary">
                 <div id="total" class="row" name="total">
                     <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
@@ -149,6 +160,7 @@
                     </div>
                 </div>
             </div>
+            </t>
 
             <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">
                 <div class="offset-8">
