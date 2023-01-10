@@ -244,7 +244,7 @@
         <field name="name">freight.booking.view.tree</field>
         <field name="model">freight.booking</field>
         <field name="arch" type="xml">
-            <tree class="o_booking_tree">
+            <tree class="o_booking_tree" default_order='create_date desc'>
                 <field name="confirmed" invisible="1"/>
                 <field name="completed" invisible="1"/>
                 <field name="stage_name" invisible="1"/>
