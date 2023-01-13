@@ -97,6 +97,7 @@
                                    attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}"
                             />
                             <field name="booking_id" />
+                            <field name="bill_no" string="B/L Number" />
                             <field name="pol" />
                             <field name="pod" />
                             <field name="etd_formatted" />
@@ -203,8 +204,7 @@
             <tree>
                 <field name="number" string="Debit No." decoration-bf="1" decoration-info="1" />
                 <field name="bill_id" string="Bill Ref" />
-<!--                <field name="vessel_booking_number" string="Booking NO" optional="show" />-->
-<!--                <field name="vessel_bol_number" optional="show" />-->
+                <field name="bill_no" string="B/L Number" optional="hide" />
                 <field name="order_id" string="Order" decoration-info="1" optional="show" />
                 <field name="customer_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
