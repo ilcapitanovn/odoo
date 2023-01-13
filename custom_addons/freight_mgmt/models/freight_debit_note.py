@@ -172,6 +172,8 @@ class FreightDebitNote(models.Model):
             raise UserError(_("The selected Bill and its Sale Order is invalid to invoice."))
         action = self.env["ir.actions.actions"]._for_xml_id("sale.action_view_sale_advance_payment_inv")
         action['context'] = {
+            'attachment_res_id': self.id,
+            'attachment_res_model': 'freight.debit.note',
             'active_id': self.order_id.ids[0] if len(self.order_id.ids) == 1 else False,
             'active_ids': self.order_id.ids
         }

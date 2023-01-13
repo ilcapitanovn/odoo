@@ -47,7 +47,7 @@
 <!--                    <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"-->
 <!--                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}" data-hotkey="q"/>-->
                     <button name="action_create_invoice" string="Create Invoice" type="object" class="oe_highlight"
-                            context="{'create_bill':True}" data-hotkey="w"
+                            context="{'create_bill':True, 'attachment_res_id':id, 'attachment_res_model':'freight.credit.note'}" data-hotkey="w"
                             attrs="{'invisible': ['|', '|', ('sale_state', 'not in', ('purchase', 'done')), ('state', 'not in', ['posted', 'completed']), ('invoice_status', 'in', ('no', 'invoiced'))]}"/>
                     <!-- Preview (only customer credit note) -->
 <!--                    <button name="preview_credit_note" type="object" string="Preview" data-hotkey="d"-->
