@@ -106,6 +106,8 @@
                 <field name="incentive_name" optional="hide"/>
                 <field name="partner_id" widget="many2one_avatar"/>
                 <field name="display_target_sales" />
+                <field name="bill_no" optional="show" />
+                <field name="sale_order_id" optional="show" />
                 <field name="display_sum_freehand" />
                 <field name="display_sum_nominated" />
                 <field name="display_sum_activities"/>

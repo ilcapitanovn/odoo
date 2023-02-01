@@ -185,7 +185,8 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             LEFT JOIN res_users usale ON usale.id = fbl.user_id
             INNER JOIN res_partner psale ON usale.partner_id = psale.id
             LEFT JOIN sale_order so ON fbl.order_id = so.id
-            LEFT JOIN purchase_order po on so.name = po.origin
+			LEFT JOIN freight_credit_note fcn ON fbl.id = fcn.bill_id
+            LEFT JOIN purchase_order po on fcn.purchase_order_id = po.id
         """
         return from_str
 
