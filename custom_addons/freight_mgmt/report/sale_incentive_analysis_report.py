@@ -24,7 +24,6 @@ class SaleIncentiveAnalysisReport(models.Model):
         ]
 
     user_id = fields.Many2one("res.users", "User", readonly=True)
-    sale_order_id = fields.Many2one("sale.order", "Order", readonly=True)
     company_id = fields.Many2one("res.company", "Company", readonly=True)
     partner_id = fields.Many2one("res.partner", "Employee", readonly=True)
     incentive_id = fields.Many2one("sale.incentive", "Incentive", readonly=True)
@@ -36,7 +35,6 @@ class SaleIncentiveAnalysisReport(models.Model):
     #display_name = fields.Char("Name", readonly=True)
     incentive_name = fields.Char("Incentive Type", readonly=True)
     target_sales = fields.Float("Target Sales", readonly=True)
-    bill_no = fields.Char("Bill No", readonly=True)
 
     sum_freehand = fields.Float("Freehand", readonly=True)
     sum_nominated = fields.Float("Nominated", readonly=True)
@@ -140,10 +138,8 @@ class SaleIncentiveAnalysisReport(models.Model):
     def _select(self):
         select_str = """
             SELECT DISTINCT
-                tblSum.sale_order_id AS id,
+                u.id AS id,
                 u.id AS user_id,
-                tblSum.sale_order_id AS sale_order_id,
-                tblSum.bill_no AS bill_no,
                 u.company_id AS company_id,
                 u.partner_id AS partner_id,
                 si.id AS incentive_id,
@@ -158,8 +154,6 @@ class SaleIncentiveAnalysisReport(models.Model):
                 sum_all
             FROM (
                 SELECT user_id
-                    , sale_order_id
-                    , bill_no
                     , CASE WHEN order_type IS NULL THEN 'freehand' ELSE order_type END as order_type
                     , SUM(DISTINCT CASE WHEN order_type = 'freehand' THEN margin ELSE 0 END) as sum_freehand
                     , SUM(DISTINCT CASE WHEN order_type = 'nominated' THEN margin ELSE 0 END) as sum_nominated
@@ -168,7 +162,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                 FROM sale_profit_forwarder_analysis_report
                 WHERE date_order >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
                     AND date_order <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                GROUP BY user_id, sale_order_id, bill_no, order_type
+                GROUP BY user_id, order_type
             ) tblSum
             INNER JOIN res_users u ON tblSum.user_id = u.id
             INNER JOIN res_partner p ON u.partner_id = p.id
