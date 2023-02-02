@@ -78,10 +78,11 @@ class SaleIncentiveAnalysisReport(models.Model):
 
     @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all')
     def _compute_incentive_and_tax(self):
-        cur = self.env.context.get('wizard_currency')
-        rate = self.env.context.get('wizard_exchange_rate')
-        if cur != 'VND' or rate <= 0:
-            rate = 1
+        # cur = self.env.context.get('wizard_currency')
+        # rate = self.env.context.get('wizard_exchange_rate')
+        # if cur != 'VND' or rate <= 0:
+        #     rate = 1
+        rate = 1    # VND
 
         for rec in self:
             incentive = 0.0
@@ -151,17 +152,24 @@ class SaleIncentiveAnalysisReport(models.Model):
                 sum_freehand,
                 sum_nominated,
                 sum_activities,
-                sum_all
+                sum_freehand + sum_nominated + sum_activities AS sum_all
             FROM (
                 SELECT user_id
                     , CASE WHEN order_type IS NULL THEN 'freehand' ELSE order_type END as order_type
-                    , SUM(DISTINCT CASE WHEN order_type = 'freehand' THEN margin ELSE 0 END) as sum_freehand
-                    , SUM(DISTINCT CASE WHEN order_type = 'nominated' THEN margin ELSE 0 END) as sum_nominated
+                    , SUM(CASE WHEN order_type = 'freehand' THEN 
+                            ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                            - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                            - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                            ELSE 0 END) as sum_freehand
+                    , SUM(CASE WHEN order_type = 'nominated' THEN 
+                            ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                            - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                            - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                            ELSE 0 END) as sum_nominated
                     , 0 as sum_activities
-                    , SUM(DISTINCT margin) as sum_all
                 FROM sale_profit_forwarder_analysis_report
-                WHERE date_order >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                    AND date_order <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+                WHERE etd >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+                    AND etd <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
                 GROUP BY user_id, order_type
             ) tblSum
             INNER JOIN res_users u ON tblSum.user_id = u.id

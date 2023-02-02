@@ -98,7 +98,7 @@ class FreightCreditNote(models.Model):
     # amount_total = fields.Monetary(related="purchase_order_id.amount_total", string="Total", readonly=True, store=True)
     amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True)
+    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True)
 
     # user_id = fields.Many2one(
     #     comodel_name="res.users", string="Assigned user", tracking=True, index=True

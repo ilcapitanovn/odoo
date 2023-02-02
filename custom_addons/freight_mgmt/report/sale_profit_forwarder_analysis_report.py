@@ -44,9 +44,20 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     po_amount_total = fields.Float("Co VAT (I)", readonly=True)
     po_amount_tax = fields.Float("VAT (I)", readonly=True)
 
+    po_amount_untaxed_vnd = fields.Float("Chua VAT (I)", readonly=True)
+    po_amount_total_vnd = fields.Float("Co VAT (I)", readonly=True)
+    po_amount_tax_vnd = fields.Float("VAT (I)", readonly=True)
+
     so_amount_untaxed = fields.Float("Chua VAT (O)", readonly=True)
     so_amount_total = fields.Float("Co VAT (O)", readonly=True)
     so_amount_tax = fields.Float("VAT (O)", readonly=True)
+
+    so_amount_untaxed_vnd = fields.Float("Chua VAT (O)", readonly=True)
+    so_amount_total_vnd = fields.Float("Co VAT (O)", readonly=True)
+    so_amount_tax_vnd = fields.Float("VAT (O)", readonly=True)
+
+    po_exchange_rate = fields.Float("Ti Gia (I)", readonly=True)
+    so_exchange_rate = fields.Float("Ti Gia (O)", readonly=True)
 
     cost_no_vat = fields.Float("Chi phi (ko hd)", readonly=True)
     revenue_no_vat = fields.Float("Doanh thu dv (ko hd)", readonly=True)
@@ -78,11 +89,15 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     @api.depends('so_amount_untaxed', 'margin')
     def _compute_profits(self):
         for rec in self:
-            rec.profit_before_tax_no_vat = rec.so_amount_untaxed - rec.po_amount_untaxed
-            rec.profit_before_tax_vat = rec.margin
-            rec.vat_payable = rec.so_amount_tax - rec.po_amount_tax
-            rec.business_tax_amount = rec.profit_before_tax_no_vat * 0.2
-            rec.profit_after_tax_no_vat = rec.profit_before_tax_no_vat - rec.vat_payable - rec.business_tax_amount
+            # rec.profit_before_tax_no_vat = rec.so_amount_untaxed - rec.po_amount_untaxed
+            # rec.profit_before_tax_vat = rec.margin
+            # rec.vat_payable = rec.so_amount_tax - rec.po_amount_tax
+            rec.profit_before_tax_no_vat = rec.so_amount_untaxed_vnd - rec.po_amount_untaxed_vnd
+            rec.profit_before_tax_vat = (rec.so_amount_total_vnd + rec.revenue_no_vat) - \
+                (rec.po_amount_total_vnd + rec.cost_no_vat + rec.po_commission_total_vnd + rec.so_commission_total_vnd)
+            rec.vat_payable = rec.so_amount_tax_vnd - rec.po_amount_tax_vnd
+            rec.business_tax_amount = rec.profit_before_tax_no_vat * 0.15
+            rec.profit_after_tax_no_vat = rec.profit_before_tax_no_vat - rec.business_tax_amount
             rec.profit_after_tax_vat = rec.profit_before_tax_vat - rec.vat_payable - rec.business_tax_amount
 
     @api.depends('pod_id')
@@ -119,23 +134,63 @@ class SaleProfitForwarderAnalysisReport(models.Model):
 
     @api.depends('so_commission_total')
     def _compute_so_commission_in_vnd(self):
-        usd = self.env['res.currency'].search([('name', '=', 'USD')])
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
-        now = fields.Datetime.now()
+        # usd = self.env['res.currency'].search([('name', '=', 'USD')])
+        # vnd = self.env['res.currency'].search([('name', '=', 'VND')])
+        # now = fields.Datetime.now()
 
         for record in self:
-            amount_vnd = usd._convert(record.so_commission_total, vnd, record.company_id, now)
+            # amount_vnd = usd._convert(record.so_commission_total, vnd, record.company_id, now)
+            '''
+            Use default exchange at 22,000 VND based on accounting profit calculation file
+            TODO: may need to define in system parameter
+            '''
+            amount_vnd = record.so_commission_total * 22000
             record.so_commission_total_vnd = amount_vnd
 
     @api.depends('po_commission_total')
     def _compute_po_commission_in_vnd(self):
-        usd = self.env['res.currency'].search([('name', '=', 'USD')])
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
-        now = fields.Datetime.now()
+        # usd = self.env['res.currency'].search([('name', '=', 'USD')])
+        # vnd = self.env['res.currency'].search([('name', '=', 'VND')])
+        # now = fields.Datetime.now()
 
         for record in self:
-            amount_vnd = usd._convert(record.po_commission_total, vnd, record.company_id, now)
+            # amount_vnd = usd._convert(record.po_commission_total, vnd, record.company_id, now)
+            '''
+            Use default exchange at 22,000 VND based on accounting profit calculation file
+            TODO: may need to define in system parameter
+            '''
+            amount_vnd = record.po_commission_total * 22000
             record.po_commission_total_vnd = amount_vnd
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        '''
+        Calculate to display total if using group by
+        '''
+        res = super(SaleProfitForwarderAnalysisReport, self).read_group(domain, fields, groupby, offset=offset,
+                                                                        limit=limit, orderby=orderby, lazy=lazy)
+
+        fields_to_calculate_total = [
+            'so_commission_total_vnd',
+            'po_commission_total_vnd',
+            'profit_before_tax_no_vat',
+            'profit_before_tax_vat',
+            'vat_payable',
+            'business_tax_amount',
+            'profit_after_tax_no_vat',
+            'profit_after_tax_vat'
+        ]
+        for field in fields_to_calculate_total:
+            if field in fields:
+                for line in res:
+                    if '__domain' in line:
+                        lines = self.search(line['__domain'])
+                        total = 0.0
+                        for record in lines:
+                            total += record[field]
+                        line[field] = total
+
+        return res
 
     def _select(self):
         select_str = """
@@ -158,20 +213,31 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
             so.date_order AS date_order,
             
-            po.amount_untaxed AS po_amount_untaxed,
-            po.amount_total AS po_amount_total,
-            po.amount_tax AS po_amount_tax,
+            CASE WHEN po.amount_untaxed IS NULL THEN 0 ELSE po.amount_untaxed END AS po_amount_untaxed,
+            CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
+            CASE WHEN po.amount_total - po.amount_untaxed IS NULL THEN 0 ELSE po.amount_total - po.amount_untaxed END AS po_amount_tax,
+
+            CASE WHEN po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE po.amount_untaxed * fcn.exchange_rate END AS po_amount_untaxed_vnd,
+			CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END AS po_amount_total_vnd,
+            CASE WHEN fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate END AS po_amount_tax_vnd,
             
-            so.amount_untaxed AS so_amount_untaxed,
-            so.amount_total AS so_amount_total,
-            so.amount_tax AS so_amount_tax,
+            CASE WHEN so.amount_untaxed IS NULL THEN 0 ELSE so.amount_untaxed END AS so_amount_untaxed,
+            CASE WHEN so.amount_total IS NULL THEN 0 ELSE so.amount_total END AS so_amount_total,
+            CASE WHEN so.amount_total - so.amount_untaxed IS NULL THEN 0 ELSE so.amount_total - so.amount_untaxed END AS so_amount_tax,
+            
+            CASE WHEN so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE so.amount_untaxed * fdn.exchange_rate END AS so_amount_untaxed_vnd,
+			CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END AS so_amount_total_vnd,
+            CASE WHEN fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate END AS so_amount_tax_vnd,
+			
+			CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
+			CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,
             
             0 AS cost_no_vat,
             0 AS revenue_no_vat,
             
-            po.commission_total AS po_commission_total,
-            so.commission_total AS so_commission_total,
-            so.margin
+            CASE WHEN po.commission_total IS NULL THEN 0 ELSE po.commission_total END AS po_commission_total,
+            CASE WHEN so.commission_total IS NULL THEN 0 ELSE so.commission_total END AS so_commission_total,
+            CASE WHEN so.margin IS NULL THEN 0 ELSE so.margin END AS margin
         """
         return select_str
 
@@ -185,6 +251,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             LEFT JOIN res_users usale ON usale.id = fbl.user_id
             INNER JOIN res_partner psale ON usale.partner_id = psale.id
             LEFT JOIN sale_order so ON fbl.order_id = so.id
+            LEFT JOIN freight_debit_note fdn ON fbl.id = fdn.bill_id
 			LEFT JOIN freight_credit_note fcn ON fbl.id = fcn.bill_id
             LEFT JOIN purchase_order po on fcn.purchase_order_id = po.id
         """

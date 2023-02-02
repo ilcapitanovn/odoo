@@ -38,6 +38,7 @@
 <!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
 <!--                />-->
                 <filter name="filter_date" date="date_order"/>
+                <filter name="filter_date" date="etd"/>
 <!--                <filter-->
 <!--                    name="Draft"-->
 <!--                    string="Draft"-->
@@ -82,9 +83,14 @@
                     />
                     <separator />
                     <filter
-                        string="Order Month"
-                        name="group_by_order_month"
-                        context="{'group_by':'date_order:month'}"
+                        string="Date Order"
+                        name="group_by_date_order"
+                        context="{'group_by':'date_order'}"
+                    />
+                    <filter
+                        string="ETD"
+                        name="group_by_etd"
+                        context="{'group_by':'etd'}"
                     />
                 </group>
             </search>
@@ -110,9 +116,9 @@
                 <field name="etd" optional="show"/>
                 <field name="display_sale_name" string="Sale" optional="show"/>
                 <field name="order_type" string="F or N" optional="show"/>
-                <field name="po_amount_untaxed" optional="show"/>
-                <field name="po_amount_total" optional="show"/>
-                <field name="po_amount_tax" optional="show"/>
+                <field name="po_amount_untaxed_vnd" optional="show"/>
+                <field name="po_amount_total_vnd" optional="show"/>
+                <field name="po_amount_tax_vnd" optional="show"/>
                 <field name="cost_no_vat" optional="show"/>
                 <field name="display_cus" string="CUS" optional="show"/>
                 <field name="so_commission_total" optional="show"/>
@@ -120,9 +126,9 @@
                 <field name="display_line" string="LINE" optional="show"/>
                 <field name="po_commission_total" optional="show"/>
                 <field name="po_commission_total_vnd" optional="show"/>
-                <field name="so_amount_untaxed" optional="show"/>
-                <field name="so_amount_total" optional="show"/>
-                <field name="so_amount_tax" optional="show"/>
+                <field name="so_amount_untaxed_vnd" optional="show"/>
+                <field name="so_amount_total_vnd" optional="show"/>
+                <field name="so_amount_tax_vnd" optional="show"/>
                 <field name="revenue_no_vat" optional="show"/>
                 <field name="profit_before_tax_no_vat" string="LN THUE (TT)" optional="show"/>
                 <field name="profit_before_tax_vat" string="LN THUC TE (TT)" optional="show"/>
