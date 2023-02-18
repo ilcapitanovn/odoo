@@ -1,0 +1,40 @@
+.o_billing_lines, .o_booking_volume_tree {
+    .o_input {
+        background-color: #D2D2FF !important;
+    }
+}
+.o_booking_tree [data-name="partner_id"]{
+    max-width: 200px !important;
+}
+.o_booking_volume_tree [data-name="quantity"]{
+    width: 20%;
+    max-width: 200px !important;
+    text-align: center !important;
+}
+.o_booking_volume_tree [data-name="container_id"]{
+    text-align: center;
+}
+.o_booking_volume_tree .o_data_row td:nth-child(even) {
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="bill_no"] {
+    text-align: center !important;
+    width: 120px !important;
+    max-width: 120px !important;
+}
+.o_report_profits_tree [data-name="display_sale_name"] {
+    width: 70px !important;
+    max-width: 70px !important;
+}
+.o_report_profits_tree [data-name="display_cus"] {
+    width: 70px !important;
+    max-width: 70px !important;
+}
+.o_report_profits_tree [data-name="display_line"] {
+    width: 70px !important;
+    max-width: 70px !important;
+}
+.pricelist-view [data-name=""] {
+    width: 100px !important;
+    max-width: 100px !important;
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="account_tax_income_tree">
+        <field name="name">Account Tax Income tree</field>
+        <field name="model">account.tax.income</field>
+        <field name="arch" type="xml">
+            <tree string="Incentives">
+                <field name="name" />
+                <field name="tax_income_type" />
+                <field name="fix_percent" />
+                <field name="section_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="account_tax_income_form">
+        <field name="name">Account Tax Income form</field>
+        <field name="model">account.tax.income</field>
+        <field name="arch" type="xml">
+            <form string="Tax Income">
+                <header></header>
+                <sheet>
+                    <group string="General information">
+                        <group>
+                            <field name="name" />
+                            <field name="tax_income_type" />
+                            <field name="currency_id" />
+                            <field name="active" />
+                        </group>
+                    </group>
+                    <group string="Tax rates definition" colspan="4">
+                        <group colspan="2">
+                            <field
+                                name="fix_percent"
+                                attrs="{'invisible': [('tax_income_type', '!=', 'fixed')], 'required': [('tax_income_type', '=', 'fixed')]}"
+                            />
+                        </group>
+                        <field
+                            name="section_ids"
+                            widget="one2many_list"
+                            colspan="4"
+                            nolabel="1"
+                            attrs="{'invisible': [('tax_income_type', '!=', 'section')]}"
+                        >
+                            <tree string="Sections" editable="bottom">
+                                <field name="amount_from" widget="monetary"
+                                       options="{'currency_field': 'currency_id', 'field_digits': True}" />
+                                <field name="amount_to" widget="monetary"
+                                       options="{'currency_field': 'currency_id', 'field_digits': True}" />
+                                <field name="tax_rate_percent" />
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_account_tax_income">
+        <field name="name">Tax Income</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.tax.income</field>
+        <field name="binding_view_types">form,tree</field>
+    </record>
+    <menuitem
+        name="Tax Income"
+        id="menu_account_tax_income_rates"
+        parent="account.account_account_menu"
+        action="action_account_tax_income"
+        sequence="40"
+    />
+</odoo>

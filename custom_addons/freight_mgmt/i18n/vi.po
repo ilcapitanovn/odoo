@@ -1,0 +1,1775 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* freight_mgmt
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-11 22:43+0000\n"
+"PO-Revision-Date: 2022-07-12 06:50+0700\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"X-Generator: Poedit 3.1.1\n"
+
+#. module: freight_mgmt
+#: model:ir.actions.report,print_report_name:freight_mgmt.freight_billing_report
+msgid "'Bill Of Lading - %s' % (object.name).replace('/', '')"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "(FOR PORT-TO-PORT OR COMBINED TRANSPORT)"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "(KGS)<br/>"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "1/3"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,body_html:freight_mgmt.assignment_email_template
+msgid ""
+"<p>Hello <t t-out=\"object.user_id.name\"/>,</p>\n"
+"                <p>The booking <t t-out=\"object.number\"/> has been "
+"assigned to you.</p>\n"
+"            "
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "<strong>BILL OF LADING</strong>"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,body_html:freight_mgmt.closed_freight_booking_template
+msgid ""
+"<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" "
+"style=\"padding: 20px; background-color: #ededed; border-collapse:separate;"
+"\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: "
+"rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s' % "
+"object.company_id.id\" style=\"padding: 0px; margin: 0px; height: auto; "
+"width: 80px;\" t-att-alt=\"'%s' % object.company_id.name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: "
+"rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,"
+"Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p>Hello <t t-out=\"object.user_id.name\"/>,"
+"</p>\n"
+"                                <p>The booking \"<t t-out=\"object."
+"display_name\"/>\" has been closed.</p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: "
+"rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.phone\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.email\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.website\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            "
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,body_html:freight_mgmt.changed_stage_template
+msgid ""
+"<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" "
+"style=\"padding: 20px; background-color: #ededed; border-collapse:separate;"
+"\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: "
+"rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s' % "
+"object.company_id.id\" style=\"padding: 0px; margin: 0px; height: auto; "
+"width: 80px;\" t-att-alt=\"'%s' % object.company_id.name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: "
+"rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,"
+"Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p>Hello <t t-out=\"object.user_id.name\"/>,"
+"</p>\n"
+"                                <p>The booking \"<t t-out=\"object."
+"display_name\"/>\" stage has changed to <t t-out=\"object.stage_id.name\"/>."
+"</p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding="
+"\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: "
+"rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.phone\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.email\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"left\" style="
+"\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;"
+"\">\n"
+"                                <t t-out=\"object.company_id.website\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"            "
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "ALSO NOTIFY PARTY (Name and address)"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_needaction
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__active
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__active
+msgid "Active"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_ids
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_exception_decoration
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_state
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_type_icon
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__transport_type__air
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_catalog_port__port_type__air
+msgid "Air"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__air-exp
+msgid "Air Export"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__air-imp
+msgid "Air Import"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_airline_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_airline_menu
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_airline_form
+msgid "Airlines"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.airline,name:freight_mgmt.freight_catalog_airline_aa
+msgid "American Airlines"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.port,name:freight_mgmt.freight_catalog_port_2
+msgid "Anguilla"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_airline_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_container_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_incoterm_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_port_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_stage_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_vessel_search
+msgid "Archived"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Assign to me"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__user_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__user_id
+msgid "Assigned user"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_attachment_count
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "BILL OF LADING NO."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_1
+msgid "Bermuda QUEEN MARY 2"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__bill_date
+msgid "Bill Date"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__name
+msgid "Bill Number"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.report,name:freight_mgmt.freight_billing_report
+msgid "Bill Of Lading"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__bill_ref
+msgid "Bill reference"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__billing_line
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Billing Lines"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__billing_id
+msgid "Billing Reference"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__state
+msgid "Billing Status"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Billing number..."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_billing_action
+msgid "Billings"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.ui.menu,name:freight_mgmt.freight_executive_bills_menu
+msgid "Bills"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__kanban_state__blocked
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__kanban_state__blocked
+msgid "Blocked"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__booking_id
+msgid "Booking"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Booking information"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__number
+msgid "Booking number"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Booking number..."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_booking_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_executive_bookings_menu
+msgid "Bookings"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.booking,description:freight_mgmt.freight_booking_1
+msgid "CNC NEPTUNE 0HB3SN1NC"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "CONSIGNEE (Non-Negotiable unless consigned \"TO ORDER\")"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_cancelled
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__state__cancel
+msgid "Cancelled"
+msgstr "Hủy"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Cargo Details"
+msgstr "Thông tin vận tải"
+
+#. module: freight_mgmt
+#: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_catalog_menu
+msgid "Catalogue"
+msgstr "Danh mục"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__freight_charge_rate
+msgid "Charge types"
+msgstr "Loại phí"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__code
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__code
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__code
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__code
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__code
+msgid "Code"
+msgstr "Mã"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__color
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__color
+msgid "Color Index"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__commodity
+msgid "Commodity"
+msgstr "Hàng hóa"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__company_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__company_id
+msgid "Company"
+msgstr "Công ty"
+
+#. module: freight_mgmt
+#: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_done
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__completed
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__completed
+msgid "Completed"
+msgstr "Hoàn thành"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__completed_date
+msgid "Completed Date"
+msgstr "Ngày hoàn thành"
+
+#. module: freight_mgmt
+#: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_configuration_menu
+msgid "Configuration"
+msgstr "Cấu hình"
+
+#. module: freight_mgmt
+#: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_in_progress
+msgid "Confirmed"
+msgstr "Xác nhận"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__approved_date
+msgid "Confirmed Date"
+msgstr "Ngày xác nhận"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__partner_id
+#: model:res.partner.category,name:freight_mgmt.res_partner_category_consignee_tag
+msgid "Consignee"
+msgstr "Người nhận hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_name
+msgid "Consignee Name"
+msgstr "Tên người nhận"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_address
+msgid "Consignee's Address"
+msgstr "Địa chỉ người nhận"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_email
+msgid "Consignee's Email"
+msgstr "Email người nhận"
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_consignee_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_consignee_menu
+msgid "Consignees"
+msgstr "Người nhận hàng"
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_res_partner
+msgid "Contact"
+msgstr "Liên hệ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_name
+msgid "Contact Name"
+msgstr "Tên liên hệ"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Contact information"
+msgstr "Thông tin liên hệ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_address
+msgid "Contact's Address"
+msgstr "Địa chỉ liên hệ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_email
+msgid "Contact's Email"
+msgstr "Email liên hệ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__container_id
+msgid "Container"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_container_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_container_menu
+msgid "Containers"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__country_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__country_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__country_id
+msgid "Country"
+msgstr "Quốc gia"
+
+#. module: freight_mgmt
+#: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_consignee_action
+msgid "Create a new consignee in your address book"
+msgstr "Tạo mới người nhận hàng trong sổ địa chỉ"
+
+#. module: freight_mgmt
+#: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_shipper_action
+msgid "Create a new shipper in your address book"
+msgstr "Tạo mới người gửi hàng trong sổ địa chỉ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__create_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__create_uid
+msgid "Created by"
+msgstr "Tạo bởi"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__create_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__create_date
+msgid "Created on"
+msgstr "Được tạo vào"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__currency_id
+msgid "Currency"
+msgstr "Tiền tệ"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/freight_billing.py:0
+#: code:addons/freight_mgmt/models/freight_booking.py:0
+#, python-format
+msgid "Customer"
+msgstr "Khách hàng"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/freight_billing.py:0
+#: code:addons/freight_mgmt/models/freight_booking.py:0
+#, python-format
+msgid "Customer Email"
+msgstr "Email khách hàng"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "DESCRIPTION OF PACKAGES AND GOODS"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__kanban_state__normal
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__kanban_state__normal
+msgid "Default"
+msgstr "Chuẩn"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_billing_kanban
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_booking_kanban
+msgid "Delete"
+msgstr "Xoá"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_id
+msgid "Delivery Contact"
+msgstr "Liên hệ giao hàng"
+
+#. module: freight_mgmt
+#: model:freight.catalog.airline,name:freight_mgmt.freight_catalog_airline_dl
+msgid "Delta Air Lines"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__description
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__description
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_port_form
+msgid "Description"
+msgstr "Mô tả"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__port_discharge_id
+msgid "Discharge Port"
+msgstr "Cảng dỡ hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__display_name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__display_name
+msgid "Display Name"
+msgstr "Tên hiển thị"
+
+#. module: freight_mgmt
+#: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_new
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__state__draft
+msgid "Draft"
+msgstr "Bản nháp"
+
+#. module: freight_mgmt
+#: model:freight.catalog.port,name:freight_mgmt.freight_catalog_port_1
+msgid "Dubai"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__due_date
+msgid "Due Date"
+msgstr "Ngày đáo hạn"
+
+#. module: freight_mgmt
+#: model:ir.actions.server,name:freight_mgmt.action_duplicate_freight_billing
+#: model:ir.actions.server,name:freight_mgmt.action_duplicate_freight_booking
+msgid "Duplicate"
+msgstr "Nhân bản"
+
+#. module: freight_mgmt
+#: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_2
+msgid "Eclipse"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_billing_kanban
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_booking_kanban
+msgid "Edit"
+msgstr "Chỉnh sửa"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__partner_email
+msgid "Email"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__mail_template_id
+msgid "Email Template"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__email_cc
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__email_cc
+msgid "Email cc"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__eta
+msgid "Est. Time Arrival"
+msgstr "Thời gian dự kiến đến"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__etd
+msgid "Est. Time Departure"
+msgstr "Thời gian dự kiến khởi hành"
+
+#. module: freight_mgmt
+#: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_executive_menu
+msgid "Executive"
+msgstr "Hoạt động"
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__transport_type__express
+msgid "Express"
+msgstr "Siếu tốc"
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__fcl-exp
+msgid "FCL Export"
+msgstr "FCL xuất khẩu"
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__fcl-imp
+msgid "FCL Import"
+msgstr "FCL nhập khẩu"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "FOR DELIVERY, PLEASE CONTACT:"
+msgstr "Để giao hăng, vui lỏng liên hệ"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "FREIGHT RATE/TYPES OF CHARGE"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__state_ids
+msgid "Federal States"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.airline,name:freight_mgmt.freight_catalog_airline_fx
+msgid "Fedex"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__final_destination
+msgid "Final destination"
+msgstr "Điểm đến cuối"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__fold
+msgid "Folded in Kanban"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_follower_ids
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_partner_ids
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_type_icon
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.module.category,name:freight_mgmt.module_freight_category
+#: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_main_menu
+msgid "Freight"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_billing
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Freight Billing"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_billing_line
+msgid "Freight Billing Line"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.action_freight_booking_kanban_from_dashboard
+#: model:ir.model,name:freight_mgmt.model_freight_booking
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Freight Booking"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,name:freight_mgmt.assignment_email_template
+msgid "Freight Booking Assignment"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_airline
+msgid "Freight Catalog Airline"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_airline_search
+msgid "Freight Catalog Airline Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_container
+msgid "Freight Catalog Container"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_container_search
+msgid "Freight Catalog Container Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_incoterm
+msgid "Freight Catalog Incoterm"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_incoterm_search
+msgid "Freight Catalog Incoterm Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_port
+msgid "Freight Catalog Port"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_port_search
+msgid "Freight Catalog Port Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_stage
+msgid "Freight Catalog Stage"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_freight_catalog_vessel
+msgid "Freight Catalog Vessel"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_vessel_search
+msgid "Freight Catalog Vessel Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,name:freight_mgmt.changed_stage_template
+msgid "Freight Changed Stage notification Email"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,name:freight_mgmt.closed_freight_booking_template
+msgid "Freight Closed Booking Notification Email"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:res.groups,name:freight_mgmt.group_freight_manager
+msgid "Freight Manager"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_stage_search
+msgid "Freight Stage Search"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Freight payable at"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "GROSS WEIGHT"
+msgstr "Trọng lượng thô"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__gross_weight
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__gross_weight
+msgid "Gross Weight (KGS)"
+msgstr "Trọng lượng thô (KGS)"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "Group By"
+msgstr "Nhóm"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "HO CHI MINH PORT, VIETNAM"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__has_message
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.module.category,description:freight_mgmt.module_freight_category
+msgid "Helps you handle your freight security."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__icao
+msgid "ICAO"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__id
+msgid "ID"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid ""
+"IN WITNESS WHEREOF three (3) original Bills of Lading have been signed, if "
+"not otherwise stated above, one of which being accomplished, the others "
+"shall be void."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_exception_icon
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_exception_icon
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_needaction
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_unread
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_needaction
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_unread
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_has_error
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_has_sms_error
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_has_error
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_catalog_stage__mail_template_id
+msgid ""
+"If set an email will be sent to the appropriate members when the booking "
+"reaches this step."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_incoterm_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_incoterm_menu
+msgid "Incoterms"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_is_follower
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__issued_date
+msgid "Issued Date"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__kanban_state
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__kanban_state
+msgid "Kanban State"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__lcl-exp
+msgid "LCL Export"
+msgstr "LCL xuất khẩu"
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__shipment_type__lcl-imp
+msgid "LCL Import"
+msgstr "LCL nhập khẩu"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage____last_update
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel____last_update
+msgid "Last Modified on"
+msgstr "Cập nhật cuối lúc"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__last_stage_update
+msgid "Last Stage Update"
+msgstr "Cập nhật trạng thái lần cuối"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__write_uid
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__write_uid
+msgid "Last Updated by"
+msgstr "Cập nhật cuối bởi"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__write_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__write_date
+msgid "Last Updated on"
+msgstr "Cập nhật cuối lúc"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__email_cc
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__email_cc
+msgid "List of cc from incoming emails."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__port_loading_id
+msgid "Loading Port"
+msgstr "Cảng bốc hàng"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "MARKS &amp; NOS.<br/>CONTAINER / SEAL NOS."
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "MEASUREMENT"
+msgstr "Đo lường"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_main_attachment_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__measurement
+msgid "Measurement"
+msgstr "Đo lường"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_has_error
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_ids
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_ids
+msgid "Messages"
+msgstr "Tin nhắn"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__my_activity_date_deadline
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_search
+msgid "My Billings"
+msgstr "Vận đơn của tôi"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "My Bookings"
+msgstr "Bookings của tôi"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "My Followed Bookings"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "NO. OF PKGS<br/> OR CONTAINERS"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.booking,description:freight_mgmt.freight_booking_2
+msgid "NORDPUMA / 0AR52N1NC"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "NOTIFY PARTY (Name and address)"
+msgstr "Thông báo đối tác (tên và địa chỉ)"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_incoterm__name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__name
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__name
+msgid "Name"
+msgstr "Tên"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_calendar_event_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_date_deadline
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_summary
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_type_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/freight_billing.py:0
+#: code:addons/freight_mgmt/models/freight_booking.py:0
+#, python-format
+msgid "No Subject"
+msgstr "Không chủ đề"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "No. of original B/Ls"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_needaction_counter
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__number_packages
+msgid "Number of Packages"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_has_error_counter
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_needaction_counter
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_has_error_counter
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__message_unread_counter
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__message_unread_counter
+msgid "Number of unread messages"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid ""
+"ONWARD INLAND ROUTING - FINAL DESTINATION (For the merchant's reference "
+"only)"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__transport_type__ocean
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_catalog_port__port_type__ocean
+msgid "Ocean"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Ocean Vessel"
+msgstr "Hãng tàu"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__vessel_id
+msgid "Ocean vessel"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_consignee_action
+msgid "Odoo helps you easily track all activities related to a consignee."
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_shipper_action
+msgid "Odoo helps you easily track all activities related to a shipper."
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "Open"
+msgstr "Mở"
+
+#. module: freight_mgmt
+#: model:freight.catalog.airline,name:freight_mgmt.freight_catalog_airline_other
+msgid "Other"
+msgstr "Khác"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Other Information"
+msgstr "Thông tin khác"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "PARTICULARS FURNISHED BY THE SHIPPER"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "PLACE AND DATE OF ISSUE"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "PLACE OF PAYMENT"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__partner_name
+msgid "Partner Name"
+msgstr "Tên đối tác"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_name
+msgid "Party Name"
+msgstr "Tên đối tác"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_id
+msgid "Party Notification"
+msgstr "Đối tác thông báo"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_address
+msgid "Party's Address"
+msgstr "Địa chỉ đối tác"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_email
+msgid "Party's Email"
+msgstr "Email đối tác"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__payable_at
+msgid "Payable at"
+msgstr "Phải trả"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__delivery_place
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Place of delivery"
+msgstr "Địa điểm giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__payment_place
+msgid "Place of payment"
+msgstr "Địa điểm thanh toán"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Place of receipt"
+msgstr "Địa điểm nhân hảng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__port_type
+msgid "Port Type"
+msgstr "Loại cảng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_discharge_id
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Port of discharge"
+msgstr "Cảng dỡ hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_loading_id
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Port of loading"
+msgstr "Cảng bốc hàng"
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_port_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_port_menu
+msgid "Ports"
+msgstr "Cảng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__state__posted
+msgid "Posted"
+msgstr "Đã gửi"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__pre_carriage
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Pre-carriage by"
+msgstr "Vận chuyển bởi"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__quantity
+msgid "Quantity"
+msgstr "Số lượng"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "RATED AS"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid ""
+"RECEIVED by Carrier for shipment by ocean vessel between port of loading "
+"and port of discharge, and for arrangement and procurement of pre-carriage "
+"from place of receipt and on-carriage to place of delivery, where stated "
+"above, the goods as specified above is in apparent good order and condition "
+"unless otherwise stated."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__rated_as
+msgid "Rated as"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__kanban_state__done
+#: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__kanban_state__done
+msgid "Ready for next stage"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_reporting_menu
+msgid "Reporting"
+msgstr "Báo cáo"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_user_id
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Routing & Vessel"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "SHIPPER (Name and address)"
+msgstr "Người giao hăng (tên và địa chỉ)"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__closing_time
+msgid "SI Cut Off Time"
+msgstr "Giờ cắt máng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_has_sms_error
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__seal_nos
+msgid "Seal NOS."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__sequence
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__sequence
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__sequence
+msgid "Sequence"
+msgstr "Trình tự"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__order_type
+msgid "Order Type"
+msgstr "Loại hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__shipment_type
+msgid "Shipment Type"
+msgstr "Kiểu lô hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_id
+#: model:res.partner.category,name:freight_mgmt.res_partner_category_shipper_tag
+msgid "Shipper"
+msgstr "Người giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_name
+msgid "Shipper Name"
+msgstr "Tên người giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_address
+msgid "Shipper's Address"
+msgstr "Địa chỉ người giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_email
+msgid "Shipper's Email"
+msgstr "Email người giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_shipper_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_shipper_menu
+msgid "Shippers"
+msgstr "Người giao hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__shipping_line
+msgid "Shipping Line"
+msgstr "Tuyến vận chuyển"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__size
+msgid "Size (ft)"
+msgstr "Kích cỡ"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__stage_id
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "Stage"
+msgstr "Trạng thái"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__name
+msgid "Stage Name"
+msgstr "Tên trạng thái"
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_stage_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_stage_menu
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_stage_form
+msgid "Stages"
+msgstr "Trạng thái"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__state
+msgid "Status"
+msgstr "Tình trạng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_state
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_awaiting
+msgid "Submitted"
+msgstr "Đã nộp"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "TERMS OF BILL OF LADING ARE CONTINUED ON THE BACK SIDE"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "TYPE OF BILL-OF-LADING ISSUE"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_container_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_incoterm_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_port_form
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_vessel_form
+msgid "Tags"
+msgstr "Nhan"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__temperature
+msgid "Temperature (C)"
+msgstr "Nhiệt độ (C)"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/freight_billing.py:0
+#, python-format
+msgid "Terms & Conditions: %s"
+msgstr "Điều khoản và điều kiện: %s"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__note
+msgid "Terms and conditions"
+msgstr "Điều khoản và điều kiện"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
+msgid "Terms and conditions..."
+msgstr "Điều khoản và điều kiện..."
+
+#. module: freight_mgmt
+#: model:mail.template,subject:freight_mgmt.closed_freight_booking_template
+msgid "The booking {{object.number}} has been closed."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,subject:freight_mgmt.changed_stage_template
+msgid "The booking {{object.number}} stage has changed."
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid ""
+"The goods to be delivered at the above mentioned port of discharge or place "
+"of delivery, whichever applicable, is subject always to the exceptions, "
+"limitations, conditions and liberties set out on the reverse side hereof, "
+"to which the Shipper and/or Consignee agree to accepting this Bill of "
+"lading."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_catalog_stage__fold
+msgid ""
+"This stage is folded in the kanban view when there are no records in that "
+"stage to display."
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__name
+msgid "Title"
+msgstr "Tiêu đề"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
+msgid "Title..."
+msgstr "Tiêu đề..."
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_billing_kanban
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_booking_kanban
+msgid "Toggle dropdown"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__total_packages_word
+msgid "Total Packs (in word)"
+msgstr "Tổng gói hàng (bằng chữ)"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Total no. of packages or container (in word)"
+msgstr "Tổng gói hàng (bằng chữ)"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__transport_type
+msgid "Transport Type"
+msgstr "Kiểu vận chuyển"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_catalog_port__port_type
+msgid "Type of Port"
+msgstr "Loại cảng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__shipment_type
+msgid "Type of Shipment"
+msgstr "Kiểu lô hàng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__transport_type
+msgid "Type of Transport"
+msgstr "Loại vận chuyển"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__issue_type
+msgid "Type of issue"
+msgstr "Loại vấn đề"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__movement_type
+msgid "Type of movement"
+msgstr "Kiểu di chuyển"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "Type of movement - Transport mode"
+msgstr "Kiểu vận chuyển"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_exception_decoration
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "Unassigned"
+msgstr "Chưa chỉ định"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_unread
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_unread
+msgid "Unread Messages"
+msgstr "Tin nhắn chưa đọc"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_unread_counter
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:res.groups,name:freight_mgmt.group_freight_user
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
+msgid "User"
+msgstr "Người dùng"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
+msgid "VIET TOAN JSC<br/><br/>BY&amp;emsp;&amp;emsp;\"AS AGENT FOR CARRIER\""
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_3
+msgid "VOYAGE"
+msgstr "Số chuyến"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__ventilation
+msgid "Ventilation (CBM/H)"
+msgstr "Độ thông gió (CBM/H)"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__vessel_id
+msgid "Vessel"
+msgstr "Hãng tàu"
+
+#. module: freight_mgmt
+#: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_vessel_action
+#: model:ir.ui.menu,name:freight_mgmt.freight_catalog_vessel_menu
+msgid "Vessels"
+msgstr "Hãng tàu"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__volume
+msgid "Volume (cbm)"
+msgstr "Số lượng"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__voyage_number
+msgid "Voyage No."
+msgstr "Số chuyến"
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__website_message_ids
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_freight_billing__website_message_ids
+#: model:ir.model.fields,help:freight_mgmt.field_freight_booking__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__weight
+msgid "Weight (kg)"
+msgstr "Trọng lượng (kg)"
+
+#. module: freight_mgmt
+#: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_4
+msgid "Wizard"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:freight.catalog.port,name:freight_mgmt.freight_catalog_port_3
+msgid "Yerevan"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:mail.template,subject:freight_mgmt.assignment_email_template
+msgid ""
+"{{object.company_id.name}} Freight Booking Assignment (Ref {{object.number "
+"or 'n/a' }})"
+msgstr ""

@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="view_incentive_report_wizard" model="ir.ui.view">
+        <field name="name">sale.incentive.analysis.report.wizard</field>
+        <field name="model">sale.incentive.analysis.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Incentive reports">
+                <group>
+                    <p colspan="4">Select the period date to which you want to make the report:</p>
+                </group>
+                <group colspan="2">
+                    <field name="date_from" />
+                    <field name="date_to" />
+                </group>
+                <group string="Currencies" colspan="4">
+                    <field name="currency_name" invisible="1" />
+                    <field name="currency_ids" options="{'no_create': True, 'no_create_edit': True}" />
+                    <field name="exchange_rate" attrs="{'invisible': [('currency_name', '!=', 'VND')],
+                        'required': [('currency_name','=','VND')]}" />
+                </group>
+                <footer>
+                    <button
+                        name="action_view_report"
+                        string="View Report"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    or
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        class="oe_link"
+                        special="cancel"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_sale_incentive_analysis_wizard" model="ir.actions.act_window">
+        <field name="name">Sales Incentive Report Wizard</field>
+        <field name="res_model">sale.incentive.analysis.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'no_breadcrumbs': True}</field>
+        <field name="binding_model_id" ref="model_sale_incentive_analysis_report_wizard" />
+    </record>
+    <menuitem
+        action="action_sale_incentive_analysis_wizard"
+        name="Sales Incentive"
+        id="menu_sale_incentive_analysis_wizard"
+        parent="sale_commission.menu_sale_commissions_management"
+        sequence="16"
+    />
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tax_income_manager,access_tax_income_manager,model_account_tax_income,account.group_account_manager,1,1,1,1
+access_tax_income_section_manager,access_tax_income_section_manager,model_account_tax_income_section,account.group_account_manager,1,1,1,1
+access_tax_income_user,access_tax_income_user,model_account_tax_income,base.group_user,1,0,0,0
+access_tax_income_section_user,access_tax_income_section_user,model_account_tax_income_section,base.group_user,1,0,0,0
