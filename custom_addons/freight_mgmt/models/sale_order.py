@@ -25,6 +25,10 @@ class SaleOrder(models.Model):
         help="The margin will be shared by this percentage to the nominated order",
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
+    def recompute_margin(self):
+        super(SaleOrder, self)._compute_margin()
+        self.message_post(body="Tính lại biên lợi nhuận")
+
     def create_bookings(self):
         """
         Create one or multi bookings from tree view when

@@ -86,6 +86,7 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="partner_id" invisible="1" />
+                        <field name="related_order_id" invisible="1" />
                         <field
                             name="company_id"
                             options="{'no_create': True}"

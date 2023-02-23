@@ -10,14 +10,14 @@
             <xpath expr="//group[@name='group_recompute_commission']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//button[@name='action_confirm']" position="before">
-                <button
-                    name="recompute_lines_agents"
-                    type="object"
-                    string="Recalculate Commission"
-                    states="draft,sent"
-                />
-            </xpath>
+<!--            <xpath expr="//button[@name='action_confirm']" position="before">-->
+<!--                <button-->
+<!--                    name="recompute_lines_agents"-->
+<!--                    type="object"-->
+<!--                    string="Recalculate Commission"-->
+<!--                    states="draft,sent"-->
+<!--                />-->
+<!--            </xpath>-->
         </field>
     </record>
     <!-- This view is needed for proper visualization of the popup / embedded one2many -->

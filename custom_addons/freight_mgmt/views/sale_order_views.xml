@@ -13,9 +13,17 @@
                             <field name="profit_sharing_percentage"
                                    attrs="{'invisible': [('order_type', '!=', 'nominated')]}" />
                         </xpath>
-<!--                        <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">-->
-<!--                            <attribute name="invisible">1</attribute>-->
-<!--                        </xpath>-->
+                        <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">
+                            <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_confirm']" position="after">
+                            <button
+                                name="recompute_margin"
+                                type="object"
+                                string="Recalculate Margin"
+                                states="draft,sent,sale"
+                            />
+                        </xpath>
                 </field>
         </record>
 

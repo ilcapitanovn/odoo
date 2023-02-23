@@ -73,7 +73,9 @@ class FreightDebitNote(models.Model):
     bill_no = fields.Char(related="bill_id.vessel_bol_number",
                           string="BL Number", readonly=True, store=False)
     booking_id = fields.Many2one(related="bill_id.booking_id", string="Booking", readonly=True)
-    order_id = fields.Many2one(related="bill_id.order_id", string="Sale Order Reference", readonly=True)
+    related_order_id = fields.Many2one(related="bill_id.order_id", string="Related Order", readonly=True, store=False)
+    order_id = fields.Many2one(related="bill_id.order_id", string="Sale Order Reference", readonly=False,
+                               domain="[('id', '=', related_order_id)]")
     partner_id = fields.Many2one(related="order_id.partner_id", string="Partner", readonly=True)
     user_id = fields.Many2one(related="order_id.user_id", string="S.I.C")
     invoice_count = fields.Integer(related="order_id.invoice_count", string='Invoice Count', copy=False)

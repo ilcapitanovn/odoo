@@ -68,7 +68,7 @@ class FreightCreditNote(models.Model):
     sale_order_id = fields.Many2one(related="bill_id.order_id", string="Sale Order Reference", readonly=True)
     origin_name = fields.Char(related="sale_order_id.name", string="Source Document", readonly=True, store=False)
     purchase_order_id = fields.Many2one('purchase.order', string="Purchase Orders",
-                                        domain="[('origin', '=', origin_name)]")
+                            domain="['&', ('origin', '=', origin_name), ('state', 'in', ['purchase', 'done'])]")
     partner_id = fields.Many2one(related="purchase_order_id.partner_id", string="Partner", readonly=True)
     user_id = fields.Many2one(related="purchase_order_id.user_id", string="S.I.C")
     invoice_count = fields.Integer(related="purchase_order_id.invoice_count", string='Bill Count', copy=False)
