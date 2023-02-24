@@ -97,6 +97,38 @@ class SaleOrder(models.Model):
 
         return booking_vals
 
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+        # purchase_order_ids = self._get_purchase_orders().ids
+        purchase_orders = self.env["purchase.order"].search([("origin", "=", self.name)])
+        if purchase_orders:
+            purchase_order_ids = purchase_orders.ids
+        else:
+            purchase_order_ids = self._get_purchase_orders().ids
+        action = {
+            'res_model': 'purchase.order',
+            'type': 'ir.actions.act_window',
+        }
+        if len(purchase_order_ids) == 1:
+            action.update({
+                'view_mode': 'form',
+                'res_id': purchase_order_ids[0],
+            })
+        else:
+            action.update({
+                'name': _("Purchase Order generated from %s", self.name),
+                'domain': [('id', 'in', purchase_order_ids)],
+                'view_mode': 'tree,form',
+            })
+        return action
+
+    @api.depends('order_line.purchase_line_ids.order_id')
+    def _compute_purchase_order_count(self):
+        for order in self:
+            # order.purchase_order_count = len(order._get_purchase_orders())
+            purchase_orders = self.env["purchase.order"].search([("origin", "=", order.name)])
+            order.purchase_order_count = len(purchase_orders)
+
     @api.onchange("order_type")
     def _onchange_order_type(self):
         if self.order_type != 'nominated':
