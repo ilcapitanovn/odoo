@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Freight Management",
-    'version': '15.0.2.4.2',
+    'version': '15.0.2.4.3',
     'summary': """Create Freight Management System""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',
@@ -64,6 +64,10 @@
     "assets": {
         'web.assets_backend': [
             'freight_mgmt/static/src/scss/freight_mgmt.scss',
+            'freight_mgmt/static/src/js/button_booking_sheet.js'
+        ],
+        'web.assets_qweb': [
+            'freight_mgmt/static/src/xml/button_booking_sheet.xml'
         ]
     },
     'images': ['static/description/banner.png'],

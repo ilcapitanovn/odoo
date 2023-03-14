@@ -384,6 +384,16 @@
         </field>
     </record>
     -->
+    <record id="freight_booking_view_tree_inherited" model="ir.ui.view">
+       <field name="name">freight.booking.view.tree.inherited</field>
+       <field name="model">freight.booking</field>
+       <field name="inherit_id" ref="freight_booking_view_tree"/>
+       <field name="arch" type="xml">
+           <xpath expr="//tree" position="attributes">
+               <attribute name="js_class">button_in_tree</attribute>
+           </xpath>
+       </field>
+   </record>
     <record id="action_duplicate_freight_booking" model="ir.actions.server">
         <field name="name">Duplicate</field>
         <field name="model_id" ref="model_freight_booking" />
