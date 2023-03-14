@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_seenpo_hr_attendance_bio_log_manager,seenpo.hr.attendance.bio.log.manager,model_seenpo_hr_attendance_bio_log,group_seenpo_hr_attendance_manager,1,1,1,1
+access_seenpo_hr_attendance_bio_log_user,seenpo.hr.attendance.bio.log.user,model_seenpo_hr_attendance_bio_log,group_seenpo_hr_attendance_user,1,1,1,0
+access_seenpo_hr_attendance_report_wizard_manager,seenpo.hr.attendance.report.wizard.manager,model_seenpo_hr_attendance_report_wizard,group_seenpo_hr_attendance_manager,1,1,1,1
+access_seenpo_hr_attendance_report_wizard_user,seenpo.hr.attendance.report.wizard.user,model_seenpo_hr_attendance_report_wizard,group_seenpo_hr_attendance_user,1,1,1,0

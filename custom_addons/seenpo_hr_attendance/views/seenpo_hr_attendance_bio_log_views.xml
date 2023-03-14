@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="seenpo_hr_attendance_bio_log_search" model="ir.ui.view">
+        <field name="name">HR Attendance Bio Log Search</field>
+        <field name="model">seenpo.hr.attendance.bio.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field string="Employee" name="employee" />
+                <filter string="Today" name="today_filter" domain="[('check_in_date','=',context_today().strftime('%%Y-%%m-%%d'))]"/>
+                <separator />
+                <filter string="This Month" name="this_month_filter" domain="[('check_in_date','&lt;',
+                        (context_today() + relativedelta(months=1)).strftime('%%Y-%%m-01')), ('check_in_date','&gt;=',
+                        context_today().strftime('%%Y-%%m-01'))]"/>
+                <filter string="Last Month" name="last_month_filter" domain="[('check_in_date','&gt;=',
+                        (context_today() - relativedelta(months=1)).strftime('%%Y-%%m-01')), ('check_in_date','&lt;',
+                        context_today().strftime('%%Y-%%m-01'))]"/>
+                <group expand="0" string="Group By">
+                    <filter
+                        string="Employee"
+                        name="group_by_employee"
+                        domain="[]"
+                        context="{'group_by':'employee'}"
+                    />
+                    <filter
+                        string="Date"
+                        name="group_by_check_in_date"
+                        domain="[]"
+                        context="{'group_by':'check_in_date'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="seenpo_hr_attendance_bio_log_tree">
+        <field name="name">HR Attendance Bio Log Tree</field>
+        <field name="model">seenpo.hr.attendance.bio.log</field>
+        <field name="arch" type="xml">
+            <tree string="Bio Log" create="false" delete="false">
+                <field name="active" invisible="1" />
+                <field name="check_in_date" invisible="1" />
+                <field name="bio_user_id" />
+                <field name="card_number" />
+                <field name="hr_employee_name" />
+                <field name="check_in_date_display" string="Date" widget="date" />
+                <field name="first_in_time" />
+                <field name="last_out_time" />
+                <field name="reason" optional="show" />
+            </tree>
+        </field>
+    </record>
+    <record id="seenpo_hr_attendance_bio_log_form" model="ir.ui.view">
+        <field name="name">HR Attendance Bio Log Form</field>
+        <field name="model">seenpo.hr.attendance.bio.log</field>
+        <field name="arch" type="xml">
+            <form string="Logs" create="false" delete="false">
+                <header>
+                </header>
+                <sheet>
+                    <field name="active" invisible="1" />
+
+                    <group name="main">
+                        <group>
+                            <field name="bio_user_id" />
+                            <field name="card_number" />
+                            <field name="hr_employee_name" />
+                            <field name="reason" />
+                        </group>
+                        <group>
+                            <field name="check_in_date_display" string="Date" widget="date" />
+                            <field name="first_in_time" />
+                            <field name="last_out_time" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="seenpo_hr_attendance_bio_log_tree_inherited" model="ir.ui.view">
+       <field name="name">seenpo.hr.attendance.bio.log.tree.inherited</field>
+       <field name="model">seenpo.hr.attendance.bio.log</field>
+       <field name="inherit_id" ref="seenpo_hr_attendance_bio_log_tree"/>
+       <field name="arch" type="xml">
+           <xpath expr="//tree" position="attributes">
+               <attribute name="js_class">button_refresh_attendance_log</attribute>
+           </xpath>
+       </field>
+   </record>
+    <!-- Actions -->
+    <record id="seenpo_hr_attendance_bio_log_action" model="ir.actions.act_window">
+        <field name="name">First In Last Out</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">seenpo.hr.attendance.bio.log</field>
+        <field name="context">{"search_default_today_filter": 1}</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="seenpo_hr_attendance_report_wizard" model="ir.ui.view">
+        <field name="name">HR Attendance Report Wizard</field>
+        <field name="model">seenpo.hr.attendance.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Timesheet reports">
+                <group>
+                    <p colspan="2">Select a month to which you want to make the report:</p>
+                </group>
+                <group colspan="2">
+                    <field name="date_month_report" widget='month_year_format'
+                            options="{'datepicker':{'maxDate': 'now'}}"/>
+                </group>
+                <footer>
+                    <button
+                        name="action_download_report"
+                        string="Download Report"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    or
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        class="oe_link"
+                        special="cancel"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="seenpo_hr_attendance_timesheet_report_wizard_action" model="ir.actions.act_window">
+        <field name="name">HR Attendance Timesheet Report Wizard</field>
+        <field name="res_model">seenpo.hr.attendance.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'no_breadcrumbs': True, 'which_report': 'timesheet'}</field>
+        <field name="binding_model_id" ref="model_seenpo_hr_attendance_report_wizard" />
+    </record>
+    <record id="seenpo_hr_attendance_annual_leave_report_wizard_action" model="ir.actions.act_window">
+        <field name="name">HR Attendance Annual Leave Report Wizard</field>
+        <field name="res_model">seenpo.hr.attendance.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'no_breadcrumbs': True, 'which_report': 'annual_leave'}</field>
+        <field name="binding_model_id" ref="model_seenpo_hr_attendance_report_wizard" />
+    </record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="seenpo_hr_attendance_employee_form_inherit" model="ir.ui.view">
+        <field name="name">HR Attendance Employee Form Inherited</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='payroll_group']" position="after">
+                <group string='Attendance/Bio Sense' name="hr_attendance_bio_group">
+                    <field name="bio_user_id" help="This bio user ID must match user ID in the bio device." />
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='active_group']//field[@name='user_id']" position="after">
+                <field name="contract_date_start" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

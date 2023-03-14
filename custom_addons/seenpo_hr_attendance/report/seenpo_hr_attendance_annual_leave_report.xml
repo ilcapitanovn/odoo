@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="seenpo_hr_attendance_paperformat_annual_leave" model="report.paperformat">
+        <field name="name">HR Attendance Paper Format Annual Leave</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="seenpo_hr_attendance_annual_leave_report" model="ir.actions.report">
+        <field name="name">HR Attendance Annual Leave Report</field>
+        <field name="model">seenpo.hr.attendance.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">seenpo_hr_attendance.report_print_seenpo_annual_leave_template</field>
+        <field name="report_file">seenpo_hr_attendance.report_print_seenpo_annual_leave_template</field>
+        <field name="print_report_name">'Annual Leave Report'</field>
+        <field name="binding_model_id" ref="model_seenpo_hr_attendance_bio_log"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="seenpo_hr_attendance.seenpo_hr_attendance_paperformat_annual_leave"/>
+    </record>
+
+    <template id="report_print_seenpo_annual_leave_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/seenpo_hr_attendance/static/src/scss/report_styles.css"/>
+
+                <div style="padding: 0 5px;">
+                    <div class="annual-container">
+                        <div class="annual-title">BẢNG THEO DÕI NGHỈ PHÉP NHÂN VIÊN VIỆT TOẢN - NĂM <t t-esc="report_year" /></div>
+                        <div class="annual-date"><t t-esc="current_date" /></div>
+                    </div>
+                    <table id="tMain" class='table table-bordered no-spacing'>
+                        <tr>
+                            <th width="3%" class="t-header-annual-leave">TT</th>
+                            <th width="5%" class="t-header-annual-leave">Ma NV</th>
+                            <th class="t-header-annual-leave">Họ và tên</th>
+                            <th width="5%" class="t-header-annual-leave">Bộ phận</th>
+                            <th width="5.5%" class="t-header-annual-leave">Ngày vào cty</th>
+                            <th width="10%" class="t-header-annual-leave">Thời gian làm việc</th>
+                            <th width="12%" class="t-header-annual-leave">Số phép năm được nghỉ <br/>hưởng nguyên lương <br/>(từ 01/01 đến 31/12/<span t-esc="report_year" />)</th>
+                            <t t-if="to_month > 0">
+                                <t t-foreach="range(to_month)" t-as="i">
+                                    <t t-if="i + 1 > 9">
+                                        <th width="3.5%" class="t-header-annual-leave">T<t t-esc="i + 1" /></th>
+                                    </t>
+                                    <t t-else="">
+                                        <th width="3%" class="t-header-annual-leave">T<t t-esc="i + 1" /></th>
+                                    </t>
+                                </t>
+                            </t>
+                            <th width="6.5%" class="t-header-annual-leave">Tổng số <br/>ngày phép <br/>đã nghỉ</th>
+                            <th width="6.5%" class="t-header-annual-leave">Số ngày phép <br/>còn lại</th>
+                        </tr>
+
+                        <t t-foreach="records" t-as="r">
+                            <tr>
+                                <td><span t-esc="r['order']"/></td>
+                                <td><span t-esc="r['emp_code']"/></td>
+                                <td class="text-left"><span t-esc="r['emp_name']"/></td>
+                                <td class="text-left"><span t-esc="r['department']"/></td>
+                                <td class="text-right"><span t-esc="r['date_start']"/></td>
+                                <td class="text-left"><span t-esc="r['total_working_time']"/></td>
+                                <td><span t-esc="r['annual_leaves']"/></td>
+                                <t t-foreach="r['arr_total_leaves']" t-as="l">
+                                    <t t-if="l_value > 0">
+                                        <td class="text-smaller background-yellow-light text-dark-red"><span t-esc="l_value"/></td>
+                                    </t>
+                                    <t t-else="">
+                                        <td class="text-smaller background-yellow-light"><span t-esc="l_value"/></td>
+                                    </t>
+                                </t>
+                                <t t-if="r['total_leaves'] > 0">
+                                    <td class="text-dark-red"><span t-esc="r['total_leaves']"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-esc="r['total_leaves']"/></td>
+                                </t>
+                                <t t-if="0 > r['total_leaves_remaining']">
+                                    <td class="background-pink text-dark-red"><span t-esc="r['total_leaves_remaining']"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-esc="r['total_leaves_remaining']"/></td>
+                                </t>
+                            </tr>
+                        </t>
+
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

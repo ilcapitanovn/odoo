@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="seenpo_hr_attendance_paperformat_timesheet" model="report.paperformat">
+        <field name="name">HR Attendance Paper Format Timesheet</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">216</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="seenpo_hr_attendance_timesheet_report" model="ir.actions.report">
+        <field name="name">HR Attendance Timesheet Report</field>
+        <field name="model">seenpo.hr.attendance.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">seenpo_hr_attendance.report_print_seenpo_timesheet_template</field>
+        <field name="report_file">seenpo_hr_attendance.report_print_seenpo_timesheet_template</field>
+        <field name="print_report_name">'Timesheet Report'</field>
+        <field name="binding_model_id" ref="model_seenpo_hr_attendance_bio_log"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="seenpo_hr_attendance.seenpo_hr_attendance_paperformat_timesheet"/>
+    </record>
+
+    <template id="report_print_seenpo_timesheet_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/seenpo_hr_attendance/static/src/scss/report_styles.css"/>
+
+                <div style="padding: 0 5px;">
+
+                    <span><strong>Công ty Cổ Phần Việt Toản</strong></span><br/>
+		            <span>684/28A Trần Hưng Đạo, Phường 2, Quận 5</span>
+                    <center><span class="title">BẢNG CHẤM CÔNG THÁNG <span class="title" t-esc="month_year"/></span></center>
+                    <table id="tMain" class='table table-bordered no-spacing'>
+                        <tr>
+                            <td rowspan="3" width="2%" class="t-header">TT</td>
+                            <td rowspan="3" width="4%" class="t-header">Ma NV</td>
+                            <td rowspan="3" class="t-header">Họ và tên</td>
+                            <td rowspan="3" width="4%" class="t-header">Bộ phận</td>
+                            <td t-attf-colspan="#{len(arr_dates_in_header)}" width="67%" class="t-header">Ngày trong tháng</td>
+                            <td rowspan="3" width="4%" class="t-header">Tổng cộng ngày công</td>
+                            <td colspan="3" width="10%" class="t-header">Ngày nghỉ</td>
+                        </tr>
+                        <tr>
+                            <t t-foreach="arr_dates_in_header" t-as="d">
+                                <td class="t-header-date"><span t-esc="d[-2:]"/></td>
+                            </t>
+                            <td rowspan="2" class="t-header">Nghỉ không lương</td>
+                            <td rowspan="2" class="t-header">Nghỉ lễ</td>
+                            <td rowspan="2" class="t-header">Nghỉ phép</td>
+                        </tr>
+                        <tr>
+                            <t t-foreach="arr_dates_in_header" t-as="d">
+                                <td class="t-header-date"><span t-esc="d_value"/></td>
+                            </t>
+                        </tr>
+
+                        <t t-foreach="records" t-as="r">
+                            <tr>
+                                <td><span t-esc="r['order']"/></td>
+                                <td><span t-esc="r['emp_code']"/></td>
+                                <td class="text-left"><span t-esc="r['name']"/></td>
+                                <td class="text-left"><span t-esc="r['department']"/></td>
+                                <t t-foreach="r['arr_leaves']" t-as="l">
+                                    <t t-if="l_value">
+                                        <t t-if="'P' in l_value or 'K' in l_value or 'O' in l_value">
+                                            <td class="text-smaller text-red"><span t-esc="l_value"/></td>
+                                        </t>
+                                        <t t-elif="'L' in l_value">
+                                            <td class="text-smaller text-dark-red"><span t-esc="l_value"/></td>
+                                        </t>
+                                        <t t-elif="'y' in l_value">
+                                            <td class="text-smaller text-blue"><span t-esc="l_value"/></td>
+                                        </t>
+                                        <t t-elif="l_value == 'SUN'">
+                                            <td class="background-yellow"></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td class="text-smaller"><span t-esc="l_value"/></td>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <td></td>
+                                    </t>
+                                </t>
+                                <td><span t-esc="'{:,.1f}'.format(r['count_working_days'])"/></td>
+                                <t t-if="r['count_unpaid'] > 0">
+                                    <td class="text-dark-red"><span t-esc="'{:,.1f}'.format(r['count_unpaid'])"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-esc="'{:,.1f}'.format(r['count_unpaid'])"/></td>
+                                </t>
+                                <td><span t-esc="'{:,.1f}'.format(r['count_public_holiday'])"/></td>
+                                <t t-if="r['count_paid'] > 0">
+                                    <td class="text-dark-red"><span t-esc="'{:,.1f}'.format(r['count_paid'])"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-esc="'{:,.1f}'.format(r['count_paid'])"/></td>
+                                </t>
+                            </tr>
+                        </t>
+
+                        <tr>
+                            <td colspan="4" class="t-footer-total">Tổng số</td>
+                            <t t-foreach="last_row_total" t-as="r">
+                                <td class="t-footer-total"><span t-esc="r_value"/></td>
+                            </t>
+                            <td class="t-footer-total"><strong><span t-esc="'{:,.1f}'.format(count_working_days_total)"/></strong></td>
+                            <td class="t-footer-total"><strong><span t-esc="'{:,.1f}'.format(count_unpaid_total)"/></strong></td>
+                            <td class="t-footer-total"><strong><span t-esc="'{:,.1f}'.format(count_public_holiday_total)"/></strong></td>
+                            <td class="t-footer-total"><strong><span t-esc="'{:,.1f}'.format(count_paid_total)"/></strong></td>
+                        </tr>
+
+                    </table>
+                    <br/>
+
+                    <div class="columns">
+                        <div class="column">&amp;nbsp;</div>
+                        <div class="column">&amp;nbsp;</div>
+                        <div class="column"><span t-esc="signed_date_text" /></div>
+                    </div>
+                    <div class="columns">
+                        <div class="column"><strong>Giám đốc</strong></div>
+                        <div class="column"><strong>Kế toán</strong></div>
+                        <div class="column"><strong>Người lập biểu</strong></div>
+                    </div>
+
+                    <br/><br/><br/>
+
+                    <table id="tNote" class='table table-bordered no-spacing'>
+                        <tr>
+                            <td colspan="2" class="t-note-header">Ký hiệu chấm công</td>
+                        </tr>
+                        <tr>
+                            <td width="80%">Đi làm cả ngày</td>
+                            <td>x</td>
+                        </tr>
+                        <tr>
+                            <td width="80%">Đi làm cả ngày (không check-in)</td>
+                            <td>y</td>
+                        </tr>
+                        <tr>
+                            <td>Đi làm nửa ngày</td>
+                            <td>x/2</td>
+                        </tr>
+                        <tr>
+                            <td>Đi làm nửa ngày (không check-in)</td>
+                            <td>y/2</td>
+                        </tr>
+                        <tr>
+                            <td>Nghỉ hưởng nguyên lương</td>
+                            <td>P</td>
+                        </tr>
+                        <tr>
+                            <td>Nghỉ nửa ngày hưởng nguyên lương</td>
+                            <td>P/2</td>
+                        </tr>
+                        <tr>
+                            <td>Nghỉ không lương</td>
+                            <td>K</td>
+                        </tr>
+                        <tr>
+                            <td>Ốm đau</td>
+                            <td>O</td>
+                        </tr>
+                        <tr>
+                            <td>Thai sản</td>
+                            <td>TS</td>
+                        </tr>
+                        <tr>
+                            <td>Nghỉ lễ, tết</td>
+                            <td>L</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

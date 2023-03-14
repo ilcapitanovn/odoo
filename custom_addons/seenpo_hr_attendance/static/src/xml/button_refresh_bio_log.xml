@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+   <t t-extend="ListView.buttons" t-name="seenpo_hr_attendance.buttons">
+       <t t-jquery="button.o_list_export_xlsx" t-operation="before">
+           <button type="button" class="btn btn-primary refresh_attendance_log">
+               Refresh
+           </button>
+       </t>
+<!--       <t t-jquery="div.o_list_buttons" t-operation="after">-->
+<!--            <t t-name="ListView.recoverBtn">-->
+<!--                <button t-if="widget.modelName == 'seenpo.hr.attendance.bio.log'" type="button"-->
+<!--                        class="btn btn-primary o_btn_recover_debt" style="margin-top: 20px !important;">-->
+<!--                     Đối trừ công nợ-->
+<!--                </button>-->
+<!--            </t>-->
+<!--        </t>-->
+   </t>
+</templates>

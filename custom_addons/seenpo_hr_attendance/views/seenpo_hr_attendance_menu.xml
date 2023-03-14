@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Menus -->
+    <menuitem
+        id="seenpo_hr_attendance_main_menu"
+        name="Attendances"
+        sequence="22"
+        web_icon="seenpo_hr_attendance,static/description/icon.png"
+        groups="group_seenpo_hr_attendance_user"
+    />
+    <menuitem
+        id="seenpo_hr_attendance_bio_log_menu"
+        name="Overview"
+        parent="seenpo_hr_attendance_main_menu"
+        action="seenpo_hr_attendance_bio_log_action"
+        sequence="10"
+        groups="group_seenpo_hr_attendance_user"
+    />
+    <menuitem
+        id="seenpo_hr_attendance_report_menu"
+        name="Reporting"
+        parent="seenpo_hr_attendance_main_menu"
+        sequence="20"
+        groups="group_seenpo_hr_attendance_user"
+    />
+    <menuitem
+        id="seenpo_hr_attendance_timesheet_report_menu"
+        name="Timesheet"
+        parent="seenpo_hr_attendance_report_menu"
+        action="seenpo_hr_attendance_timesheet_report_wizard_action"
+        sequence="10"
+        groups="group_seenpo_hr_attendance_user"
+    />
+    <menuitem
+        id="seenpo_hr_attendance_annual_leave_report_menu"
+        name="Annual Leave"
+        parent="seenpo_hr_attendance_report_menu"
+        action="seenpo_hr_attendance_annual_leave_report_wizard_action"
+        sequence="20"
+        groups="group_seenpo_hr_attendance_user"
+    />
+</odoo>
