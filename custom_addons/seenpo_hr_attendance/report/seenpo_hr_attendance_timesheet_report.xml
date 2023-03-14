@@ -69,17 +69,20 @@
                                 <td class="text-left"><span t-esc="r['department']"/></td>
                                 <t t-foreach="r['arr_leaves']" t-as="l">
                                     <t t-if="l_value">
-                                        <t t-if="'P' in l_value or 'K' in l_value or 'O' in l_value">
+                                        <t t-if="l_value in ['P','P/2','K','O']">
                                             <td class="text-smaller text-red"><span t-esc="l_value"/></td>
                                         </t>
-                                        <t t-elif="'L' in l_value">
+                                        <t t-elif="l_value == 'L'">
                                             <td class="text-smaller text-dark-red"><span t-esc="l_value"/></td>
                                         </t>
-                                        <t t-elif="'y' in l_value">
+                                        <t t-elif="l_value == 'y' or l_value == 'y/2'">
                                             <td class="text-smaller text-blue"><span t-esc="l_value"/></td>
                                         </t>
                                         <t t-elif="l_value == 'SUN'">
                                             <td class="background-yellow"></td>
+                                        </t>
+                                        <t t-elif="l_value == 'OUT'">
+                                            <td class="background-gray"></td>
                                         </t>
                                         <t t-else="">
                                             <td class="text-smaller"><span t-esc="l_value"/></td>

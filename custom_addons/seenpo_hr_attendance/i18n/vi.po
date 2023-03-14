@@ -132,7 +132,9 @@ msgstr ""
 #. module: seenpo_hr_attendance
 #: model:ir.model.fields,field_description:seenpo_hr_attendance.field_seenpo_hr_attendance_bio_log__check_in_date
 #: model:ir.model.fields,field_description:seenpo_hr_attendance.field_seenpo_hr_attendance_bio_log__check_in_date_display
+#: model_terms:ir.ui.view,arch_db:seenpo_hr_attendance.seenpo_hr_attendance_bio_log_form
 #: model_terms:ir.ui.view,arch_db:seenpo_hr_attendance.seenpo_hr_attendance_bio_log_search
+#: model_terms:ir.ui.view,arch_db:seenpo_hr_attendance.seenpo_hr_attendance_bio_log_tree
 msgid "Date"
 msgstr "Ngày"
 
@@ -356,6 +358,11 @@ msgid "Report month"
 msgstr "Tháng báo cáo"
 
 #. module: seenpo_hr_attendance
+#: model:ir.model.fields,field_description:seenpo_hr_attendance.field_seenpo_hr_attendance_report_wizard__date_year_report
+msgid "Report year"
+msgstr "Năm báo cáo"
+
+#. module: seenpo_hr_attendance
 #: model:ir.ui.menu,name:seenpo_hr_attendance.seenpo_hr_attendance_report_menu
 msgid "Reporting"
 msgstr "Báo cáo"
@@ -367,8 +374,8 @@ msgstr ""
 
 #. module: seenpo_hr_attendance
 #: model_terms:ir.ui.view,arch_db:seenpo_hr_attendance.seenpo_hr_attendance_report_wizard
-msgid "Select a month to which you want to make the report:"
-msgstr "Chọn tháng hoặc năm để xuất báo cáo:"
+msgid "Select a period to which you want to make the report:"
+msgstr "Chọn thời gian để xuất báo cáo:"
 
 #. module: seenpo_hr_attendance
 #: model_terms:ir.ui.view,arch_db:seenpo_hr_attendance.report_print_seenpo_annual_leave_template

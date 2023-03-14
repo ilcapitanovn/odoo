@@ -6,11 +6,15 @@
         <field name="arch" type="xml">
             <form string="Timesheet reports">
                 <group>
-                    <p colspan="2">Select a month to which you want to make the report:</p>
+                    <p colspan="2">Select a period to which you want to make the report:</p>
                 </group>
                 <group colspan="2">
+                    <field name="report_type" invisible="1" />
                     <field name="date_month_report" widget='month_year_format'
-                            options="{'datepicker':{'maxDate': 'now'}}"/>
+                           attrs="{'invisible': [('report_type','!=', 'timesheet')], 'required': [('report_type','=', 'timesheet')]}"
+                           options="{'datepicker':{'maxDate': 'now'}}"/>
+                    <field name="date_year_report"
+                           attrs="{'invisible': [('report_type','!=', 'annual_leave')], 'required': [('report_type','=', 'annual_leave')]}"/>
                 </group>
                 <footer>
                     <button
@@ -35,7 +39,7 @@
         <field name="res_model">seenpo.hr.attendance.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-        <field name="context">{'no_breadcrumbs': True, 'which_report': 'timesheet'}</field>
+        <field name="context">{'no_breadcrumbs': True, 'report_type': 'timesheet'}</field>
         <field name="binding_model_id" ref="model_seenpo_hr_attendance_report_wizard" />
     </record>
     <record id="seenpo_hr_attendance_annual_leave_report_wizard_action" model="ir.actions.act_window">
@@ -43,7 +47,7 @@
         <field name="res_model">seenpo.hr.attendance.report.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
-        <field name="context">{'no_breadcrumbs': True, 'which_report': 'annual_leave'}</field>
+        <field name="context">{'no_breadcrumbs': True, 'report_type': 'annual_leave'}</field>
         <field name="binding_model_id" ref="model_seenpo_hr_attendance_report_wizard" />
     </record>
 

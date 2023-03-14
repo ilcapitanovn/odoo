@@ -10,13 +10,21 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
     _name = "seenpo.hr.attendance.report.wizard"
     _description = "Wizard for reporting attendance timesheet"
 
-    date_month_report = fields.Date("Report month", required=True, default=fields.Date.today())
+    def _get_default_report_type(self):
+        return self._context.get("report_type")
+
+    date_month_report = fields.Date("Report month", default=fields.Date.today())
+    date_year_report = fields.Selection([
+        (str(num), str(num)) for num in range(2010, datetime.datetime.now().year + 1)
+    ], 'Report year', default=str(datetime.datetime.now().year))
+    report_type = fields.Char(string="Report Type", readonly=True, store=False,
+                              default=_get_default_report_type)
 
     def action_download_report(self):
         self.ensure_one()
 
-        which_report = self._context.get("which_report")
-        if which_report == "annual_leave":
+        report_type = self._context.get("report_type")
+        if report_type == "annual_leave":
             return self.download_annual_leave_report()
         else:
             return self.download_timesheet_report()
@@ -25,16 +33,22 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
         self.ensure_one()
 
         today = datetime.datetime.now()
-        report_date = self.date_month_report
+        report_year = int(self.date_year_report)
         to_month = 12
-        if report_date.year == today.year:
+        if report_year == today.year:
             to_month = today.month
-        elif report_date.year > today.year:
-            to_month = 0
+        elif report_year > today.year:
+            to_month = 1
+
+        report_date = datetime.date(report_year, to_month, 31 if to_month == 12 else today.day)
 
         employees = self.env['hr.employee'].search(
             [
-                ("bio_user_id", "!=", False)
+                '&',
+                ("bio_user_id", "!=", False),
+                '|',
+                ('active', '=', True),
+                ('active', '=', False)
             ]
         )
         emp_ids = employees.ids
@@ -68,8 +82,12 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
         )
 
         arr_employees_eval = []
+        order_num = 0
         for idx, emp in enumerate(employees):
-            order_num = idx + 1
+            if emp.departure_date and emp.departure_date.strftime('%Y%m') < today.strftime('%Y%m'):
+                continue
+
+            order_num += 1
 
             total_working_time = ''
             if emp.contract_date_start:
@@ -168,7 +186,11 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
         )
         employees = self.env['hr.employee'].search(
             [
-                ("bio_user_id", "!=", False)
+                '&',
+                ("bio_user_id", "!=", False),
+                '|',
+                ('active', '=', True),
+                ('active', '=', False)
             ]
         )
         leaves = self.env['hr.leave'].search(
@@ -206,8 +228,12 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
         count_unpaid_total = 0
         count_paid_total = 0
         count_public_holiday_total = 0
+        order_num = 0
         for idx, emp in enumerate(employees):
-            order_num = idx + 1
+            if emp.departure_date and emp.departure_date.strftime('%Y%m') < today.strftime('%Y%m'):
+                continue
+
+            order_num += 1
 
             arr_leaves = {}
             count_working_days = 0
@@ -234,11 +260,14 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
                 if not (d_key in last_row_total):
                     last_row_total[d_key] = 0
 
-                '''Skip Sunday and future dates printing'''
+                '''Skip Sunday, departure and future dates printing'''
                 if d_key > today.strftime('%Y-%m-%d'):
                     continue
                 if d_value == 'CN':
                     arr_leaves[d_key] = 'SUN'
+                    continue
+                if emp.departure_date and emp.departure_date.strftime('%Y-%m-%d') < d_key:
+                    arr_leaves[d_key] = 'OUT'
                     continue
 
                 holidays = [h for h in public_holidays if h.date_from.date().strftime('%Y-%m-%d') <= d_key
