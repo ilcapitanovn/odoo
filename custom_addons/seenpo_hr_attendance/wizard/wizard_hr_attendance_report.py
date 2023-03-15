@@ -66,7 +66,7 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
             last_date_of_report_year = datetime.datetime(report_date.year, 12, 31)
         else:
             last_date_of_report_year = today
-        leaves = self.env['hr.leave'].search(
+        leaves = self.env['hr.leave'].sudo().search(
             [
                 '&', '&',
                 ("state", "=", "validate"),
@@ -193,7 +193,7 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
                 ('active', '=', False)
             ]
         )
-        leaves = self.env['hr.leave'].search(
+        leaves = self.env['hr.leave'].sudo().search(
             [
                 '&',
                 ("state", "=", "validate"),
@@ -206,7 +206,7 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
                 ("date_to", "<=", last_date_of_month)
             ]
         )
-        public_holidays = self.env['resource.calendar.leaves'].search(
+        public_holidays = self.env['resource.calendar.leaves'].sudo().search(
             [
                 '&', '&', '&',
                 ("time_type", "=", "leave"),
