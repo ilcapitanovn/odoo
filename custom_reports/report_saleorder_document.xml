@@ -18,7 +18,7 @@
                     <strong>Salesperson:</strong>
                     <p class="m-0" t-field="doc.user_id"/>
                     <p class="m-0"><t t-esc="doc.user_id.mobile_phone or doc.user_id.work_phone or doc.user_id.phone" /></p>
-                    <p class="m-0" t-field="doc.user_id.email"/>
+                    <p class="m-0" t-field="doc.company_id.email"/>
                 </div>
             </div>
         </div>
