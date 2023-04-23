@@ -249,6 +249,8 @@ class FreightBooking(models.Model):
                             rec.volumes_display += ', %sx%s' % (item.quantity, item.container_id.code)
                         else:
                             rec.volumes_display = '%sx%s' % (item.quantity, item.container_id.code)
+                    else:
+                        rec.volumes_display = ''
             else:
                 rec.volumes_display = ''
 
