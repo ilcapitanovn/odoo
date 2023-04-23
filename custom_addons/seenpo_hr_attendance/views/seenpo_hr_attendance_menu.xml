@@ -39,4 +39,12 @@
         sequence="20"
         groups="group_seenpo_hr_attendance_user"
     />
+    <menuitem
+        id="seenpo_hr_attendance_check_in_late_report_menu"
+        name="Check In Late"
+        parent="seenpo_hr_attendance_report_menu"
+        action="seenpo_hr_attendance_check_in_late_report_action"
+        sequence="30"
+        groups="group_seenpo_hr_attendance_user"
+    />
 </odoo>

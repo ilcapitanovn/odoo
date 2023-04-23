@@ -15,12 +15,16 @@ class SeenpoHrAttendanceBioLog(models.Model):
     _name = "seenpo.hr.attendance.bio.log"
     _description = "Seenpo HR Attendance Bio Log"
     _order = "bio_user_id, check_in_date"
+    _rec_name = "id"
+    _mail_post_access = "read"
+    _inherit = ["mail.thread.cc", "mail.activity.mixin"]
     _session = requests.Session()
     _bio_config = {
-        "url": "http://viet-toan.ddns.net:8081",
+        "url": "http://vtoan.ddns.net:8081",
         "username": "admin",
         "password": "admin"
     }
+    _no_reason = 'ko lý do'
 
     ''' This user_id should be reference key ID added in the employee table '''
     bio_user_id = fields.Char(string='User ID', readonly=True, index=True)
@@ -40,19 +44,45 @@ class SeenpoHrAttendanceBioLog(models.Model):
     hr_employee_active = fields.Boolean(related="hr_employee_id.active", string="Employee Active", readonly=True, store=False)
     hr_employee_name = fields.Char(compute="_compute_hr_employee", string="Employee", readonly=True, store=True)
     check_in_date_display = fields.Date(compute="_compute_check_in_date_display", string='Date', readonly=True, store=False)
+    is_check_in_late = fields.Boolean(compute="_compute_is_check_in_late", string="Late", readonly=True, store=False)
+    reason_display = fields.Char(compute="_compute_reason_display", string="Reason", readonly=True, store=False)
+    is_permission_group_user = fields.Boolean(compute="_compute_is_permission_group_user", string="Check Permission")
 
     @api.model
     def fields_get(self, all_fields=None, attributes=None):
         fields_to_hide = ['employee', 'hr_employee_name_related', 'hr_employee_bio_user_id', 'hr_employee_active']
         res = super(SeenpoHrAttendanceBioLog, self).fields_get(all_fields, attributes=attributes)
         for field in fields_to_hide:
-            res[field]['searchable'] = False
+            if field in res:
+                res[field]['searchable'] = False
         return res
+
+    @api.depends('is_permission_group_user')
+    def _compute_is_permission_group_user(self):
+        res_user = self.env['res.users'].search([('id', '=', self._uid)])
+        if res_user.has_group('seenpo_hr_attendance.group_seenpo_hr_attendance_user') \
+                and not res_user.has_group('seenpo_hr_attendance.group_seenpo_hr_attendance_manager'):
+            self.is_permission_group_user = True
+        else:
+            self.is_permission_group_user = False
 
     @api.depends('check_in_date')
     def _compute_check_in_date_display(self):
         for rec in self:
             rec.check_in_date_display = rec.check_in_date.date()
+
+    @api.depends('first_in_time')
+    def _compute_is_check_in_late(self):
+        accepted_check_in_time_late = '08:15:00'
+        for rec in self:
+            rec.is_check_in_late = rec.first_in_time > accepted_check_in_time_late
+
+    @api.depends('is_check_in_late', 'reason')
+    def _compute_reason_display(self):
+        for rec in self:
+            rec.reason_display = rec.reason
+            if rec.is_check_in_late and not rec.reason:
+                rec.reason_display = self._no_reason
 
     @api.depends('hr_employee_name_related', 'hr_employee_bio_user_id', 'hr_employee_active')
     def _compute_hr_employee(self):
