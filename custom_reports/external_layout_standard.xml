@@ -14,11 +14,11 @@
 				<div style="border-bottom: 1px solid black;"/>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-6" name="company_address">
-				<span t-if="company.company_details" t-field="company.company_details"/>
-			</div>
-		</div>
+<!--		<div class="row">-->
+<!--			<div class="col-6" name="company_address">-->
+<!--				<span t-if="company.company_details" t-field="company.company_details"/>-->
+<!--			</div>-->
+<!--		</div>-->
 	</div>
 
 	<div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
