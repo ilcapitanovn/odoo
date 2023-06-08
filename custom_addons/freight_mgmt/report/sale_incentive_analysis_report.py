@@ -76,7 +76,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             else:
                 rec.display_target_sales = rec.target_sales
 
-    @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all')
+    @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all', 'target_sales')
     def _compute_incentive_and_tax(self):
         # cur = self.env.context.get('wizard_currency')
         # rate = self.env.context.get('wizard_exchange_rate')
@@ -90,8 +90,8 @@ class SaleIncentiveAnalysisReport(models.Model):
 
             if rec.incentive_id and rec.incentive_id.section_ids:
                 for sec in rec.incentive_id.section_ids:
-                    amount_from = sec.percent_from * rec.target_sales / 100
-                    amount_to = sec.percent_to * rec.target_sales / 100
+                    amount_from = sec.percent_from * rec.display_target_sales / 100
+                    amount_to = sec.percent_to * rec.display_target_sales / 100
                     if amount_from <= rec.sum_all and rec.sum_all < amount_to:
                         incentive = (sec.incentive_percent_month / 100) * \
                                     ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
