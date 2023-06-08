@@ -155,7 +155,6 @@ class SaleIncentiveAnalysisReport(models.Model):
                 sum_freehand + sum_nominated + sum_activities AS sum_all
             FROM (
                 SELECT user_id
-                    , CASE WHEN order_type IS NULL THEN 'freehand' ELSE order_type END as order_type
                     , SUM(CASE WHEN order_type = 'freehand' THEN 
                             ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
                             - (so_amount_tax_vnd - po_amount_tax_vnd) 
@@ -170,7 +169,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                 FROM sale_profit_forwarder_analysis_report
                 WHERE etd >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
                     AND etd <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                GROUP BY user_id, order_type
+                GROUP BY user_id
             ) tblSum
             INNER JOIN res_users u ON tblSum.user_id = u.id
             INNER JOIN res_partner p ON u.partner_id = p.id
