@@ -26,6 +26,23 @@ class SaleOrder(models.Model):
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
     def recompute_margin(self):
+        '''
+        Update purchase price by the latest price unit from purchase order line if there is different
+        so that recalculate profit will get the latest values
+        '''
+        related_purchase_orders = self._get_purchase_orders()
+        if related_purchase_orders:
+            for so_line in self.order_line:
+                for po in related_purchase_orders:
+                    if po.state == 'cancel':
+                        continue
+
+                    for po_line in po.order_line:
+                        if po_line.product_id and so_line.product_id and po_line.product_id.id == so_line.product_id.id \
+                                and po_line.price_unit != so_line.purchase_price:
+                            so_line.purchase_price = po_line.price_unit
+        # else -> skip if a sale order doesn't have a related purchase order
+
         super(SaleOrder, self)._compute_margin()
         self.message_post(body="Tính lại biên lợi nhuận")
 

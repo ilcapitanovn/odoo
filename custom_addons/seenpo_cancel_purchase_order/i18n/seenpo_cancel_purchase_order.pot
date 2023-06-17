@@ -1,0 +1,79 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* seenpo_cancel_purchase_order
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-25 17:59+0000\n"
+"PO-Revision-Date: 2023-04-25 17:59+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: seenpo_cancel_purchase_order
+#: model_terms:ir.ui.view,arch_db:seenpo_cancel_purchase_order.view_cancel_order
+msgid ""
+"All Selected Purchase Order will be going in cancel state.  Please review "
+"them before Confirm."
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model_terms:ir.ui.view,arch_db:seenpo_cancel_purchase_order.seenpo_purchase_order_view_form_inherited
+#: model_terms:ir.ui.view,arch_db:seenpo_cancel_purchase_order.view_cancel_order
+msgid "Cancel"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.actions.act_window,name:seenpo_cancel_purchase_order.action_view_purchase_order_cancel
+msgid "Cancel Purchase"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model_terms:ir.ui.view,arch_db:seenpo_cancel_purchase_order.view_cancel_order
+msgid "Confirm"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__id
+msgid "ID"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model.fields,field_description:seenpo_cancel_purchase_order.field_purchase_order_cancel__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: seenpo_cancel_purchase_order
+#: model:ir.model,name:seenpo_cancel_purchase_order.model_purchase_order_cancel
+msgid "Purchase Orders Cancel"
+msgstr ""

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="seenpo_purchase_order_view_form_inherited" model="ir.ui.view">
+        <field name="name">seenpo.purchase.order.view.form.inherited</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_cancel']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_cancel']" position="after">
+                <button name="%(action_view_purchase_order_cancel)d" states="draft,to approve,sent,purchase"
+                        string="Cancel" type="action"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
