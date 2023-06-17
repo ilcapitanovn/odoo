@@ -126,6 +126,41 @@ class SaleIncentiveAnalysisReport(models.Model):
 
                     # @api.depends("incentive")
 
+    def action_view_sale_incentive(self):
+        # self.ensure_one()
+        # pricelist_id = self.env.context.get('active_id', False)
+        user_id = self.id
+        title_name = self.display_name
+
+        wizard_date_from = self.env.context.get('wizard_date_from')
+        wizard_date_to = self.env.context.get('wizard_date_to')
+
+        context = {
+            'search_default_group_by_sale': 1,
+            # 'wizard_currency': self.currency_ids.name,
+            # 'wizard_currency_id': self.currency_ids.id,
+            # 'wizard_exchange_rate': self.exchange_rate,
+            # 'wizard_date_from': self.date_from,
+            # 'wizard_date_to': self.date_to
+        }
+        domain = [('user_id', '=', user_id), ('payment_state', 'in', ('in_payment', 'paid')),
+                  ('invoice_date', '>=', wizard_date_from), ('invoice_date', '<=', wizard_date_to)]
+
+        profit_tree = self.env.ref('freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree', False)
+        view_id_tree = self.env['ir.ui.view'].sudo().search([('name', '=', "freight.view.profit.forwarder.detail.by.incentive.tree")])
+        return {
+            'name': title_name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.profit.forwarder.analysis.report',
+            'binding_view_types': 'list',
+            'view_mode': 'tree',
+            'views': [(view_id_tree[0].id, 'tree')],
+            'view_id': profit_tree.id,
+            'target': 'main',
+            'context': context,
+            'domain': domain,
+        }
+
     # @api.depends('po_commission_total')
     # def _compute_po_commission_in_vnd(self):
     #     usd = self.env['res.currency'].search([('name', '=', 'USD')])
@@ -137,47 +172,93 @@ class SaleIncentiveAnalysisReport(models.Model):
     #         record.po_commission_total_vnd = amount_vnd
 
     def _select(self):
+        ''' This has been deprecated due to new policy of incentive is applied from 01 June 2023 '''
+
+        # select_str = """
+        #     SELECT DISTINCT
+        #         u.id AS id,
+        #         u.id AS user_id,
+        #         u.company_id AS company_id,
+        #         u.partner_id AS partner_id,
+        #         si.id AS incentive_id,
+        #         ati.id AS tax_income_id,
+        #
+        #         si.name AS incentive_name,
+        #         p.target_sales AS target_sales,
+        #
+        #         sum_freehand,
+        #         sum_nominated,
+        #         sum_activities,
+        #         sum_freehand + sum_nominated + sum_activities AS sum_all
+        #     FROM (
+        #         SELECT user_id
+        #             , SUM(CASE WHEN order_type = 'freehand' THEN
+        #                     ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+        #                     - (so_amount_tax_vnd - po_amount_tax_vnd)
+        #                     - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+        #                     ELSE 0 END) as sum_freehand
+        #             , SUM(CASE WHEN order_type = 'nominated' THEN
+        #                     ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+        #                     - (so_amount_tax_vnd - po_amount_tax_vnd)
+        #                     - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+        #                     ELSE 0 END) as sum_nominated
+        #             , 0 as sum_activities
+        #         FROM sale_profit_forwarder_analysis_report
+        #         WHERE etd >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+        #             AND etd <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+        #         GROUP BY user_id
+        #     ) tblSum
+        #     INNER JOIN res_users u ON tblSum.user_id = u.id
+        #     INNER JOIN res_partner p ON u.partner_id = p.id
+        #     LEFT JOIN sale_incentive si ON p.incentive_id = si.id
+        #     LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
+        #     LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
+        #     LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
+        # """
+
+        ''' New incentive policy is available since 01 June 2023 '''
         select_str = """
-            SELECT DISTINCT
-                u.id AS id,
-                u.id AS user_id,
-                u.company_id AS company_id,
-                u.partner_id AS partner_id,
-                si.id AS incentive_id,
-                ati.id AS tax_income_id,
+                    SELECT DISTINCT
+                        u.id AS id,
+                        u.id AS user_id,
+                        u.company_id AS company_id,
+                        u.partner_id AS partner_id,
+                        si.id AS incentive_id,
+                        ati.id AS tax_income_id,
 
-                si.name AS incentive_name,
-                p.target_sales AS target_sales,
+                        si.name AS incentive_name,
+                        p.target_sales AS target_sales,
 
-                sum_freehand,
-                sum_nominated,
-                sum_activities,
-                sum_freehand + sum_nominated + sum_activities AS sum_all
-            FROM (
-                SELECT user_id
-                    , SUM(CASE WHEN order_type = 'freehand' THEN 
-                            ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                            - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                            - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                            ELSE 0 END) as sum_freehand
-                    , SUM(CASE WHEN order_type = 'nominated' THEN 
-                            ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                            - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                            - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                            ELSE 0 END) as sum_nominated
-                    , 0 as sum_activities
-                FROM sale_profit_forwarder_analysis_report
-                WHERE etd >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                    AND etd <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                GROUP BY user_id
-            ) tblSum
-            INNER JOIN res_users u ON tblSum.user_id = u.id
-            INNER JOIN res_partner p ON u.partner_id = p.id
-            LEFT JOIN sale_incentive si ON p.incentive_id = si.id
-            LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
-            LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
-            LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
-        """
+                        sum_freehand,
+                        sum_nominated,
+                        sum_activities,
+                        sum_freehand + sum_nominated + sum_activities AS sum_all
+                    FROM (
+                        SELECT user_id
+                            , SUM(CASE WHEN order_type = 'freehand' THEN 
+                                    ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                                    - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                                    - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                                    ELSE 0 END) as sum_freehand
+                            , SUM(CASE WHEN order_type = 'nominated' THEN 
+                                    ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                                    - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                                    - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                                    ELSE 0 END) as sum_nominated
+                            , 0 as sum_activities
+                        FROM sale_profit_forwarder_analysis_report
+                        WHERE payment_state in ('in_payment', 'paid')
+                            AND invoice_date >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+                            AND invoice_date <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
+                        GROUP BY user_id
+                    ) tblSum
+                    INNER JOIN res_users u ON tblSum.user_id = u.id
+                    INNER JOIN res_partner p ON u.partner_id = p.id
+                    LEFT JOIN sale_incentive si ON p.incentive_id = si.id
+                    LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
+                    LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
+                    LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
+                """
 
         # GROUP BY u.login, si.name, p.target_sales, sum_freehand, sum_nominated, sum_activities, sum_all
 

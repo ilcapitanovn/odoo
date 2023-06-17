@@ -9,8 +9,8 @@
                     <p colspan="4">Select the period date to which you want to make the report:</p>
                 </group>
                 <group colspan="2">
-                    <field name="date_from" />
-                    <field name="date_to" />
+                    <field name="date_from" string="Invoice Date From" />
+                    <field name="date_to" string="Invoice Date To" />
                 </group>
                 <group string="Currencies" colspan="4">
                     <field name="currency_name" invisible="1" />

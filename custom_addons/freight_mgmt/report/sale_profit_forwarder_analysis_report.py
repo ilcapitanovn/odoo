@@ -40,6 +40,9 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     order_type = fields.Char("Freehand <br/>or <br/>Nominated", readonly=True)
     date_order = fields.Date("Date Order", readonly=True)
 
+    payment_state = fields.Char("Payment Status", readonly=True)
+    invoice_date = fields.Date("Invoice Date", readonly=True)
+
     po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
     po_amount_total = fields.Float("Co VAT (I)", readonly=True)
     po_amount_tax = fields.Float("VAT (I)", readonly=True)
@@ -210,6 +213,8 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             fbl.vessel_bol_number AS bill_no,
             '' AS volumes,
             DATE(fbk.etd_revised) AS etd,
+            fdn.payment_state AS payment_state,
+            DATE(fdn.invoice_date) AS invoice_date,
             CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
             so.date_order AS date_order,
             

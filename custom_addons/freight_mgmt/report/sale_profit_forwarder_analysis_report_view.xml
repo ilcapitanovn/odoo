@@ -37,8 +37,11 @@
 <!--                    name="year"-->
 <!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
 <!--                />-->
-                <filter name="filter_date" date="date_order"/>
-                <filter name="filter_date" date="etd"/>
+                <filter name="filter_date_order" date="date_order"/>
+                <filter name="filter_etd" date="etd"/>
+                <filter name="filter_invoice_date" date="invoice_date"/>
+                <separator />
+                <filter name="filter_order_closed" string="Paid" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
 <!--                <filter-->
 <!--                    name="Draft"-->
 <!--                    string="Draft"-->
@@ -114,6 +117,7 @@
                 <field name="volumes" optional="hide"/>
                 <field name="display_pod" string="POL/D" />
                 <field name="etd" optional="show"/>
+                <field name="invoice_date" optional="show"/>
                 <field name="display_sale_name" string="Sale" optional="show"/>
                 <field name="order_type" string="F or N" optional="show"/>
                 <field name="po_amount_untaxed_vnd" optional="show"/>
@@ -146,12 +150,38 @@
             </tree>
         </field>
     </record>
+
+    <record id="freight_view_profit_forwarder_detail_by_incentive_tree" model="ir.ui.view">
+        <field name="name">freight.view.profit.forwarder.detail.by.incentive.tree</field>
+        <field name="model">sale.profit.forwarder.analysis.report</field>
+        <field name="arch" type="xml">
+            <tree string="Profits" class="o_report_profits_tree"
+                  default_order = 'customer_id, bill_id desc'
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  duplicate="false"
+                  import="false">
+                <field name="bill_id" invisible="1"/>
+                <field name="sale_partner_id" invisible="1"/>
+<!--                <field name="customer_id" widget="many2one_avatar"/>-->
+                <field name="bill_no"/>
+                <field name="display_pod" string="POL/D" />
+                <field name="etd" optional="show"/>
+                <field name="invoice_date" optional="show"/>
+                <field name="order_type" string="Order Type" optional="show"/>
+                <field name="profit_after_tax_vat" string="Profit" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+
     <record id="action_sale_profit_forwarder_analysis_report" model="ir.actions.act_window">
         <field name="name">Profit Forwarder Report</field>
         <field name="res_model">sale.profit.forwarder.analysis.report</field>
         <field name="view_mode">tree</field>
         <field name="binding_view_types">list</field>
-        <field name="context">{'search_default_group_by_customer': 1}</field>
+        <field name="context">{'search_default_filter_order_closed': 1, 'search_default_group_by_customer': 1}</field>
         <field name="search_view_id" ref="view_sale_profit_forwarder_analysis_search" />
         <field name="view_id" ref="view_sale_profit_forwarder_analysis_view_list" />
         <field

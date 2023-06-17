@@ -129,8 +129,9 @@ class FreightDebitNote(models.Model):
     currency_id = fields.Many2one('res.currency', 'Currency', default=_get_default_currency_id, required=True)
     sequence = fields.Integer(default=16)
 
-    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status",
+    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
                                      readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
+    invoice_date = fields.Date(string="Invoice Date", readonly=True, store=True, compute='_compute_payment_state')
     payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
     state = fields.Selection(selection=[
@@ -292,8 +293,10 @@ class FreightDebitNote(models.Model):
             if rec.order_id and rec.order_id.invoice_ids:
                 for invoice in rec.order_id.invoice_ids:
                     rec.payment_state = invoice.payment_state
+                    rec.invoice_date = invoice.invoice_date
             else:
                 rec.payment_state = 'not_paid'
+                rec.invoice_date = None
 
     @api.depends('partner_id')
     def _compute_payment_term(self):
