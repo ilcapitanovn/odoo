@@ -42,6 +42,9 @@
                 <filter name="filter_invoice_date" date="invoice_date"/>
                 <separator />
                 <filter name="filter_order_closed" string="Paid" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
+                <separator />
+                <filter name="filter_nominated" string="Nominated" domain="[('order_type', '=', 'nominated')]"/>
+                <filter name="filter_freehand" string="Freehand" domain="[('order_type', '=', 'freehand')]"/>
 <!--                <filter-->
 <!--                    name="Draft"-->
 <!--                    string="Draft"-->

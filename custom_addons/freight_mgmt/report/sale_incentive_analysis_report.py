@@ -137,13 +137,15 @@ class SaleIncentiveAnalysisReport(models.Model):
 
         context = {
             'search_default_group_by_sale': 1,
-            # 'wizard_currency': self.currency_ids.name,
-            # 'wizard_currency_id': self.currency_ids.id,
-            # 'wizard_exchange_rate': self.exchange_rate,
-            # 'wizard_date_from': self.date_from,
-            # 'wizard_date_to': self.date_to
+            'search_default_filter_order_closed': 1
         }
-        domain = [('user_id', '=', user_id), ('payment_state', 'in', ('in_payment', 'paid')),
+        if self.incentive_id:
+            if self.incentive_id.target_nominated > 0:
+                context['search_default_filter_nominated'] = 1
+            if self.incentive_id.target_freehand > 0:
+                context['search_default_filter_freehand'] = 1
+
+        domain = [('user_id', '=', user_id),
                   ('invoice_date', '>=', wizard_date_from), ('invoice_date', '<=', wizard_date_to)]
 
         profit_tree = self.env.ref('freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree', False)
@@ -229,10 +231,10 @@ class SaleIncentiveAnalysisReport(models.Model):
                         si.name AS incentive_name,
                         p.target_sales AS target_sales,
 
-                        sum_freehand,
-                        sum_nominated,
-                        sum_activities,
-                        sum_freehand + sum_nominated + sum_activities AS sum_all
+                        CASE WHEN si.target_freehand > 0 THEN sum_freehand ELSE 0 END sum_freehand,
+                        CASE WHEN si.target_nominated > 0 THEN sum_nominated ELSE 0 END sum_nominated,
+                        CASE WHEN si.target_activities > 0 THEN sum_activities ELSE 0 END sum_activities,
+                        (CASE WHEN si.target_freehand > 0 THEN sum_freehand ELSE 0 END + CASE WHEN si.target_nominated > 0 THEN sum_nominated ELSE 0 END + CASE WHEN si.target_activities > 0 THEN sum_activities ELSE 0 END) AS sum_all
                     FROM (
                         SELECT user_id
                             , SUM(CASE WHEN order_type = 'freehand' THEN 
@@ -258,6 +260,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                     LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
                     LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
                     LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
+                    WHERE si.target_freehand * sum_freehand + si.target_nominated * sum_nominated + si.target_activities * sum_activities > 0
                 """
 
         # GROUP BY u.login, si.name, p.target_sales, sum_freehand, sum_nominated, sum_activities, sum_all

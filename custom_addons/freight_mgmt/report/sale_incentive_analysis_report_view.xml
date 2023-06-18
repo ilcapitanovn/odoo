@@ -108,7 +108,7 @@
                 <field name="display_target_sales" />
                 <field name="display_sum_freehand" />
                 <field name="display_sum_nominated" />
-                <field name="display_sum_activities"/>
+                <field name="display_sum_activities" optional="hide"/>
                 <field name="display_sum_all" />
                 <field name="incentive" />
                 <field name="incentive_tax_amount" />
