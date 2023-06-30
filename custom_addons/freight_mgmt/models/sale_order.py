@@ -18,7 +18,14 @@ class SaleOrder(models.Model):
     order_type = fields.Selection([
         ('freehand', 'Freehand'),
         ('nominated', 'Nominated'),
-    ], string='Order Type', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    ], string='Order Type', readonly=True, tracking=True,
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+
+    order_shipment_type = fields.Selection(
+        selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
+                   ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
+        string="Shipment Type", states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+        readonly=True, default="fcl-exp", tracking=True, help='Type of Shipment')
 
     profit_sharing_percentage = fields.Float(
         string="Profit Sharing (%)",

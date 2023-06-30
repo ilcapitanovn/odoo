@@ -219,10 +219,20 @@
                                 </field>
                             </page>
                             <page string="Other Information" name="other_info">
-                                <group>
-                                    <field name="last_stage_update" readonly="1" />
-                                    <field name="issued_date" />
-                                    <field name="approved_date" />
+                                <group colspan="2">
+                                    <group>
+                                        <field name="last_stage_update" readonly="1" />
+                                        <field name="issued_date" />
+                                        <field name="approved_date" />
+                                    </group>
+                                    <group>
+                                        <field name="arrival_notice_count"
+                                               attrs="{'invisible' : [('shipment_type', 'not in', ('fcl-imp','lcl-imp','air-imp'))]}"/>
+                                        <field name="demurrage_time"
+                                               attrs="{'invisible' : [('shipment_type', 'not in', ('fcl-imp','lcl-imp','air-imp'))]}" />
+                                        <field name="detention_days"
+                                               attrs="{'invisible' : [('shipment_type', 'not in', ('fcl-imp','lcl-imp','air-imp'))]}" />
+                                    </group>
                                 </group>
                             </page>
                         </notebook>

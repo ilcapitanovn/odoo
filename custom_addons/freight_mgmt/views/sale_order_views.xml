@@ -9,6 +9,9 @@
                         <xpath expr="//field[@name='payment_term_id']" position="before">
                             <field name="order_type" />
                         </xpath>
+                        <xpath expr="//field[@name='payment_term_id']" position="before">
+                            <field name="order_shipment_type" />
+                        </xpath>
                         <xpath expr="//field[@name='require_signature']" position="before">
                             <field name="profit_sharing_percentage"
                                    attrs="{'invisible': [('order_type', '!=', 'nominated')]}" />
@@ -37,6 +40,9 @@
                         <xpath expr="//field[@name='order_type']" position="attributes">
                             <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
                         </xpath>
+                        <xpath expr="//field[@name='order_shipment_type']" position="attributes">
+                            <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
+                        </xpath>
                 </field>
         </record>
 
@@ -48,6 +54,9 @@
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_type" optional="hide" />
                         </xpath>
+                        <xpath expr="//field[@name='activity_ids']" position="before">
+                            <field name="order_shipment_type" optional="hide" />
+                        </xpath>
                 </field>
         </record>
 
@@ -58,6 +67,9 @@
                 <field name="arch" type="xml">
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_type" optional="hide" />
+                        </xpath>
+                        <xpath expr="//field[@name='activity_ids']" position="before">
+                            <field name="order_shipment_type" optional="hide" />
                         </xpath>
                 </field>
         </record>
@@ -112,6 +124,12 @@
                         </xpath>
                         <xpath expr="//button[@name='action_unlock']" position="attributes">
                                 <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='order_type']" position="attributes">
+                                <attribute name="readonly">1</attribute>
+                        </xpath>
+                         <xpath expr="//field[@name='order_shipment_type']" position="attributes">
+                                <attribute name="readonly">1</attribute>
                         </xpath>
                 </field>
         </record>

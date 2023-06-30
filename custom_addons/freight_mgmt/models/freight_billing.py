@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import pytz
+from datetime import datetime
+
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 from odoo.tools import html_keep_url
@@ -100,7 +103,8 @@ class FreightBilling(models.Model):
 
     booking_id = fields.Many2one(
         comodel_name="freight.booking", string="Booking",
-        domain="['&',('confirmed', '=', True), ('billing_id', '=', False)]",
+        # domain="['&',('confirmed', '=', True), ('billing_id', '=', False)]",
+        domain=lambda self: self._get_booking_id_domain(),
         tracking=True, index=True, required=True
     )
     vessel_booking_number = fields.Char(related="booking_id.vessel_booking_number",
@@ -139,6 +143,8 @@ class FreightBilling(models.Model):
 
     debit_count = fields.Integer("Debit Count", compute='_compute_debit_count')
     credit_count = fields.Integer("Credit Count", compute='_compute_credit_count')
+
+    etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
 
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -380,6 +386,16 @@ class FreightBilling(models.Model):
             "There is nothing to create debit note! Contact administrator for details.\n\n"
         ))
 
+    @api.model
+    def _get_booking_id_domain(self):
+        if self.env.context.get("shipment_type_suffix") == 'imp':
+            res = [('shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('confirmed', '=', True), ('billing_id', '=', False)]
+        else:
+            res = [('shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('confirmed', '=', True), ('billing_id', '=', False)]
+        return res
+
     def action_view_debit_note(self):
         self.ensure_one()
         debit_notes = self.env['freight.debit.note'].search([
@@ -446,6 +462,47 @@ class FreightBilling(models.Model):
             bill.credit_count = self.env['freight.credit.note'].search_count([
                 ('bill_id', '=', bill.id)
             ])
+
+    @api.depends('booking_id.etd_revised')
+    def _compute_format_etd(self):
+        for rec in self:
+            rec.etd_formatted = ''
+            if rec.booking_id.etd_revised:
+                etd_local = self._convert_utc_to_local(rec.booking_id.etd_revised)
+                if etd_local:
+                    rec.etd_formatted = etd_local.strftime('%d-%B-%Y')
+
+    def _convert_utc_to_local(self, utc_date):
+        result = utc_date
+        if result:
+            try:
+                fmt = "%Y-%m-%d %H:%M:%S"
+                utc_date_str = utc_date.strftime(fmt)
+
+                ########################################################
+                # OPTION 1
+                ########################################################
+                # now_utc = datetime.now(pytz.timezone('UTC'))
+                # tz = pytz.timezone(self.env.user.tz)      # Consider get tz correct
+                # now_tz = now_utc.astimezone(tz) or pytz.utc
+                # utc_offset_timedelta = datetime.strptime(now_tz.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+                # # local_date = datetime.strptime(utc_date_str, fmt)
+                # result = utc_date + utc_offset_timedelta
+
+                ########################################################
+                # OPTION 2
+                ########################################################
+                timezone = 'UTC'
+                if self.env.user.tz:
+                    timezone = self.env.user.tz
+                elif self.user_id and self.user_id.partner_id.tz:
+                    timezone = self.user_id.partner_id.tz
+                tz = pytz.timezone(timezone)
+                result = pytz.utc.localize(datetime.strptime(utc_date_str, fmt)).astimezone(tz)
+            except:
+                print("ERROR in _convert_utc_to_local")
+
+            return result
 
     # @api.onchange("order_id")
     # def _onchange_order_id(self):
@@ -578,6 +635,31 @@ class FreightBilling(models.Model):
         res = ''
         if self.booking_id and self.booking_id.volumes_display:
             res += self.booking_id.volumes_display.replace(',', '<br/>') + '<br/><br/>'
+        if dict_to_concat:
+            res += ''.join('{:,.2f}'.format(dict_to_concat[key]) + ' ' + key + '<br/>' for key in dict_to_concat.keys())
+
+        return res
+
+    @staticmethod
+    def update_delivery_order_total_pkgs_dict(dict_to_update, key, value_number):
+        if not value_number:
+            return dict_to_update
+
+        if not key:
+            key = ' '
+
+        if key in dict_to_update:
+            dict_to_update[key] += value_number
+        else:
+            dict_to_update[key] = value_number
+
+        return dict_to_update
+
+    @staticmethod
+    def generate_delivery_order_no_of_pkgs(dict_to_concat):
+        res = ''
+        # if self.booking_id and self.booking_id.volumes_display:
+        #     res += self.booking_id.volumes_display.replace(',', '<br/>') + '<br/><br/>'
         if dict_to_concat:
             res += ''.join('{:,.2f}'.format(dict_to_concat[key]) + ' ' + key + '<br/>' for key in dict_to_concat.keys())
 

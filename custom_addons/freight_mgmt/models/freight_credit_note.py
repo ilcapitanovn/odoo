@@ -54,7 +54,8 @@ class FreightCreditNote(models.Model):
     number = fields.Char(string='Credit Number', default="#", readonly=True, store=True, index=True, required=True)
     bill_id = fields.Many2one(
         comodel_name="freight.billing", string="Bill Reference",
-        domain="['&',('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]",
+        # domain="['&',('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]",
+        domain=lambda self: self._get_bill_id_domain(),
         tracking=True, index=True, required=True
     )
 
@@ -188,6 +189,16 @@ class FreightCreditNote(models.Model):
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
 
+    @api.model
+    def _get_bill_id_domain(self):
+        if self.env.context.get("shipment_type_suffix") == 'imp':
+            res = [('booking_id.shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+        else:
+            res = [('booking_id.shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+        return res
+
     @api.depends('purchase_order_id')
     def _compute_is_purchase_order_empty(self):
         if self.purchase_order_id:
@@ -281,12 +292,15 @@ class FreightCreditNote(models.Model):
             if rec.amount_subtotal_vnd > 0:
                 rec.amount_total_vnd += rec.amount_subtotal_vnd
 
+    @api.depends('purchase_order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):
         for rec in self:
             if rec.purchase_order_id and rec.purchase_order_id.invoice_ids:
                 for invoice in rec.purchase_order_id.invoice_ids:
                     rec.payment_state = invoice.payment_state
                     rec.invoice_date = invoice.invoice_date
+                    if invoice.payment_state == 'paid':
+                        break
             else:
                 rec.payment_state = 'not_paid'
                 rec.invoice_date = None

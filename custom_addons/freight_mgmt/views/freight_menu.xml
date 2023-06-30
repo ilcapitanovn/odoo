@@ -2,37 +2,88 @@
 <odoo>
     <!-- Actions -->
     <record id="freight_booking_action" model="ir.actions.act_window">
-        <field name="name">Bookings</field>
+        <field name="name">Export - Bookings</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.booking</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp'}</field>
+        <field name="domain">[('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
     </record>
     <record id="freight_orders_to_booking_action" model="ir.actions.act_window">
-        <field name="name">Orders To Booking</field>
+        <field name="name">Export - Orders To Booking</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'create': False}</field>
-        <field name="domain">[('booking_status','=','to booking')]</field>
+        <field name="domain">[('booking_status','=','to booking'),('order_shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
     </record>
     <record id="freight_billing_action" model="ir.actions.act_window">
-        <field name="name">Bills</field>
+        <field name="name">Export - Bills</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.billing</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp'}</field>
+        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
     </record>
     <record id="freight_debit_note_action" model="ir.actions.act_window">
-        <field name="name">Debit Notes</field>
+        <field name="name">Export - Debit Notes</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.debit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp'}</field>
+        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
     </record>
     <record id="freight_credit_note_action" model="ir.actions.act_window">
-        <field name="name">Credit Notes</field>
+        <field name="name">Export - Credit Notes</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.credit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp'}</field>
+        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
     </record>
+
+    <!-- Import Menu - Actions -->
+    <record id="freight_import_orders_to_booking_action" model="ir.actions.act_window">
+        <field name="name">Import - Orders To Booking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="domain">[('booking_status','=','to booking'),('order_shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+    </record>
+    <record id="freight_import_booking_action" model="ir.actions.act_window">
+        <field name="name">Import - Bookings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.booking</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp'}</field>
+        <field name="domain">[('shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+    </record>
+    <record id="freight_import_delivery_order_action" model="ir.actions.act_window">
+        <field name="name">Import - Delivery Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.billing</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp'}</field>
+        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+    </record>
+    <record id="freight_import_debit_note_action" model="ir.actions.act_window">
+        <field name="name">Import - Debit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.debit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp'}</field>
+        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+    </record>
+    <record id="freight_import_credit_note_action" model="ir.actions.act_window">
+        <field name="name">Import - Credit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.credit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp'}</field>
+        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+    </record>
+
     <!--
     <record id="freight_catalog_reporting_action" model="ir.actions.act_window">
         <field name="name">Reporting</field>
@@ -111,9 +162,16 @@
     -->
     <menuitem
         id="freight_mgmt_executive_menu"
-        name="Executive"
+        name="Export"
         parent="freight_mgmt_main_menu"
         sequence="10"
+        groups="group_freight_user"
+    />
+    <menuitem
+        id="freight_mgmt_import_menu"
+        name="Import"
+        parent="freight_mgmt_main_menu"
+        sequence="20"
         groups="group_freight_user"
     />
     <menuitem
@@ -145,7 +203,7 @@
         groups="group_freight_manager"
     />
     <!-- Sub menu items -->
-    <!-- Executive sub -->
+    <!-- Executive (Export) sub -->
     <menuitem
         id="freight_executive_orders_to_booking_menu"
         name="Orders To Booking"
@@ -179,6 +237,43 @@
         name="Credit Notes"
         parent="freight_mgmt_executive_menu"
         action="freight_credit_note_action"
+        sequence="45"
+    />
+
+    <!-- Import sub -->
+    <menuitem
+        id="freight_import_orders_to_booking_menu"
+        name="Orders To Booking"
+        parent="freight_mgmt_import_menu"
+        action="freight_import_orders_to_booking_action"
+        sequence="5"
+    />
+    <menuitem
+        id="freight_import_bookings_menu"
+        name="Bookings"
+        parent="freight_mgmt_import_menu"
+        action="freight_import_booking_action"
+        sequence="15"
+    />
+    <menuitem
+        id="freight_import_delivery_order_menu"
+        name="Delivery Orders"
+        parent="freight_mgmt_import_menu"
+        action="freight_import_delivery_order_action"
+        sequence="25"
+    />
+    <menuitem
+        id="freight_import_debit_notes_menu"
+        name="Debit Notes"
+        parent="freight_mgmt_import_menu"
+        action="freight_import_debit_note_action"
+        sequence="35"
+    />
+    <menuitem
+        id="freight_import_credit_notes_menu"
+        name="Credit Notes"
+        parent="freight_mgmt_import_menu"
+        action="freight_import_credit_note_action"
         sequence="45"
     />
 

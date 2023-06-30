@@ -1,3 +1,4 @@
+from datetime import timedelta
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError, ValidationError
 
@@ -42,14 +43,17 @@ class FreightBooking(models.Model):
         selection=[("ocean", "Ocean"), ("air", "Air"), ("express", "Express")],
         string="Transport Type", default="ocean", help='Type of Transport')
 
-    shipment_type = fields.Selection(
-        selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
-                   ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
-        string="Shipment Type", default="fcl-exp", help='Type of Shipment')
+    # shipment_type = fields.Selection(
+    #     selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
+    #                ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
+    #     string="Shipment Type", default="fcl-exp", help='Type of Shipment')
+    shipment_type = fields.Selection(related="order_id.order_shipment_type", string="Shipment Type", store=True,
+                                     readonly=True, help='Type of Shipment')
 
     order_id = fields.Many2one(
         comodel_name="sale.order", string="Sale Order Reference",
-        domain="['|', ('invoice_status','=','to invoice'), ('invoice_status','=','invoiced')]",
+        #domain="['|', ('invoice_status','=','to invoice'), ('invoice_status','=','invoiced')]",
+        domain=lambda self: self._get_order_id_domain(),
         tracking=True, index=True
     )
     currency_id = fields.Many2one("res.currency", string="Currency", readonly=True)
@@ -61,10 +65,11 @@ class FreightBooking(models.Model):
         ('trading', 'Trading'),
     ], string='Booking Type', default='forwarding', required=True, tracking=True)
 
-    order_type = fields.Selection([
-        ('freehand', 'Freehand'),
-        ('nominated', 'Nominated'),
-    ], string='Order Type')
+    # order_type = fields.Selection([
+    #     ('freehand', 'Freehand'),
+    #     ('nominated', 'Nominated'),
+    # ], string='Order Type')
+    order_type = fields.Selection(related="order_id.order_type", string="Order Type", store=True, readonly=True)
 
     booking_volumes = fields.One2many('freight.booking.volume', 'booking_id', string="Booking volumes")
     volumes_display = fields.Char(compute="_compute_volumes_display", string="Volumes", store=False)
@@ -116,6 +121,10 @@ class FreightBooking(models.Model):
     confirmed = fields.Boolean(related="stage_id.confirmed")
     completed = fields.Boolean(related="stage_id.completed")
     stage_name = fields.Char(related="stage_id.name", readonly=True, store=False)
+
+    arrival_notice_count = fields.Integer(string="Arrival Notice Count", tracking=True, default=1)
+    demurrage_time = fields.Datetime(string="Demurrage (DEM)", tracking=True)
+    detention_days = fields.Integer(string="Detention (DET)", tracking=True, default=7)
 
     company_id = fields.Many2one(
         comodel_name="res.company",
@@ -261,6 +270,16 @@ class FreightBooking(models.Model):
             'order_type': 'freehand' or False
         })
         return res
+
+    @api.model
+    def _get_order_id_domain(self):
+        if self.env.context.get("shipment_type_suffix") == 'imp':
+            res = ['&', ('order_shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   '|', ('invoice_status', '=', 'to invoice'), ('invoice_status', '=', 'invoiced')]
+        else:
+            res = ['&', ('order_shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   '|', ('invoice_status', '=', 'to invoice'), ('invoice_status', '=', 'invoiced')]
+        return res
     
     @api.model
     def _nothing_to_invoice_error(self):
@@ -279,6 +298,11 @@ class FreightBooking(models.Model):
     def _onchange_original_etd(self):
         if self.etd and (not self.etd_revised or self.etd_revised < self.etd):
             self.etd_revised = self.etd
+
+    @api.onchange("etd_revised")
+    def _onchange_revised_etd(self):
+        if self.etd_revised:
+            self.demurrage_time = self.etd_revised + timedelta(days=7)
 
     @api.onchange("order_id")
     def _onchange_order_id(self):
@@ -358,7 +382,7 @@ class FreightBooking(models.Model):
             seq = seq.with_company(values["company_id"])
 
         seq_date = None
-        if 'etd_revised' in values:
+        if 'etd_revised' in values and values['etd_revised']:
             seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(values['etd_revised']))
 
         result = seq.next_by_code("freight.booking.sequence", sequence_date=seq_date) or "#"

@@ -45,7 +45,7 @@
 <!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
 <!--                    />-->
                     <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"
-                            attrs="{'invisible': ['|', ('invoice_status', '!=', 'to invoice'), ('state', 'not in', ['posted', 'completed'])]}" data-hotkey="q"/>
+                            attrs="{'invisible': ['|', '|', ('payment_state', 'in', ('in_payment', 'paid')), ('invoice_status', 'in', ('no', 'invoiced')), ('state', 'not in', ['posted', 'completed'])]}" data-hotkey="q"/>
                     <!-- Preview (only customer debit note) -->
                     <button name="preview_debit_note" type="object" string="Preview" data-hotkey="d"
                             title="Preview Debit Note"/>

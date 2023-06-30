@@ -62,13 +62,14 @@ class FreightDebitNote(models.Model):
     number = fields.Char(string='Debit Number', default="#", readonly=True, store=True, index=True, required=True)
     bill_id = fields.Many2one(
         comodel_name="freight.billing", string="Bill Reference",
-        domain="['&',('state', 'in', ['posted', 'completed']), ('debit_note_ids', '=', False)]",
+        # domain="['&',('state', 'in', ['posted', 'completed']), ('debit_note_ids', '=', False)]",
+        domain=lambda self: self._get_bill_id_domain(),
         tracking=True, index=True, required=True
     )
 
-    debit_date = fields.Datetime(string="Debit date", default=fields.Datetime.now)
+    debit_date = fields.Datetime(string="Debit date", tracking=True, default=fields.Datetime.now)
     exchange_rate = fields.Float(string='Exchange rate', default=_get_default_exchange_rate, readonly=False,
-                        help='The rate of the currency to the currency of rate 1.', store=True)
+                        help='The rate of the currency to the currency of rate 1.', tracking=True, store=True)
 
     bill_no = fields.Char(related="bill_id.vessel_bol_number",
                           string="BL Number", readonly=True, store=False)
@@ -90,15 +91,15 @@ class FreightDebitNote(models.Model):
 
     customer_id = fields.Many2one(related="partner_id", string="Customer", readonly=False, store=False)
     invoice_partner_id = fields.Many2one('res.partner', compute='_get_invoice_partner_id',
-                                         string='Invoice Address')
-    partner_vat = fields.Char(related="partner_id.vat", store=True, string="VAT", readonly=False)
+                                         string='Invoice Address', tracking=True)
+    partner_vat = fields.Char(related="partner_id.vat", store=True, string="VAT", tracking=True, readonly=False)
     partner_name = fields.Char(string="Company Name", compute="_get_partner_name",
-                               store=True, readonly=False)
+                               store=True, readonly=False, tracking=True)
     partner_address = fields.Char(string="Address", compute="_parse_address_from_contact_address",
-                                  store=True, readonly=False)
+                                  store=True, readonly=False, tracking=True)
 
     debit_items = fields.One2many('freight.debit.note.item', 'debit_id', string='Debit Note Items',
-                                  store=True, copy=True, auto_join=True)
+                                  store=True, copy=True, tracking=True, auto_join=True)
     # amount_total = fields.Monetary(related="order_id.amount_total", string="Total", readonly=True, store=True)
     amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
@@ -200,6 +201,16 @@ class FreightDebitNote(models.Model):
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
 
+    @api.model
+    def _get_bill_id_domain(self):
+        if self.env.context.get("shipment_type_suffix") == 'imp':
+            res = [('booking_id.shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('state', 'in', ['posted', 'completed']), ('debit_note_ids', '=', False)]
+        else:
+            res = [('booking_id.shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+                   ('state', 'in', ['posted', 'completed']), ('debit_note_ids', '=', False)]
+        return res
+
     @api.depends('bank_ids')
     def _compute_company_bank_id(self):
         ''' The default company_bank_id will be the first available on the company. '''
@@ -288,12 +299,15 @@ class FreightDebitNote(models.Model):
             if rec.amount_subtotal_vnd > 0:
                 rec.amount_total_vnd += rec.amount_subtotal_vnd
 
+    @api.depends('order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):
         for rec in self:
             if rec.order_id and rec.order_id.invoice_ids:
                 for invoice in rec.order_id.invoice_ids:
                     rec.payment_state = invoice.payment_state
                     rec.invoice_date = invoice.invoice_date
+                    if invoice.payment_state == 'paid':
+                        break
             else:
                 rec.payment_state = 'not_paid'
                 rec.invoice_date = None

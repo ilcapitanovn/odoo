@@ -1,0 +1,142 @@
+* {
+    font-size: 13px;
+}
+h2 {
+    font-weight: 600;
+    font-size: 22px;
+}
+#quote_content {
+    background-color: white;
+    font-weight: 500;
+    font-family: Serif;
+}
+#header {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 50px;
+    height: 100px;
+}
+.header-left {
+    float: left;
+    width: 20%;
+}
+.header-right {
+    float: right;
+    width: 80%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+.company-logo {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+#introduction {
+    text-align: center;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+#do_number {
+    display: flex;
+    display: -webkit-box; /* wkhtmltopdf uses this one */
+    justify-content: flex-end;
+    -webkit-box-pack: end; /* wkhtmltopdf uses this one */
+}
+
+#address-table td {
+    border: none;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+}
+#address-table td:nth-child(odd) {
+    width: 15%;
+}
+#address-table .address-content {
+    padding-left: 20px;
+}
+
+#do-table {
+    margin-left: 40px;
+}
+#do-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: none;
+    vertical-align: middle;
+}
+#do-table td:nth-child(odd) {
+    font-weight: bold;
+    width: 18%;
+}
+#do-table td:nth-child(even) {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#order-table {
+    margin-top: 40px;
+}
+
+#order-table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: 2px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+#order-table td {
+
+    margin: 0 !important;
+    border: 2px solid black;
+    text-align: center;
+    vertical-align: middle;
+    height: 120px;
+}
+
+#note {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    height: 60px;
+}
+.note-left {
+    float: left;
+    width: 10%;
+    padding-top: 10px;
+}
+.note-right {
+    float: right;
+    width: 90%;
+}
+
+#notice-count {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    height: 80px;
+    float: right;
+}
+
+#sign-table {
+    margin-top: 10px;
+}
+#sign-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: none;
+}
+#sign-table td:nth-child(odd) {
+    text-align: right;
+}
+#sign-table td:nth-child(even) {
+    text-align: left;
+    padding-left: 0 !important;
+}
+
+#for-behalf {
+    float: right;
+    text-align: center;
+}

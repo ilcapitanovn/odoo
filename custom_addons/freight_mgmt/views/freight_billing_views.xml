@@ -155,23 +155,31 @@
                                 <group col="2">
                                     <group>
                                         <field name="shipper_id" />
+                                        <field name="shipper_name" invisible="1" />
+                                        <field name="shipper_email" invisible="1" />
                                         <field name="shipper_address" />
                                         <field name="shipper_extra_info" />
 
                                         <separator colspan="2"/>
 
                                         <field name="consignee_id" />
+                                        <field name="consignee_name" invisible="1" />
+                                        <field name="consignee_email" invisible="1" />
                                         <field name="consignee_address" />
                                         <field name="consignee_extra_info" />
                                     </group>
                                     <group>
                                         <field name="party_id" />
+                                        <field name="party_name" invisible="1" />
+                                        <field name="party_email" invisible="1" />
                                         <field name="party_address" />
                                         <field name="party_extra_info" />
 
                                         <separator colspan="2"/>
 
                                         <field name="contact_id" />
+                                        <field name="contact_name" invisible="1" />
+                                        <field name="contact_email" invisible="1" />
                                         <field name="contact_address" />
                                         <field name="contact_extra_info" />
                                     </group>
