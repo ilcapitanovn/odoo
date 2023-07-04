@@ -96,6 +96,9 @@ h2 {
     vertical-align: middle;
     height: 120px;
 }
+#order-table td:nth-child(1) {
+    white-space: nowrap;
+}
 
 #note {
     padding-top: 0 !important;

@@ -37,7 +37,8 @@ class SaleOrder(models.Model):
         Update purchase price by the latest price unit from purchase order line if there is different
         so that recalculate profit will get the latest values
         '''
-        related_purchase_orders = self._get_purchase_orders()
+        # related_purchase_orders = self._get_purchase_orders()
+        related_purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.name)])
         if related_purchase_orders:
             for so_line in self.order_line:
                 for po in related_purchase_orders:

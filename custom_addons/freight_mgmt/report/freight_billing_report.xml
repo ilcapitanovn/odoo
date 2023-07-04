@@ -281,6 +281,8 @@
                 <t t-set="pol" t-value="doc.pol"/>
                 <t t-set="pod" t-value="doc.pod"/>
                 <t t-set="etd" t-value="doc.etd_formatted"/>
+                <t t-set="eta" t-value="doc.eta"/>
+                <t t-set="shipment_type" t-value="doc.shipment_type"/>
                 <t t-set="volume" t-value="doc.volume"/>
                 <t t-set="amount_subtotal_vnd" t-value="doc.amount_subtotal_vnd"/>
                 <t t-set="amount_vnd" t-value="doc.amount_total_vnd"/>
@@ -346,10 +348,18 @@
                         <td>POD</td>
                         <td><span t-esc="pod"/></td>
                       </tr>
+                    <t t-if="shipment_type in ('fcl-imp','lcl-imp','air-imp')">
+                      <tr>
+                        <td>ETA</td>
+                        <td><span t-esc="context_timestamp(eta).strftime('%d-%B-%Y')"/></td>
+                      </tr>
+                    </t>
+                    <t t-else="">
                       <tr>
                         <td>ETD</td>
                         <td><span t-esc="etd"/></td>
                       </tr>
+                    </t>
                       <tr>
                         <td>VOLUME</td>
                         <td><span t-esc="volume"/></td>
@@ -436,7 +446,7 @@
                       </tr>
                     </table>
 
-                    <div id="remark">Remark: only collect freight by T/T, If there is any payment by cash, invoice will be added 10% VAT, pls note!</div>
+                    <div id="remark">Remark: only collect freight by T/T, If there is any payment by cash, invoice will be added 8% VAT, pls note!</div>
                 </div>
                 </t>
             </div>

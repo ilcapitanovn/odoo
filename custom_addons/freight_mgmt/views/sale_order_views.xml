@@ -147,6 +147,19 @@
        <field name="act_window_id" ref="freight_orders_to_booking_action"/>
     </record>
 
+    <record id="freight_import_sale_order_to_bookings_action_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="14"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="freight_sale_order_to_bookings_view_tree"/>
+        <field name="act_window_id" ref="freight_import_orders_to_booking_action"/>
+    </record>
+    <record id="freight_import_sale_order_to_bookings_action_form" model="ir.actions.act_window.view">
+       <field name="sequence" eval="15"/>
+       <field name="view_mode">form</field>
+       <field name="view_id" ref="freight_sale_order_to_bookings_view_form"/>
+       <field name="act_window_id" ref="freight_import_orders_to_booking_action"/>
+    </record>
+
 <!--    <record id="freight_action_create_bookings" model="ir.actions.act_window">-->
 <!--        <field name="name">Create bookings</field>-->
 <!--        <field name="type">ir.actions.act_window</field>-->

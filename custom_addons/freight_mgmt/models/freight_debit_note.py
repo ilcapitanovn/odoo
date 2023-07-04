@@ -83,6 +83,19 @@ class FreightDebitNote(models.Model):
     invoice_status = fields.Selection(related="order_id.invoice_status", string="Invoice Status", store=True)
     sale_state = fields.Selection(related="order_id.state", string="Sale Order State", store=True)
 
+    vessel_id = fields.Many2one(related="booking_id.vessel_id", string="Ocean vessel", readonly=True, store=False)
+    shipment_type = fields.Selection(related="booking_id.shipment_type", string="Shipment Type", store=False,
+                                     readonly=True, help='Type of Shipment')
+    arrival_notice_count = fields.Integer(related="booking_id.arrival_notice_count", string="Arrival Notice Count",
+                                          tracking=True, store=True, readonly=False, default=1)
+    demurrage_time = fields.Datetime(related="booking_id.demurrage_time", string="Demurrage (DEM)",
+                                     tracking=True, store=True, readonly=False)
+    detention_days = fields.Integer(related="booking_id.detention_days", string="Detention (DET)",
+                                    tracking=True, store=True, readonly=False, default=7)
+    storage_time = fields.Datetime(related="booking_id.storage_time", string="Storage Time",
+                                   tracking=True, store=True, readonly=False)
+    eta = fields.Datetime(related="booking_id.eta", string="ETA", tracking=True, store=True, readonly=False)
+
     pol = fields.Char(related="bill_id.port_loading_id.name", string="POL", readonly=True, store=False)
     pod = fields.Char(related="bill_id.port_discharge_id.name", string="POD", readonly=True, store=False)
     etd = fields.Datetime(related="booking_id.etd_revised", string="ETD", readonly=True, store=False)

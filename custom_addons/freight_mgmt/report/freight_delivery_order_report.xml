@@ -12,17 +12,17 @@
         <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_delivery_order"/>
     </record>
 
-    <record id="freight_arrival_notice_report" model="ir.actions.report">
-        <field name="name">Arrival Notice</field>
-        <field name="model">freight.billing</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">freight_mgmt.report_print_arrival_notice_template</field>
-        <field name="report_file">freight_mgmt.report_print_arrival_notice_template</field>
-        <field name="print_report_name">'Arrival Notice - %s' % (object.name).replace('/', '')</field>
-        <field name="binding_model_id" ref="model_freight_billing"/>
-        <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_delivery_order"/>
-    </record>
+<!--    <record id="freight_arrival_notice_report" model="ir.actions.report">-->
+<!--        <field name="name">Arrival Notice</field>-->
+<!--        <field name="model">freight.billing</field>-->
+<!--        <field name="report_type">qweb-pdf</field>-->
+<!--        <field name="report_name">freight_mgmt.report_print_arrival_notice_template</field>-->
+<!--        <field name="report_file">freight_mgmt.report_print_arrival_notice_template</field>-->
+<!--        <field name="print_report_name">'Arrival Notice - %s' % (object.name).replace('/', '')</field>-->
+<!--        <field name="binding_model_id" ref="model_freight_billing"/>-->
+<!--        <field name="binding_type">report</field>-->
+<!--        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_delivery_order"/>-->
+<!--    </record>-->
 
     <template id="report_print_delivery_order_template">
         <t t-call="web.basic_layout">
@@ -31,17 +31,18 @@
 
                 <t t-foreach="docs" t-as="doc">
 
-                <t t-set="consignee_name" t-value="doc.consignee_name"/>
                 <t t-set="contact_name" t-value="doc.contact_name"/>
-                <t t-set="contact_address" t-value="doc.contact_address"/>
+                <t t-set="consignee_name" t-value="doc.consignee_name"/>
+                <t t-set="consignee_address" t-value="doc.consignee_address"/>
                 <t t-set="vessel_voy" t-value="doc.vessel_id.name"/>
                 <t t-set="etd" t-value="doc.etd_formatted"/>
+                <t t-set="eta" t-value="doc.eta"/>
                 <t t-set="pol" t-value="doc.port_loading_text"/>
                 <t t-set="pod" t-value="doc.port_discharge_text"/>
                 <t t-set="mbl" t-value="doc.vessel_booking_number"/>
                 <t t-set="hbl" t-value="doc.vessel_bol_number"/>
 
-                <t t-set="do_number" t-value="doc.booking_id.number + '-DO'"/>
+                <t t-set="do_number" t-value="doc.do_number"/>
 
                 <div id="quote_content" class="col-12 col-lg justify-content-end">
                     <div id="header">
@@ -67,18 +68,18 @@
                     <table class="table no-spacing" id="address-table">
                       <tr>
                         <td>Kính gửi:</td>
-                        <td><b><span t-esc="consignee_name"/><br/>CÁC CƠ QUAN HỮU QUAN</b></td>
+                        <td><b><span t-esc="contact_name"/><br/>CÁC CƠ QUAN HỮU QUAN</b></td>
                       </tr>
                       <tr>
                         <td colspan="2">Công ty VIET TOAN JSC trân trọng yêu cầu Quý cơ quan giao lô hàng cho</td>
                       </tr>
                       <tr>
                         <td>Người nhận:</td>
-                        <td><b><span t-esc="contact_name"/></b></td>
+                        <td><b><span t-esc="consignee_name"/></b></td>
                       </tr>
                       <tr>
                         <td></td>
-                        <td>ADD: <span class="address-content" t-esc="contact_address"/></td>
+                        <td>ADD: <span class="address-content" t-esc="consignee_address"/></td>
                       </tr>
                     </table>
 
@@ -87,7 +88,11 @@
                           <td width="15%" >Tàu/ Chuyến:<br/>(Vsl/ Voy.)</td>
                           <td><span t-esc="vessel_voy"/></td>
                           <td width="15%">Đến ngày:<br/>(Date of Arrival)</td>
-                          <td><span t-esc="etd"/></td>
+                          <td>
+                              <t t-if="eta">
+                                  <span t-esc="context_timestamp(eta).strftime('%B %d, %Y')"/>
+                              </t>
+                          </td>
                       </tr>
                       <tr>
                           <td>Từ cảng xếp:<br/>(POL)</td>
@@ -105,7 +110,7 @@
 
                     <table class="table no-spacing" id="order-table">
                       <tr>
-                        <th width="35%">SỐ CONTAINER/ SEAL/ KÝ MÃ HIỆU <br/> <i>CONT./ SEAL NO./ MARKS</i></th>
+                        <th width="35%">SỐ CONTAINER/ SEAL <br/> <i>CONT./ SEAL NO.</i></th>
                         <th width="17%">SỐ LƯỢNG <br/> <i>QUANTITY</i></th>
                         <th width="23%">MÔ TẢ HÀNG HÓA <br/> <i>DESCRIPTION</i></th>
                         <th width="25%">TRỌNG LƯỢNG <br/> <i>WEIGHT/ MEASURE</i></th>
@@ -130,9 +135,9 @@
                             <t t-set="total_weight" t-value="total_weight + line.gross_weight"/>
                             <t t-set="total_measure" t-value="total_measure + line.measurement_cbm"/>
                         </t>
-                        <t t-if="doc.shipping_mark">
-                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / ' + doc.shipping_mark"/>
-                        </t>
+<!--                        <t t-if="doc.shipping_mark">-->
+<!--                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / ' + doc.shipping_mark"/>-->
+<!--                        </t>-->
 
                         <tr>
                             <td><span t-raw="mark_seal_nos"/></td>
@@ -174,151 +179,148 @@
         </t>
     </template>
 
-    <template id="report_print_arrival_notice_template">
-        <t t-call="web.basic_layout">
-            <div class="page">
-                <link rel="stylesheet" href="/freight_mgmt/static/src/css/delivery_order.css"/>
+<!--    <template id="report_print_arrival_notice_template">-->
+<!--        <t t-call="web.basic_layout">-->
+<!--            <div class="page">-->
+<!--                <link rel="stylesheet" href="/freight_mgmt/static/src/css/delivery_order.css"/>-->
 
-                <t t-foreach="docs" t-as="doc">
+<!--                <t t-foreach="docs" t-as="doc">-->
 
-                <t t-set="consignee_name" t-value="doc.consignee_name"/>
-                <t t-set="contact_name" t-value="doc.contact_name"/>
-                <t t-set="contact_address" t-value="doc.contact_address"/>
-                <t t-set="vessel_voy" t-value="doc.vessel_id.name"/>
-                <t t-set="etd" t-value="doc.etd_formatted"/>
-                <t t-set="pol" t-value="doc.port_loading_text"/>
-                <t t-set="pod" t-value="doc.port_discharge_text"/>
-                <t t-set="mbl" t-value="doc.vessel_booking_number"/>
-                <t t-set="hbl" t-value="doc.vessel_bol_number"/>
-                    <t t-set="notice_count" t-value="doc.booking_id.arrival_notice_count"/>
-                    <t t-set="dem" t-value="doc.booking_id.demurrage_time"/>
-                    <t t-set="det" t-value="doc.booking_id.detention_days"/>
+<!--                <t t-set="consignee_name" t-value="doc.consignee_name"/>-->
+<!--                <t t-set="consignee_address" t-value="doc.consignee_address"/>-->
+<!--                <t t-set="vessel_voy" t-value="doc.vessel_id.name"/>-->
+<!--                <t t-set="etd" t-value="doc.etd_formatted"/>-->
+<!--                <t t-set="pol" t-value="doc.port_loading_text"/>-->
+<!--                <t t-set="pod" t-value="doc.port_discharge_text"/>-->
+<!--                <t t-set="mbl" t-value="doc.vessel_booking_number"/>-->
+<!--                <t t-set="hbl" t-value="doc.vessel_bol_number"/>-->
+<!--                <t t-set="notice_count" t-value="doc.booking_id.arrival_notice_count"/>-->
+<!--                <t t-set="dem" t-value="doc.booking_id.demurrage_time"/>-->
+<!--                <t t-set="det" t-value="doc.booking_id.detention_days"/>-->
 
-                <t t-set="do_number" t-value="doc.booking_id.number + '-DO'"/>
+<!--                <div id="quote_content" class="col-12 col-lg justify-content-end">-->
+<!--                    <div id="header">-->
+<!--                        <div class="header-left">-->
+<!--                            <img t-att-src="'freight_mgmt/static/img/logo.jpg'" class="company-logo" alt="Logo"/>-->
+<!--                        </div>-->
+<!--                        <div class="header-right">-->
+<!--                            CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>-->
+<!--                            VIET TOAN JOINT STOCK COMPANY <br/>-->
+<!--                            684/28A Tran Hung Dao, Ward 2, District 5, Ho Chi Minh, Vietnam <br/>-->
+<!--                            Tel: (84) 28 38384168 MST: 0314859219-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                <div id="quote_content" class="col-12 col-lg justify-content-end">
-                    <div id="header">
-                        <div class="header-left">
-                            <img t-att-src="'freight_mgmt/static/img/logo.jpg'" class="company-logo" alt="Logo"/>
-                        </div>
-                        <div class="header-right">
-                            CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>
-                            VIET TOAN JOINT STOCK COMPANY <br/>
-                            684/28A Tran Hung Dao, Ward 2, District 5, Ho Chi Minh, Vietnam <br/>
-                            Tel: (84) 28 38384168 MST: 0314859219
-                        </div>
-                    </div>
+<!--                    <div id="introduction" t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}">-->
+<!--                        <h2>GIẤY BÁO HÀNG ĐẾN</h2>-->
+<!--                        <i><h2>ARRIVAL NOTICE</h2></i>-->
+<!--                        <div id="notice-count">-->
+<!--                            <table class="table no-spacing" id="sign-table">-->
+<!--                              <tr>-->
+<!--                                <td>Thông báo lần:</td>-->
+<!--                                <td><b><span t-esc="notice_count"/></b></td>-->
+<!--                              </tr>-->
+<!--                              <tr>-->
+<!--                                <td>Ngày:</td>-->
+<!--                                <td><b><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/></b></td>-->
+<!--                              </tr>-->
+<!--                            </table>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div id="introduction" t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}">
-                        <h2>GIẤY BÁO HÀNG ĐẾN</h2>
-                        <i><h2>ARRIVAL NOTICE</h2></i>
-                        <div id="notice-count">
-                            <table class="table no-spacing" id="sign-table">
-                              <tr>
-                                <td>Thông báo lần:</td>
-                                <td><b><span t-esc="notice_count"/></b></td>
-                              </tr>
-                              <tr>
-                                <td>Ngày:</td>
-                                <td><b><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/></b></td>
-                              </tr>
-                            </table>
-                        </div>
-                    </div>
+<!--                    <table class="table no-spacing" id="address-table">-->
+<!--                      <tr>-->
+<!--                        <td width="10%">Kính gửi:</td>-->
+<!--                        <td><b><span t-esc="consignee_name"/></b></td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                        <td></td>-->
+<!--                        <td>ADD: <span class="address-content" t-esc="consignee_address"/></td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                        <td></td>-->
+<!--                        <td>IMPORT DEPT.:</td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                        <td></td>-->
+<!--                        <td>Chúng tôi xin Thông báo lô hàng của Quý khách với chi tiết như sau: <br/>-->
+<!--                            <i>Please be informed that you have incoming due to arrival by the below mentioned vessel on:</i>-->
+<!--                        </td>-->
+<!--                      </tr>-->
+<!--                    </table>-->
 
-                    <table class="table no-spacing" id="address-table">
-                      <tr>
-                        <td width="10%">Kính gửi:</td>
-                        <td><b><span t-esc="contact_name"/></b></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>ADD: <span class="address-content" t-esc="contact_address"/></td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>IMPORT DEPT.:</td>
-                      </tr>
-                      <tr>
-                        <td></td>
-                        <td>Chúng tôi xin Thông báo lô hàng của Quý khách với chi tiết như sau: <br/>
-                            <i>Please be informed that you have incoming due to arrival by the below mentioned vessel on:</i>
-                        </td>
-                      </tr>
-                    </table>
+<!--                    <table class="table no-spacing" id="do-table">-->
+<!--                      <tr>-->
+<!--                          <td width="15%" >Tàu/ Chuyến:<br/>(Vsl/ Voy.)</td>-->
+<!--                          <td><span t-esc="vessel_voy"/></td>-->
+<!--                          <td width="18%">Dự kiến đến ngày:<br/>(Date of Arrival)</td>-->
+<!--                          <td><span t-esc="etd"/></td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                          <td>Từ cảng xếp:<br/>(POL)</td>-->
+<!--                          <td><span t-esc="pol"/></td>-->
+<!--                          <td>Cảng dỡ hàng:<br/>(POD)</td>-->
+<!--                          <td><span t-esc="pod"/></td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                          <td></td>-->
+<!--                          <td></td>-->
+<!--                          <td>Vận đơn:<br/>(HBL)</td>-->
+<!--                          <td><span t-esc="hbl"/></td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                          <td colspan="4">Free Demurrage (DEM):-->
+<!--                              <t t-if="dem">-->
+<!--                                  <span t-esc="context_timestamp(dem).strftime('%B %d, %Y')"/>-->
+<!--                              </t>-->
+<!--                          </td>-->
+<!--                      </tr>-->
+<!--                      <tr>-->
+<!--                          <td colspan="4">Free Detention (DET): <span t-esc="det"/> DAYS</td>-->
+<!--                      </tr>-->
+<!--                    </table>-->
 
-                    <table class="table no-spacing" id="do-table">
-                      <tr>
-                          <td width="15%" >Tàu/ Chuyến:<br/>(Vsl/ Voy.)</td>
-                          <td><span t-esc="vessel_voy"/></td>
-                          <td width="18%">Dự kiến đến ngày:<br/>(Date of Arrival)</td>
-                          <td><span t-esc="etd"/></td>
-                      </tr>
-                      <tr>
-                          <td>Từ cảng xếp:<br/>(POL)</td>
-                          <td><span t-esc="pol"/></td>
-                          <td>Cảng dỡ hàng:<br/>(POD)</td>
-                          <td><span t-esc="pod"/></td>
-                      </tr>
-                      <tr>
-                          <td></td>
-                          <td></td>
-                          <td>Vận đơn:<br/>(HBL)</td>
-                          <td><span t-esc="hbl"/></td>
-                      </tr>
-                      <tr>
-                          <td colspan="4">Free Demurrage (DEM):
-                              <t t-if="dem">
-                                  <span t-esc="context_timestamp(dem).strftime('%B %d, %Y')"/>
-                              </t>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td colspan="4">Free Detention (DET): <span t-esc="det"/> DAYS</td>
-                      </tr>
-                    </table>
+<!--                    <table class="table no-spacing" id="order-table">-->
+<!--                      <tr>-->
+<!--                        <th width="35%">SỐ CONTAINER/ SEAL/ KÝ MÃ HIỆU <br/> <i>CONT./ SEAL NO./ MARKS</i></th>-->
+<!--                        <th width="17%">SỐ LƯỢNG <br/> <i>QUANTITY</i></th>-->
+<!--                        <th width="23%">MÔ TẢ HÀNG HÓA <br/> <i>DESCRIPTION</i></th>-->
+<!--                        <th width="25%">TRỌNG LƯỢNG <br/> <i>WEIGHT/ MEASURE</i></th>-->
+<!--                      </tr>-->
 
-                    <table class="table no-spacing" id="order-table">
-                      <tr>
-                        <th width="35%">SỐ CONTAINER/ SEAL/ KÝ MÃ HIỆU <br/> <i>CONT./ SEAL NO./ MARKS</i></th>
-                        <th width="17%">SỐ LƯỢNG <br/> <i>QUANTITY</i></th>
-                        <th width="23%">MÔ TẢ HÀNG HÓA <br/> <i>DESCRIPTION</i></th>
-                        <th width="25%">TRỌNG LƯỢNG <br/> <i>WEIGHT/ MEASURE</i></th>
-                      </tr>
+<!--                        <t t-set="mark_seal_nos" t-value="''"/>-->
+<!--                        <t t-set="description" t-value="'DETAIL AS PER &lt;br/&gt; BILL OF LADING'"/>-->
+<!--                        <t t-set="total_weight" t-value="0.0"/>-->
+<!--                        <t t-set="total_measure" t-value="0.0"/>-->
+<!--                        <t t-set="total_pkgs_dict" t-value="{}"/>-->
+<!--                        <t t-foreach="doc.billing_line" t-as="line">-->
+<!--                            <t t-if="line.container_no or line.seal_nos">-->
+<!--                                <t t-if="line.container_no">-->
+<!--                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.container_no"/>-->
+<!--                                </t>-->
+<!--                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / '"/>-->
+<!--                                <t t-if="line.seal_nos">-->
+<!--                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos"/>-->
+<!--                                </t>-->
+<!--                            </t>-->
+<!--                            <t t-set="total_pkgs_dict" t-value="doc.update_delivery_order_total_pkgs_dict(total_pkgs_dict, line.product_uom.display_name, line.packages_number)"/>-->
+<!--                            <t t-set="total_weight" t-value="total_weight + line.gross_weight"/>-->
+<!--                            <t t-set="total_measure" t-value="total_measure + line.measurement_cbm"/>-->
+<!--                        </t>-->
+<!--                        <t t-if="doc.shipping_mark">-->
+<!--                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / ' + doc.shipping_mark"/>-->
+<!--                        </t>-->
 
-                        <t t-set="mark_seal_nos" t-value="''"/>
-                        <t t-set="description" t-value="'DETAIL AS PER &lt;br/&gt; BILL OF LADING'"/>
-                        <t t-set="total_weight" t-value="0.0"/>
-                        <t t-set="total_measure" t-value="0.0"/>
-                        <t t-set="total_pkgs_dict" t-value="{}"/>
-                        <t t-foreach="doc.billing_line" t-as="line">
-                            <t t-if="line.container_no or line.seal_nos">
-                                <t t-if="line.container_no">
-                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.container_no"/>
-                                </t>
-                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / '"/>
-                                <t t-if="line.seal_nos">
-                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos"/>
-                                </t>
-                            </t>
-                            <t t-set="total_pkgs_dict" t-value="doc.update_delivery_order_total_pkgs_dict(total_pkgs_dict, line.product_uom.display_name, line.packages_number)"/>
-                            <t t-set="total_weight" t-value="total_weight + line.gross_weight"/>
-                            <t t-set="total_measure" t-value="total_measure + line.measurement_cbm"/>
-                        </t>
-                        <t t-if="doc.shipping_mark">
-                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / ' + doc.shipping_mark"/>
-                        </t>
-
-                        <tr>
-                            <td><span t-raw="mark_seal_nos"/></td>
-                            <td><span t-raw="doc.generate_delivery_order_no_of_pkgs(total_pkgs_dict)"/></td>
-                            <td><span t-raw="description"/></td>
-                            <td><span t-esc="'{:,.2f} '.format(total_weight)"/>KGS<br/><span t-esc="'{:,.2f} '.format(total_measure)"/>CBM</td>
-                        </tr>
-                    </table>
-                </div>
-                </t>
-            </div>
-        </t>
-    </template>
+<!--                        <tr>-->
+<!--                            <td><span t-raw="mark_seal_nos"/></td>-->
+<!--                            <td><span t-raw="doc.generate_delivery_order_no_of_pkgs(total_pkgs_dict)"/></td>-->
+<!--                            <td><span t-raw="description"/></td>-->
+<!--                            <td><span t-esc="'{:,.2f} '.format(total_weight)"/>KGS<br/><span t-esc="'{:,.2f} '.format(total_measure)"/>CBM</td>-->
+<!--                        </tr>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--                </t>-->
+<!--            </div>-->
+<!--        </t>-->
+<!--    </template>-->
 </odoo>

@@ -119,6 +119,9 @@ class FreightBilling(models.Model):
     # )
     vessel_id = fields.Many2one(related="booking_id.vessel_id", string="Ocean vessel",
                                 readonly=True, store=False)
+    shipment_type = fields.Selection(related="booking_id.shipment_type", string="Shipment Type", store=False,
+                                     readonly=True, help='Type of Shipment')
+    eta = fields.Datetime(related="booking_id.eta", string="ETA", store=False, readonly=True)
     port_loading_text = fields.Char(string="Port of loading text")
     port_discharge_text = fields.Char(string="Port of discharge text")
     pre_carriage = fields.Char(string="Pre-carriage by")
@@ -145,6 +148,9 @@ class FreightBilling(models.Model):
     credit_count = fields.Integer("Credit Count", compute='_compute_credit_count')
 
     etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
+    do_number_ref = fields.Char(related="booking_id.number", string="DO No. Ref", store=False, readonly=True)
+    do_number = fields.Char(compute="_compute_delivery_order_number", string="DO Number",
+                            readonly=False, tracking=True, store=True)
 
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -462,6 +468,11 @@ class FreightBilling(models.Model):
             bill.credit_count = self.env['freight.credit.note'].search_count([
                 ('bill_id', '=', bill.id)
             ])
+
+    @api.depends('do_number_ref')
+    def _compute_delivery_order_number(self):
+        for rec in self:
+            rec.do_number = rec.do_number_ref + "-DO"
 
     @api.depends('booking_id.etd_revised')
     def _compute_format_etd(self):

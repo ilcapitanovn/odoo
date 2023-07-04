@@ -35,7 +35,7 @@ class FreightBooking(models.Model):
     vessel_bol_no = fields.Char(string="B/L Number", related="billing_id.vessel_bol_number", readonly=True)
 
     partner_id = fields.Many2one(comodel_name="res.partner",
-                                 string="Customer", readonly=True)
+                                 string="Customer", tracking=True)
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
 
@@ -97,27 +97,27 @@ class FreightBooking(models.Model):
     port_discharge_id = fields.Many2one(
         comodel_name="freight.catalog.port", string="Discharge Port", tracking=True, index=True
     )
-    place_of_delivery = fields.Char(string="Destination")
+    place_of_delivery = fields.Char(string="Destination", tracking=True)
     vessel_id = fields.Many2one(
         comodel_name="freight.catalog.vessel", string="Line", tracking=True, index=True
     )
-    shipping_line = fields.Char(string="Shipping Line")     # TODO: Possible duplicate with vessel_id, need to check
-    ro = fields.Char(string="R.O.")
-    commodity = fields.Char(string="Commodity")
-    quantity = fields.Integer(string="Quantity")    # TODO: Should delete this field since it's replaced by o2m
-    temperature = fields.Char(string="Temperature (C)")
-    ventilation = fields.Char(string="Ventilation (CBM/H)")
-    voyage_number = fields.Char(string="Voyage No.")
-    gross_weight = fields.Float(string='Gross Weight (KGS)')
-    etd = fields.Datetime(string="Original ETD", store=True)
+    shipping_line = fields.Char(string="Shipping Line", tracking=True)     # TODO: Possible duplicate with vessel_id, need to check
+    ro = fields.Char(string="R.O.", tracking=True)
+    commodity = fields.Char(string="Commodity", tracking=True)
+    quantity = fields.Integer(string="Quantity", tracking=True)    # TODO: Should delete this field since it's replaced by o2m
+    temperature = fields.Char(string="Temperature (C)", tracking=True)
+    ventilation = fields.Char(string="Ventilation (CBM/H)", tracking=True)
+    voyage_number = fields.Char(string="Voyage No.", tracking=True)
+    gross_weight = fields.Float(string='Gross Weight (KGS)', tracking=True)
+    etd = fields.Datetime(string="Original ETD", tracking=True, store=True)
     etd_revised = fields.Datetime(string="Revised ETD", tracking=True, store=True)
-    eta = fields.Datetime(string="Est. Time Arrival", store=True)
+    eta = fields.Datetime(string="Est. Time Arrival", tracking=True, store=True)
 
     last_stage_update = fields.Datetime(default=fields.Datetime.now)
-    closing_time = fields.Datetime(string="SI Cut Off Time", store=True)
-    issued_date = fields.Datetime(string="Issued Date", store=True)
-    approved_date = fields.Datetime(string="Confirmed Date", store=True)
-    completed_date = fields.Datetime(string="Completed Date", store=True)
+    closing_time = fields.Datetime(string="SI Cut Off Time", tracking=True, store=True)
+    issued_date = fields.Datetime(string="Issued Date", tracking=True, store=True)
+    approved_date = fields.Datetime(string="Confirmed Date", tracking=True, store=True)
+    completed_date = fields.Datetime(string="Completed Date", tracking=True, store=True)
     confirmed = fields.Boolean(related="stage_id.confirmed")
     completed = fields.Boolean(related="stage_id.completed")
     stage_name = fields.Char(related="stage_id.name", readonly=True, store=False)
@@ -125,6 +125,7 @@ class FreightBooking(models.Model):
     arrival_notice_count = fields.Integer(string="Arrival Notice Count", tracking=True, default=1)
     demurrage_time = fields.Datetime(string="Demurrage (DEM)", tracking=True)
     detention_days = fields.Integer(string="Detention (DET)", tracking=True, default=7)
+    storage_time = fields.Datetime(string="Storage Time", tracking=True)
 
     company_id = fields.Many2one(
         comodel_name="res.company",

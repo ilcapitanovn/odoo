@@ -87,6 +87,7 @@
                         <field name="active" invisible="1" />
                         <field name="partner_id" invisible="1" />
                         <field name="related_order_id" invisible="1" />
+                        <field name="shipment_type" invisible="1" />
                         <field
                             name="company_id"
                             options="{'no_create': True}"
@@ -197,6 +198,30 @@
                 </div>
             </form>
         </field>
+    </record>
+    <record id="freight_debit_note_view_form_inherited" model="ir.ui.view">
+            <field name="name">freight.debit.note.view.form.inherited</field>
+            <field name="model">freight.debit.note</field>
+            <field name="inherit_id" ref="freight_mgmt.freight_debit_note_view_form"/>
+            <field name="arch" type="xml">
+                <page name="bank_information" position="after">
+                    <page name="an_information"
+                          string="Arrival Notice Information"
+                          attrs="{'invisible':[('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]}">
+                        <group colspan="2">
+                            <group>
+                                <field name="arrival_notice_count" />
+                                <field name="demurrage_time" />
+                                <field name="detention_days" />
+                            </group>
+                            <group>
+                                <field name="eta" />
+                                <field name="storage_time" />
+                            </group>
+                        </group>
+                    </page>
+                </page>
+            </field>
     </record>
     <record id="freight_debit_note_view_tree" model="ir.ui.view">
         <field name="name">freight.debit.note.view.tree</field>

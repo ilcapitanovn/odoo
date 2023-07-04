@@ -103,6 +103,7 @@
                     </div>
                     <group name="main">
                         <field name="active" invisible="1" />
+                        <field name="shipment_type" invisible="1" />
                         <field
                             name="company_id"
                             options="{'no_create': True}"
@@ -125,6 +126,8 @@
                             <field name="vessel_bol_number" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
                             <field name="bill_date" />
                             <field name="due_date" />
+                            <field name="do_number"
+                                   attrs="{'invisible' : [('shipment_type', 'not in', ('fcl-imp','lcl-imp','air-imp'))]}" />
                         </group>
                     </group>
                     <group>
@@ -178,7 +181,8 @@
                                         <separator colspan="2"/>
 
                                         <field name="contact_id" />
-                                        <field name="contact_name" invisible="1" />
+                                        <field name="contact_name" string="Contact's Name"
+                                               help="Display name on delivery order printed." />
                                         <field name="contact_email" invisible="1" />
                                         <field name="contact_address" />
                                         <field name="contact_extra_info" />
