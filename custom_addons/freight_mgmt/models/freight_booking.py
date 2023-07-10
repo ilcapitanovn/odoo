@@ -19,7 +19,7 @@ class FreightBooking(models.Model):
         stage_ids = self.env["freight.catalog.stage"].search([])
         return stage_ids
 
-    number = fields.Char(string="SHPTMT Number", default="#", readonly=True, tracking=True, required=True)
+    number = fields.Char(string="SHPTMT Number", default="#", tracking=True, required=True)
     name = fields.Char(string="Title")
     description = fields.Char(translate=True)
 
@@ -143,6 +143,9 @@ class FreightBooking(models.Model):
         ],
     )
     active = fields.Boolean(default=True)
+
+    _sql_constraints = [('uniq_booking_number', 'unique(number)',
+                         'A booking number already exists with this name. Please choose another one!')]
 
     def name_get(self):
         res = []
@@ -340,7 +343,18 @@ class FreightBooking(models.Model):
     @api.model
     def create(self, vals):
         if vals.get("number", "#") == "#":
-            vals["number"] = self._prepare_freight_booking_shptmt_number(vals)
+            max_repeat = 10
+            count = 1
+            shipment_number = ''
+            while count <= max_repeat and not shipment_number:
+                shipment_number = self._prepare_freight_booking_shptmt_number(vals)
+                exist_record = self.search_count([('number', '=', shipment_number)])
+                if exist_record:
+                    shipment_number = ''
+                count += 1
+            if count > max_repeat and not shipment_number:
+                raise ValidationError(_('A booking number already exists with this name. Please choose another one!'))
+            vals["number"] = shipment_number
         return super().create(vals)
 
     def copy(self, default=None):
@@ -368,7 +382,7 @@ class FreightBooking(models.Model):
             if vals.get("etd_revised"):
                 current_date = fields.Datetime.context_timestamp(self, booking.etd_revised) if booking.etd_revised else False
                 new_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(vals['etd_revised']))
-                if current_date and new_date and new_date.month != current_date.month or not current_date:
+                if current_date and new_date and new_date.month != current_date.month:
                     vals["number"] = self._prepare_freight_booking_shptmt_number(vals)
 
         return super().write(vals)
