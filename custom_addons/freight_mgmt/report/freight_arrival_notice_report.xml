@@ -29,8 +29,9 @@
                 <t t-set="mbl" t-value="doc.bill_id.vessel_booking_number"/>
                 <t t-set="hbl" t-value="doc.bill_id.vessel_bol_number"/>
                 <t t-set="notice_count" t-value="doc.arrival_notice_count"/>
-                <t t-set="dem" t-value="doc.demurrage_time"/>
+                <t t-set="dem" t-value="doc.demurrage_days"/>
                 <t t-set="det" t-value="doc.detention_days"/>
+                <t t-set="storage" t-value="doc.storage_days"/>
 
                 <div id="quote_content" class="col-12 col-lg justify-content-end">
                     <div id="header">
@@ -107,14 +108,18 @@
                           <td><span t-esc="hbl"/></td>
                       </tr>
                       <tr>
-                          <td colspan="4">Free Demurrage (DEM):
-                              <t t-if="dem">
-                                  <span t-esc="context_timestamp(dem).strftime('%B %d, %Y')"/>
-                              </t>
-                          </td>
+<!--                          <td colspan="4">Free Demurrage (DEM):-->
+<!--                              <t t-if="dem">-->
+<!--                                  <span t-esc="context_timestamp(dem).strftime('%B %d, %Y')"/>-->
+<!--                              </t>-->
+<!--                          </td>-->
+                          <td colspan="4">Free Demurrage (DEM): <span t-esc="dem"/> DAYS</td>
                       </tr>
                       <tr>
                           <td colspan="4">Free Detention (DET): <span t-esc="det"/> DAYS</td>
+                      </tr>
+                      <tr>
+                          <td colspan="4">Free Storage: <span t-esc="storage"/> DAYS</td>
                       </tr>
                     </table>
 

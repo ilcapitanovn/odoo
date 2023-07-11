@@ -211,12 +211,14 @@
                         <group colspan="2">
                             <group>
                                 <field name="arrival_notice_count" />
-                                <field name="demurrage_time" />
+                                <field name="demurrage_time" invisible="1" />
+                                <field name="demurrage_days" />
                                 <field name="detention_days" />
                             </group>
                             <group>
                                 <field name="eta" />
-                                <field name="storage_time" />
+                                <field name="storage_days" />
+                                <field name="storage_time" invisible="1" />
                             </group>
                         </group>
                     </page>

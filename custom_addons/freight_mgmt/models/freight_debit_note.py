@@ -89,11 +89,15 @@ class FreightDebitNote(models.Model):
     arrival_notice_count = fields.Integer(related="booking_id.arrival_notice_count", string="Arrival Notice Count",
                                           tracking=True, store=True, readonly=False, default=1)
     demurrage_time = fields.Datetime(related="booking_id.demurrage_time", string="Demurrage (DEM)",
-                                     tracking=True, store=True, readonly=False)
+                                     tracking=True, store=True, readonly=False)     # Deprecated, consider to delete
+    demurrage_days = fields.Integer(related="booking_id.demurrage_days", string="Demurrage (DEM)",
+                                    tracking=True, store=True, readonly=False, default=7)
     detention_days = fields.Integer(related="booking_id.detention_days", string="Detention (DET)",
                                     tracking=True, store=True, readonly=False, default=7)
+    storage_days = fields.Integer(related="booking_id.storage_days", string="Storage",
+                                  tracking=True, store=True, readonly=False, default=7)
     storage_time = fields.Datetime(related="booking_id.storage_time", string="Storage Time",
-                                   tracking=True, store=True, readonly=False)
+                                   tracking=True, store=True, readonly=False)       # Deprecated, consider to delete
     eta = fields.Datetime(related="booking_id.eta", string="ETA", tracking=True, store=True, readonly=False)
 
     pol = fields.Char(related="bill_id.port_loading_id.name", string="POL", readonly=True, store=False)

@@ -123,9 +123,11 @@ class FreightBooking(models.Model):
     stage_name = fields.Char(related="stage_id.name", readonly=True, store=False)
 
     arrival_notice_count = fields.Integer(string="Arrival Notice Count", tracking=True, default=1)
-    demurrage_time = fields.Datetime(string="Demurrage (DEM)", tracking=True)
+    demurrage_time = fields.Datetime(string="Demurrage (DEM)", tracking=True)   # Deprecated, consider to delete
+    demurrage_days = fields.Integer(string="Demurrage (DEM)", tracking=True, default=7)
     detention_days = fields.Integer(string="Detention (DET)", tracking=True, default=7)
-    storage_time = fields.Datetime(string="Storage Time", tracking=True)
+    storage_days = fields.Integer(string="Storage", tracking=True, default=7)
+    storage_time = fields.Datetime(string="Storage Time", tracking=True)   # Deprecated, consider to delete
 
     company_id = fields.Many2one(
         comodel_name="res.company",
@@ -302,11 +304,6 @@ class FreightBooking(models.Model):
     def _onchange_original_etd(self):
         if self.etd and (not self.etd_revised or self.etd_revised < self.etd):
             self.etd_revised = self.etd
-
-    @api.onchange("etd_revised")
-    def _onchange_revised_etd(self):
-        if self.etd_revised:
-            self.demurrage_time = self.etd_revised + timedelta(days=7)
 
     @api.onchange("order_id")
     def _onchange_order_id(self):

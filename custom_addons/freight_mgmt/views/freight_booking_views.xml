@@ -230,7 +230,9 @@
                                     <group>
                                         <field name="arrival_notice_count" invisible="1" />
                                         <field name="demurrage_time" invisible="1" />
+                                        <field name="demurrage_days" invisible="1" />
                                         <field name="detention_days" invisible="1" />
+                                        <field name="storage_days" invisible="1" />
                                         <field name="storage_time" invisible="1" />
                                     </group>
                                 </group>
