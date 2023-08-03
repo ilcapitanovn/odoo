@@ -2,3 +2,4 @@
 
 from . import seenpo_hr_attendance_bio_log
 from . import hr_employee
+from . import hr_employee_public
