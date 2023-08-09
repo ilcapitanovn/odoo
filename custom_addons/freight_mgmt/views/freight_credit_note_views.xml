@@ -22,12 +22,24 @@
                         context="{'group_by':'team_id'}"
                     />
                     -->
-                    <filter
-                        string="User"
-                        name="group_user"
-                        domain="[]"
-                        context="{'group_by':'user_id'}"
-                    />
+<!--                    <filter-->
+<!--                        string="User"-->
+<!--                        name="group_user"-->
+<!--                        domain="[]"-->
+<!--                        context="{'group_by':'user_id'}"-->
+<!--                    />-->
+<!--                    <filter-->
+<!--                        string="Vendor"-->
+<!--                        name="group_vendor"-->
+<!--                        domain="[]"-->
+<!--                        context="{'group_by':'supplier_id'}"-->
+<!--                    />-->
+<!--                    <filter-->
+<!--                        string="Branch"-->
+<!--                        name="group_branch"-->
+<!--                        domain="[]"-->
+<!--                        context="{'group_by':'branch_id'}"-->
+<!--                    />-->
                 </group>
             </search>
         </field>
@@ -109,10 +121,23 @@
                         </group>
                         <group>
 <!--                                attrs="{'readonly': ['|', ('bill_id', '=', False), ('is_purchase_order_empty', '=', True)]}"-->
-                            <field name="purchase_order_id"
-                                   options="{'no_create': True, 'no_create_edit': True}"
-                                   attrs="{'readonly': ['|', ('bill_id', '=', False), ('state', 'in', ('completed','cancel'))]}"
-                            />
+<!--                            <field name="purchase_order_id"-->
+<!--                                   options="{'no_create': True, 'no_create_edit': True}"-->
+<!--                                   attrs="{'readonly': ['|', ('bill_id', '=', False), ('state', 'in', ('completed','cancel'))]}"-->
+<!--                            />-->
+                            <label for="purchase_order_id" />
+                            <div class="o_row">
+                                <field name="purchase_order_id"
+                                       options="{'no_create': True, 'no_create_edit': True}"
+                                       attrs="{'readonly': ['|', ('bill_id', '=', False), ('state', 'in', ('completed','cancel'))]}"
+                                />
+                                <button name="update_order_items" type="object"
+                                        string=" Refresh"
+                                        attrs="{'invisible': ['|', ('bill_id', '=', False), ('state', 'in', ('completed','cancel'))]}"
+                                        help="Reload order items"
+                                        class="btn-link mb-1 px-0" icon="fa-refresh"
+                                        confirm="This will update order items and re-calculate total amount." />
+                            </div>
                             <field name="sale_order_id" />
                             <field name="user_id" />
                             <field name="supplier_id"
@@ -164,11 +189,12 @@
                                 </field>
                                 <group name="note_group" class="mt-2 mt-md-0">
                                     <group class="oe_subtotal_footer oe_right mr-3" name="sale_total">
-                                        <field name="amount_total" string="Total (USD)" />
+                                        <field name="amount_total" string="Total (USD)"
+                                            attrs="{'invisible': [('amount_total', '=', 0)]}"/>
                                         <field name="amount_subtotal_vnd" string="Total (VND)"
                                             attrs="{'invisible': [('amount_subtotal_vnd', '=', 0)]}"/>
                                         <field name="amount_total_vnd" string="Total Amount (VND)"
-                                            attrs="{'invisible': [('exchange_rate', '=', 0)]}"/>
+                                            attrs="{'invisible': [('amount_subtotal_vnd', '=', 0)]}"/>
                                     </group>
                                     <div class="oe_clear"/>
                                 </group>
@@ -218,6 +244,7 @@
                 <field name="purchase_order_id" string="Purchase Order" decoration-info="1" optional="show" />
                 <field name="supplier_id" readonly="1" optional="show"/>
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
+                <field name="branch_id" optional="hide" />
                 <field name="credit_date" widget="date" optional="show" />
                 <field name="payment_term" optional="show" />
                 <field name="payment_state"

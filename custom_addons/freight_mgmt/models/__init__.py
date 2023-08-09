@@ -7,8 +7,15 @@ from . import freight_catalog_incoterm
 from . import freight_catalog_port
 from . import freight_catalog_stage
 from . import freight_catalog_vessel
+from . import hr_employee
+from . import hr_employee_public
 from . import res_partner
+from . import res_users
+from . import restrict_menu
 from . import sale_order
+from . import sale_order_line
+from . import purchase
+from . import purchase_order_line
 from . import freight_debit_note
 from . import freight_debit_note_item
 from . import freight_credit_note

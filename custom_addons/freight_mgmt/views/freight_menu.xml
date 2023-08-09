@@ -1,21 +1,21 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <odoo>
-    <!-- Actions -->
-    <record id="freight_booking_action" model="ir.actions.act_window">
-        <field name="name">Export - Bookings</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">freight.booking</field>
-        <field name="view_mode">tree,kanban,form,pivot</field>
-        <field name="context">{'shipment_type_suffix': 'exp'}</field>
-        <field name="domain">[('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
-    </record>
+    <!-- Export Menu - Actions -->
     <record id="freight_orders_to_booking_action" model="ir.actions.act_window">
         <field name="name">Export - Orders To Booking</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'create': False}</field>
-        <field name="domain">[('booking_status','=','to booking'),('order_shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_status','=','to booking'),('order_shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_booking_action" model="ir.actions.act_window">
+        <field name="name">Export - Bookings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.booking</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_billing_action" model="ir.actions.act_window">
         <field name="name">Export - Bills</field>
@@ -23,7 +23,7 @@
         <field name="res_model">freight.billing</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'exp'}</field>
-        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_debit_note_action" model="ir.actions.act_window">
         <field name="name">Export - Debit Notes</field>
@@ -31,7 +31,7 @@
         <field name="res_model">freight.debit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'exp'}</field>
-        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_credit_note_action" model="ir.actions.act_window">
         <field name="name">Export - Credit Notes</field>
@@ -39,7 +39,7 @@
         <field name="res_model">freight.credit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'exp'}</field>
-        <field name="domain">[('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
 
     <!-- Import Menu - Actions -->
@@ -49,7 +49,7 @@
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'create': False}</field>
-        <field name="domain">[('booking_status','=','to booking'),('order_shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_status','=','to booking'),('order_shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_import_booking_action" model="ir.actions.act_window">
         <field name="name">Import - Bookings</field>
@@ -57,7 +57,7 @@
         <field name="res_model">freight.booking</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'imp'}</field>
-        <field name="domain">[('shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_import_delivery_order_action" model="ir.actions.act_window">
         <field name="name">Import - Delivery Orders</field>
@@ -65,7 +65,7 @@
         <field name="res_model">freight.billing</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'imp'}</field>
-        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_import_debit_note_action" model="ir.actions.act_window">
         <field name="name">Import - Debit Notes</field>
@@ -73,7 +73,7 @@
         <field name="res_model">freight.debit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'imp'}</field>
-        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_import_credit_note_action" model="ir.actions.act_window">
         <field name="name">Import - Credit Notes</field>
@@ -81,7 +81,7 @@
         <field name="res_model">freight.credit.note</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
         <field name="context">{'shipment_type_suffix': 'imp'}</field>
-        <field name="domain">[('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
 
     <!--

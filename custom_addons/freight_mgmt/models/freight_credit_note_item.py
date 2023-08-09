@@ -31,6 +31,7 @@ class FreightCreditNoteItem(models.Model):
     price_total = fields.Monetary(string='Total', store=True)
 
     company_id = fields.Many2one(related='credit_id.company_id', string='Company', store=True, index=True)
+    branch_id = fields.Many2one(related="credit_id.branch_id", string='Branch')
 
     state = fields.Selection(
         related='credit_id.state', string='Debit Status', copy=False, store=True)

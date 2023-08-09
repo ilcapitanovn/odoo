@@ -19,6 +19,41 @@
                         </group>
                     </page>
                 </page>
+                <xpath expr="//field[@name='property_account_income_id']" position="after">
+                    <label for="exchange_rate" />
+                    <div class="o_row">
+                        <field name="exchange_rate" digits="[12,0]"/>
+                        <button name="update_exchange_rate" type="object"
+                                string=" Refresh"
+                                help="Recompute exchange rate"
+                                class="btn-link mb-1 px-0" icon="fa-refresh"
+                                confirm="This will update exchange and re-calculate price and cost in VND." />
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='uom_id']" position="before">
+                    <field name="vnd_currency_id" invisible="1" />
+                    <field name="product_currency_id" options="{'no_open': 1, 'no_create': 1, 'no_create_edit': 1}" />
+                </xpath>
+                <xpath expr="//label[@for='list_price']" position="attributes">
+                    <attribute name="string">Sales Price (USD)</attribute>
+                </xpath>
+                <xpath expr="//div[@name='pricing']" position="after">
+                    <label for="list_price_vnd" class="mt-1"/>
+                    <div name="pricing_vnd">
+                      <field name="list_price_vnd" class="oe_inline" widget='monetary'
+                        options="{'currency_field': 'vnd_currency_id'}" digits="[12,0]" />
+                    </div>
+                </xpath>
+                <xpath expr="//label[@for='standard_price']" position="attributes">
+                    <attribute name="string">Cost (USD)</attribute>
+                </xpath>
+                <xpath expr="//div[@name='standard_price_uom']" position="after">
+                    <label for="standard_price_vnd" class="mt-1"/>
+                    <div name="standard_pricing_vnd">
+                      <field name="standard_price_vnd" class="oe_inline" widget='monetary'
+                        options="{'currency_field': 'vnd_currency_id'}" digits="[12,0]" />
+                    </div>
+                </xpath>
             </field>
         </record>
 
@@ -40,6 +75,23 @@
                     <filter name="port_discharge_id" context="{'group_by':'port_discharge_id'}"/>
                     <filter name="container_id" context="{'group_by':'container_id'}"/>
                     <filter name="vessel_id" context="{'group_by':'vessel_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="freight_product_supplierinfo_tree_view_inherit" model="ir.ui.view">
+            <field name="name">freight.product.supplierinfo.tree.view.inherit</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="purchase.product_supplierinfo_tree_view2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price']" position="after">
+                    <field name="price_vnd" digits="[12,0]" />
+                </xpath>
+                <xpath expr="//field[@name='currency_id']" position="attributes">
+                    <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//field[@name='price']" position="attributes">
+                    <attribute name="string">Price (USD)</attribute>
                 </xpath>
             </field>
         </record>

@@ -21,6 +21,23 @@
           </field>
         </record>
 
+        <record id="freight_product_pricelist_view_form_inherit" model="ir.ui.view">
+          <field name="name">freight.product.pricelist.view.form.inherit</field>
+          <field name="model">product.pricelist</field>
+          <field name="inherit_id" ref="product.product_pricelist_view"/>
+          <field name="arch" type="xml">
+            <xpath expr="//group[@name='pricelist_settings']//field[@name='currency_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='fixed_price']" position="after">
+                <field name="fixed_price_vnd" digits="[12,0]" string="Price (VND)" />
+            </xpath>
+            <xpath expr="//tree//field[@name='fixed_price']" position="attributes">
+                <attribute name="string">Price (USD)</attribute>
+            </xpath>
+          </field>
+        </record>
+
         <record id="freight_product_pricelist_item_tree_view" model="ir.ui.view">
           <field name="name">freight.product.pricelist.item.tree</field>
           <field name="model">product.pricelist.item</field>

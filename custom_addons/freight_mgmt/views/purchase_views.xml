@@ -8,6 +8,72 @@
             <xpath expr="//button[@name='action_create_invoice']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <label for="exchange_rate" />
+                <div class="o_row">
+                    <field name="exchange_rate" digits="[12,0]"
+                           attrs="{'readonly': [('state', 'in', ('purchase','done','cancel'))]}"
+                    />
+                    <button name="update_exchange_rate" type="object"
+                            string=" Refresh"
+                            attrs="{'invisible': [('state', 'in', ('purchase','done','cancel'))]}"
+                            help="Recompute exchange rate"
+                            class="btn-link mb-1 px-0" icon="fa-refresh"
+                            confirm="This will update exchange and re-calculate total amount in VND." />
+                </div>
+            </xpath>
+            <xpath expr="//tree//field[@name='price_unit']" position="after">
+                <field name="price_tax_vnd" invisible="1" force_save="1" />
+                <field name="price_unit_input"
+                       attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+                <field name="order_line_currency_id" />
+            </xpath>
+            <xpath expr="//tree//field[@name='price_subtotal']" position="before">
+                <field name="price_subtotal_display" widget='monetary' force_save="1"
+                        options="{'currency_field': 'order_line_currency_id'}"/>
+            </xpath>
+            <xpath expr="//tree//field[@name='price_unit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='price_subtotal']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tax_totals_json']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|',('has_tax_totals_usd','=',True),('has_tax_totals_vnd','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tax_totals_json']" position="before">
+                <field name="vnd_currency_id" invisible="1" />
+                <field name="has_tax_totals_usd" invisible="1" />
+                <field name="has_tax_totals_vnd" invisible="1" />
+                <field name="amount_untaxed_usd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_usd', '!=', True)]}" />
+                <field name="amount_tax_usd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_usd', '!=', True)]}" />
+                <field name="amount_total_usd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_usd', '!=', True)]}" />
+                <field name="amount_untaxed_vnd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+                <field name="amount_tax_vnd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+                <field name="amount_total_vnd" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+                <field name="total_amount_vnd_summary" widget='monetary'
+                       attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_action_purchase_recalculate_margin" model="ir.actions.server">
+        <field name="name">Recalculate Margin After Purchase Updated</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.recalculate_margin()
         </field>
     </record>
 </odoo>

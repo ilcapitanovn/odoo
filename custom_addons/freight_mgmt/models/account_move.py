@@ -20,7 +20,7 @@ class AccountMove(models.Model):
                 purchase_order = rec.invoice_line_ids.mapped('purchase_order_id')
                 if purchase_order:
                     order_name = purchase_order[0].origin
-                    sale_order = self.env['sale.order'].search([('name', '=', order_name)])
+                    sale_order = self.env['sale.order'].sudo().search([('name', '=', order_name)])
                     if sale_order and sale_order[0].booking_id:
                         rec.vessel_bol_number = sale_order[0].booking_id[0].vessel_bol_no
 

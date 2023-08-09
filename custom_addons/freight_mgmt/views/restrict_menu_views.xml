@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="freight_ir_ui_menu_users" model="ir.ui.view">
+        <field name="name">freight.restrict.menu</field>
+        <field name="model">ir.ui.menu</field>
+        <field name="inherit_id" ref="base.edit_menu_access"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Restrict users" name="restrict_users">
+                    <tree>
+                        <field name="restrict_user_ids"/>
+                    </tree>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Branch -->
+        <record id="seenpo_branch_saigon" model="res.branch">
+            <field name="code">SG</field>
+            <field name="name">Sai Gon</field>
+            <field name="is_main_branch">True</field>
+            <field name="company_id">1</field>
+            <field name="city">Sai Gon</field>
+            <field name="country_id">241</field>
+        </record>
+        <record id="seenpo_branch_langson" model="res.branch">
+            <field name="code">LS</field>
+            <field name="name">Lang Son</field>
+            <field name="is_main_branch">False</field>
+            <field name="company_id">1</field>
+            <field name="city">Lang Son</field>
+            <field name="country_id">241</field>
+        </record>
+        <record id="base.user_admin" model="res.users">
+            <field name="branch_id" ref="seenpo_branch_saigon" />
+            <field name="branch_ids" eval="[(4, ref('seenpo_branch_saigon')), (4, ref('seenpo_branch_langson'))]" />
+        </record>
+        <function model="res.users" name="_init_default_user_branch" />
+        <function model="res.partner" name="_init_default_partner_branch" />
+        <function model="sale.order" name="_init_default_sale_order_branch" />
+        <function model="purchase.order" name="_init_default_purchase_order_branch" />
+        <function model="account.move" name="_init_default_account_move_branch" />
+<!--        <function model="res.users" name="write">-->
+<!--            <value model="res.users" eval="obj().env['res.users'].search([]).ids"/>-->
+<!--            <value eval="{'branch_ids': [(4, ref('seenpo_branch_saigon'))], 'branch_id': ref('seenpo_branch_saigon')}"/>-->
+<!--        </function>-->
+    </data>
+</odoo>

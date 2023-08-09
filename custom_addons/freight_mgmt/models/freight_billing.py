@@ -162,6 +162,7 @@ class FreightBilling(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+    branch_id = fields.Many2one(related="booking_id.branch_id", string='Branch')
 
     debit_note_ids = fields.One2many('freight.debit.note', 'bill_id', string='Debit Note',
                                      copy=True, auto_join=True)
@@ -256,22 +257,26 @@ class FreightBilling(models.Model):
 
         debit_items = []
         if billing.order_id:
+            debit_vals['exchange_rate'] = billing.order_id.exchange_rate
+
             for item in billing.order_id.order_line:
                 vals = {
-                    # "debit_id": self.id,
                     "external_id": item.id,
                     "sequence": item.sequence,
-                    # "state": item.state,
                     "name": item.name,
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
-                    "unit_price": item.price_unit,
-                    "currency_id": item.currency_id.id if item.currency_id else False,
+                    "unit_price": item.price_unit_input,
+                    "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
                     "tax_id": item.tax_id,
-                    "price_subtotal": item.price_subtotal,
-                    "price_tax": item.price_tax,
-                    "price_total": item.price_total,
+                    "price_subtotal": item.price_subtotal_display,
+                    "price_total": item.price_total_display,
                 }
+                if item.order_line_currency_id and item.order_line_currency_id.name == 'VND':
+                    vals['price_tax'] = item.price_tax_vnd
+                else:
+                    vals['price_tax'] = item.price_tax
+
                 debit_items.append((0, 0, vals))
 
         if debit_items:
@@ -336,10 +341,13 @@ class FreightBilling(models.Model):
 
         purchase_order_id = None
         if billing.order_id:
-            purchase_orders = billing.order_id._get_purchase_orders()
+            # purchase_orders = billing.order_id._get_purchase_orders()
+            purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", billing.order_id.name)])
             if purchase_orders:
                 for rec in purchase_orders:
-                    purchase_order_id = rec
+                    if rec.state == 'purchase' or rec.state == 'done':
+                        purchase_order_id = rec
+                        break
 
         if purchase_order_id:
             if purchase_order_id.state != 'purchase' and purchase_order_id.state != 'done':
@@ -348,6 +356,7 @@ class FreightBilling(models.Model):
                 ))
 
             credit_vals['purchase_order_id'] = purchase_order_id.id
+            credit_vals['exchange_rate'] = purchase_order_id.exchange_rate
 
             if purchase_order_id.partner_id:
                 partner_id = purchase_order_id.partner_id
@@ -368,17 +377,20 @@ class FreightBilling(models.Model):
                     # "credit_id": self.id,
                     "external_id": item.id,
                     "sequence": item.sequence,
-                    # "state": item.state,
                     "name": item.name,
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
                     "unit_price": item.price_unit,
-                    "currency_id": item.currency_id.id if item.currency_id else False,
+                    "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
                     "tax_id": item.taxes_id,
-                    "price_subtotal": item.price_subtotal,
-                    "price_tax": item.price_tax,
-                    "price_total": item.price_total,
+                    "price_subtotal": item.price_subtotal_display,
+                    "price_total": item.price_total_display,
                 }
+                if item.order_line_currency_id and item.order_line_currency_id.name == 'VND':
+                    vals['price_tax'] = item.price_tax_vnd
+                else:
+                    vals['price_tax'] = item.price_tax
+
                 credit_items.append((0, 0, vals))
 
             if credit_items:

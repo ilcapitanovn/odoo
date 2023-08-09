@@ -9,7 +9,7 @@ class SaleCommissionMakeSettle(models.TransientModel):
     _description = "Wizard for calculating sales incentive report"
 
     def _get_default_currency(self):
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
+        vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')])
         return vnd.id
 
     date_from = fields.Date("Report from", required=True, default=fields.Date.today())

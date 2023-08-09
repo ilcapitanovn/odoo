@@ -33,6 +33,7 @@ class FreightBillingLine(models.Model):
     measurement_cbm = fields.Float(string='Measurement (CBM)')
 
     company_id = fields.Many2one(related='billing_id.company_id', string='Company', store=True, index=True)
+    branch_id = fields.Many2one(related="billing_id.branch_id", string='Branch')
 
     state = fields.Selection(
         related='billing_id.state', string='Billing Status', copy=False, store=True)

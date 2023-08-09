@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="freight_langson_order_to_bookings_form_inherited" model="ir.ui.view">
+        <field name="name">freight.langson.order.to.bookings.form.inherited</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_sale_order_to_bookings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='create_bookings']" position="replace">
+                <button name="create_bookings" string="Create Booking"
+                        type="object" class="btn-primary"
+                        context="{'default_advance_payment_method': 'percentage'}"
+                        attrs="{'invisible': [('booking_status', '!=', 'to booking')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_langson_sale_order_to_bookings_action_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="12"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="freight_mgmt.freight_sale_order_to_bookings_view_tree"/>
+        <field name="act_window_id" ref="freight_langson_orders_to_booking_action"/>
+    </record>
+    <record id="freight_langson_sale_order_to_bookings_action_form" model="ir.actions.act_window.view">
+       <field name="sequence" eval="13"/>
+       <field name="view_mode">form</field>
+       <field name="view_id" ref="freight_langson_order_to_bookings_form_inherited"/>
+       <field name="act_window_id" ref="freight_langson_orders_to_booking_action"/>
+    </record>
+
+</odoo>

@@ -36,14 +36,7 @@ class FreightDebitNote(models.Model):
         return self.env.ref('freight_mgmt.freight_debit_note_action')
 
     def _get_default_exchange_rate(self):
-        #usd = self.env['res.currency'].search([('name', '=', 'USD')])
-        #vnd = self.env['res.currency'].search([('name', '=', 'VND')])
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')], limit=1)
-        #company = self.order_id.company_id
-        #amount_vnd = usd._convert(self.order_id.amount_total, vnd, company, self.debit_date)
-        # rate = 0
-        # if vnd:
-        #     rate = vnd.rate
+        vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')], limit=1)
         vnd_rate = vnd.rate if vnd else 0
         return float_round(vnd_rate, precision_digits=0)
 
@@ -69,7 +62,8 @@ class FreightDebitNote(models.Model):
 
     debit_date = fields.Datetime(string="Debit date", tracking=True, default=fields.Datetime.now)
     exchange_rate = fields.Float(string='Exchange rate', default=_get_default_exchange_rate, readonly=False,
-                        help='The rate of the currency to the currency of rate 1.', tracking=True, store=True)
+                                 required=True, tracking=True, store=True,
+                                 help='The rate of the currency to the currency of rate 1.')
 
     bill_no = fields.Char(related="bill_id.vessel_bol_number",
                           string="BL Number", readonly=True, store=False)
@@ -132,6 +126,7 @@ class FreightDebitNote(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+    branch_id = fields.Many2one(related="bill_id.branch_id", string='Branch')
 
     bank_ids = fields.One2many(related="company_id.bank_ids")
     company_bank_id = fields.Many2one('res.partner.bank', string="Company Bank Account",
@@ -217,6 +212,13 @@ class FreightDebitNote(models.Model):
         for rec in self:
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
+
+    @api.onchange('exchange_rate')
+    def _onchange_exchange_rate(self):
+        if self.exchange_rate <= 0:
+            raise UserError(_(
+                "A valid exchange rate is required."
+            ))
 
     @api.model
     def _get_bill_id_domain(self):
@@ -367,31 +369,39 @@ class FreightDebitNote(models.Model):
     @api.onchange("order_id")
     def _onchange_order_id(self):
         items = []
-        if self.order_id and self.order_id.order_line:
-            for item in self.order_id.order_line:
-                vals = {
-                    "debit_id": self.id,
-                    "external_id": item.id,
-                    "state": item.state,
-                    "name": item.name,
-                    "sequence": item.sequence,
-                    "quantity": item.product_uom_qty,
-                    "uom": item.product_uom.display_name,
-                    "unit_price": item.price_unit,
-                    "currency_id": item.currency_id.id if item.currency_id else False,
-                    "tax_id": item.tax_id,
-                    "price_subtotal": item.price_subtotal,
-                    "price_tax": item.price_tax,
-                    "price_total": item.price_total,
-                }
-                #self.fill_readonly_data_to_debit_item(vals, item)
-                items.append((0, 0, vals))
+        if self.order_id:
+            self.exchange_rate = self.order_id.exchange_rate
+
+            if self.order_id.order_line:
+                for item in self.order_id.order_line:
+                    vals = {
+                        "debit_id": self.id,
+                        "external_id": item.id,
+                        "name": item.name,
+                        "sequence": item.sequence,
+                        "quantity": item.product_uom_qty,
+                        "uom": item.product_uom.display_name,
+                        "unit_price": item.price_unit_input,
+                        "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
+                        "tax_id": item.tax_id,
+                        "price_subtotal": item.price_subtotal_display,
+                        "price_total": item.price_total_display,
+                    }
+                    if item.order_line_currency_id and item.order_line_currency_id.name == 'VND':
+                        vals['price_tax'] = item.price_tax_vnd
+                    else:
+                        vals['price_tax'] = item.price_tax
+                    items.append((0, 0, vals))
 
         if items:
             self.debit_items = [(5, 0, 0)]
             self.debit_items = items
         else:
             self.debit_items = items.append((0, 0, {}))
+
+    def update_order_items(self):
+        self.ensure_one()
+        self._onchange_order_id()
 
     # ---------------------------------------------------
     # CRUD

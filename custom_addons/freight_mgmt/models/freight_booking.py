@@ -135,6 +135,7 @@ class FreightBooking(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+    branch_id = fields.Many2one(related="user_id.branch_id", string='Branch', store=True)
 
     color = fields.Integer(string="Color Index")
     kanban_state = fields.Selection(
@@ -500,6 +501,7 @@ class FreightBooking(models.Model):
             # imply modifying followers
             return recipients
         return recipients
+
 
 class FreightBookingVolume(models.Model):
     _name = 'freight.booking.volume'

@@ -421,7 +421,7 @@
                         <td class="total text-right"><span t-esc="'{:,.0f}'.format(amount_subtotal_vnd)"/></td>
                       </tr>
                       </t>
-                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <t t-if="amount_subtotal_vnd &gt; 0">
                       <tr>
                         <td colspan="4" class="no-bordered"/>
                         <td colspan="3" class="total_amount">TOTAL AMOUNT (VND)</td>

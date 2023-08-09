@@ -36,7 +36,7 @@ class FreightCreditNote(models.Model):
         return self.env.ref('freight_mgmt.freight_credit_note_action')
 
     def _get_default_exchange_rate(self):
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')], limit=1)
+        vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')], limit=1)
         vnd_rate = vnd.rate if vnd else 0
         return float_round(vnd_rate, precision_digits=0)
 
@@ -111,6 +111,7 @@ class FreightCreditNote(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+    branch_id = fields.Many2one(related="bill_id.branch_id", string='Branch')
 
     bank_ids = fields.One2many(related="company_id.bank_ids")
     company_bank_id = fields.Many2one('res.partner.bank', string="Company Bank Account",
@@ -188,6 +189,13 @@ class FreightCreditNote(models.Model):
         for rec in self:
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
+
+    @api.onchange('exchange_rate')
+    def _onchange_exchange_rate(self):
+        if self.exchange_rate <= 0:
+            raise UserError(_(
+                "A valid exchange rate is required."
+            ))
 
     @api.model
     def _get_bill_id_domain(self):
@@ -358,30 +366,39 @@ class FreightCreditNote(models.Model):
     @api.onchange("purchase_order_id")
     def _onchange_purchase_order_id(self):
         items = []
-        if self.purchase_order_id and self.purchase_order_id.order_line:
-            for item in self.purchase_order_id.order_line:
-                vals = {
-                    "credit_id": self.id,
-                    "external_id": item.id,
-                    "state": item.state,
-                    "name": item.name,
-                    "sequence": item.sequence,
-                    "quantity": item.product_uom_qty,
-                    "uom": item.product_uom.display_name,
-                    "unit_price": item.price_unit,
-                    "currency_id": item.currency_id.id if item.currency_id else False,
-                    "tax_id": item.taxes_id,
-                    "price_subtotal": item.price_subtotal,
-                    "price_tax": item.price_tax,
-                    "price_total": item.price_total,
-                }
-                items.append((0, 0, vals))
+        if self.purchase_order_id:
+            self.exchange_rate = self.purchase_order_id.exchange_rate
+
+            if self.purchase_order_id.order_line:
+                for item in self.purchase_order_id.order_line:
+                    vals = {
+                        "credit_id": self.id,
+                        "external_id": item.id,
+                        "name": item.name,
+                        "sequence": item.sequence,
+                        "quantity": item.product_uom_qty,
+                        "uom": item.product_uom.display_name,
+                        "unit_price": item.price_unit_input,
+                        "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
+                        "tax_id": item.taxes_id,
+                        "price_subtotal": item.price_subtotal_display,
+                        "price_total": item.price_total_display,
+                    }
+                    if item.order_line_currency_id and item.order_line_currency_id.name == 'VND':
+                        vals['price_tax'] = item.price_tax_vnd
+                    else:
+                        vals['price_tax'] = item.price_tax
+                    items.append((0, 0, vals))
 
         if items:
             self.credit_items = [(5, 0, 0)]
             self.credit_items = items
         else:
             self.credit_items = items.append((0, 0, {}))
+
+    def update_order_items(self):
+        self.ensure_one()
+        self._onchange_purchase_order_id()
 
     # ---------------------------------------------------
     # CRUD
