@@ -34,19 +34,36 @@ class SeenpoHrAttendanceBioLog(models.Model):
     first_in_time = fields.Char(string='First In Time', readonly=True)
     last_out_time = fields.Char(string='Last Out Time', readonly=True)
     reason = fields.Char(string='Reason', tracking=True, translate=True)
-    active = fields.Boolean(string='Active')
 
     hr_employee_id = fields.Many2one(
-        comodel_name="hr.employee", string="HR Employee Reference", readonly=True, store=False
+        comodel_name="hr.employee", string="HR Employee Reference", readonly=True, tracking=True
     )
     hr_employee_name_related = fields.Char(related="hr_employee_id.name", readonly=True, store=False)
     hr_employee_bio_user_id = fields.Char(related="hr_employee_id.bio_user_id", readonly=True, store=False)
     hr_employee_active = fields.Boolean(related="hr_employee_id.active", string="Employee Active", readonly=True, store=False)
     hr_employee_name = fields.Char(compute="_compute_hr_employee", string="Employee", readonly=True, store=True)
+    active = fields.Boolean(compute="_compute_hr_employee", string='Active', readonly=True, store=True)
     check_in_date_display = fields.Date(compute="_compute_check_in_date_display", string='Date', readonly=True, store=False)
     is_check_in_late = fields.Boolean(compute="_compute_is_check_in_late", string="Late", readonly=True, store=False)
     reason_display = fields.Char(compute="_compute_reason_display", string="Reason", readonly=True, store=False)
     is_permission_group_user = fields.Boolean(compute="_compute_is_permission_group_user", string="Check Permission")
+
+    @api.model
+    def _update_hr_employee_id_by_upgrading(self):
+        employees = self.env["hr.employee"].search(
+            [
+                '&',
+                ("bio_user_id", "!=", False),
+                '|',
+                ('active', '=', True),
+                ('active', '=', False)
+            ]
+        )
+        logs = self.search([('hr_employee_id', '=', False)])
+        for log in logs:
+            for emp in employees:
+                if emp["bio_user_id"] == log.bio_user_id:
+                    log.write({'hr_employee_id': emp.id})
 
     @api.model
     def fields_get(self, all_fields=None, attributes=None):
@@ -86,29 +103,35 @@ class SeenpoHrAttendanceBioLog(models.Model):
 
     @api.depends('hr_employee_name_related', 'hr_employee_bio_user_id', 'hr_employee_active')
     def _compute_hr_employee(self):
-        match_employees = self.env["hr.employee"].search(
-            [
-                '&',
-                ("bio_user_id", "!=", False),
-                '|',
-                ('active', '=', True),
-                ('active', '=', False)
-            ]
-        )
+        """ This code has performance issue """
+        # match_employees = self.env["hr.employee"].search(
+        #     [
+        #         '&',
+        #         ("bio_user_id", "!=", False),
+        #         '|',
+        #         ('active', '=', True),
+        #         ('active', '=', False)
+        #     ]
+        # )
+        # for rec in self:
+        #     rec.hr_employee_name = ''
+        #     rec.active = True
+        #     if match_employees:
+        #         for emp in match_employees:
+        #             if emp["bio_user_id"] == rec.bio_user_id:
+        #                 rec.hr_employee_name = emp["name"]
+        #                 rec.active = emp["active"]
+
         for rec in self:
-            rec.hr_employee_name = ''
-            rec.active = True
-            if match_employees:
-                for emp in match_employees:
-                    if emp["bio_user_id"] == rec.bio_user_id:
-                        rec.hr_employee_name = emp["name"]
-                        rec.active = emp["active"]
+            rec.hr_employee_name = rec.hr_employee_name_related
+            rec.active = rec.hr_employee_active
 
     def refresh_bio_attendance_log(self, date_specified=fields.Date.today()):
         try:
             print(f"Refresh bio attendance for date: {date_specified}")
             # The Bio device only set download filename is always format of today
-            today = fields.Date.today()
+            # today = fields.Date.today()
+            today = fields.Datetime.context_timestamp(self, fields.Datetime.now())  # now in local time zone
             filename = today.strftime('%m%d%y') + '.txt'
 
             self._load_bio_config_from_sys_params()
@@ -130,6 +153,8 @@ class SeenpoHrAttendanceBioLog(models.Model):
                     ("check_in_date", "=", date_specified)
                 ]
             )
+
+            employees = self.env["hr.employee"].search([("bio_user_id", "!=", False)])
 
             create_vals_list = []
 
@@ -157,13 +182,19 @@ class SeenpoHrAttendanceBioLog(models.Model):
                                 "last_out_time": last_out_time
                             })
                     else:
+                        employee_id = False
+                        hr_employees = employees.filtered(lambda emp: emp.bio_user_id == user_id)
+                        if hr_employees:
+                            employee_id = hr_employees[0].id
+
                         create_vals_list.append({
                             "bio_user_id": user_id,
                             "card_number": card,
                             "employee": employee,
                             "check_in_date": check_in_date,
                             "first_in_time": first_in_time,
-                            "last_out_time": last_out_time
+                            "last_out_time": last_out_time,
+                            "hr_employee_id": employee_id
                         })
             else:
                 for row in dict_content:
@@ -174,13 +205,19 @@ class SeenpoHrAttendanceBioLog(models.Model):
                     first_in_time = row.get('First In Time')
                     last_out_time = row.get('Last Out Time')
 
+                    employee_id = False
+                    hr_employees = employees.filtered(lambda emp: emp.bio_user_id == user_id)
+                    if hr_employees:
+                        employee_id = hr_employees[0].id
+
                     create_vals_list.append({
                         "bio_user_id": user_id,
                         "card_number": card,
                         "employee": employee,
                         "check_in_date": check_in_date,
                         "first_in_time": first_in_time,
-                        "last_out_time": last_out_time
+                        "last_out_time": last_out_time,
+                        "hr_employee_id": employee_id
                     })
 
             if create_vals_list:

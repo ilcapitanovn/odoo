@@ -21,5 +21,6 @@
                 eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
             />
         </record>
+        <function model="seenpo.hr.attendance.bio.log" name="_update_hr_employee_id_by_upgrading" />
     </data>
 </odoo>

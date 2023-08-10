@@ -37,6 +37,7 @@
         <field name="model">seenpo.hr.attendance.bio.log</field>
         <field name="arch" type="xml">
             <tree string="Bio Log" create="false" delete="false">
+                <field name="hr_employee_id" invisible="1" />
                 <field name="active" invisible="1" />
                 <field name="check_in_date" invisible="1" />
                 <field name="is_check_in_late" invisible="1" />
@@ -68,6 +69,7 @@
                 <header>
                 </header>
                 <sheet>
+                    <field name="hr_employee_id" invisible="1" />
                     <field name="active" invisible="1" />
                     <field name="is_check_in_late" invisible="1" />
                     <field name="is_permission_group_user" invisible="1" />
