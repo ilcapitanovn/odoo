@@ -119,7 +119,7 @@ class ProductSupplierinfo(models.Model):
     exchange_rate = fields.Float(related="product_tmpl_id.exchange_rate", string="VND/USD rate")
     price_vnd = fields.Float(
         'Price (VND)', compute='_compute_price_vnd', readonly=False, store=True, tracking=True,
-        required=True, help="The price to purchase a product in VND")
+        help="The price to purchase a product in VND")
     flag_just_updated = fields.Boolean(compute="_compute_flag_just_updated")
 
     def _compute_flag_just_updated(self):
