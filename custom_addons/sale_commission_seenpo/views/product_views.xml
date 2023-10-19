@@ -9,7 +9,7 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='categ_id']" position="before">
-                    <field name="vendor_commission_amount" widget='monetary' />
+                    <field name="vendor_commission_amount" string="Comm. Amount (USD)" widget='monetary' />
                 </xpath>
             </field>
         </record>
@@ -34,8 +34,8 @@
                     <attribute name="optional">hide</attribute>
                 </xpath>
                 <xpath expr="//field[@name='price']" position="after">
-                    <field name="commission_amount" invisible="1" />
-                    <field name="commission_amount_custom" />
+                    <field name="commission_amount" string="Comm. Amount (USD)" invisible="1" />
+                    <field name="commission_amount_custom" string="Comm. Amount (USD)" />
                 </xpath>
             </field>
         </record>
