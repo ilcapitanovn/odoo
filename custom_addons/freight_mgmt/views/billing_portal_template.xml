@@ -203,7 +203,7 @@
                       </tr>
                       </t>
 
-                      <t t-if="exchange_rate &gt; 0 and amount_vnd &gt; 0">
+                      <t t-if="show_amount_total_vnd">
                       <tr>
                         <td colspan="4" class="no-bordered"></td>
                         <td colspan="3" class="total_amount">TOTAL AMOUNT (VND)</td>

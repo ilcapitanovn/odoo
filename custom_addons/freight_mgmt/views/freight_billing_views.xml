@@ -6,7 +6,7 @@
         <field name="model">freight.billing</field>
         <field name="arch" type="xml">
             <search>
-<!--                <field name="number" />-->
+                <field name="vessel_bol_number" />
                 <field name="user_id" />
                 <field name="name" />
                 <filter

@@ -147,6 +147,8 @@ class FreightDebitNote(models.Model):
     invoice_date = fields.Date(string="Invoice Date", readonly=True, store=True, compute='_compute_payment_state')
     payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
+    show_amount_total_vnd = fields.Boolean(string="Show Total (VND)", default=True)
+
     state = fields.Selection(selection=[
         ('draft', 'Draft'),
         ('posted', 'Posted'),

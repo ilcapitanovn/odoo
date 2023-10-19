@@ -18,10 +18,11 @@
         <field name="arch" type="xml">
             <search>
                 <field name="branch_id" invisible="1" />
+                <field name="vessel_booking_number" />
                 <field name="number" />
                 <field name="user_id" />
                 <field name="partner_id" />
-                <field name="name" />
+<!--                <field name="name" />-->
                 <field name="stage_id" />
                 <filter
                     string="Unassigned"
