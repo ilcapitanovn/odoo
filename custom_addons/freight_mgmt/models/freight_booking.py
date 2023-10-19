@@ -40,7 +40,7 @@ class FreightBooking(models.Model):
     partner_email = fields.Char(string="Email")
 
     transport_type = fields.Selection(
-        selection=[("ocean", "Ocean"), ("air", "Air"), ("express", "Express")],
+        selection=[("ocean", "Ocean"), ("land", "Land"), ("air", "Air"), ("express", "Express")],
         string="Transport Type", default="ocean", help='Type of Transport')
 
     # shipment_type = fields.Selection(
@@ -135,7 +135,7 @@ class FreightBooking(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
-    branch_id = fields.Many2one(related="user_id.branch_id", string='Branch', store=True)
+    branch_id = fields.Many2one(related="order_id.branch_id", string='Branch', store=True)
 
     color = fields.Integer(string="Color Index")
     kanban_state = fields.Selection(

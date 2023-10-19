@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Freight Management for Lang Son",
-    'version': '15.0.4.0.0',
+    'version': '15.0.4.0.3',
     'summary': """Create Freight Management System for branch Lang Son""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',
@@ -29,10 +29,12 @@
     'maintainer': 'Bao Thinh Software Ltd.',
     'depends': ['mail', 'freight_mgmt'],
     "data": [
+        "data/freight_data.xml",
         "security/freight_security.xml",
         "security/ir.model.access.csv",
         "views/freight_menu.xml",
         "views/sale_order_views.xml",
+        "report/freight_billing_report.xml",
     ],
     'web.assets_frontend': [
 

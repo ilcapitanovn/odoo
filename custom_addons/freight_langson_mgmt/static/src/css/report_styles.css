@@ -1,0 +1,211 @@
+	/*
+	@font-face {
+		font-family: 'minion-pro';
+		src: url('/freight_mgmt/static/fonts/MinionPro-Regular.woff') format('woff');
+    }
+
+	@font-face {
+        font-family: 'minion-pro';
+        src: url('/freight_mgmt/static/fonts/test/FontAwesome.otf'); //* IE9 Compat Modes
+        src: local('O'),
+            url('/freight_mgmt/static/fonts/test/fontawesome-webfont.ttf') format('truetype'),
+            url('/freight_mgmt/static/fonts/test/fontawesome-webfont.woff') format('woff'),
+            url('/freight_mgmt/static/fonts/test/fontawesome-webfont.svg') format('svg');
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal
+    }
+    */
+
+	* {
+      font-family: 'Microsoft Yahei';
+      font-size: 12px !important;
+    }
+    .title {
+      font-size: 24px !important;
+    }
+    .title-larger {
+      font-size: 24px !important;
+    }
+    footer {
+        position: relative;
+	    overflow: hidden;
+    }
+    .footer-left {
+        text-align: center;
+        float: left;
+        width: 50%;
+        padding: 5px;
+    }
+    .footer-right {
+        text-align: center;
+        float: right;
+        width: 50%;
+        padding: 5px;
+    }
+	.table-bordered {
+		border: 1px solid #000000 !important
+	}
+	.table-lines-bordered {
+		border: 1px dashed #000000 !important;
+		border-right-width: 0px !important;
+		border-left-width: 0px !important;
+	}
+	td {
+		border: 1px solid #000000 !important
+	}
+	.label-left {
+	    float: left;
+	}
+	.content-right {
+	    float: right;
+	}
+	.bill-lines-bordered {
+		border: 1px dashed #000000 !important;
+	}
+	.borderless {
+		border: 0px !important;
+	}
+	.border-left-no {
+		border-left-width: 0px !important;
+	}
+	.border-right-no {
+		border-right-width: 0px !important;
+	}
+	.border-right-dashed {
+		border-right: 1px dashed #000000 !important;
+	}
+	.border-bottom-solid {
+		border-top: 1px dashed #000000 !important;
+		border-bottom: 1px solid #000000 !important;
+	}
+	.border-right-solid {
+		border-right: 1px solid #000000 !important;
+	}
+	.content {
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+	.no-spacing {
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+	.label {
+		font-size: 10px !important;
+		height: 15px;
+	}
+	.value {
+		padding: 5px 20px 5px 10px;
+	}
+	.logo-container {
+		height: 65px;
+	}
+	.logo-img {
+		width: 350px;
+		padding-top: 2px;
+	}
+	.bill-no {
+		text-align: center;
+	}
+	.bill-no span {
+	    font-size: 16px !important;
+	}
+	.freight-note {
+		display: inline-block;
+	}
+	.freight-note p {
+		line-height: 80%;
+	}
+	.h-address-extra {
+		height: 120px !important;
+	}
+	.h-address-extra-l {
+	    height: 180px !important;
+	}
+	.h-address {
+		height: 100px !important;
+		line-height: 100px;
+	}
+	.h-address p {
+	    line-height: 1.5;
+	    display: inline-block;
+	    vertical-align: middle;
+    }
+	.h-extra-party {
+	    height: 66px !important;
+	}
+	.h-bill-no {
+		height: 25px !important;
+	}
+	.total-in-word-label { 
+		display: inline-block;
+		border-right: 1px dashed #000000;
+		width: 235px;
+		text-align: center;
+		/*opacity: 0.8;*/
+    }
+	.total-in-word-value { 
+		display: inline-block;
+		padding-left: 100px;
+    }
+
+    #contact-table {
+        height: 465px;
+        max-height: 465px;
+    }
+
+	#bill-lines-table th {
+		text-align: center;
+		vertical-align: middle;
+		font-size: 14px;
+		font-weight: normal;
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+	#bill-lines-table td {
+		padding: 1rem 2rem 1rem 2rem;
+		height: 200px;
+	}
+	#bill-lines-table td > * {
+		vertical-align: middle;
+	}
+
+	#bottom-table {
+	    height: 300px;
+        max-height: 300px;
+	}
+	#bottom-table td {
+		padding: 0 !important;
+		margin: 0 !important;
+		height: 80px;
+	}
+	#bottom-table td > * {
+		vertical-align: middle;
+		text-align: center;
+	}
+	#bottom-table .div-label {
+		height: 25px;
+		border-bottom: 1px dashed #000000;
+		text-align: center;
+		/*opacity: 0.8;*/
+	}
+	#bottom-table .div-value {
+		height: 185px;
+	}
+	#bottom-table .div-value-issue {
+		height: 102px;
+	}
+	#bottom-table .div-value-sign {
+		height: 150px;
+		line-height: 150px;
+	}
+	#bottom-table .div-value-sign p {
+	    line-height: 1.5;
+	    display: inline-block;
+	    vertical-align: middle;
+	}
+	.payable-w {
+		width: 300px;
+	}
+
+

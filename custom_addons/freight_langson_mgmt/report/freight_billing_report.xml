@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_print_bill_lading_template_langson" inherit_id="freight_mgmt.report_print_bill_lading_template">
+        <xpath expr="//div[hasclass('page')]" position="replace">
+            <div class="page">
+                <t t-foreach="docs" t-as="doc">
+<!--                    <t t-esc="doc._fields" />-->
+
+                <t t-if="doc.branch_id and doc.branch_id.code=='LS'">
+                    <link rel="stylesheet" href="/freight_langson_mgmt/static/src/css/report_styles.css"/>
+                    <div id="bill-lading-langson" style="padding: 0 5px;">
+                    <center>
+                        <div class="title">提运单</div>
+                        <div class="title-larger">BILL OF LADING</div>
+                    </center>
+                    <table class="table table-bordered no-spacing" id="table-01">
+                        <tr>
+                            <td colspan="2">承运人(SHIPPER)： VIET TOAN LANG SON COMPANY LIMITED</td>
+                            <td>提单号(B/L NO):</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">收货人(CONSIGNEE)：GUANGXI FAN BO TECHNOLOGY CO.,LTD</td>
+                            <td>CT-VTLS094.2023</td>
+                        </tr>
+                        <tr>
+                            <td>收货地（PLACE OF RECEIPT）</td>
+                            <td>车牌号（CAR NUMBER ）</td>
+                            <td>运输方式（MODE OF TRANSPORT）</td>
+                        </tr>
+                        <tr>
+                            <td>越南嘉菜省 ( GIA LAI, VIET NAM)</td>
+                            <td>36H 01262</td>
+                            <td>公路运输</td>
+                        </tr>
+                        <tr>
+                            <td>起运地（PORT OF DEPARTURE）</td>
+                            <td>经停地（STOPOVER AIRPORT OR SEAPORT）</td>
+                            <td>目的地（PORT OF DESTINATION）</td>
+                        </tr>
+                        <tr>
+                            <td>越南嘉菜省 ( GIA LAI, VIET NAM)</td>
+                            <td>友谊关( 越南) ( HUU NGHI, VIETNAM)</td>
+                            <td>凭祥友谊关通道</td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-02">
+                        <tr>
+                            <td>柜号：</td>
+                            <td>EALU 9868424</td>
+                        </tr>
+                        <tr>
+                            <td>运输路线：</td>
+                            <td>越南至友谊关</td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-03">
+                        <tr>
+                            <td colspan="5">商品信息</td>
+                        </tr>
+                        <tr>
+                            <td>唛头（MARKS)</td>
+                            <td>商品名称 （DESCRIPTION OF GOODS）</td>
+                            <td>件数（NUMBER OF PACKAGES）</td>
+                            <td>毛重（KG G.W.）</td>
+                            <td>净重（KG N.W.)</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">SAI HUANG</td>
+                            <td>鲜榴莲</td>
+                            <td>823</td>
+                            <td>17,694.50</td>
+                            <td>16,048.50</td>
+                        </tr>
+                        <tr>
+                            <td>FRESH DURIAN FRUIT</td>
+                            <td>157</td>
+                            <td>3,297.00</td>
+                            <td>2,983.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">合计：</td>
+                            <td>980</td>
+                            <td>20,991.50</td>
+                            <td>19,031.50</td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-04">
+                        <tr>
+                            <td rowspan="6">运费费用 (Total freight)：运输费用已包含在货物成交价格里</td>
+                            <td colspan="2">发货日期（THE DATE OF ISSUANCE）</td>
+                        </tr>
+                        <tr>
+                            <td>2023.09.02</td>
+                            <td>越南嘉菜省 ( GIA LAI, VIET NAM)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">起运日期（DEPARTURE DATE）</td>
+                        </tr>
+                        <tr>
+                            <td>2023.09.02</td>
+                            <td>越南嘉菜省 ( GIA LAI, VIET NAM)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">到达日期（ARRIVAL DATE）</td>
+                        </tr>
+                        <tr>
+                            <td>2023.09.04-2023.09.11</td>
+                            <td>凭祥友谊关通道</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">其他备注事宜：按照《中华人民共和国海关总署与越南社会主义共和国农业与农村发展部关于越南鲜食榴莲输华植物检疫要求的议定书》（海关总署公告2022年第66号）相关要求，已按要求集装箱封识挂锁，且在抵达中国入境口岸运输期间，未打开集装箱或更换集装箱，其封识完好无损。</td>
+                        </tr>
+                    </table>
+
+                    <footer>
+                        <div class="footer-left">收货人（盖章）Consignee Signature</div>
+                        <div class="footer-right">承运人（盖章）Shipper Signature</div>
+                    </footer>
+                </div>
+                </t>
+                <t t-else="">
+                    <link rel="stylesheet" href="/freight_mgmt/static/src/css/report_styles.css"/>
+                    <div id="bill-lading-saigon" style="padding: 0 5px;">
+                    <center>
+                        <div class="title"><strong>BILL OF LADING</strong></div>
+                        <div>(FOR PORT-TO-PORT OR COMBINED TRANSPORT)</div>
+                    </center>
+                    <table class="table table-bordered no-spacing" id="contact-table">
+                        <tr>
+                            <td class="no-spacing" width="50%">
+                                <table class="table no-spacing">
+                                    <tr>
+                                        <td colspan="2" class="content">
+                                            <div class="label">SHIPPER (Name and address)</div>
+                                            <div class="value h-address">
+<!--                                                    <p>VIET NAM SUPPLY CO.,LTD<br></br>48/10 TRAN DINH XU STREET, CO GIANG WARD,DISTRICT 1, HOCHIMINH CITY, VIETNAM</p>-->
+                                                <p><span t-field="doc.shipper_id"/><br/><span t-field="doc.shipper_address"/><br/><span t-field="doc.shipper_extra_info"/></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="content">
+                                            <div class="label">CONSIGNEE (Non-Negotiable unless consigned "TO ORDER")</div>
+                                            <!--<div class="value h-address"><p>TO THE ORDER OF SHINHAN BANK SEOUL</p></div>-->
+                                            <div class="value h-address">
+                                              <p><span t-field="doc.consignee_id"/><br/><span t-field="doc.consignee_address"/><br/><span t-field="doc.consignee_extra_info"/></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="content">
+                                            <div class="label">NOTIFY PARTY (Name and address)</div>
+                                            <!--<div class="value h-address"><p>SGC SOLUTIONS CO., LTD<br/>SONGAHM BLDG., 246, YANGJAE-DAERO, SEOCHO-GU, SEOUL 06792 KOREA</p></div>-->
+                                            <div class="value h-address">
+                                              <p><span t-field="doc.party_id"/><br/><span t-field="doc.party_address"/><br/><span t-field="doc.party_extra_info"/></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">Pre-carriage by</div>
+                                            <div class="value h-bill-no"/>
+                                        </td>
+                                        <td class="content">
+                                            <div class="label">Place of receipt</div>
+                                            <div class="value h-bill-no"><p>HO CHI MINH PORT, VIETNAM</p></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">Ocean Vessel</div>
+                                            <!--<div class="value h-bill-no"><p>KMTC PUSAN 2112N</p></div>-->
+                                            <div class="value h-bill-no"><p><span t-field="doc.vessel_id.name"/></p></div>
+                                        </td>
+                                        <td class="content">
+                                            <div class="label">Port of loading</div>
+                                            <!--<div class="value h-bill-no"><p>HO CHI MINH PORT, VIETNAM</p></div>-->
+                                            <div class="value h-bill-no"><p><span t-field="doc.port_loading_text"/></p></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">Port of discharge</div>
+                                            <!--<div class="value h-bill-no"><p>KWANGYANG PORT, SOUTH KOREA</p></div>-->
+                                            <div class="value h-bill-no"><p><span t-field="doc.port_discharge_text"/></p></div>
+                                        </td>
+                                        <td class="content">
+                                            <div class="label">Place of delivery</div>
+                                            <!--<div class="value h-bill-no"><p>KWANGYANG PORT, SOUTH KOREA</p></div>-->
+                                            <div class="value h-bill-no"><p><span t-field="doc.delivery_place"/></p></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="no-spacing">
+                                <table class="table no-spacing">
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">BILL OF LADING NO.</div>
+                                            <!--<div class="value bill-no h-bill-no"><p>VITOSGN2111019</p></div>-->
+                                            <div class="value bill-no h-bill-no no-spacing"><p><span t-field="doc.name"/></p></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="logo-container"><center><img class="logo-img" src="/freight_mgmt/static/img/bill_of_lading_logo.jpg"/></center></div>
+                                            <div class="value freight-note h-address-extra">
+                                                <p>RECEIVED by Carrier for shipment by ocean vessel between port of loading and port of discharge, and for arrangement and procurement of pre-carriage from place of receipt and on-carriage to place of delivery, where stated above, the goods as specified above is in apparent good order and condition unless otherwise stated.</p>
+                                                <p>The goods to be delivered at the above mentioned port of discharge or place of delivery, whichever applicable, is subject always to the exceptions, limitations, conditions and liberties set out on the reverse side hereof, to which the Shipper and/or Consignee agree to accepting this Bill of lading.</p>
+                                                <p>IN WITNESS WHEREOF three (3) original Bills of Lading have been signed, if not otherwise stated above, one of which being accomplished, the others shall be void.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">ALSO NOTIFY PARTY (Name and address)</div>
+                                            <div class="value h-extra-party"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">FOR DELIVERY, PLEASE CONTACT:</div>
+                                            <!--<div class="value h-address"><p>PIK CORPORATION<br/>3F SEOHYUN BUILDING, #98 WORLD CUP STREET, MAPO-KU, SEOUL, KOREA<br/>TEL: 82-2-333-9616 FAX: 82-2-333-9691, 2-333-9617<br/>Ocean-import@shippingnews.co.kr</p></div>-->
+                                            <div class="value h-address">
+                                              <p><span t-field="doc.contact_id"/><br/><span t-field="doc.contact_address"/><br/><span t-field="doc.contact_extra_info"/></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="content">
+                                            <div class="label">ONWARD INLAND ROUTING - FINAL DESTINATION (For the merchant's reference only)</div>
+                                            <div class="value h-bill-no"><p><span t-field="doc.final_destination"/></p></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div><center>PARTICULARS FURNISHED BY THE SHIPPER</center></div>
+
+                    <table class="table table-lines-bordered no-spacing" id="bill-lines-table">
+                        <tr>
+                            <th class="bill-lines-bordered border-left-no" width="25%">
+                                MARKS &amp; NOS.<br/>CONTAINER / SEAL NOS.
+                            </th>
+                            <th class="bill-lines-bordered" width="12%">NO. OF PKGS<br/> OR CONTAINERS</th>
+                            <th class="bill-lines-bordered" width="35%">DESCRIPTION OF PACKAGES AND GOODS</th>
+                            <th class="bill-lines-bordered" width="12%">GROSS WEIGHT</th>
+                            <th class="bill-lines-bordered border-right-no" width="12%">MEASUREMENT</th>
+                        </tr>
+                        <t t-set="mark_seal_nos" t-value="''"/>
+                        <t t-set="total_desc" t-value="''"/>
+                        <t t-set="total_weight" t-value="0.0"/>
+                        <t t-set="total_measure" t-value="0.0"/>
+                        <t t-set="total_pkgs_dict" t-value="{}"/>
+                        <t t-foreach="doc.billing_line" t-as="line">
+                            <t t-if="line.container_no or line.seal_nos">
+                                <t t-if="line.container_no">
+                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.container_no"/>
+                                </t>
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + ' / '"/>
+                                <t t-if="line.seal_nos">
+                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos"/>
+                                </t>
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + '&lt;br/&gt;'"/>
+                            </t>
+                            <t t-set="total_pkgs_dict" t-value="doc.update_total_pkgs_dict(total_pkgs_dict, line.product_uom.display_name, line.packages_number)"/>
+                            <t t-if="line.description">
+                                <t t-set="total_desc" t-value="total_desc + line.description + '&lt;br/&gt; &lt;br/&gt;'"/>
+                            </t>
+                            <t t-set="total_weight" t-value="total_weight + line.gross_weight"/>
+                            <t t-set="total_measure" t-value="total_measure + line.measurement_cbm"/>
+                        </t>
+                        <t t-if="doc.shipping_mark">
+                            <t t-set="mark_seal_nos" t-value="mark_seal_nos + '&lt;br/&gt; &lt;br/&gt;SHIPPING MARK:&lt;br/&gt;' + doc.shipping_mark"/>
+                        </t>
+                        <tr>
+                            <td class="bill-lines-bordered border-left-no"><span t-raw="mark_seal_nos"/></td>
+                            <td class="bill-lines-bordered"><span t-raw="doc.generate_no_of_pkgs(total_pkgs_dict)"/></td>
+                            <td class="bill-lines-bordered"><span t-raw="total_desc"/></td>
+                            <td class="bill-lines-bordered text-right">(KGS)<br/><span t-esc="'{:,.2f}'.format(total_weight)"/></td>
+                            <td class="bill-lines-bordered text-right border-right-no">(CBM)<br/><span t-esc="'{:,.2f}'.format(total_measure)"/></td>
+                        </tr>
+                        <tr>
+                            <td class="border-left-no border-right-no border-bottom-solid h-bill-no no-spacing" colspan="5">
+                                <div class="total-in-word-label">Total no. of packages or container (in word)</div>
+                                <!--<div class="total-in-word-value">SAY: THIRTY (30) CONTAINERS ONLY.</div>-->
+                                <div class="total-in-word-value"><p><span t-field="doc.total_packages_word"/></p></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table no-spacing" id="bottom-table">
+                        <tr>
+                            <td width="55%" class='border-left-no'>
+                                <table width='100%'>
+                                    <tr>
+                                        <td width="40%" class="border-left-no border-right-dashed">
+                                            <div class="div-label">FREIGHT RATE/TYPES OF CHARGE</div>
+                                            <!--<div class="div-value"><p>"FREIGHT PREPAID" (CY/CY)</p></div>-->
+                                            <div class="div-value"><p><span t-field="doc.freight_charge_rate"/></p></div>
+                                        </td>
+                                        <td width="25%" class="border-left-no border-right-dashed">
+                                            <div class="div-label">RATED AS</div>
+                                            <div class="div-value"><p><span t-field="doc.rated_as"/></p></div>
+                                        </td>
+                                        <td width="35%" class="border-left-no">
+                                            <div class="div-label">PLACE OF PAYMENT</div>
+                                            <!--<div class="div-value"><p>HOCHIMINH, VIETNAM</p></div>-->
+                                            <div class="div-value"><p><span t-field="doc.payment_place"/></p></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table width='100%'>
+                                    <tr>
+                                        <td width="40%" class="border-left-no h-bill-no">
+                                            <div>Type of movement - Transport mode</div>
+                                            <div><span t-field="doc.movement_type"/></div>
+                                        </td>
+                                        <td width="35%" class="borderless border-right-solid">
+                                            <div>Freight payable at</div>
+                                            <div><span t-field="doc.payable_at"/></div>
+                                        </td>
+                                        <td class="borderless">
+                                            <div>No. of original B/Ls</div>
+                                            <div>1/3</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class='border-right-no'>
+                                <table width='100%'>
+                                    <tr>
+                                        <td class="border-right-no h-address">
+                                            <div class="div-label">TYPE OF BILL-OF-LADING ISSUE</div>
+                                            <div class="div-value-issue"><p><span t-field="doc.issue_type"/></p></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border-right-no h-address-extra">
+                                            <div class="div-label">PLACE AND DATE OF ISSUE</div>
+                                            <div class="div-value-sign"><p>VIET TOAN JSC<br/><br/>BY&amp;emsp;&amp;emsp;"AS AGENT FOR CARRIER"</p></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <footer>
+                        TERMS OF BILL OF LADING ARE CONTINUED ON THE BACK SIDE
+                    </footer>
+                </div>
+                </t>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>
