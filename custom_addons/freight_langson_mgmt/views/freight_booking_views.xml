@@ -15,6 +15,9 @@
             <xpath expr="//field[@name='closing_time']" position="before">
                 <field name="transport_route" />
             </xpath>
+            <xpath expr="//field[@name='create_date']" position="before">
+                <field name="issued_date" />
+            </xpath>
             <xpath expr="//field[@name='port_loading_id']" position="attributes">
                 <attribute name="string">Place Of Departure</attribute>
             </xpath>
@@ -25,6 +28,9 @@
                 <attribute name="attrs">{'invisible':[('transport_type','in',['land'])]}</attribute>
             </xpath>
             <xpath expr="//field[@name='vessel_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='create_date']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>
