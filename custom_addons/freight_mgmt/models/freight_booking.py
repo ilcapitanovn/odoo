@@ -39,6 +39,7 @@ class FreightBooking(models.Model):
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
 
+    transport_route = fields.Char(string="Transport Route")
     transport_type = fields.Selection(
         selection=[("ocean", "Ocean"), ("land", "Land"), ("air", "Air"), ("express", "Express")],
         string="Transport Type", default="ocean", help='Type of Transport')

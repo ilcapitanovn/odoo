@@ -12,6 +12,9 @@
                 <field name="vehicle_supplier_id" />
                 <field name="vehicle_number" />
             </xpath>
+            <xpath expr="//field[@name='closing_time']" position="before">
+                <field name="transport_route" />
+            </xpath>
             <xpath expr="//field[@name='port_loading_id']" position="attributes">
                 <attribute name="string">Place Of Departure</attribute>
             </xpath>

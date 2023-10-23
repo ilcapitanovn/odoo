@@ -20,6 +20,9 @@
                 <field name="port_stopover_id" />
                 <field name="port_stopover_text" />
             </xpath>
+            <xpath expr="//field[@name='freight_charge_rate']" position="before">
+                <field name="transport_route" />
+            </xpath>
             <xpath expr="//field[@name='booking_id']" position="attributes">
                 <attribute name="context">{'form_view_ref' : 'freight_langson_mgmt.freight_langson_booking_view_form_inherited'}</attribute>
             </xpath>

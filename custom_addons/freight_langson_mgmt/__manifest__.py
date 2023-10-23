@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Freight Management for Lang Son",
-    'version': '15.0.4.0.4',
+    'version': '15.0.4.0.5',
     'summary': """Create Freight Management System for branch Lang Son""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',

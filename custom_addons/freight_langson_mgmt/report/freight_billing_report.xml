@@ -16,6 +16,7 @@
                     <t t-set="bl_number" t-value="doc.vessel_bol_number"/>
                     <t t-set="receipt_place" t-value="doc.receipt_place"/>
                     <t t-set="vehicle_number" t-value="doc.vehicle_number"/>
+                    <t t-set="transport_route" t-value="doc.transport_route"/>
                     <t t-set="transport_type" t-value="'公路运输'"/>
 <!--                    <t t-if="doc.transport_type != 'land'">-->
 <!--                        <t t-set="transport_type" t-value="doc.transport_type"/>-->
@@ -86,7 +87,7 @@
                         </tr>
                         <tr>
                             <td>运输路线：</td>
-                            <td>越南至友谊关</td>
+                            <td><span t-esc="transport_route"/></td>
                         </tr>
                     </table>
 
