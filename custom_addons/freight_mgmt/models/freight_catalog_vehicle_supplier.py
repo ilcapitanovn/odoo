@@ -1,19 +1,17 @@
 from odoo import fields, models
 
 
-class FreightCatalogPort(models.Model):
-    _name = "freight.catalog.port"
-    _description = "Freight Catalog Port"
+class FreightCatalogVehicleSupplier(models.Model):
+    _name = "freight.catalog.vehicle.supplier"
+    _description = "Freight Catalog Vehicle Supplier"
 
-    name = fields.Char(required=True, translate=True)
     code = fields.Char(required=True)
-    printing_name = fields.Char(string="Printing Name", translate=True, help="The name is printed in BL")
+    name = fields.Char(required=True, translate=True)
+    phone = fields.Char()
+    email = fields.Char()
+    address = fields.Char()
     description = fields.Char(translate=True)
     country_id = fields.Many2one('res.country', 'Country')
-    state_ids = fields.Many2many('res.country.state', string='Federal States')
-    port_type = fields.Selection(
-        selection=[("ocean", "Ocean"), ("land", "Land"), ("air", "Air")],
-        string="Port Type", help='Type of Port')
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
         comodel_name="res.company",

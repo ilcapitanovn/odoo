@@ -6,6 +6,7 @@ from . import freight_catalog_container
 from . import freight_catalog_incoterm
 from . import freight_catalog_port
 from . import freight_catalog_stage
+from . import freight_catalog_vehicle_supplier
 from . import freight_catalog_vessel
 from . import hr_employee
 from . import hr_employee_public

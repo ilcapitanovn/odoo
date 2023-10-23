@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Freight Management",
-    'version': '15.0.4.0.1',
+    'version': '15.0.4.0.4',
     'summary': """Create Freight Management System""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',
@@ -43,6 +43,7 @@
         "views/freight_catalog_incoterm_views.xml",
         "views/freight_catalog_port_views.xml",
         "views/freight_catalog_stage_views.xml",
+        "views/freight_catalog_vehicle_supplier_views.xml",
         "views/freight_catalog_vessel_views.xml",
         "views/freight_menu.xml",
         "views/billing_portal_template.xml",

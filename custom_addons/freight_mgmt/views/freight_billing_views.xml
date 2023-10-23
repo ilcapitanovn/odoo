@@ -150,6 +150,7 @@
                                         <field name="vessel_id"/>
                                         <field name="pre_carriage" />
                                         <field name="delivery_place"/>
+                                        <field name="receipt_place"/>
                                     </group>
                                     <group>
                                         <field name="port_loading_id" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />

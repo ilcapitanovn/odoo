@@ -1,7 +1,7 @@
 from odoo import fields, models
 
 
-class FreightBooking(models.Model):
+class FreightLangSonBooking(models.Model):
     _inherit = "freight.booking"
 
     def _prepare_freight_booking_shptmt_number(self, values):
@@ -18,4 +18,4 @@ class FreightBooking(models.Model):
 
             return result
 
-        return super(FreightBooking, self)._prepare_freight_booking_shptmt_number(values)
+        return super(FreightLangSonBooking, self)._prepare_freight_booking_shptmt_number(values)

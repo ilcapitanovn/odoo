@@ -19,13 +19,22 @@
 
 	* {
       font-family: 'Microsoft Yahei';
-      font-size: 12px !important;
+      font-size: 16px !important;
     }
     .title {
       font-size: 24px !important;
     }
     .title-larger {
       font-size: 24px !important;
+    }
+    .content-center {
+      text-align: center;
+    }
+    .content-right {
+      float: right;
+    }
+    .light-bold {
+      font-weight: 600;
     }
     footer {
         position: relative;

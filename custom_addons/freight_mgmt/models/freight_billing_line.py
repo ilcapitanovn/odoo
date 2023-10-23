@@ -29,6 +29,7 @@ class FreightBillingLine(models.Model):
     product_uom_readonly = fields.Boolean(compute='_compute_product_uom_readonly')
     description = fields.Text(string='Description')
     gross_weight = fields.Float(string='Gross Weight (KGS)')
+    net_weight = fields.Float(string='Net Weight (KGS)')
     measurement = fields.Text(string='Measurement')     # Deprecated
     measurement_cbm = fields.Float(string='Measurement (CBM)')
 

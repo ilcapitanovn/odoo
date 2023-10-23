@@ -31,8 +31,7 @@
                     <group name="main">
                         <group name="main_left">
                             <field name="name" />
-                            <field name="country_id"
-                                options="{'no_create': True}"/>
+                            <field name="printing_name" />
                             <field name="port_type" />
                             <field name="active" />
                             <field
@@ -42,6 +41,8 @@
                         </group>
                         <group name="main_right">
                             <field name="code" />
+                            <field name="country_id"
+                                options="{'no_create': True}"/>
                             <field name="state_ids" widget="many2many_tags" domain="[('country_id', '=', country_id)]" />
                         </group>
                     </group>
@@ -63,6 +64,7 @@
             <tree>
                 <field name="code" />
                 <field name="name" />
+                <field name="printing_name" optional="hide" />
                 <field name="country_id" />
                 <field name="state_ids" />
                 <field name="port_type" />

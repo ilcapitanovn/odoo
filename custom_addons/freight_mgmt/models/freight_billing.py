@@ -114,23 +114,28 @@ class FreightBilling(models.Model):
                                       readonly=False, store=False, tracking=True)
     port_discharge_id = fields.Many2one(related="booking_id.port_discharge_id", string="Port of discharge",
                                         readonly=False, store=False, tracking=True)
-    # vessel_id = fields.Many2one(
-    #     comodel_name="freight.catalog.vessel", string="Ocean vessel", tracking=True, index=True
-    # )
+    port_stopover_id = fields.Many2one(related="booking_id.port_stopover_id", string="Stopover Port",
+                                       readonly=False, store=False, tracking=True)
     vessel_id = fields.Many2one(related="booking_id.vessel_id", string="Ocean vessel",
                                 readonly=True, store=False)
+    vehicle_supplier_id = fields.Many2one(related="booking_id.vehicle_supplier_id", string="Vehicle Supplier",
+                                          readonly=False, store=False, tracking=True)
+    vehicle_number = fields.Char(related="booking_id.vehicle_number", readonly=False, store=True, tracking=True)
     shipment_type = fields.Selection(related="booking_id.shipment_type", string="Shipment Type", store=False,
                                      readonly=True, help='Type of Shipment')
     eta = fields.Datetime(related="booking_id.eta", string="ETA", store=False, readonly=True)
     port_loading_text = fields.Char(string="Port of loading text")
     port_discharge_text = fields.Char(string="Port of discharge text")
+    port_stopover_text = fields.Char(string="Port of stopover text")
     pre_carriage = fields.Char(string="Pre-carriage by")
     delivery_place = fields.Char(string="Place of delivery")
+    receipt_place = fields.Char(string="Place of receipt")
+    container_number = fields.Char(string="Container No.")
     final_destination = fields.Char(string="Final destination")
 
     billing_line = fields.One2many('freight.billing.line', 'billing_id', string='Item Lines',
-                                 states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True,
-                                 auto_join=True)
+                                   states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True,
+                                   auto_join=True)
 
     total_packages_word = fields.Char(string="Total Packs (in word)")
     freight_charge_rate = fields.Char(string="Charge types")
@@ -543,16 +548,34 @@ class FreightBilling(models.Model):
     @api.onchange("port_loading_id")
     def _onchange_port_loading_id(self):
         if self.port_loading_id:
-            self.port_loading_text = self.port_loading_id.name
-            if self.port_loading_id.country_id:
-                self.port_loading_text += ', ' + self.port_loading_id.country_id.name
+            if self.port_loading_id.printing_name:
+                self.port_loading_text = self.port_loading_id.printing_name
+            else:
+                self.port_loading_text = self.port_loading_id.name
+                if self.port_loading_id.country_id:
+                    self.port_loading_text += ', ' + self.port_loading_id.country_id.name
+
+            self.receipt_place = self.port_loading_text
 
     @api.onchange("port_discharge_id")
     def _onchange_port_discharge_id(self):
         if self.port_discharge_id:
-            self.port_discharge_text = self.port_discharge_id.name
-            if self.port_discharge_id.country_id:
-                self.port_discharge_text += ', ' + self.port_discharge_id.country_id.name
+            if self.port_discharge_id.printing_name:
+                self.port_discharge_text = self.port_discharge_id.printing_name
+            else:
+                self.port_discharge_text = self.port_discharge_id.name
+                if self.port_discharge_id.country_id:
+                    self.port_discharge_text += ', ' + self.port_discharge_id.country_id.name
+
+    @api.onchange("port_stopover_id")
+    def _onchange_port_stopover_id(self):
+        if self.port_stopover_id:
+            if self.port_stopover_id.printing_name:
+                self.port_stopover_text = self.port_stopover_id.printing_name
+            else:
+                self.port_stopover_text = self.port_stopover_id.name
+                if self.port_stopover_id.country_id:
+                    self.port_stopover_text += ', ' + self.port_stopover_id.country_id.name
 
     @api.onchange("shipper_id")
     def _onchange_shipper_id(self):

@@ -97,10 +97,17 @@ class FreightBooking(models.Model):
     port_discharge_id = fields.Many2one(
         comodel_name="freight.catalog.port", string="Discharge Port", tracking=True, index=True
     )
+    port_stopover_id = fields.Many2one(
+        comodel_name="freight.catalog.port", string="Stopover Port", tracking=True, index=True
+    )
     place_of_delivery = fields.Char(string="Destination", tracking=True)
     vessel_id = fields.Many2one(
         comodel_name="freight.catalog.vessel", string="Line", tracking=True, index=True
     )
+    vehicle_supplier_id = fields.Many2one(
+        comodel_name="freight.catalog.vehicle.supplier", string="Vehicle Supplier", tracking=True, index=True
+    )
+    vehicle_number = fields.Char(string="Car Number", tracking=True)
     shipping_line = fields.Char(string="Shipping Line", tracking=True)     # TODO: Possible duplicate with vessel_id, need to check
     ro = fields.Char(string="R.O.", tracking=True)
     commodity = fields.Char(string="Commodity", tracking=True)

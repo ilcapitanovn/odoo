@@ -128,6 +128,12 @@
         <field name="res_model">freight.catalog.vessel</field>
         <field name="view_mode">tree,form</field>
     </record>
+    <record id="freight_catalog_vehicle_supplier_action" model="ir.actions.act_window">
+        <field name="name">Vehicle Suppliers</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.catalog.vehicle.supplier</field>
+        <field name="view_mode">tree,form</field>
+    </record>
 
     <!-- Products Actions -->
     <record id="freight_products_products_action" model="ir.actions.act_window">
@@ -312,6 +318,13 @@
         parent="freight_mgmt_catalog_menu"
         action="freight_catalog_vessel_action"
         sequence="45"
+    />
+    <menuitem
+        id="freight_catalog_vehicle_supplier_menu"
+        name="Vehicle Suppliers"
+        parent="freight_mgmt_catalog_menu"
+        action="freight_catalog_vehicle_supplier_action"
+        sequence="50"
     />
     <menuitem
         id="freight_catalog_shipper_menu"

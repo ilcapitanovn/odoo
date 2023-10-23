@@ -246,6 +246,13 @@
         sequence="45"
     />
     <menuitem
+        id="freight_langson_catalog_vehicle_supplier_menu"
+        name="Vehicle Suppliers"
+        parent="freight_langson_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_vehicle_supplier_action"
+        sequence="50"
+    />
+    <menuitem
         id="freight_langson_catalog_shipper_menu"
         name="Shippers"
         parent="freight_langson_mgmt_catalog_menu"
