@@ -236,6 +236,7 @@
         name="Debit Notes"
         parent="freight_mgmt_executive_menu"
         action="freight_debit_note_action"
+        groups="group_freight_manager"
         sequence="35"
     />
     <menuitem
@@ -243,6 +244,7 @@
         name="Credit Notes"
         parent="freight_mgmt_executive_menu"
         action="freight_credit_note_action"
+        groups="group_freight_manager"
         sequence="45"
     />
 
@@ -273,6 +275,7 @@
         name="Debit Notes"
         parent="freight_mgmt_import_menu"
         action="freight_import_debit_note_action"
+        groups="group_freight_manager"
         sequence="35"
     />
     <menuitem
@@ -280,6 +283,7 @@
         name="Credit Notes"
         parent="freight_mgmt_import_menu"
         action="freight_import_credit_note_action"
+        groups="group_freight_manager"
         sequence="45"
     />
 

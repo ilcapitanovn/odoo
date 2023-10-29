@@ -8,13 +8,21 @@
         </record>
         <record id="group_freight_langson_user" model="res.groups">
             <field name="name">User</field>
+            <field name="comment">The user will be only able to view documents created by everyone.</field>
             <field name="category_id" ref="module_freight_langson_category" />
             <field name="implied_ids" eval="[(4, ref('freight_mgmt.group_freight_user'))]" />
         </record>
-        <record id="group_freight_langson_manager" model="res.groups">
-            <field name="name">Manager</field>
+        <record id="group_freight_langson_operation" model="res.groups">
+            <field name="name">Operations</field>
+            <field name="comment">The operations will be able to edit documents but limited permission some areas such as debit/credit notes.</field>
             <field name="category_id" ref="module_freight_langson_category" />
             <field name="implied_ids" eval="[(4, ref('group_freight_langson_user'))]" />
+        </record>
+        <record id="group_freight_langson_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="comment">The manager will be able to do whose permissions.</field>
+            <field name="category_id" ref="module_freight_langson_category" />
+            <field name="implied_ids" eval="[(4, ref('group_freight_langson_operation'))]" />
             <field
                 name="users"
                 eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"

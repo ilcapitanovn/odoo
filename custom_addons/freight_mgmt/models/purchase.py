@@ -39,6 +39,23 @@ class PurchaseOrder(models.Model):
         for rec in self:
             rec.vnd_currency_id = vnd.id or False
 
+    @api.model
+    def fields_view_get(self, view_id=None, view_type='tree', toolbar=False, submenu=False):
+        res = super(PurchaseOrder, self).fields_view_get(
+            view_id=view_id, view_type=view_type, toolbar=toolbar,
+            submenu=submenu)
+
+        if not self._context.get('validate', False):
+            """
+            Remove link button 'Create Vendor Bills' displays in action menu when multiple selecting order items. 
+            """
+            create_vendor_bills_button_id = self.env.ref('purchase.action_purchase_batch_bills').id or False
+            for button in res.get('toolbar', {}).get('action', []):
+                if create_vendor_bills_button_id and button['id'] == create_vendor_bills_button_id:
+                    res['toolbar']['action'].remove(button)
+
+            return res
+
     @api.depends('amount_total_usd', 'amount_total_vnd', 'exchange_rate')
     def _compute_total_amount_vnd_summary(self):
         for rec in self:

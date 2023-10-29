@@ -257,6 +257,23 @@ class SaleOrder(models.Model):
     #     res = super().fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
 
     @api.model
+    def fields_view_get(self, view_id=None, view_type='tree', toolbar=False, submenu=False):
+        res = super(SaleOrder, self).fields_view_get(
+            view_id=view_id, view_type=view_type, toolbar=toolbar,
+            submenu=submenu)
+
+        if not self._context.get('validate', False):
+            """
+            Remove link button 'Create Invoices' displays in action menu when multiple selecting order items. 
+            """
+            create_invoices_button_id = self.env.ref('sale.action_view_sale_advance_payment_inv').id or False
+            for button in res.get('toolbar', {}).get('action', []):
+                if create_invoices_button_id and button['id'] == create_invoices_button_id:
+                    res['toolbar']['action'].remove(button)
+
+            return res
+
+    @api.model
     def _nothing_to_invoice_error(self):
         return UserError(_(
             "There is nothing to booking!\n\n"

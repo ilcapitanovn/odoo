@@ -57,3 +57,7 @@ class PurchaseOrderLine(models.Model):
                 'price_tax_vnd': price_tax_vnd,
                 'price_total_display': price_total_display,
             })
+
+
+class PurchaseOrderLineAgent(models.Model):
+    _inherit = "purchase.order.line.agent"

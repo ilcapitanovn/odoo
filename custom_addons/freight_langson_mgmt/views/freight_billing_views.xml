@@ -23,6 +23,9 @@
             <xpath expr="//field[@name='freight_charge_rate']" position="before">
                 <field name="transport_route" />
             </xpath>
+            <xpath expr="//field[@name='order_id']" position="attributes">
+                <attribute name="context">{'form_view_ref' : 'freight_mgmt.freight_sale_order_to_bookings_view_form'}</attribute>
+            </xpath>
             <xpath expr="//field[@name='booking_id']" position="attributes">
                 <attribute name="context">{'form_view_ref' : 'freight_langson_mgmt.freight_langson_booking_view_form_inherited'}</attribute>
             </xpath>

@@ -134,8 +134,8 @@
                             <t t-if="count_lines == 1">
                                 <tr>
                                     <t t-if="len(doc.billing_line) > 1">
-                                        <td class="content-center" rowspan="2"><span t-raw="mark_seal_nos" class="light-bold"/></td>
-                                        <td class="content-center" rowspan="2"><span t-raw="total_desc"/></td>
+                                        <td class="content-center" t-att-rowspan="len(doc.billing_line)"><span t-raw="mark_seal_nos" class="light-bold"/></td>
+                                        <td class="content-center" t-att-rowspan="len(doc.billing_line)"><span t-raw="total_desc"/></td>
                                     </t>
                                     <t t-else="">
                                         <td class="content-center"><span t-raw="mark_seal_nos" class="light-bold"/></td>

@@ -67,11 +67,16 @@
                     <!-- Preview (only customer debit note) -->
 <!--                    <button name="preview_debit_note" type="object" string="Debit Note" data-hotkey="d"-->
 <!--                            title="Preview Debit Note"/>-->
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            string="Confirm" type="object" data-hotkey="c" groups="freight_mgmt.group_freight_operation"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="create_debit_note" string="Create Debit Note"
-                            type="object" data-hotkey="b"
+                            type="object" data-hotkey="d"
+                            groups="freight_mgmt.group_freight_manager"
                             attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('debit_count', '&gt;', 0)]}"/>
                     <button name="create_credit_note" string="Create Credit Note"
-                            type="object" data-hotkey="b"
+                            type="object" data-hotkey="r"
+                            groups="freight_mgmt.group_freight_manager"
                             attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('credit_count', '&gt;', 0)]}"/>
                     <field
                         name="state"
@@ -97,6 +102,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
+                            groups="freight_mgmt.group_freight_manager"
                             attrs="{'invisible': [('debit_count', '=', 0)]}">
                             <field name="debit_count" widget="statinfo" string="Debit Notes"/>
                         </button>
@@ -104,6 +110,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
+                            groups="freight_mgmt.group_freight_manager"
                             attrs="{'invisible': [('credit_count', '=', 0)]}">
                             <field name="credit_count" widget="statinfo" string="Credit Notes"/>
                         </button>

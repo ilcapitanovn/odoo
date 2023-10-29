@@ -197,6 +197,12 @@ class FreightBilling(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
+    def action_confirm(self):
+        if not self.vessel_bol_number:
+            raise UserError(_("A B/L Number is required in order to confirm a bill."))
+
+        self.write({'state': 'posted'})
+
     # ---------------------------------------------------
     # Create Debit Note Action
     # ---------------------------------------------------
@@ -489,7 +495,7 @@ class FreightBilling(models.Model):
     @api.depends('do_number_ref')
     def _compute_delivery_order_number(self):
         for rec in self:
-            rec.do_number = rec.do_number_ref + "-DO"
+            rec.do_number = rec.do_number_ref + "-DO" if rec.do_number_ref else "#-DO"
 
     @api.depends('booking_id.etd_revised')
     def _compute_format_etd(self):

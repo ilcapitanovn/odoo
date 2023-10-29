@@ -77,24 +77,6 @@ class SaleOrderLine(models.Model):
                 'price_total_display': price_total_display,
             })
 
-    # @api.depends('margin')
-    # def _compute_margin_vnd(self):
-    #     for rec in self:
-    #         if rec.exchange_rate and rec.margin:
-    #             rec.margin_vnd = rec.margin * rec.exchange_rate
-    #         else:
-    #             rec.margin_vnd = 0.0
 
-    # @staticmethod
-    # def _check_price_from_template_or_pricelist(so_line):
-    #     result = {'is_price_from_pricelist': False, 'fixed_price_vnd': 0.0}
-    #
-    #     if so_line.order_id and so_line.order_id.pricelist_id:
-    #         for item in so_line.order_id.pricelist_id.item_ids:
-    #             if item.product_tmpl_id and so_line.product_template_id.id == item.product_tmpl_id.id:
-    #                 if item.fixed_price == so_line.price_unit:
-    #                     result['is_price_from_pricelist'] = True
-    #                     result['fixed_price_vnd'] = item.fixed_price_vnd
-    #                     break
-    #
-    #     return result
+class SaleOrderLineAgent(models.Model):
+    _inherit = "sale.order.line.agent"

@@ -12,11 +12,17 @@
                 <field name="vehicle_supplier_id" />
                 <field name="vehicle_number" />
             </xpath>
+            <xpath expr="//field[@name='booking_type']" position="attributes">
+                <attribute name="default">Place Of Departure</attribute>
+            </xpath>
             <xpath expr="//field[@name='closing_time']" position="before">
                 <field name="transport_route" />
             </xpath>
             <xpath expr="//field[@name='create_date']" position="before">
                 <field name="issued_date" />
+            </xpath>
+            <xpath expr="//field[@name='order_id']" position="attributes">
+                <attribute name="context">{'form_view_ref' : 'freight_mgmt.freight_sale_order_to_bookings_view_form'}</attribute>
             </xpath>
             <xpath expr="//field[@name='port_loading_id']" position="attributes">
                 <attribute name="string">Place Of Departure</attribute>

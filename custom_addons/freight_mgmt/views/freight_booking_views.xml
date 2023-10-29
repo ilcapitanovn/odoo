@@ -129,10 +129,10 @@
 <!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
 <!--                    />-->
                     <button name="create_bill_lading" string="Create B/L" class="oe_highlight"
-                            type="object" data-hotkey="b"
+                            type="object" data-hotkey="b" groups="freight_mgmt.group_freight_operation"
                             attrs="{'invisible': ['|', ('billing_count', '&gt;', 0), ('confirmed', '=', False)]}"/>
                     <button name="action_confirm" id="action_confirm" class="btn-primary"
-                            string="Confirm" type="object" data-hotkey="v"
+                            string="Confirm" type="object" data-hotkey="v" groups="freight_mgmt.group_freight_operation"
                             attrs="{'invisible': ['|', '|', ('stage_id', '=', False), ('confirmed', '=', True), ('completed', '=', True)]}"/>
                     <field
                         name="stage_id"

@@ -91,7 +91,7 @@
                 </field>
         </record>
 
-        <!-- Set field form_type editable for managers -->
+        <!-- Set field form_type editable for administrators -->
         <record id="freight_sale_order_form_type_readonly_inherited" model="ir.ui.view">
                 <field name="name">freight.sale.order.form.type.readonly.inherited</field>
                 <field name="model">sale.order</field>
@@ -135,6 +135,7 @@
                 </field>
         </record>
 
+        <!-- Views of the function Order To Bookings -->
         <record id="freight_sale_order_to_bookings_view_tree" model="ir.ui.view">
                 <field name="name">freight.sale.order.to.bookings.view.tree.inherited</field>
                 <field name="model">sale.order</field>
@@ -143,7 +144,10 @@
                 <field eval="10" name="priority"/>
                 <field name="arch" type="xml">
                         <xpath expr="//tree" position="attributes">
-                                <attribute name="decoration-info">(booking_status == 'to booking')</attribute>
+                            <attribute name="decoration-info">(booking_status == 'to booking')</attribute>
+                            <attribute name="create">false</attribute>
+                            <attribute name="edit">false</attribute>
+                            <attribute name="delete">false</attribute>
                         </xpath>
                         <xpath expr="//field[@name='invoice_status']" position="before">
                             <field name="booking_status"
@@ -152,7 +156,20 @@
                                    widget="badge" optional="show"/>
                         </xpath>
                         <xpath expr="//field[@name='invoice_status']" position="attributes">
-                                <attribute name="invisible">1</attribute>
+                            <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <!--Hide money columns from users who are not managers-->
+                        <xpath expr="//field[@name='amount_untaxed']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='amount_tax']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='amount_total']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='margin']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
                         </xpath>
                 </field>
         </record>
@@ -164,11 +181,16 @@
                 <field name="mode">primary</field>
                 <field eval="99" name="priority"/>
                 <field name="arch" type="xml">
+                        <xpath expr="//form" position="attributes">
+                            <attribute name="create">false</attribute>
+                            <attribute name="edit">false</attribute>
+                            <attribute name="delete">false</attribute>
+                        </xpath>
                         <xpath expr="//button[@name='payment_action_void']" position="before">
                                 <field name="booking_status" invisible="1"/>
                                 <button name="create_bookings" string="Create Booking"
                                         type="object" class="btn-primary"
-                                        groups="freight_mgmt.group_freight_manager"
+                                        groups="freight_mgmt.group_freight_operation"
                                         context="{'default_advance_payment_method': 'percentage'}"
                                         attrs="{'invisible': [('booking_status', '!=', 'to booking')]}"/>
                         </xpath>
@@ -187,11 +209,49 @@
                         <xpath expr="//button[@name='action_unlock']" position="attributes">
                                 <attribute name="invisible">1</attribute>
                         </xpath>
+                        <xpath expr="//button[@name='button_edit_agents']" position="attributes">
+                                <attribute name="attrs">{'invisible': 1}</attribute>
+                        </xpath>
                         <xpath expr="//field[@name='order_type']" position="attributes">
                                 <attribute name="readonly">1</attribute>
                         </xpath>
-                         <xpath expr="//field[@name='order_shipment_type']" position="attributes">
+                        <xpath expr="//field[@name='order_shipment_type']" position="attributes">
                                 <attribute name="readonly">1</attribute>
+                        </xpath>
+                        <!--Only managers can see some functions-->
+                        <xpath expr="//button[@name='preview_sale_order']" position="attributes">
+                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='action_view_delivery']" position="attributes">
+                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+<!--                        <xpath expr="//button[@name='action_view_purchase_orders']" position="attributes">-->
+<!--                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+                        <!--Hide money columns from users who are not managers-->
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_unit_input']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_subtotal_display']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='purchase_price']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin_percent']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='tax_id']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='commission_status']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
+                        </xpath>
+                        <xpath expr="//group[@name='note_group']//group[@name='sale_total']" position="attributes">
+                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
                         </xpath>
                 </field>
         </record>
@@ -243,11 +303,5 @@
                 action = model.create_bookings()
         </field>
     </record>
-
-    <!-- Disable act_window actions - TODO: still not working -->
-<!--    <record id="sale.action_view_sale_advance_payment_inv" model="ir.actions.act_window">-->
-<!--        /// <field name="action_view_sale_advance_payment_inv" eval="False"/>-->
-<!--        <field name="groups_id" eval="[(4,ref('base.group_no_one'))]" />-->
-<!--    </record>-->
 
 </odoo>
