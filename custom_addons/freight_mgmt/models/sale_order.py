@@ -113,24 +113,42 @@ class SaleOrder(models.Model):
 
     def recompute_margin(self):
         '''
-        Update purchase price by the latest price unit from purchase order line if there is different
+        Deprecated: Update purchase price by the latest price unit from purchase order line if there is different
         so that recalculate profit will get the latest values
+        Updated - 2023-11-03: recalculate margin of sale order based on total amount of SO and PO (if SO has related PO),
+        skip margin of every line item because it doesn't map SO and PO lines in some cases.
         '''
         # related_purchase_orders = self._get_purchase_orders()
         related_purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.name)])
         if related_purchase_orders:
-            for so_line in self.order_line:
+            # for so_line in self.order_line:
+            #     for po in related_purchase_orders:
+            #         if po.state == 'cancel':
+            #             continue
+            #
+            #         for po_line in po.order_line:
+            #             if po_line.product_id and so_line.product_id and po_line.product_id.id == so_line.product_id.id \
+            #                     and po_line.price_unit != so_line.purchase_price:
+            #                 so_line.purchase_price = po_line.price_unit
+
+            # by USD currency only
+            for so in self:
+                so_commission_total = so.commission_total if so.commission_total > 0 else 0.0
+                po_total_amount_untaxed = 0.0
                 for po in related_purchase_orders:
                     if po.state == 'cancel':
                         continue
 
-                    for po_line in po.order_line:
-                        if po_line.product_id and so_line.product_id and po_line.product_id.id == so_line.product_id.id \
-                                and po_line.price_unit != so_line.purchase_price:
-                            so_line.purchase_price = po_line.price_unit
-        # else -> skip if a sale order doesn't have a related purchase order
+                    po_total_amount_untaxed += po.amount_untaxed
+                    if po.commission_total > 0:
+                        po_total_amount_untaxed += po.commission_total
 
-        super(SaleOrder, self)._compute_margin()
+                so.margin = so.amount_untaxed - so_commission_total - po_total_amount_untaxed
+                so.margin_percent = so.amount_untaxed and so.margin / so.amount_untaxed
+
+        else:   # lets it is calculated in parent method if a sale order doesn't have a related purchase order
+            super(SaleOrder, self)._compute_margin()
+
         self.message_post(body="Tính lại biên lợi nhuận")
 
     def create_bookings(self):

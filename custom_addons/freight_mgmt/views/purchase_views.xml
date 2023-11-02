@@ -8,6 +8,14 @@
             <xpath expr="//button[@name='action_create_invoice']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//button[@name='button_confirm']" position="after">
+                <button
+                    name="recalculate_margin"
+                    type="object"
+                    string="Recalculate Margin"
+                    states="draft,sent,purchase"
+                />
+            </xpath>
             <xpath expr="//field[@name='currency_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
