@@ -186,13 +186,22 @@
                             <attribute name="edit">false</attribute>
                             <attribute name="delete">false</attribute>
                         </xpath>
+                        <xpath expr="//div[@name='button_box']" position="inside">
+                                <button name="action_view_booking"
+                                        type="object"
+                                        class="oe_stat_button"
+                                        icon="fa-pencil-square-o"
+                                        attrs="{'invisible': [('booking_count', '=', 0)]}">
+                                        <field name="booking_count" widget="statinfo" string="Booking"/>
+                                </button>
+                        </xpath>
                         <xpath expr="//button[@name='payment_action_void']" position="before">
                                 <field name="booking_status" invisible="1"/>
                                 <button name="create_bookings" string="Create Booking"
                                         type="object" class="btn-primary"
                                         groups="freight_mgmt.group_freight_operation"
                                         context="{'default_advance_payment_method': 'percentage'}"
-                                        attrs="{'invisible': [('booking_status', '!=', 'to booking')]}"/>
+                                        attrs="{'invisible': ['|', ('booking_status', '!=', 'to booking'), ('booking_count', '&gt;', 0)]}"/>
                         </xpath>
                         <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d']" position="attributes">
                                 <attribute name="invisible">1</attribute>
@@ -211,6 +220,9 @@
                         </xpath>
                         <xpath expr="//button[@name='button_edit_agents']" position="attributes">
                                 <attribute name="attrs">{'invisible': 1}</attribute>
+                        </xpath>
+                        <xpath expr="//button[@name='recompute_margin']" position="attributes">
+                                <attribute name="invisible">1</attribute>
                         </xpath>
                         <xpath expr="//field[@name='order_type']" position="attributes">
                                 <attribute name="readonly">1</attribute>

@@ -6,6 +6,7 @@
         <field name="model">freight.credit.note</field>
         <field name="arch" type="xml">
             <search>
+                <field name="bill_no" />
                 <field name="user_id" />
                 <filter
                     string="My Credit Notes"
@@ -14,26 +15,19 @@
                 />
                 <separator />
                 <group expand="0" string="Group By">
-                    <!--
+                    <!-- Cannot group_by by supplier_id field because it is not stored field. -->
                     <filter
-                        string="Team"
-                        name="group_team"
+                        string="Vendor"
+                        name="group_vendor"
                         domain="[]"
-                        context="{'group_by':'team_id'}"
+                        context="{'group_by':'partner_name'}"
                     />
-                    -->
-<!--                    <filter-->
-<!--                        string="User"-->
-<!--                        name="group_user"-->
-<!--                        domain="[]"-->
-<!--                        context="{'group_by':'user_id'}"-->
-<!--                    />-->
-<!--                    <filter-->
-<!--                        string="Vendor"-->
-<!--                        name="group_vendor"-->
-<!--                        domain="[]"-->
-<!--                        context="{'group_by':'supplier_id'}"-->
-<!--                    />-->
+                    <filter
+                        string="Bill Reference"
+                        name="group_bill"
+                        domain="[]"
+                        context="{'group_by':'bill_id'}"
+                    />
 <!--                    <filter-->
 <!--                        string="Branch"-->
 <!--                        name="group_branch"-->
@@ -58,6 +52,9 @@
 <!--                    />-->
 <!--                    <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"-->
 <!--                            attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}" data-hotkey="q"/>-->
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            string="Confirm" type="object" data-hotkey="c"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="action_create_invoice" string="Create Invoice" type="object" class="oe_highlight"
                             context="{'create_bill':True, 'attachment_res_id':id, 'attachment_res_model':'freight.credit.note'}" data-hotkey="w"
                             attrs="{'invisible': ['|', '|', ('sale_state', 'not in', ('purchase', 'done')), ('state', 'not in', ['posted', 'completed']), ('invoice_status', 'in', ('no', 'invoiced'))]}"/>
@@ -100,8 +97,8 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="partner_id" invisible="1" />
-                        <field name="is_purchase_order_empty" invisible="1" />
                         <field name="origin_name" invisible="1" />
+                        <field name="related_purchase_order_ids" invisible="1" />
                         <field
                             name="company_id"
                             options="{'no_create': True}"

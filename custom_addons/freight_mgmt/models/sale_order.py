@@ -58,6 +58,8 @@ class SaleOrder(models.Model):
                                                currency_field='vnd_currency_id',
                                                compute='_compute_total_amount_vnd_summary')
 
+    booking_count = fields.Integer("Booking Count", compute='_compute_booking_count')
+
     def update_exchange_rate(self):
         self.ensure_one()
         self.exchange_rate = self._get_default_exchange_rate()
@@ -66,6 +68,12 @@ class SaleOrder(models.Model):
         vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')], limit=1)
         for rec in self:
             rec.vnd_currency_id = vnd.id or False
+
+    def _compute_booking_count(self):
+        for order in self:
+            order.booking_count = self.env['freight.booking'].search_count([
+                ('order_id', '=', order.id)
+            ])
 
     @api.depends('amount_total_usd', 'amount_total_vnd', 'exchange_rate')
     def _compute_total_amount_vnd_summary(self):
@@ -193,6 +201,23 @@ class SaleOrder(models.Model):
 
         return booking_vals
 
+    def action_view_booking(self):
+        self.ensure_one()
+        bookings = self.env['freight.booking'].search([
+            ('order_id', '=', self.id)
+        ])
+        result = {
+            "type": "ir.actions.act_window",
+            "res_model": "freight.booking",
+            "domain": [['id', 'in', bookings.ids]],
+            "name": "Bookings",
+            'view_mode': 'tree,form',
+        }
+        if len(bookings) == 1:
+            result['view_mode'] = 'form'
+            result['res_id'] = bookings.id
+        return result
+
     def action_view_purchase_orders(self):
         self.ensure_one()
         # purchase_order_ids = self._get_purchase_orders().ids
@@ -271,7 +296,7 @@ class SaleOrder(models.Model):
                 if create_invoices_button_id and button['id'] == create_invoices_button_id:
                     res['toolbar']['action'].remove(button)
 
-            return res
+        return res
 
     @api.model
     def _nothing_to_invoice_error(self):

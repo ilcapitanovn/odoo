@@ -74,16 +74,17 @@
                             type="object" data-hotkey="d"
                             groups="freight_mgmt.group_freight_manager"
                             attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('debit_count', '&gt;', 0)]}"/>
-                    <button name="create_credit_note" string="Create Credit Note"
+                    <button name="create_credit_note" string="Create Credit Notes"
                             type="object" data-hotkey="r"
                             groups="freight_mgmt.group_freight_manager"
-                            attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('credit_count', '&gt;', 0)]}"/>
+                            attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('show_create_credit_button', '=', False)]}"/>
                     <field
                         name="state"
                         widget="statusbar"
                         statusbar_visible="draft,posted,completed,cancel"
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />
+                    <field name="show_create_credit_button" invisible="1"/>
 <!--                    <field-->
 <!--                        name="stage_id"-->
 <!--                        widget="statusbar"-->

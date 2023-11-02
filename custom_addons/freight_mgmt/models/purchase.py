@@ -13,6 +13,9 @@ class PurchaseOrder(models.Model):
         vnd_rate = vnd.rate if vnd else 0
         return float_round(vnd_rate, precision_digits=0)
 
+    credit_note_id = fields.One2many('freight.credit.note', 'purchase_order_id',
+                                     string='Credit Note Reference', auto_join=True)
+
     exchange_rate = fields.Float(string='VND/USD rate', default=_get_default_exchange_rate,
                                  help='The rate of VND per USD.', tracking=True, store=True)
     amount_untaxed_usd = fields.Monetary(string='Untaxed Amount (USD)', tracking=True, store=True,

@@ -40,13 +40,6 @@ class FreightCreditNote(models.Model):
         vnd_rate = vnd.rate if vnd else 0
         return float_round(vnd_rate, precision_digits=0)
 
-    def _get_purchase_order_domain(self):
-        domain = [('id', '=', -1)]
-        filtered_order_id = self.sale_order_id._get_purchase_orders()
-        if filtered_order_id:
-            domain = [('id', 'in', filtered_order_id.ids)]
-        return domain
-
     def _get_default_currency_id(self):
         return self.env.company.currency_id.id
 
@@ -68,16 +61,17 @@ class FreightCreditNote(models.Model):
     booking_id = fields.Many2one(related="bill_id.booking_id", string="Booking", readonly=True)
     sale_order_id = fields.Many2one(related="bill_id.order_id", string="Sale Order Reference", readonly=True)
     origin_name = fields.Char(related="sale_order_id.name", string="Source Document", readonly=True, store=False)
-    purchase_order_id = fields.Many2one('purchase.order', string="Purchase Orders",
-                            domain="['&', ('origin', '=', origin_name), ('state', 'in', ['purchase', 'done'])]")
+    related_purchase_order_ids = fields.Many2many('purchase.order', compute="_compute_related_purchase_order_ids")
+    purchase_order_id = fields.Many2one(
+        'purchase.order', string="Purchase Orders",
+        domain="[('origin', '=', origin_name), ('id', 'not in', related_purchase_order_ids), ('state', 'in', ['purchase', 'done'])]"
+    )
     partner_id = fields.Many2one(related="purchase_order_id.partner_id", string="Partner", readonly=True)
     user_id = fields.Many2one(related="purchase_order_id.user_id", string="S.I.C")
     invoice_count = fields.Integer(related="purchase_order_id.invoice_count", string='Bill Count', copy=False)
     invoice_ids = fields.Many2many(related="purchase_order_id.invoice_ids", string='Bills', copy=False)
     invoice_status = fields.Selection(related="purchase_order_id.invoice_status", string="Invoice Status", store=True)
     sale_state = fields.Selection(related="purchase_order_id.state", string="Purchase Order State", store=True)
-
-    is_purchase_order_empty = fields.Boolean(compute='_compute_is_purchase_order_empty', store=False)
 
     pol = fields.Char(related="bill_id.port_loading_id.name", string="POL", readonly=True, store=False)
     pod = fields.Char(related="bill_id.port_discharge_id.name", string="POD", readonly=True, store=False)
@@ -190,6 +184,30 @@ class FreightCreditNote(models.Model):
             rec.invoice_partner_id = rec.partner_id.address_get(
                 adr_pref=['invoice']).get('invoice', rec.partner_id.id)
 
+    @api.depends("sale_order_id")
+    def _compute_related_purchase_order_ids(self):
+        for rec in self:
+            rec.related_purchase_order_ids = False
+            if self.sale_order_id.id and self.sale_order_id.name:
+                '''
+                Search credit notes which were created for the same bill in order to filter out purchase orders have done.
+                '''
+                existing_credits = self.search([('sale_order_id', '=', self.sale_order_id.id)])
+
+                if existing_credits:
+                    filtered_existing_credits = existing_credits
+                    if self.ids:  # In case of Edit
+                        filtered_existing_credits = existing_credits.filtered(lambda x: x.id not in self.ids)
+
+                    if filtered_existing_credits and filtered_existing_credits.purchase_order_id:
+                        rec.related_purchase_order_ids = filtered_existing_credits.purchase_order_id.ids
+
+    def action_confirm(self):
+        if not self.purchase_order_id:
+            raise UserError(_("A purchase order is required in order to confirm a credit note."))
+
+        self.write({'state': 'posted'})
+
     @api.onchange('exchange_rate')
     def _onchange_exchange_rate(self):
         if self.exchange_rate <= 0:
@@ -199,21 +217,21 @@ class FreightCreditNote(models.Model):
 
     @api.model
     def _get_bill_id_domain(self):
+        # if self.env.context.get("shipment_type_suffix") == 'imp':
+        #     res = [('booking_id.shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+        #            ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+        # else:
+        #     res = [('booking_id.shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
+        #            ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+
+        # Update domain conditions to allow creating multi credit notes per bill
         if self.env.context.get("shipment_type_suffix") == 'imp':
             res = [('booking_id.shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
-                   ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+                   ('state', '=', 'posted')]
         else:
             res = [('booking_id.shipment_type', 'not in', ('fcl-imp', 'lcl-imp', 'air-imp')),
-                   ('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]
+                   ('state', '=', 'posted')]
         return res
-
-    @api.depends('purchase_order_id')
-    def _compute_is_purchase_order_empty(self):
-        if self.purchase_order_id:
-            self.is_purchase_order_empty = False
-        else:
-            self.is_purchase_order_empty = True
-        print("finish - remove after debug")
 
     @api.depends('bank_ids')
     def _compute_company_bank_id(self):
@@ -338,17 +356,7 @@ class FreightCreditNote(models.Model):
     @api.depends('sale_order_id.order_line.purchase_line_ids.order_id')
     @api.onchange("bill_id")
     def _onchange_bill_id(self):
-        filtered_order_id = self.sale_order_id._get_purchase_orders()
-
-        if filtered_order_id:
-            self.is_purchase_order_empty = False
-            # res = {}
-            # res['domain'] = {'purchase_order_id': [('id', 'in', filtered_order_id.ids)]}
-            # return res
-            # self.update({'purchase_order_id': [6, 0, filtered_order_id]})
-        else:
-            self.is_purchase_order_empty = True
-            self.update({'purchase_order_id': [(5, 0, 0)]})
+        self.update({'purchase_order_id': [(5, 0, 0)]})     # Clear current selected item in dropdown
 
     @api.onchange("supplier_id")
     def _onchange_partner_id(self):
@@ -421,15 +429,11 @@ class FreightCreditNote(models.Model):
         return res
 
     def write(self, vals):
-        # for _ticket in self:
-        #     now = fields.Datetime.now()
-        #     # if vals.get("stage_id"):
-        #     #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
-        #     #     vals["last_stage_update"] = now
-        #     #     if stage.completed:
-        #     #         vals["completed_date"] = now
-        #     if not vals.get("credit_date"):
-        #         vals["credit_date"] = now
+        for item in self:
+            if vals.get("state") in ['posted', 'completed']:
+                if not item.bill_id or not item.purchase_order_id:
+                    raise UserError(_("A purchase order is required in order to update a credit note."))
+
         return super().write(vals)
 
     def _prepare_freight_credit_note_number(self, values):

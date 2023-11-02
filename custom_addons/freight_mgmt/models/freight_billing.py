@@ -151,6 +151,7 @@ class FreightBilling(models.Model):
 
     debit_count = fields.Integer("Debit Count", compute='_compute_debit_count')
     credit_count = fields.Integer("Credit Count", compute='_compute_credit_count')
+    show_create_credit_button = fields.Boolean("Check Credit Note Button", compute='_compute_credit_count')
 
     etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
     do_number_ref = fields.Char(related="booking_id.number", string="DO No. Ref", store=False, readonly=True)
@@ -311,54 +312,30 @@ class FreightBilling(models.Model):
         # 1) Create credit notes.
         credit_vals_list = []
         for billing in self:
-            credit_vals = self._prepare_credit_values(billing)
-
-            credit_vals_list.append(credit_vals)
+            if billing.order_id:
+                domain = [('state', 'in', ('purchase', 'done')), ("origin", "=", billing.order_id.name)]
+                purchase_orders = self.env["purchase.order"].sudo().search(domain)
+                if purchase_orders:
+                    for order in purchase_orders:
+                        if not order.credit_note_id:
+                            credit_vals = self._prepare_credit_values(billing, order)
+                            credit_vals_list.append(credit_vals)
 
         if not credit_vals_list:
-            raise self._nothing_to_debit_error()
+            raise self._nothing_to_credit_error()
 
         new_credits = self.env['freight.credit.note'].sudo().with_context().create(credit_vals_list)
 
         if new_credits:
-            return self._open_view_credit_note(new_credits)
+            return self.action_view_credit_note()
 
-    def _open_view_credit_note(self, new_credits):
-        credit_form = self.env.ref('freight_mgmt.freight_credit_note_view_form', False)
-
-        if isinstance(new_credits.ids, list):
-            new_credit_id = new_credits.ids[0]
-        else:
-            new_credit_id = new_credits.id
-
-        if credit_form and new_credit_id:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'freight.credit.note',
-                'view_type': 'form',
-                'view_mode': 'tree,form',
-                'target': 'current',
-                'views': [(credit_form.id, 'form')],
-                'view_id': credit_form.id,
-                'res_id': new_credit_id,
-            }
-
-    def _prepare_credit_values(self, billing):
+    @staticmethod
+    def _prepare_credit_values(billing, purchase_order_id):
         credit_vals = {
             'bill_id': billing.id,
             'booking_id': billing.booking_id,
             'sale_order_id': billing.order_id,
         }
-
-        purchase_order_id = None
-        if billing.order_id:
-            # purchase_orders = billing.order_id._get_purchase_orders()
-            purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", billing.order_id.name)])
-            if purchase_orders:
-                for rec in purchase_orders:
-                    if rec.state == 'purchase' or rec.state == 'done':
-                        purchase_order_id = rec
-                        break
 
         if purchase_order_id:
             if purchase_order_id.state != 'purchase' and purchase_order_id.state != 'done':
@@ -412,7 +389,13 @@ class FreightBilling(models.Model):
     @api.model
     def _nothing_to_debit_error(self):
         return UserError(_(
-            "There is nothing to create debit note! Contact administrator for details.\n\n"
+            "No available sale order selected to create debit note! Please contact administrator for details.\n\n"
+        ))
+
+    @api.model
+    def _nothing_to_credit_error(self):
+        return UserError(_(
+            "No available purchase order selected to create credit note! Please contact administrator for details.\n\n"
         ))
 
     @api.model
@@ -488,9 +471,15 @@ class FreightBilling(models.Model):
 
     def _compute_credit_count(self):
         for bill in self:
-            bill.credit_count = self.env['freight.credit.note'].search_count([
-                ('bill_id', '=', bill.id)
-            ])
+            bill.credit_count = 0
+            bill.show_create_credit_button = True
+            if bill.credit_note_ids:
+                bill.credit_count = len(bill.credit_note_ids)
+
+                if bill.order_id:
+                    domain = [('state', 'in', ('purchase', 'done')), ("origin", "=", bill.order_id.name)]
+                    purchase_orders_count = self.env["purchase.order"].sudo().search_count(domain)
+                    bill.show_create_credit_button = bill.credit_count < purchase_orders_count
 
     @api.depends('do_number_ref')
     def _compute_delivery_order_number(self):
@@ -737,8 +726,11 @@ class FreightBilling(models.Model):
         return res
 
     def write(self, vals):
-        for _ticket in self:
+        for item in self:
             now = fields.Datetime.now()
+            if vals.get("state") in ['posted', 'completed'] and not item.vessel_bol_number:
+                raise UserError(_("A B/L Number is required in order to update a bill."))
+
             # if vals.get("stage_id"):
             #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])
             #     vals["last_stage_update"] = now
