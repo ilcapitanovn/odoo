@@ -203,11 +203,11 @@
                             </page>
                             <page string="Bank Information" name="bank_information">
                                 <group>
-                                    <group>
-                                        <field name="bank_name" />
-                                        <field name="bank_acc_no"/>
-                                        <field name="bank_acc_name" />
-                                    </group>
+                                    <field name="bank_ids" invisible="1" />
+                                    <field name="company_bank_id" />
+                                    <field name="bank_name" />
+                                    <field name="bank_acc_no"/>
+                                    <field name="bank_acc_name" />
                                 </group>
                             </page>
                         </notebook>
