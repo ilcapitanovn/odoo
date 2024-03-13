@@ -6,8 +6,8 @@
             <field name="inherit_id" ref="account.res_partner_view_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='customer']" position="before">
-                    <filter string="Shippers" name="shipper_tag" domain="[('category_id.name','=ilike', 'shipper')]"/>
-                    <filter string="Consignees" name="consignee_tag" domain="[('category_id.name','=ilike', 'consignee')]"/>
+                    <filter string="Shippers" name="shipper_tag" domain="['|', ('category_id.name','=ilike', 'shipper'), ('category_id.name','=ilike', 'Người giao hàng')]"/>
+                    <filter string="Consignees" name="consignee_tag" domain="['|', ('category_id.name','=ilike', 'consignee'), ('category_id.name','=ilike', 'Người nhận hàng')]"/>
                     <separator/>
                 </xpath>
             </field>

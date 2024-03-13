@@ -59,7 +59,7 @@ class FreightBilling(models.Model):
     description = fields.Char(translate=True)
 
     shipper_id = fields.Many2one(comodel_name="res.partner",
-                                 domain=[("category_id.name", "=", "Shipper")],
+                                 domain=["|", ("category_id.name", "=", "Shipper"), ('category_id.name','=ilike', 'Người giao hàng')],
                                  string="Shipper")
     shipper_name = fields.Char()
     shipper_email = fields.Char(string="Shipper's Email")
@@ -67,7 +67,7 @@ class FreightBilling(models.Model):
     shipper_extra_info = fields.Char(string="Shipper's Information")
 
     consignee_id = fields.Many2one(comodel_name="res.partner",
-                                   domain=[("category_id.name", "=", "Consignee")],
+                                   domain=["|", ("category_id.name", "=", "Consignee"), ('category_id.name','=ilike', 'Người nhận hàng')],
                                    string="Consignee")
     consignee_name = fields.Char()
     consignee_email = fields.Char(string="Consignee's Email")
