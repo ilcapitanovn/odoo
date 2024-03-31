@@ -1,1 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_freight_langson_purchase_order_line_saigon_custom_price,freight.langson.purchase.order.line.saigon.custom.price,model_purchase_order_line_saigon,group_freight_langson_custom_price,1,1,1,1
+access_freight_langson_purchase_order_line_saigon_salesman,freight.langson.purchase.order.line.saigon.salesman,model_purchase_order_line_saigon,sales_team.group_sale_salesman,1,1,1,1
+access_freight_langson_sale_order_line_saigon_custom_price,freight.langson.sale.order.line.saigon.custom.price,model_sale_order_line_saigon,group_freight_langson_custom_price,1,1,1,1
+access_freight_langson_sale_order_line_saigon_salesman,freight.langson.sale.order.line.saigon.salesman,model_sale_order_line_saigon,sales_team.group_sale_salesman,1,1,1,1

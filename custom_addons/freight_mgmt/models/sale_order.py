@@ -239,7 +239,7 @@ class SaleOrder(models.Model):
     def action_view_purchase_orders(self):
         self.ensure_one()
         # purchase_order_ids = self._get_purchase_orders().ids
-        purchase_orders = self.env["purchase.order"].search([("origin", "=", self.name)])
+        purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.name)])
         if purchase_orders:
             purchase_order_ids = purchase_orders.ids
         else:
@@ -265,7 +265,7 @@ class SaleOrder(models.Model):
     def _compute_purchase_order_count(self):
         for order in self:
             # order.purchase_order_count = len(order._get_purchase_orders())
-            purchase_orders = self.env["purchase.order"].search([("origin", "=", order.name)])
+            purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", order.name)])
             order.purchase_order_count = len(purchase_orders)
 
     @api.onchange("order_type")

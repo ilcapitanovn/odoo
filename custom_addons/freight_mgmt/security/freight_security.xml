@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="0">
+        <record id="group_freight_hide_money_field_sale_purchase_order" model="res.groups">
+            <field name="name">Hide money fields in Sale and Purchase Order</field>
+        </record>
         <record id="group_freight_user" model="res.groups">
             <field name="name">User</field>
             <field name="comment">The user will be only able to view documents created by everyone.</field>

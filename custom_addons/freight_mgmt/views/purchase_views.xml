@@ -74,6 +74,112 @@
         </field>
     </record>
 
+<!--    <record id="freight_purchase_order_form_set_view_only_inherited" model="ir.ui.view">-->
+<!--        <field name="name">freight.purchase.order.form.set.view.only.inherited</field>-->
+<!--        <field name="model">purchase.order</field>-->
+<!--        <field name="inherit_id" ref="freight_mgmt.freight_purchase_order_view_form_inherited" />-->
+<!--        <field eval="19" name="priority"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//form" position="attributes">-->
+<!--                <attribute name="create">false</attribute>-->
+<!--                <attribute name="edit">false</attribute>-->
+<!--                <attribute name="delete">false</attribute>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <!--Hide money fields from users who are given access to PO but not in sale or pricing team-->
+    <record id="freight_purchase_order_form_money_field_hidden_inherited" model="ir.ui.view">
+        <field name="name">freight.purchase.order.form.money.field.hidden.inherited</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_purchase_order_view_form_inherited" />
+        <field name="groups_id" eval="[(4, ref('freight_mgmt.group_freight_hide_money_field_sale_purchase_order'))]"/>
+        <field eval="19" name="priority"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='products']//tree//field[@name='price_unit_input']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='products']//tree//field[@name='price_subtotal_display']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='products']//tree//field[@name='taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='products']//tree//field[@name='commission_status']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group//group[hasclass('oe_subtotal_footer')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Hide modification functions so that users with view permission only not seeing buttons on top of the form.-->
+    <record id="freight_purchase_order_view_form_group_user_inherited" model="ir.ui.view">
+        <field name="name">freight.purchase.order.view.form.group.user.inherited</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_purchase_order_view_form_inherited" />
+        <field eval="29" name="priority"/>
+<!--        <field name="groups_id" eval="[(4, ref('purchase.group_purchase_user'))]"/>-->
+<!--        <field name="mode">primary</field>-->
+<!--        <field eval="99" name="priority"/>-->
+        <field name="arch" type="xml">
+<!--            <xpath expr="//page[@name='products']//field[@name='order_line']" position="attributes">-->
+<!--                    <attribute name="readonly">1</attribute>-->
+<!--                    <attribute name="groups">purchase.group_purchase_user</attribute>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//field[@name='partner_id']" position="attributes">-->
+<!--                    <attribute name="readonly">1</attribute>-->
+<!--                    <attribute name="groups">purchase.group_purchase_user</attribute>-->
+<!--            </xpath>-->
+            <xpath expr="//button[@name='action_rfq_send'][1]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_rfq_send'][2]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='print_quotation']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_confirm'][1]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_confirm'][2]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_approve']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_create_invoice'][1]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_create_invoice'][2]" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='confirm_reminder_mail']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_draft']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_cancel']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_done']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_unlock']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+            <xpath expr="//button[@name='recalculate_margin']" position="attributes">
+                    <attribute name="groups">purchase.group_purchase_user</attribute>
+            </xpath>
+<!--            <xpath expr="//button[@name='%(seenpo_cancel_purchase_order.action_view_purchase_order_cancel)d']" position="attributes">-->
+<!--                    <attribute name="groups">purchase.group_purchase_user</attribute>-->
+<!--            </xpath>-->
+        </field>
+    </record>
+
     <record id="freight_action_purchase_recalculate_margin" model="ir.actions.server">
         <field name="name">Recalculate Margin After Purchase Updated</field>
         <field name="model_id" ref="purchase.model_purchase_order"/>

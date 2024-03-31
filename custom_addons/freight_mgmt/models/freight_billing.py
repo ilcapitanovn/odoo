@@ -149,6 +149,8 @@ class FreightBilling(models.Model):
     bill_date = fields.Datetime(string="Bill Date", default=fields.Datetime.now)
     due_date = fields.Datetime(string="Due Date")
 
+    sale_order_count = fields.Integer("Sale Count", compute='_compute_sale_order_count')
+    purchase_order_count = fields.Integer("Purchase Count", compute='_compute_purchase_order_count')
     debit_count = fields.Integer("Debit Count", compute='_compute_debit_count')
     credit_count = fields.Integer("Credit Count", compute='_compute_credit_count')
     show_create_credit_button = fields.Boolean("Check Credit Note Button", compute='_compute_credit_count')
@@ -408,6 +410,53 @@ class FreightBilling(models.Model):
                    ('confirmed', '=', True), ('billing_id', '=', False)]
         return res
 
+    def action_view_sale_order(self):
+        self.ensure_one()
+        result = {
+            "type": "ir.actions.act_window",
+            "res_model": "sale.order",
+            "domain": [['id', 'in', self.order_id.ids]],
+            "name": "Sale Order",
+            'view_mode': 'tree,form',
+        }
+        if len(self.order_id) == 1:
+            result['view_mode'] = 'form'
+            result['res_id'] = self.order_id.id
+        return result
+
+    def action_view_purchase_order(self):
+        self.ensure_one()
+        purchase_orders = self.env['purchase.order'].search([
+            ("origin", "=", self.order_id.name)
+        ])
+        if not purchase_orders:
+            return
+
+        purchase_order_view_form = self.env.ref('freight_mgmt.freight_purchase_order_view_form_from_billing_inherited', False)
+
+        action = {
+            'res_model': 'purchase.order',
+            'type': 'ir.actions.act_window'
+        }
+        if len(purchase_orders) == 1:
+            action.update({
+                'res_id': purchase_orders.id,
+                'view_type': 'tree',
+                'view_mode': 'form',
+                'views': [(purchase_order_view_form.id, 'form')],
+                'view_id': purchase_order_view_form.id
+            })
+        else:
+            action.update({
+                'name': _("Purchase Order generated from %s", self.order_id.name),
+                'domain': [('id', 'in', purchase_orders.ids)],
+                'view_type': 'list',
+                'view_mode': 'list,form',
+                'views': [(False, 'list'), (purchase_order_view_form.id, 'form')],
+                'view_id': purchase_order_view_form.id
+            })
+        return action
+
     def action_view_debit_note(self):
         self.ensure_one()
         debit_notes = self.env['freight.debit.note'].search([
@@ -458,6 +507,20 @@ class FreightBilling(models.Model):
     def _get_report_base_filename(self):
         self.ensure_one()
         return '%s' % (self.display_name)
+
+    def _compute_sale_order_count(self):
+        for bill in self:
+            bill.sale_order_count = len(bill.order_id)
+
+    def _compute_purchase_order_count(self):
+        for bill in self:
+            so_name = bill.order_id.name if bill.order_id else False
+            if so_name:
+                bill.purchase_order_count = self.env['purchase.order'].sudo().search_count([
+                    ('origin', '=', so_name)
+                ])
+            else:
+                bill.purchase_order_count = 0
 
     def _compute_debit_count(self):
         # The invoice_ids are obtained thanks to the invoice lines of the SO

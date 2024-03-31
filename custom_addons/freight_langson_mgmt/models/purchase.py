@@ -1,72 +1,58 @@
-import json
-
 from odoo import api, fields, models
 
 
-class FreightLangSonSaleOrder(models.Model):
-    _inherit = "sale.order"
+class FreightLangSonPurchaseOrder(models.Model):
+    _inherit = "purchase.order"
 
-    order_items_saigon = fields.One2many('sale.order.line.saigon', 'order_id', string='Order Lines SaiGon',
+    order_items_saigon = fields.One2many('purchase.order.line.saigon', 'order_id', string='Purchase Order Lines SaiGon',
                                          states={'cancel': [('readonly', True)], 'done': [('readonly', True)]},
-                                         store=True, copy=True, auto_join=True)
+                                         store=True, copy=True, tracking=True, auto_join=True)
 
-    branch_id_langson_condition = fields.Boolean(compute="_compute_branch_id_langson_condition", readonly=True, store=False)
+    branch_id_langson_condition = fields.Boolean(compute="_compute_branch_id_langson_condition", readonly=True,
+                                                 store=False)
 
     '''Only computing fields, no need to save db'''
-    saigon_amount_untaxed_usd = fields.Monetary(string='Untaxed Amount (USD)', compute='_saigon_amount_totals', store=False)
-    saigon_amount_tax_usd = fields.Monetary(string='Taxes (USD)', compute='_saigon_amount_totals', store=False)
-    saigon_amount_total_usd = fields.Monetary(string='Total (USD)', compute='_saigon_amount_totals', store=False)
+    saigon_amount_untaxed_usd = fields.Monetary(string='Untaxed Amount (USD)', compute='_saigon_amount_totals')
+    saigon_amount_tax_usd = fields.Monetary(string='Taxes (USD)', compute='_saigon_amount_totals')
+    saigon_amount_total_usd = fields.Monetary(string='Total (USD)', compute='_saigon_amount_totals')
 
     saigon_amount_untaxed_vnd = fields.Monetary(string='Untaxed Amount (VND)', compute='_saigon_amount_totals',
-                                                currency_field='vnd_currency_id', store=False)
+                                                currency_field='vnd_currency_id')
     saigon_amount_tax_vnd = fields.Monetary(string='Taxes (VND)', compute='_saigon_amount_totals',
-                                            currency_field='vnd_currency_id', store=False)
+                                            currency_field='vnd_currency_id')
     saigon_amount_total_vnd = fields.Monetary(string='Total (VND)', compute='_saigon_amount_totals',
-                                              currency_field='vnd_currency_id', store=False)
-    saigon_has_tax_totals_usd = fields.Boolean(compute='_saigon_amount_totals', store=False)
-    saigon_has_tax_totals_vnd = fields.Boolean(compute='_saigon_amount_totals', store=False)
+                                              currency_field='vnd_currency_id')
+    saigon_has_tax_totals_usd = fields.Boolean(compute='_saigon_amount_totals')
+    saigon_has_tax_totals_vnd = fields.Boolean(compute='_saigon_amount_totals')
 
-    saigon_amount_untaxed_vnd_summary = fields.Monetary(string='Total Amount Untaxed (VND)', store=False,
+    saigon_amount_untaxed_vnd_summary = fields.Monetary(string='Total Amount Untaxed (VND)',
                                                         currency_field='vnd_currency_id',
                                                         compute='_saigon_total_amount_vnd_summary')
-    saigon_total_amount_vnd_summary = fields.Monetary(string='Total Amount (VND)', store=False,
+    saigon_total_amount_vnd_summary = fields.Monetary(string='Total Amount (VND)',
                                                       currency_field='vnd_currency_id',
                                                       compute='_saigon_total_amount_vnd_summary')
 
-    saigon_margin = fields.Monetary(string="Margin", compute='_compute_saigon_margin', store=False)
-    saigon_margin_percent = fields.Float(string="Margin (%)", compute='_compute_saigon_margin', digits=(12, 4), store=False)
+    def button_confirm(self):
+        self._copy_products_to_saigon()
 
-    def _prepare_booking_values(self, order):
-        booking_values = super(FreightLangSonSaleOrder, self)._prepare_booking_values(order)
-
-        if self._context.get('branch_code') == 'LS':
-            if booking_values:
-                booking_values['booking_type'] = 'trading'
-                booking_values['transport_type'] = 'land'
-
-        return booking_values
-
-    def action_confirm(self):
-        self._copy_order_lines_to_saigon()
-
-        return super().action_confirm()
+        return super().button_confirm()
 
     '''TODO: need to be delete after this function is deployed to production '''
     def action_copy_all_old_order_lines_to_saigon(self):
         branch_langson = self.env.ref('seenpo_multi_branch_base.seenpo_branch_langson', False)
         branch_langson_id = branch_langson.id if branch_langson else -1
-        sale_orders_langson = self.env["sale.order"].sudo().search([("branch_id", "=", branch_langson_id)])
-        if sale_orders_langson:
-            for order in sale_orders_langson:
+        purchase_orders_langson = self.env["purchase.order"].sudo().search([("branch_id", "=", branch_langson_id)])
+        if purchase_orders_langson:
+            for order in purchase_orders_langson:
                 '''Only copy the old ones which are empty '''
                 if order.order_line and not order.order_items_saigon:
-                    order.copy_order_lines()
+                    order.copy_products()
 
-    '''Manual copy action to duplicate order lines into SaiGon section'''
-    def copy_order_lines(self):
-        self._copy_order_lines_to_saigon()
+    '''Manual copy action to duplicate line of products into SaiGon section'''
+    def copy_products(self):
+        self._copy_products_to_saigon()
 
-    def _copy_order_lines_to_saigon(self):
+    def _copy_products_to_saigon(self):
         items = []
         '''Delete existing records'''
         if self.order_items_saigon:
@@ -91,7 +77,7 @@ class FreightLangSonSaleOrder(models.Model):
             "product_qty": item.product_uom_qty,
             "product_uom": item.product_uom.display_name,
             "price_unit": item.price_unit_input,
-            "taxes_id": [(6, 0, [x.id for x in item.tax_id])],
+            "taxes_id": [(6, 0, [x.id for x in item.taxes_id])],
             "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
             "price_subtotal": item.price_subtotal_display,
             "price_total": item.price_total_display,
@@ -103,13 +89,13 @@ class FreightLangSonSaleOrder(models.Model):
         branch_langson = self.env.ref('seenpo_multi_branch_base.seenpo_branch_langson', False)
         branch_langson_id = branch_langson.id if branch_langson else -1
         for rec in self:
-            order_branch_id = rec.branch_id.id if rec.branch_id else -2
-            rec.branch_id_langson_condition = order_branch_id == branch_langson_id
+            purchase_order_branch_id = rec.branch_id.id if rec.branch_id else -2
+            rec.branch_id_langson_condition = purchase_order_branch_id == branch_langson_id
 
     @api.depends('order_items_saigon.price_total')
     def _saigon_amount_totals(self):
         """
-        Compute the total amounts of the Sale Order for SaiGon section.
+        Compute the total amounts of the Purchase Order for SaiGon section.
         """
         for order in self:
             amount_untaxed_usd = amount_tax_usd = 0.0
@@ -142,34 +128,3 @@ class FreightLangSonSaleOrder(models.Model):
         for rec in self:
             rec.saigon_amount_untaxed_vnd_summary = rec.saigon_amount_untaxed_usd * rec.exchange_rate + rec.saigon_amount_untaxed_vnd
             rec.saigon_total_amount_vnd_summary = rec.saigon_amount_total_usd * rec.exchange_rate + rec.saigon_amount_total_vnd
-
-    @api.depends('saigon_amount_untaxed_vnd_summary')
-    def _compute_saigon_margin(self):
-        print("_compute_saigon_margin called with order_name = %s" % self.name)
-
-        related_purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.name)])
-        for so in self:
-            so_commission_total_vnd = so.commission_total * so.exchange_rate if so.commission_total > 0 else 0.0
-            po_total_amount_untaxed_vnd = 0.0
-            so.saigon_margin = 0
-            so.saigon_margin_percent = 0
-            if related_purchase_orders:
-                for po in related_purchase_orders:
-                    if po.state == 'cancel':
-                        continue
-
-                    po_total_amount_untaxed_vnd += po.saigon_amount_untaxed_vnd_summary
-                    if po.commission_total > 0:
-                        po_total_amount_untaxed_vnd += po.commission_total * so.exchange_rate
-
-                if po_total_amount_untaxed_vnd > 0:
-                    saigon_margin_vnd = so.saigon_amount_untaxed_vnd_summary - so_commission_total_vnd - po_total_amount_untaxed_vnd
-                else:
-                    """
-                    In case of PO not in purchase or done, then margin of saigon price will be based on margin in normal price
-                    """
-                    saigon_margin_vnd = (so.saigon_total_amount_vnd_summary - so.total_amount_vnd_summary) + so.margin * so.exchange_rate
-
-                so.saigon_margin = saigon_margin_vnd / so.exchange_rate
-                so.saigon_margin_percent = so.saigon_amount_untaxed_vnd_summary and saigon_margin_vnd / so.saigon_amount_untaxed_vnd_summary
-

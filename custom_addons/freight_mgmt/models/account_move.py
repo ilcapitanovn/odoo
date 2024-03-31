@@ -37,7 +37,7 @@ class AccountMove(models.Model):
             res_model = self.env.context.get("attachment_res_model")
             if res_id and res_model:
                 new_attachments_list = []
-                attachments = self.env['ir.attachment'].search([('res_id', '=', res_id), ('res_model', '=', res_model)])
+                attachments = self.env['ir.attachment'].sudo().search([('res_id', '=', res_id), ('res_model', '=', res_model)])
                 if attachments:
                     for att in attachments:
                         new_att = {

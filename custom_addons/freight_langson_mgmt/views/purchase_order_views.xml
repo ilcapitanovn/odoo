@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="freight_langson_sale_order_view_form_inherited" model="ir.ui.view">
+    <record id="freight_langson_purchase_order_view_form_inherited" model="ir.ui.view">
         <field name="name">freight.langson.sale.order.view.form.inherited</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="freight_mgmt.freight_sale_order_view_form_inherited"/>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_purchase_order_view_form_inherited"/>
         <field name="groups_id" eval="[(4, ref('freight_langson_mgmt.group_freight_langson_custom_price'))]"/>
-        <field eval="49" name="priority"/>
+        <field eval="39" name="priority"/>
         <field name="arch" type="xml">
-                <xpath expr="//button[@name='action_unlock']" position="after">
+                <xpath expr="//button[@name='button_unlock']" position="after">
                     <field name="branch_id_langson_condition" invisible="1"/>
                     <button
-                        name="copy_order_lines"
+                        name="copy_products"
                         type="object"
                         groups="base.group_no_one"
-                        string="Copy Order Lines"
-                        attrs="{'invisible': ['|',('branch_id_langson_condition', '=', False),('state', 'not in', ('sale','done'))]}"
+                        string="Copy Products"
+                        attrs="{'invisible': ['|',('branch_id_langson_condition', '=', False),('state', 'not in', ('purchase','done'))]}"
                     />
                 </xpath>
-                <xpath expr="//sheet//notebook//page[@name='order_lines']" position="after">
-                    <page string="Order Lines (Sai Gon)"
-                          name="order_lines_saigon"
-                          attrs="{'invisible': ['|',('branch_id_langson_condition', '=', False),('state', 'not in', ('sale','done'))]}"
+                <xpath expr="//sheet//notebook//page[@name='products']" position="after">
+                    <page string="Products (Sai Gon)"
+                          name="products_saigon"
+                          attrs="{'invisible': ['|',('branch_id_langson_condition', '=', False),('state', 'not in', ('draft','purchase','done'))]}"
                     >
                         <field name="order_items_saigon"
                                widget="section_and_note_one2many"
@@ -64,33 +64,12 @@
                                 <field name="saigon_total_amount_vnd_summary" widget='monetary'
                                        attrs="{'invisible': [('saigon_has_tax_totals_vnd', '!=', True)]}" />
                                 <field name="commission_total" widget='monetary' />
-
-                                <label for="saigon_margin"/>
-                                <div class="text-nowrap">
-                                    <field name="saigon_margin" class="oe_inline"/>
-                                    <span class="oe_inline" attrs="{'invisible': [('saigon_total_amount_vnd_summary', '=', 0)]}">
-                                        (<field name="saigon_margin_percent" nolabel="1" class="oe_inline" widget="percentage"/>)
-                                    </span>
-                                </div>
                             </group>
                             <div class="oe_clear"/>
                         </group>
                     </page>
                 </xpath>
         </field>
-    </record>
-
-    <record id="freight_langson_sale_order_to_bookings_action_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="12"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="freight_mgmt.freight_sale_order_to_bookings_view_tree"/>
-        <field name="act_window_id" ref="freight_langson_orders_to_booking_action"/>
-    </record>
-    <record id="freight_langson_sale_order_to_bookings_action_form" model="ir.actions.act_window.view">
-       <field name="sequence" eval="13"/>
-       <field name="view_mode">form</field>
-       <field name="view_id" ref="freight_mgmt.freight_sale_order_to_bookings_view_form"/>
-       <field name="act_window_id" ref="freight_langson_orders_to_booking_action"/>
     </record>
 
 </odoo>

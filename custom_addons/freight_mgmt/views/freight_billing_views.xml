@@ -99,6 +99,20 @@
                         attrs="{'invisible': [('active', '=', True)]}"
                     />
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('sale_order_count', '=', 0)]}">
+                            <field name="sale_order_count" widget="statinfo" string="Sale"/>
+                        </button>
+                        <button name="action_view_purchase_order"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchase"/>
+                        </button>
                         <button name="action_view_debit_note"
                             type="object"
                             class="oe_stat_button"

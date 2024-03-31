@@ -91,6 +91,58 @@
                 </field>
         </record>
 
+        <!--Hide money fields from users who are given access to SO but not in sale team-->
+        <record id="freight_sale_order_form_money_field_hidden_inherited" model="ir.ui.view">
+                <field name="name">freight.sale.order.form.money.field.hidden.inherited</field>
+                <field name="model">sale.order</field>
+                <field name="inherit_id" ref="freight_mgmt.freight_sale_order_form_total_customize_inherited"/>
+                <field name="groups_id" eval="[(4, ref('freight_mgmt.group_freight_hide_money_field_sale_purchase_order'))]"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//form" position="attributes">
+                        <attribute name="create">false</attribute>
+                        <attribute name="edit">false</attribute>
+                        <attribute name="delete">false</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='price_unit_input']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='price_subtotal_display']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='purchase_price']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='margin']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='margin_percent']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='tax_id']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//page[@name='order_lines']//tree//field[@name='commission_status']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//group[@name='note_group']//group[@name='sale_total']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <!--Hide extra functions on Sale Order-->
+                    <xpath expr="//button[@name='preview_sale_order']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_view_delivery']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='button_edit_agents']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_draft']" position="attributes">
+                        <attribute name="invisible">1</attribute>
+                    </xpath>
+                </field>
+        </record>
+
         <!-- Set field form_type editable for administrators -->
         <record id="freight_sale_order_form_type_readonly_inherited" model="ir.ui.view">
                 <field name="name">freight.sale.order.form.type.readonly.inherited</field>
@@ -231,40 +283,40 @@
                                 <attribute name="readonly">1</attribute>
                         </xpath>
                         <!--Only managers can see some functions-->
-                        <xpath expr="//button[@name='preview_sale_order']" position="attributes">
-                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//button[@name='action_view_delivery']" position="attributes">
-                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
+<!--                        <xpath expr="//button[@name='preview_sale_order']" position="attributes">-->
+<!--                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//button[@name='action_view_delivery']" position="attributes">-->
+<!--                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
 <!--                        <xpath expr="//button[@name='action_view_purchase_orders']" position="attributes">-->
 <!--                                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
 <!--                        </xpath>-->
                         <!--Hide money columns from users who are not managers-->
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_unit_input']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_subtotal_display']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='purchase_price']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin_percent']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='tax_id']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//page[@name='order_lines']//tree//field[@name='commission_status']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
-                        <xpath expr="//group[@name='note_group']//group[@name='sale_total']" position="attributes">
-                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
-                        </xpath>
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_unit_input']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='price_subtotal_display']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='purchase_price']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='margin_percent']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='tax_id']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//page[@name='order_lines']//tree//field[@name='commission_status']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
+<!--                        <xpath expr="//group[@name='note_group']//group[@name='sale_total']" position="attributes">-->
+<!--                            <attribute name="groups">freight_mgmt.group_freight_manager</attribute>-->
+<!--                        </xpath>-->
                 </field>
         </record>
 
