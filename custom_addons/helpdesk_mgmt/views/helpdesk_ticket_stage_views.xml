@@ -47,6 +47,7 @@
                         <group name="main_left">
                             <field name="sequence" />
                             <field name="mail_template_id" />
+                            <field name="processing_day" string="Processing Days" />
                             <field
                                 name="company_id"
                                 groups="base.group_multi_company"
@@ -70,6 +71,7 @@
                 <field name="sequence" widget="handle" />
                 <field name="name" />
                 <field name="mail_template_id" />
+                <field name="processing_day" string="Processing Days" />
             </tree>
         </field>
     </record>

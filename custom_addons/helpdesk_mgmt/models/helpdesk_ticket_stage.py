@@ -12,6 +12,8 @@ class HelpdeskTicketStage(models.Model):
     active = fields.Boolean(default=True)
     unattended = fields.Boolean()
     closed = fields.Boolean()
+    processing_day = fields.Integer(string="Processing Time", default=0,
+                                    help="Number of days need to be processed to avoid warning. 0: unlimited, > 0: days limited.")
     mail_template_id = fields.Many2one(
         comodel_name="mail.template",
         string="Email Template",

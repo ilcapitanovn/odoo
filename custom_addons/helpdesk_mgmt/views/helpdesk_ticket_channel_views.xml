@@ -19,7 +19,7 @@
         <field name="name">view.helpdesk_channel.form</field>
         <field name="model">helpdesk.ticket.channel</field>
         <field name="arch" type="xml">
-            <form string="Stages">
+            <form string="Commodities">
                 <header>
                 </header>
                 <sheet>

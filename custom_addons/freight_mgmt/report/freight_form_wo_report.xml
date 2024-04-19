@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="freight_form_wo_report" model="ir.actions.report">
+        <field name="name">Form WO</field>
+        <field name="model">freight.form.wo</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">freight_mgmt.report_print_form_wo_template</field>
+        <field name="report_file">freight_mgmt.report_print_form_wo_template</field>
+        <field name="print_report_name">'Form WO - %s' % (object.export_form_number or '').replace('/', '')</field>
+        <field name="binding_model_id" ref="model_freight_form_wo"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_form_wo"/>
+    </record>
+
+    <template id="report_print_form_wo_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/freight_mgmt/static/src/css/form_wo.css"/>
+
+                <t t-set="today" t-value="datetime.datetime.now()"/>
+                <t t-foreach="docs" t-as="doc">
+
+                <t t-set="business_display_name" t-value="doc.business_display_name"/>
+                <t t-set="business_vat" t-value="doc.business_vat"/>
+                <t t-set="export_form_number" t-value="doc.export_form_number"/>
+                <t t-set="place_of_purchase_address" t-value="doc.place_of_purchase_address"/>
+                <t t-set="responsible_buyer" t-value="doc.responsible_buyer"/>
+                <t t-set="buyer_id_number" t-value="doc.buyer_id_number"/>
+                <t t-set="applicable_criteria" t-value="doc.applicable_criteria"/>
+                <t t-set="commodity" t-value="doc.commodity"/>
+                <t t-set="commodity_code" t-value="doc.commodity_code"/>
+                <t t-set="quantity" t-value="doc.quantity"/>
+                <t t-set="value_daf" t-value="doc.value_daf"/>
+
+                <div id="quote_content" class="col-12 col-lg justify-content-end">
+                    <div id="header">
+                        <div class="header-center">
+                            <b>Phụ lục II</b> <br/>
+                            <b>BẢNG KÊ KHAI HÀNG HÓA XUẤT KHẨU ĐẠT TIÊU CHÍ "WO"</b><br/>
+                            <b>(sử dụng nguyên liệu thu mua trong nước, không có hóa đơn giá trị gia tăng)</b><br/>
+                            <i>(ban hành kèm theo Thông tư số 44/2023/TT-BCT ngày 29 tháng 12 năm 2023 của Bộ trưởng Bộ Công Thương sửa đổi, <br/>
+                                bổ sung một số điều của Thông tư số 05/2018/TT-BCT)</i>
+                        </div>
+                    </div>
+
+                    <table class="table no-spacing" id="first-table">
+                      <tr>
+                        <td width="70%">Tên Thương nhân: <span t-esc="business_display_name"/></td>
+                        <td>Tiêu chí áp dụng: <span t-esc="applicable_criteria"/></td>
+                      </tr>
+                      <tr>
+                        <td>Mã số thuế: <span t-esc="business_vat"/></td>
+                        <td>Tên hàng hóa: &amp;emsp;<span t-esc="commodity"/></td>
+                      </tr>
+                      <tr>
+                        <td>Tờ khai hải quan xuất khẩu số: &amp;emsp;&amp;emsp;<span t-esc="export_form_number"/></td>
+                        <td>Mã HS của hàng hóa (6 số): &amp;emsp;<span t-esc="commodity_code"/></td>
+                      </tr>
+                      <tr>
+                        <td>Địa chỉ nơi tổ chức thu mua: &amp;emsp;&amp;emsp;&amp;emsp;<span t-esc="place_of_purchase_address"/></td>
+                        <td>Số lượng: &amp;emsp;&amp;emsp;&amp;emsp;&amp;emsp;<span t-esc="'{:,.1f} '.format(quantity).replace(',','#').replace('.',',').replace('#','.')"/> kg</td>
+                      </tr>
+                      <tr>
+                        <td>Người phụ trách thu mua (Tên, số định danh cá nhân, số CCCD):
+                            <t t-if="responsible_buyer"><span t-esc="responsible_buyer.name"/></t> – CCCD số:
+                            <span t-esc="buyer_id_number"/>
+                        </td>
+                        <td>Trị giá (DAF): &amp;emsp;&amp;emsp;<span t-esc="'{:,.2f} '.format(value_daf).replace(',','#').replace('.',',').replace('#','.')"/> USD</td>
+                      </tr>
+                    </table>
+
+                    <table class="table no-spacing" id="order-table">
+                      <tr>
+                        <th width="7%" rowspan="2">Ngày tháng năm mua hàng</th>
+                        <th width="36%" colspan="3">Người bán</th>
+                        <th width="46%" colspan="6">Nguyên liệu thu mua trong nước</th>
+                        <th width="11%" rowspan="2">Ghi chú</th>
+                      </tr>
+                      <tr>
+                        <th width="10%">Tên người bán</th>
+                        <th width="16%">Địa chỉ</th>
+                        <th width="10%">Số định danh cá nhân (số CCCD) và ngày cấp</th>
+                        <th width="10%">Tên hàng hóa</th>
+                        <th width="5%">Mã HS</th>
+                        <th width="8%">Nơi khai thác/đánh bắt/nuôi trồng</th>
+                        <th width="8%">Số lượng và Đơn vị tính (kg)</th>
+                        <th width="7%">Đơn giá</th>
+                        <th width="8%">Tổng trị giá</th>
+                      </tr>
+                      <tr>
+                          <th>1</th>
+                          <th>2</th>
+                          <th>3</th>
+                          <th>4</th>
+                          <th>5</th>
+                          <th>6</th>
+                          <th>7</th>
+                          <th>8</th>
+                          <th>9</th>
+                          <th>10</th>
+                          <th>11</th>
+                      </tr>
+
+                        <t t-set="mark_seal_nos" t-value="''"/>
+                        <t t-set="description" t-value="'DETAIL AS PER &lt;br/&gt; BILL OF LADING'"/>
+                        <t t-set="total_weight" t-value="0.0"/>
+                        <t t-set="total_measure" t-value="0.0"/>
+                        <t t-set="total_pkgs_dict" t-value="{}"/>
+                        <t t-foreach="doc.form_wo_items" t-as="line">
+                            <td>
+                                <t t-if="line.buy_date">
+                                    <span t-esc="context_timestamp(line.buy_date).strftime('%d/%m/%Y')"/>
+                                </t>
+                            </td>
+                            <td>
+                                <t t-if="line.seller">
+                                    <span t-esc="line.seller.name"/>
+                                </t>
+                            </td>
+                            <td><span t-esc="line.seller_address"/></td>
+                            <td><span t-esc="line.seller_id_number"/></td>
+                            <td><span t-esc="line.commodity"/></td>
+                            <td><span t-esc="line.commodity_code"/></td>
+                            <td><span t-esc="line.place_of_farm"/></td>
+                            <td><span t-esc="'{:,.1f}'.format(line.quantity).replace(',','#').replace('.',',').replace('#','.')"/></td>
+                            <td><span t-esc="'{:,.0f}'.format(line.unit_price).replace(',','#').replace('.',',').replace('#','.')"/></td>
+                            <td><span t-esc="'{:,.0f}'.format(line.price_total).replace(',','#').replace('.',',').replace('#','.')"/></td>
+                            <td><span t-esc="line.note"/></td>
+                        </t>
+                    </table>
+
+                    <div>
+                        <b>Kết luận: Hàng hóa đáp ứng tiêu chí "WO"</b><br/>
+                        Công ty cam kết số liệu, thông tin khai báo trên là đúng và chịu trách nhiệm trước pháp luật về thông tin, số liệu đã khai.
+                    </div>
+
+                    <div id="signature">
+                        Lạng Sơn, ngày <span t-esc="today.day"/> tháng <span t-esc="today.month"/> năm <span t-esc="today.year"/><br/>
+                        <b>Người đại diện theo pháp luật của thương nhân</b><br/>
+                        <i>(Ký, đóng dấu, ghi rõ họ, tên)</i>
+                    </div>
+
+                    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+                    <div>
+                        Ghi chú:<br/>
+                        - Mẫu Bảng kê khai này áp dụng trong trường hợp nguyên liệu được thu mua trong nước để sản xuất ra hàng hóa xuất khẩu nhưng không có hóa đơn giá trị gia tăng.<br/>
+                        - Thương nhân nộp bản sao các chứng từ (đóng dấu sao y bản chính): Quy trình sản xuất hàng hóa, CCCD của người bán nguyên liệu; Giấy xác nhận của người bán nguyên liệu về vùng nuôi trồng, khai thác, số lượng và trị giá bán cho thương nhân (nếu có) để đối chiếu với thông tin kê khai.
+                    </div>
+                </div>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

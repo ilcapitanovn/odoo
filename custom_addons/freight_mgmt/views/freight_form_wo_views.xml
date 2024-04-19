@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_freight_form_wo_search" model="ir.ui.view">
+        <field name="name">freight.form.wo.search</field>
+        <field name="model">freight.form.wo</field>
+        <field name="arch" type="xml">
+            <search string="Freight Form WO Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="export_form_number" filter_domain="[('export_form_number', 'ilike', self)]" />
+                <field name="commodity" filter_domain="[('commodity', 'ilike', self)]" />
+                <field name="commodity_code" filter_domain="[('commodity_code', 'ilike', self)]" />
+                <group expand="0" string="Group By">
+                    <filter name="responsible_buyer" context="{'group_by':'responsible_buyer'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_freight_form_wo_form" model="ir.ui.view">
+        <field name="name">freight.form.wo.form</field>
+        <field name="model">freight.form.wo</field>
+        <field name="arch" type="xml">
+            <form string="Tags" class="o_sale_order" js_class="sale_discount_form">
+                <header>
+                    <button name="%(freight_form_wo_report)d"
+                            string="Print Form WO" type="action"
+                            attrs="{'invisible' : [('active', '=', True)]}"/>
+                </header>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <group name="main">
+                        <field name="active" invisible="1" />
+                        <group name="main_left">
+                            <field name="business_contact" />
+                            <field name="business_display_name" />
+                            <field name="business_vat" />
+                            <field name="place_of_purchase_address" />
+                            <field name="responsible_buyer" />
+                            <field name="buyer_id_number" />
+                        </group>
+                        <group name="main_right">
+                            <field name="applicable_criteria" readonly="1" />
+                            <field name="export_form_number" />
+                            <field name="commodity" />
+                            <field name="commodity_code" />
+                            <field name="quantity" digits="[12,2]" />
+                            <field name="value_daf" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Items" name="form_wo_lines">
+                            <field name="form_wo_items"
+                                   widget="section_and_note_one2many"
+                                   mode="tree"
+                                   context="{'default_commodity_code': commodity_code, 'default_commodity': commodity, 'default_place_of_farm': place_of_purchase_address}"
+                            >
+                                <tree editable="bottom">
+                                    <field name="form_wo_id" invisible="1"/>
+                                    <field name="sequence" string="NO" widget="handle"/>
+                                    <field name="buy_date" widget="date" />
+                                    <field name="seller" force_save="1"/>
+                                    <field name="seller_address" force_save="1"/>
+                                    <field name="seller_id_number" force_save="1"/>
+                                    <field name="commodity" string="Comm" force_save="1"/>
+                                    <field name="commodity_code" string="Comm No." force_save="1"/>
+                                    <field name="place_of_farm" force_save="1"/>
+                                    <field name="quantity" force_save="1"/>
+                                    <field name="unit_price" digits="[12,0]" force_save="1"/>
+                                    <field name="price_total" digits="[12,0]" readonly="1" force_save="1"/>
+                                    <field name="note" force_save="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field
+                        name="message_ids"
+                        widget="mail_thread"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_freight_form_wo_tree" model="ir.ui.view">
+        <field name="name">freight.form.wo.tree</field>
+        <field name="model">freight.form.wo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="export_form_number" />
+                <field name="create_date" widget="date" />
+                <field name="commodity" />
+                <field name="commodity_code" />
+                <field name="quantity" />
+                <field name="value_daf" widget="monetary" options="{'currency_field': 'currency_id'}" />
+            </tree>
+        </field>
+    </record>
+    <record id="action_freight_form_wo" model="ir.actions.act_window">
+        <field name="name">Form WO</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.form.wo</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        action="action_freight_form_wo"
+        name="Form WO"
+        id="menu_freight_form_wo"
+        parent="account.menu_finance_entries_accounting_miscellaneous"
+        sequence="55"
+    />
+</odoo>

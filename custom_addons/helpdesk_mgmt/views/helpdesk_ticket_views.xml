@@ -23,6 +23,7 @@
                 <field name="name" />
                 <field name="tag_ids" />
                 <field name="stage_id" />
+                <field name="is_processing_time_warning" />
                 <filter
                     string="Unassigned"
                     name="unassigned"
@@ -30,7 +31,7 @@
                 />
                 <filter string="Open" name="open" domain="[('closed', '=', False )]" />
                 <filter
-                    string="Unattended"
+                    string="New"
                     name="unattended"
                     domain="[('unattended', '=', True )]"
                 />
@@ -55,6 +56,11 @@
                     name="last_week"
                     string="Last Week"
                     domain="[('create_date','&gt;', (context_today() - datetime.timedelta(weeks=1)).strftime('%%Y-%%m-%%d') )]"
+                />
+                <filter
+                    name="late_processing"
+                    string="Late Processing"
+                    domain="[('is_processing_time_warning', '=', True)]"
                 />
                 <separator />
                 <filter
@@ -160,7 +166,7 @@
                                 groups="base.group_multi_company"
                             />
                             <field name="create_date" readonly="1" />
-                            <field name="channel_id" />
+                            <field name="channel_id" string="Commodity" />
                         </group>
                         <group>
                             <field name="partner_id" />
@@ -206,7 +212,9 @@
         <field name="model">helpdesk.ticket</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="number" />
+                <field name="closed" invisible="1" />
+                <field name="is_processing_time_warning" invisible="1" />
+                <field name="number" decoration-danger="is_processing_time_warning" decoration-success="closed" />
                 <field name="name" />
                 <field name="partner_id" />
                 <field name="partner_name" />
@@ -224,6 +232,7 @@
         <field name="priority" eval="100" />
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" default_group_by="stage_id">
+                <field name="is_processing_time_warning" invisible="1" />
                 <field name="number" />
                 <field name="active" />
                 <field name="name" />
@@ -234,7 +243,7 @@
                 <field name="priority" widget="priority" />
                 <field name="assigned_date" />
                 <progressbar
-                    field="activity_state"
+                    field="kanban_state"
                     colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}"
                 />
                 <templates>
@@ -283,7 +292,14 @@
                                         widget="many2many_tags"
                                         options="{'color_field': 'color'}"
                                     />
-                                    <field name="number" />
+                                    <div class="text-danger">
+                                        <field name="number"
+                                           attrs="{'invisible': [('is_processing_time_warning', '!=', True)]}" />
+                                    </div>
+                                    <div>
+                                        <field name="number"
+                                           attrs="{'invisible': [('is_processing_time_warning', '=', True)]}" />
+                                    </div>
                                     <small class="o_kanban_record_subtitle text-muted">
                                         <field name="partner_id" />
                                     </small>

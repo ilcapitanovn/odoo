@@ -1,3 +1,5 @@
+import datetime
+
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError
 
@@ -37,6 +39,8 @@ class HelpdeskTicket(models.Model):
         index=True,
         copy=False,
     )
+    processing_day = fields.Integer(related="stage_id.processing_day", readonly=True, store=False)
+    is_processing_time_warning = fields.Boolean(compute="_compute_is_processing_time_warning", store=True)
     partner_id = fields.Many2one(comodel_name="res.partner", string="Contact")
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
@@ -82,7 +86,7 @@ class HelpdeskTicket(models.Model):
         domain=[("res_model", "=", "helpdesk.ticket")],
         string="Media Attachments",
     )
-    color = fields.Integer(string="Color Index")
+    color = fields.Integer(string="Color Index", compute="_get_color")
     kanban_state = fields.Selection(
         selection=[
             ("normal", "Default"),
@@ -100,6 +104,25 @@ class HelpdeskTicket(models.Model):
 
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
+
+    @api.depends("processing_day", "last_stage_update")
+    def _compute_is_processing_time_warning(self):
+        now = fields.Datetime.now()
+        for rec in self:
+            rec.is_processing_time_warning = False
+            if rec.processing_day > 0 and rec.last_stage_update:
+                warning_time = rec.last_stage_update + datetime.timedelta(days=rec.processing_day)
+                if now > warning_time:
+                    rec.is_processing_time_warning = True
+
+    @api.depends("is_processing_time_warning")
+    def _get_color(self):
+        """Compute Color value according to the conditions"""
+        for rec in self:
+            if rec.is_processing_time_warning:
+                rec.color = 1   # Red
+            else:
+                rec.color = 0   # Gray
 
     @api.onchange("partner_id")
     def _onchange_partner_id(self):
@@ -123,8 +146,11 @@ class HelpdeskTicket(models.Model):
 
     @api.model
     def create(self, vals):
+        now = fields.Datetime.now()
         if vals.get("number", "/") == "/":
             vals["number"] = self._prepare_ticket_number(vals)
+        if vals.get("user_id"):
+            vals["assigned_date"] = now
         return super().create(vals)
 
     def copy(self, default=None):

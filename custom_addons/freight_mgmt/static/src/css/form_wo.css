@@ -1,0 +1,90 @@
+* {
+    font-size: 12px;
+}
+h2 {
+    font-weight: 600;
+    font-size: 22px;
+}
+#quote_content {
+    background-color: white;
+    font-weight: 500;
+    font-family: Serif;
+}
+#header {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 10px;
+}
+.header-left {
+    float: left;
+    width: 20%;
+}
+.header-right {
+    float: right;
+    width: 80%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+.header-center {
+    text-align: center;
+}
+.header-center > b {
+    font-size: 18px;
+}
+.header-center > i {
+    font-size: 18px;
+}
+
+#first-table {
+}
+
+#first-table td {
+    border: none;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    line-height: 95%;
+}
+
+#order-table {
+    margin-top: 20px;
+    line-height: 95%;
+}
+
+#order-table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin: 0 !important;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 400;
+}
+#order-table td {
+    margin: 0 !important;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#note {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    height: 60px;
+}
+.note-left {
+    float: left;
+    width: 10%;
+    padding-top: 10px;
+}
+.note-right {
+    float: right;
+    width: 90%;
+}
+
+#signature {
+    float: right;
+    text-align: center;
+    margin-right: 50px;
+    width: 400px;
+}
