@@ -24,6 +24,9 @@
                         <xpath expr="//group[@name='sale']//field[@name='user_id']" position="attributes">
                             <attribute name="attrs">{'readonly': [('has_edit_salesperson', '=', False), ('id', '!=', False)]}</attribute>
                         </xpath>
+                        <xpath expr="//page[@name='contact_addresses']//group//field[@name='mobile']" position="after">
+                            <field name="category_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" placeholder="Tags..."/>
+                        </xpath>
                 </field>
         </record>
 
