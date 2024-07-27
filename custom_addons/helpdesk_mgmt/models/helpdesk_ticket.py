@@ -105,6 +105,22 @@ class HelpdeskTicket(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
+    def action_schedule_processing_time_warning(self):
+        try:
+            print("action_schedule_processing_time_warning is called.")
+            unclosed_tickets = self.search([('processing_day', '>', 0), ('stage_id.closed', '!=', True)])
+            if unclosed_tickets:
+                now = fields.Datetime.now()
+                for rec in unclosed_tickets:
+                    if rec.processing_day > 0 and rec.last_stage_update:
+                        warning_time = rec.last_stage_update + datetime.timedelta(days=rec.processing_day)
+                        if now > warning_time:
+                            rec.is_processing_time_warning = True
+
+            print("action_schedule_processing_time_warning was done")
+        except Exception as e:
+            print("action_schedule_processing_time_warning error: " + str(e))
+
     @api.depends("processing_day", "last_stage_update")
     def _compute_is_processing_time_warning(self):
         now = fields.Datetime.now()
