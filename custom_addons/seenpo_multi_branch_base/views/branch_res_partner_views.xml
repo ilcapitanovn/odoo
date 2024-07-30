@@ -9,7 +9,6 @@
                 <field name="vat" position="after">
                     <field name="branch_id" options="{'no_create': True}"
                            domain="[('id', 'in', allowed_branch_ids)]"
-                           groups="base.group_no_one"
                            attrs="{'readonly': [('parent_id', '!=', False)]}"
                            force_save="1"/>
                     <field name="allowed_branch_ids" invisible="1"/>
