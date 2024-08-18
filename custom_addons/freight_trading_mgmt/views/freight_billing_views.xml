@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<odoo>
+    <record id="freight_trading_billing_view_form_inherited" model="ir.ui.view">
+        <field name="name">freight.trading.billing.view.form.inherited</field>
+        <field name="model">freight.billing</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_billing_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vessel_bol_number']" position="after">
+                <field name="container_number" />
+            </xpath>
+            <xpath expr="//field[@name='do_number']" position="after">
+                <field name="print_report_type" />
+            </xpath>
+            <xpath expr="//field[@name='vessel_id']" position="after">
+                <field name="vehicle_supplier_id" />
+                <field name="vehicle_number" invisible="1" />
+            </xpath>
+            <xpath expr="//field[@name='port_loading_text']" position="after">
+                <field name="port_stopover_id" />
+                <field name="port_stopover_text" />
+            </xpath>
+            <xpath expr="//field[@name='freight_charge_rate']" position="before">
+                <field name="transport_route" />
+            </xpath>
+            <xpath expr="//field[@name='order_id']" position="attributes">
+                <attribute name="context">{'form_view_ref' : 'freight_mgmt.freight_sale_order_to_bookings_view_form'}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='booking_id']" position="attributes">
+                <attribute name="context">{'form_view_ref' : 'freight_trading_mgmt.freight_trading_booking_view_form_inherited'}</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='gross_weight']" position="after">
+                <field name="net_weight" />
+            </xpath>
+            <xpath expr="//field[@name='port_loading_id']" position="attributes">
+                <attribute name="string">Place Of Departure</attribute>
+            </xpath>
+            <xpath expr="//field[@name='port_loading_text']" position="attributes">
+                <attribute name="string">Departure Text</attribute>
+            </xpath>
+            <xpath expr="//field[@name='port_stopover_id']" position="attributes">
+                <attribute name="string">Place Of Stopover</attribute>
+            </xpath>
+            <xpath expr="//field[@name='port_stopover_text']" position="attributes">
+                <attribute name="string">Stopover Text</attribute>
+            </xpath>
+            <xpath expr="//field[@name='port_discharge_id']" position="attributes">
+                <attribute name="string">Place Of Destination</attribute>
+            </xpath>
+            <xpath expr="//field[@name='port_discharge_text']" position="attributes">
+                <attribute name="string">Destination Text</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vessel_booking_number']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vessel_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='container_no']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='measurement_cbm']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='seal_nos']" position="attributes">
+                <attribute name="string">Marks</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_trading_billing_view_tree_inherited" model="ir.ui.view">
+        <field name="name">freight.trading.billing.view.tree.inherited</field>
+        <field name="model">freight.billing</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_billing_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vessel_bol_number']" position="after">
+                <field name="vehicle_number" invisible="1" />
+                <field name="container_number" />
+            </xpath>
+            <xpath expr="//field[@name='booking_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vessel_booking_number']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_trading_billing_action_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="99"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="freight_trading_billing_view_form_inherited"/>
+        <field name="act_window_id" ref="freight_trading_billing_action"/>
+    </record>
+
+    <record id="freight_trading_billing_action_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="88"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="freight_trading_billing_view_tree_inherited"/>
+        <field name="act_window_id" ref="freight_trading_billing_action"/>
+    </record>
+</odoo>

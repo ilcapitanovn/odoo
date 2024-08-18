@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<odoo>
+    <!-- Actions -->
+    <record id="freight_trading_orders_to_booking_action" model="ir.actions.act_window">
+        <field name="name">Export - Orders To Booking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False, 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_status','=','to booking'),('booking_id','=',False),('order_shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_booking_action" model="ir.actions.act_window">
+        <field name="name">Export - Bookings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.booking</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_billing_action" model="ir.actions.act_window">
+        <field name="name">Export - Bills</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.billing</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_debit_note_action" model="ir.actions.act_window">
+        <field name="name">Export - Debit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.debit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_credit_note_action" model="ir.actions.act_window">
+        <field name="name">Export - Credit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.credit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'exp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+
+    <!-- Import Menu - Actions -->
+    <record id="freight_trading_import_orders_to_booking_action" model="ir.actions.act_window">
+        <field name="name">Import - Orders To Booking</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False, 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_status','=','to booking'),('booking_id','=',False),('order_shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_import_booking_action" model="ir.actions.act_window">
+        <field name="name">Import - Bookings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.booking</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_import_delivery_order_action" model="ir.actions.act_window">
+        <field name="name">Import - Delivery Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.billing</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_import_debit_note_action" model="ir.actions.act_window">
+        <field name="name">Import - Debit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.debit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+    <record id="freight_trading_import_credit_note_action" model="ir.actions.act_window">
+        <field name="name">Import - Credit Notes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">freight.credit.note</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="context">{'shipment_type_suffix': 'imp', 'branch_code': 'TRA'}</field>
+        <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_trading'))),('booking_id.shipment_type','in',('fcl-imp','lcl-imp','air-imp'))]"></field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem
+        id="freight_trading_mgmt_main_menu"
+        name="Freight Trading"
+        sequence="19"
+        web_icon="freight_trading_mgmt,static/description/icon.png"
+        groups="group_freight_trading_user"
+    />
+    <menuitem
+        id="freight_trading_mgmt_executive_menu"
+        name="Export"
+        parent="freight_trading_mgmt_main_menu"
+        sequence="10"
+        groups="group_freight_trading_user"
+    />
+    <menuitem
+        id="freight_trading_mgmt_import_menu"
+        name="Import"
+        parent="freight_trading_mgmt_main_menu"
+        sequence="20"
+        groups="group_freight_trading_user"
+    />
+    <menuitem
+        id="freight_trading_mgmt_catalog_menu"
+        name="Catalogue"
+        parent="freight_trading_mgmt_main_menu"
+        sequence="25"
+        groups="group_freight_trading_user"
+    />
+    <menuitem
+        id="freight_trading_mgmt_products_menu"
+        name="Products"
+        parent="freight_trading_mgmt_main_menu"
+        sequence="35"
+        groups="group_freight_trading_user"
+    />
+<!--    <menuitem-->
+<!--        id="freight_trading_mgmt_reporting_menu"-->
+<!--        name="Reporting"-->
+<!--        parent="freight_trading_mgmt_main_menu"-->
+<!--        sequence="45"-->
+<!--        groups="group_freight_trading_manager"-->
+<!--    />-->
+<!--    <menuitem-->
+<!--        id="freight_trading_mgmt_configuration_menu"-->
+<!--        name="Configuration"-->
+<!--        parent="freight_trading_mgmt_main_menu"-->
+<!--        sequence="55"-->
+<!--        groups="group_freight_trading_manager"-->
+<!--    />-->
+    <!-- Sub menu items -->
+    <!-- Executive (Export) sub -->
+    <menuitem
+        id="freight_trading_executive_orders_to_booking_menu"
+        name="Orders To Booking"
+        parent="freight_trading_mgmt_executive_menu"
+        action="freight_trading_orders_to_booking_action"
+        sequence="5"
+    />
+    <menuitem
+        id="freight_trading_executive_bookings_menu"
+        name="Bookings"
+        parent="freight_trading_mgmt_executive_menu"
+        action="freight_trading_booking_action"
+        sequence="15"
+    />
+    <menuitem
+        id="freight_trading_executive_bills_menu"
+        name="Bills"
+        parent="freight_trading_mgmt_executive_menu"
+        action="freight_trading_billing_action"
+        sequence="25"
+    />
+    <menuitem
+        id="freight_trading_executive_debit_notes_menu"
+        name="Debit Notes"
+        parent="freight_trading_mgmt_executive_menu"
+        action="freight_trading_debit_note_action"
+        sequence="35"
+    />
+    <menuitem
+        id="freight_trading_executive_credit_notes_menu"
+        name="Credit Notes"
+        parent="freight_trading_mgmt_executive_menu"
+        action="freight_trading_credit_note_action"
+        sequence="45"
+    />
+
+    <!-- Import sub -->
+    <menuitem
+        id="freight_trading_import_orders_to_booking_menu"
+        name="Orders To Booking"
+        parent="freight_trading_mgmt_import_menu"
+        action="freight_trading_import_orders_to_booking_action"
+        sequence="5"
+    />
+    <menuitem
+        id="freight_trading_import_bookings_menu"
+        name="Bookings"
+        parent="freight_trading_mgmt_import_menu"
+        action="freight_trading_import_booking_action"
+        sequence="15"
+    />
+    <menuitem
+        id="freight_trading_import_delivery_order_menu"
+        name="Delivery Orders"
+        parent="freight_trading_mgmt_import_menu"
+        action="freight_trading_import_delivery_order_action"
+        sequence="25"
+    />
+    <menuitem
+        id="freight_trading_import_debit_notes_menu"
+        name="Debit Notes"
+        parent="freight_trading_mgmt_import_menu"
+        action="freight_trading_import_debit_note_action"
+        sequence="35"
+    />
+    <menuitem
+        id="freight_trading_import_credit_notes_menu"
+        name="Credit Notes"
+        parent="freight_trading_mgmt_import_menu"
+        action="freight_trading_import_credit_note_action"
+        sequence="45"
+    />
+
+    <!-- Catalog sub -->
+    <menuitem
+        id="freight_trading_catalog_airline_menu"
+        name="Airlines"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_airline_action"
+        sequence="5"
+    />
+    <menuitem
+        id="freight_trading_catalog_container_menu"
+        name="Containers"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_container_action"
+        sequence="15"
+    />
+    <menuitem
+        id="freight_trading_catalog_incoterm_menu"
+        name="Incoterms"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_incoterm_action"
+        sequence="25"
+    />
+    <menuitem
+        id="freight_trading_catalog_port_menu"
+        name="Ports"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_port_action"
+        sequence="35"
+    />
+    <menuitem
+        id="freight_trading_catalog_vessel_menu"
+        name="Lines"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_vessel_action"
+        sequence="45"
+    />
+    <menuitem
+        id="freight_trading_catalog_vehicle_supplier_menu"
+        name="Vehicle Suppliers"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_vehicle_supplier_action"
+        sequence="50"
+    />
+    <menuitem
+        id="freight_trading_catalog_shipper_menu"
+        name="Shippers"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_shipper_action"
+        sequence="55"
+    />
+    <menuitem
+        id="freight_trading_catalog_consignee_menu"
+        name="Consignees"
+        parent="freight_trading_mgmt_catalog_menu"
+        action="freight_mgmt.freight_catalog_consignee_action"
+        sequence="65"
+    />
+
+    <!-- Products sub -->
+    <menuitem
+        id="freight_trading_products_products_menu"
+        name="Products"
+        parent="freight_trading_mgmt_products_menu"
+        action="freight_mgmt.freight_products_products_action"
+        sequence="5"
+    />
+    <menuitem
+        id="freight_trading_products_pricelists_view_menu"
+        name="Pricelists View"
+        parent="freight_trading_mgmt_products_menu"
+        action="freight_mgmt.freight_products_pricelists_view_action"
+        sequence="15"
+    />
+    
+    <!-- Configuration sub -->
+<!--    <menuitem-->
+<!--        id="freight_trading_catalog_stage_menu"-->
+<!--        name="Stages"-->
+<!--        parent="freight_trading_mgmt_configuration_menu"-->
+<!--        action="freight_trading_catalog_stage_action"-->
+<!--        sequence="10"-->
+<!--    />-->
+</odoo>

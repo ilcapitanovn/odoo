@@ -1,0 +1,214 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* freight_langson_mgmt
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-09 19:56+0000\n"
+"PO-Revision-Date: 2023-08-09 19:56+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_airline_menu
+msgid "Airlines"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_executive_bills_menu
+msgid "Bills"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_executive_bookings_menu
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_import_bookings_menu
+msgid "Bookings"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_mgmt_catalog_menu
+msgid "Catalogue"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_consignee_menu
+msgid "Consignees"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_container_menu
+msgid "Containers"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_langson_mgmt.freight_langson_order_to_bookings_form_inherited
+msgid "Create Booking"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_executive_credit_notes_menu
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_import_credit_notes_menu
+msgid "Credit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_executive_debit_notes_menu
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_import_debit_notes_menu
+msgid "Debit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_import_delivery_order_menu
+msgid "Delivery Orders"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_mgmt_executive_menu
+msgid "Export"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_billing_action
+msgid "Export - Bills"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_booking_action
+msgid "Export - Bookings"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_credit_note_action
+msgid "Export - Credit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_debit_note_action
+msgid "Export - Debit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_orders_to_booking_action
+msgid "Export - Orders To Booking"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.module.category,name:freight_langson_mgmt.module_freight_langson_category
+msgid "Freight Lang Son"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.module.category,description:freight_langson_mgmt.module_freight_langson_category
+msgid "Helps you handle your freight security."
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_mgmt_import_menu
+msgid "Import"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_import_booking_action
+msgid "Import - Bookings"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_import_credit_note_action
+msgid "Import - Credit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_import_debit_note_action
+msgid "Import - Debit Notes"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_import_delivery_order_action
+msgid "Import - Delivery Orders"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.actions.act_window,name:freight_langson_mgmt.freight_langson_import_orders_to_booking_action
+msgid "Import - Orders To Booking"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_incoterm_menu
+msgid "Incoterms"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_mgmt_main_menu
+msgid "Lang Son"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_vessel_menu
+msgid "Lines"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:res.groups,name:freight_langson_mgmt.group_freight_langson_manager
+msgid "Manager"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: code:addons/freight_langson_mgmt/controllers/portal.py:0
+#, python-format
+msgid "Order Date"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_executive_orders_to_booking_menu
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_import_orders_to_booking_menu
+msgid "Orders To Booking"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_port_menu
+msgid "Ports"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_products_pricelists_view_menu
+msgid "Pricelists View"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_mgmt_products_menu
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_products_products_menu
+msgid "Products"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: code:addons/freight_langson_mgmt/controllers/portal.py:0
+#, python-format
+msgid "Reference"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.ui.menu,name:freight_langson_mgmt.freight_langson_catalog_shipper_menu
+msgid "Shippers"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: code:addons/freight_langson_mgmt/controllers/portal.py:0
+#, python-format
+msgid "Stage"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:res.groups,name:freight_langson_mgmt.group_freight_langson_user
+msgid "User"
+msgstr ""
+
+#. module: freight_langson_mgmt
+#: model:ir.model,name:freight_langson_mgmt.model_res_users
+msgid "Users"
+msgstr ""

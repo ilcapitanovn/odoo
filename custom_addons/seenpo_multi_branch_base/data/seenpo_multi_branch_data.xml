@@ -18,9 +18,17 @@
             <field name="city">Lang Son</field>
             <field name="country_id">241</field>
         </record>
+        <record id="seenpo_branch_trading" model="res.branch">
+            <field name="code">TRA</field>
+            <field name="name">Trading</field>
+            <field name="is_main_branch">False</field>
+            <field name="company_id">1</field>
+            <field name="city">Sai Gon</field>
+            <field name="country_id">241</field>
+        </record>
         <record id="base.user_admin" model="res.users">
             <field name="branch_id" ref="seenpo_branch_saigon" />
-            <field name="branch_ids" eval="[(4, ref('seenpo_branch_saigon')), (4, ref('seenpo_branch_langson'))]" />
+            <field name="branch_ids" eval="[(4, ref('seenpo_branch_saigon')), (4, ref('seenpo_branch_langson')), (4, ref('seenpo_branch_trading'))]" />
         </record>
         <function model="res.users" name="_init_default_user_branch" />
         <function model="res.partner" name="_init_default_partner_branch" />
