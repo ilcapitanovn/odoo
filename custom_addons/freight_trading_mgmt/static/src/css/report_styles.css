@@ -36,6 +36,12 @@
     .light-bold {
       font-weight: 600;
     }
+    .text-red {
+        color: red;
+    }
+    .text-light-red {
+        color: #C00000;
+    }
     footer {
         position: relative;
 	    overflow: hidden;
@@ -65,9 +71,6 @@
 	}
 	.label-left {
 	    float: left;
-	}
-	.content-right {
-	    float: right;
 	}
 	.bill-lines-bordered {
 		border: 1px dashed #000000 !important;
@@ -158,6 +161,10 @@
 		padding-left: 100px;
     }
 
+    #bill-lading-trading-rp2 * {
+        font-family: 'Arial';
+        font-size: 13px !important;
+    }
     #contact-table {
         height: 465px;
         max-height: 465px;

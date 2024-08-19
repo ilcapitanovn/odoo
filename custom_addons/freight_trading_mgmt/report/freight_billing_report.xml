@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- TODO: This report is overriding report in Lang Son. It should be fixed to separate these two report independently-->
     <template id="report_print_bill_lading_template_trading" inherit_id="freight_mgmt.report_print_bill_lading_template">
         <xpath expr="//div[hasclass('page')]" position="replace">
             <div class="page">
                 <t t-foreach="docs" t-as="doc">
 <!--                    <t t-esc="doc._fields" />-->
 
-                <t t-if="doc.branch_id and doc.branch_id.code=='LS'">
+                <t t-if="doc.branch_id and doc.branch_id.code=='LS-REPLACED-BY-NEW-FORM-20240818'">
                     <link rel="stylesheet" href="/freight_trading_mgmt/static/src/css/report_styles.css"/>
 
                     <t t-set="report_type" t-value="doc.print_report_type"/>
@@ -317,6 +318,343 @@
                     <footer>
                         <div class="footer-left">收货方</div>
                         <div class="footer-right">承运方</div>
+                    </footer>
+                    </div>
+                    </t> <!-- End Print Report Of rp2 -->
+                </t>
+                <t t-elif="doc.branch_id and doc.branch_id.code=='LS'">
+                    <link rel="stylesheet" href="/freight_trading_mgmt/static/src/css/report_styles.css"/>
+
+                    <t t-set="report_type" t-value="doc.print_report_type"/>
+
+                    <t t-set="carrier_name" t-value="doc.shipper_name"/>
+                    <t t-set="shipper_name" t-value="doc.shipper_name"/>
+                    <t t-set="consignee_name" t-value="doc.consignee_name"/>
+                    <t t-set="bl_number" t-value="doc.vessel_bol_number"/>
+                    <t t-set="receipt_place" t-value="doc.receipt_place"/>
+                    <t t-set="vehicle_number" t-value="doc.vehicle_number"/>
+                    <t t-set="transport_route" t-value="doc.transport_route"/>
+                    <t t-set="transport_type" t-value="'公路运输'"/>
+                    <t t-set="port_loading_text" t-value="doc.port_loading_text"/>
+                    <t t-set="port_discharge_text" t-value="doc.port_discharge_text"/>
+                    <t t-set="port_stopover_text" t-value="doc.port_stopover_text"/>
+                    <t t-set="container_number" t-value="doc.container_number"/>
+
+                    <t t-set="issued_date_formatted" t-value="''"/>
+                    <t t-if="doc.issued_date">
+                        <t t-set="issued_date_formatted" t-value="context_timestamp(doc.issued_date).strftime('%Y.%m.%d')"/>
+                    </t>
+                    <t t-set="departure_date_formatted" t-value="''"/>
+                    <t t-if="doc.etd_revised">
+                        <t t-set="departure_date_formatted" t-value="context_timestamp(doc.etd_revised).strftime('%Y.%m.%d')"/>
+                    </t>
+                    <t t-set="arrival_date_from_formatted" t-value="''"/>
+                    <t t-set="arrival_date_formatted" t-value="''"/>
+                    <t t-if="doc.eta">
+                        <t t-set="d_delta" t-value="datetime.timedelta(days=7)"/>
+                        <t t-set="arrival_date_from_formatted" t-value="context_timestamp(doc.eta).strftime('%Y.%m.%d')"/>
+                        <t t-set="arrival_date_to_formatted" t-value="context_timestamp(doc.eta + d_delta).strftime('%Y.%m.%d')"/>
+                        <t t-set="arrival_date_formatted" t-value="arrival_date_from_formatted + ' - ' + arrival_date_to_formatted"/>
+                    </t>
+
+                    <t t-if="report_type == 'rp1'">
+                    <div id="bill-lading-trading-rp1" style="padding: 0 5px;">
+                    <center>
+                        <div class="title">提运单</div>
+                        <div class="title-larger">BILL OF LADING</div>
+                    </center>
+                    <table class="table table-bordered no-spacing" id="table-01">
+                        <tr>
+                            <td colspan="2">承运人(SHIPPER)： <span t-esc="shipper_name" class="content-right light-bold" /></td>
+                            <td>提单号(B/L NO):</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">收货人(CONSIGNEE)：<span t-esc="consignee_name" class="content-right light-bold"/></td>
+                            <td><span t-esc="bl_number"/></td>
+                        </tr>
+                        <tr>
+                            <td class="content-center">收货地（PLACE OF RECEIPT）</td>
+                            <td class="content-center">车牌号（CAR NUMBER ）</td>
+                            <td class="content-center">运输方式（MODE OF TRANSPORT）</td>
+                        </tr>
+                        <tr>
+                            <td class="content-center"><span t-esc="receipt_place"/></td>
+                            <td class="content-center"><span t-esc="vehicle_number" class="light-bold"/></td>
+                            <td class="content-center"><span t-esc="transport_type"/></td>
+                        </tr>
+                        <tr>
+                            <td class="content-center">起运地（PORT OF DEPARTURE）</td>
+                            <td class="content-center">经停地（STOPOVER AIRPORT OR SEAPORT）</td>
+                            <td class="content-center">目的地（PORT OF DESTINATION）</td>
+                        </tr>
+                        <tr>
+                            <td class="content-center"><span t-esc="port_loading_text"/></td>
+                            <td class="content-center"><span t-esc="port_stopover_text"/></td>
+                            <td class="content-center"><span t-esc="port_discharge_text"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-02">
+                        <tr>
+                            <td width="20%">柜号：</td>
+                            <td><span t-esc="container_number" class="light-bold"/></td>
+                        </tr>
+                        <tr>
+                            <td>运输路线：</td>
+                            <td><span t-esc="transport_route"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-03">
+                        <tr>
+                            <td colspan="5" class="content-center">商品信息</td>
+                        </tr>
+                        <tr>
+                            <td class="content-center light-bold">唛头（MARKS)</td>
+                            <td class="content-center light-bold">商品名称 （DESCRIPTION OF GOODS）</td>
+                            <td class="content-center light-bold">件数（NUMBER OF PACKAGES）</td>
+                            <td class="content-center light-bold">毛重（KG G.W.）</td>
+                            <td class="content-center light-bold">净重（KG N.W.)</td>
+                        </tr>
+                        <t t-set="mark_seal_nos" t-value="''"/>
+                        <t t-set="total_desc" t-value="''"/>
+                        <t t-set="number_pkgs" t-value="0.0"/>
+                        <t t-set="gross_weight" t-value="0.0"/>
+                        <t t-set="net_weight" t-value="0.0"/>
+                        <t t-set="total_pkgs" t-value="0.0"/>
+                        <t t-set="total_gross_weight" t-value="0.0"/>
+                        <t t-set="total_net_weight" t-value="0.0"/>
+                        <t t-set="count_lines" t-value="0"/>
+                        <t t-foreach="doc.billing_line" t-as="line">
+                            <t t-set="count_lines" t-value="count_lines + 1"/>
+                            <t t-if="line.seal_nos">
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos + '&lt;br/&gt;'"/>
+                            </t>
+                            <t t-if="line.description">
+                                <t t-set="total_desc" t-value="total_desc + line.description + '&lt;br/&gt; &lt;br/&gt;'"/>
+                            </t>
+                            <t t-if="line.packages_number > 0">
+                                <t t-set="number_pkgs" t-value="line.packages_number"/>
+                                <t t-set="total_pkgs" t-value="total_pkgs + number_pkgs"/>
+                            </t>
+                            <t t-if="line.gross_weight > 0">
+                                <t t-set="gross_weight" t-value="line.gross_weight"/>
+                                <t t-set="total_gross_weight" t-value="total_gross_weight + gross_weight"/>
+                            </t>
+                            <t t-if="line.net_weight > 0">
+                                <t t-set="net_weight" t-value="line.net_weight"/>
+                                <t t-set="total_net_weight" t-value="total_net_weight + net_weight"/>
+                            </t>
+                            <t t-if="count_lines == 1">
+                                <tr>
+                                    <t t-if="len(doc.billing_line) > 1">
+                                        <td class="content-center" t-att-rowspan="len(doc.billing_line)"><span t-raw="mark_seal_nos" class="light-bold"/></td>
+                                        <td class="content-center" t-att-rowspan="len(doc.billing_line)"><span t-raw="total_desc"/></td>
+                                    </t>
+                                    <t t-else="">
+                                        <td class="content-center"><span t-raw="mark_seal_nos" class="light-bold"/></td>
+                                        <td class="content-center"><span t-raw="total_desc"/></td>
+                                    </t>
+                                    <td class="content-center"><span t-raw="'{:,.0f}'.format(number_pkgs)"/></td>
+                                    <td class="content-center"><span t-esc="'{:,.2f}'.format(gross_weight)"/></td>
+                                    <td class="content-center"><span t-esc="'{:,.2f}'.format(net_weight)"/></td>
+                                </tr>
+                            </t>
+                            <t t-if="count_lines > 1">
+                                <tr>
+                                    <td class="content-center"><span t-raw="'{:,.0f}'.format(number_pkgs)"/></td>
+                                    <td class="content-center"><span t-esc="'{:,.2f}'.format(gross_weight)"/></td>
+                                    <td class="content-center"><span t-esc="'{:,.2f}'.format(net_weight)"/></td>
+                                </tr>
+                            </t>
+                        </t>
+                        <tr>
+                            <td colspan="2">合计：</td>
+                            <td class="content-center"><span t-esc="'{:,.0f}'.format(total_pkgs)"/></td>
+                            <td class="content-center"><span t-esc="'{:,.2f}'.format(total_gross_weight)"/></td>
+                            <td class="content-center"><span t-esc="'{:,.2f}'.format(total_net_weight)"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-04">
+                        <tr>
+                            <td rowspan="6">运费费用 (Total freight)：运输费用已包含在货物成交价格里</td>
+                            <td colspan="2">发货日期（THE DATE OF ISSUANCE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="issued_date_formatted"/></td>
+<!--                            <td>越南嘉菜省 ( GIA LAI, VIET NAM)</td>-->
+                            <td><span t-esc="port_loading_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">起运日期（DEPARTURE DATE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="departure_date_formatted"/></td>
+                            <td><span t-esc="port_loading_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">到达日期（ARRIVAL DATE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="arrival_date_formatted"/></td>
+<!--                            <td>凭祥友谊关通道</td>-->
+                            <td><span t-esc="port_discharge_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">其他备注事宜：按照《中华人民共和国海关总署与越南社会主义共和国农业与农村发展部关于越南鲜食榴莲输华植物检疫要求的议定书》（海关总署公告2022年第66号）相关要求，已按要求集装箱封识挂锁，且在抵达中国入境口岸运输期间，未打开集装箱或更换集装箱，其封识完好无损。</td>
+                        </tr>
+                    </table>
+
+                    <footer>
+                        <div class="footer-left">收货人（盖章）Consignee Signature</div>
+                        <div class="footer-right">承运人（盖章）Shipper Signature</div>
+                    </footer>
+                    </div>
+                    </t> <!-- End Print Report Of rp1 -->
+
+                    <t t-if="report_type == 'rp2'">
+                    <div id="bill-lading-trading-rp2" style="padding: 0 5px;">
+                    <center>
+                        <div class="title">国际承运协议</div>
+                        <div class="title">INTERNATIONAL CARRIAGE AGREEMENT</div>
+                    </center>
+                    <table class="table table-bordered no-spacing" id="table-01">
+                        <tr>
+                            <td width="20%">承运方(CARRIER)：</td>
+                            <td width="50%"><span t-esc="carrier_name"/></td>
+                            <td class="borderless">协议号:</td>
+                        </tr>
+                        <tr>
+                            <td>发货方(SHIPPER)：</td>
+                            <td><span t-esc="shipper_name"/></td>
+                            <td class="text-red borderless"><span t-esc="bl_number"/></td>
+                        </tr>
+                        <tr>
+                            <td>收货人(CONSIGNEE)：</td>
+                            <td><span t-esc="consignee_name"/></td>
+                            <td class="borderless"></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-02">
+                        <tr>
+                            <td class="content-center">收货地（PLACE OF RECEIPT）</td>
+                            <td class="content-center">车牌号（CAR NUMBER）</td>
+                            <td class="content-center">运输方式（MODE OF TRANSPORT）</td>
+                        </tr>
+                        <tr>
+                            <td class="content-center"><span t-esc="receipt_place"/></td>
+                            <td class="content-center text-light-red"><span t-esc="vehicle_number"/></td>
+                            <td class="content-center"><span t-esc="transport_type"/></td>
+                        </tr>
+                        <tr>
+                            <td class="content-center">起运地（PORT OF DEPARTURE）</td>
+                            <td class="content-center">经停地（STOPOVER AIRPORT OR SEAPORT）</td>
+                            <td class="content-center">目的地（PORT OF DESTINATION）</td>
+                        </tr>
+                        <tr>
+                            <td class="content-center"><span t-esc="port_loading_text"/></td>
+                            <td class="content-center"><span t-esc="port_stopover_text"/></td>
+                            <td class="content-center"><span t-esc="port_discharge_text"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered no-spacing" id="table-03">
+                        <tr>
+                            <td>柜号：</td>
+                            <td colspan="4" class="text-light-red"><span t-esc="container_number"/></td>
+                        </tr>
+                        <tr>
+                            <td>运输路线：</td>
+                            <td colspan="4">越南平顺省到中国友谊关</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="content-center">商品信息</td>
+                        </tr>
+                        <tr>
+                            <td width="11%" class="content-center">唛头（MARKS)</td>
+                            <td class="content-center">商品名称<br/>（DESCRIPTION OF GOODS）</td>
+                            <td width="15%" class="content-center">件数（NUMBER OF PACKAGES）</td>
+                            <td width="18%" class="content-center">毛重（KG G.W.）</td>
+                            <td width="18%" class="content-center">净重（KG N.W.)</td>
+                        </tr>
+                        <t t-set="mark_seal_nos" t-value="''"/>
+                        <t t-set="total_desc" t-value="''"/>
+                        <t t-set="number_pkgs" t-value="0.0"/>
+                        <t t-set="gross_weight" t-value="0.0"/>
+                        <t t-set="net_weight" t-value="0.0"/>
+                        <t t-set="total_pkgs" t-value="0.0"/>
+                        <t t-set="total_gross_weight" t-value="0.0"/>
+                        <t t-set="total_net_weight" t-value="0.0"/>
+                        <t t-set="count_lines" t-value="0"/>
+                        <t t-foreach="doc.billing_line" t-as="line">
+                            <t t-set="count_lines" t-value="count_lines + 1"/>
+                            <t t-if="line.seal_nos">
+                                <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.seal_nos + '&lt;br/&gt;'"/>
+                            </t>
+                            <t t-if="line.description">
+                                <t t-set="total_desc" t-value="total_desc + line.description + '&lt;br/&gt; &lt;br/&gt;'"/>
+                            </t>
+                            <t t-if="line.packages_number > 0">
+                                <t t-set="number_pkgs" t-value="line.packages_number"/>
+                                <t t-set="total_pkgs" t-value="total_pkgs + number_pkgs"/>
+                            </t>
+                            <t t-if="line.net_weight > 0">
+                                <t t-set="net_weight" t-value="line.net_weight"/>
+                                <t t-set="total_net_weight" t-value="total_net_weight + net_weight"/>
+                            </t>
+                            <t t-if="line.gross_weight > 0">
+                                <t t-set="gross_weight" t-value="line.gross_weight"/>
+                                <t t-set="total_gross_weight" t-value="total_gross_weight + gross_weight"/>
+                            </t>
+                            <tr>
+                                <td class="content-center"><span t-raw="mark_seal_nos"/></td>
+                                <td class="content-center"><span t-raw="total_desc"/></td>
+                                <td><span t-raw="'{:,.0f}'.format(number_pkgs)" class="content-right"/></td>
+                                <td class="content-center"><span t-esc="'{:,.2f}'.format(net_weight)"/></td>
+                                <td class="content-center"><span t-esc="'{:,.2f}'.format(gross_weight)"/></td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="2">合计：</td>
+                            <td><span t-esc="'{:,.0f}'.format(total_pkgs)" class="content-right"/></td>
+                            <td class="content-center"><span t-esc="'{:,.2f}'.format(total_gross_weight)"/></td>
+                            <td class="content-center"><span t-esc="'{:,.2f}'.format(total_net_weight)"/></td>
+                        </tr>
+<!--                    </table>-->
+
+<!--                    <table class="table table-bordered no-spacing" id="table-04">-->
+                        <tr>
+                            <td rowspan="6" colspan="2"><span>运费费用 (Total freight)：运输费用已包含在货物成交价格里，运费已由发货方承担.</span></td>
+                            <td colspan="3">发货日期（THE DATE OF ISSUANCE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="issued_date_formatted"/></td>
+                            <td colspan="2"><span t-esc="port_loading_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">起运日期（DEPARTURE DATE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="departure_date_formatted"/></td>
+                            <td colspan="2"><span t-esc="port_loading_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">到达日期（ARRIVAL DATE）</td>
+                        </tr>
+                        <tr>
+                            <td><span t-esc="arrival_date_formatted"/></td>
+                            <td colspan="2"><span t-esc="port_discharge_text"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">其他备注事宜：按照《中华人民共和国海关总署与越南社会主义共和国农业与农村发展部关于越南鲜食榴莲输华植物检疫要求的议定书》（海关总署公告2022年第66号）相关要求，已按要求集装箱封识挂锁，且在抵达中国入境口岸运输期间，未打开集装箱或更换集装箱，其封识完好无损.</td>
+                        </tr>
+                    </table>
+
+                    <footer>
+                        <div class="footer-left">收货人（盖章）Consignee Signature</div>
+                        <div class="footer-right">承运人（盖章）Shipper Signature</div>
                     </footer>
                     </div>
                     </t> <!-- End Print Report Of rp2 -->
