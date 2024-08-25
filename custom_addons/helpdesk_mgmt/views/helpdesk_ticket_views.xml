@@ -58,6 +58,31 @@
                     domain="[('create_date','&gt;', (context_today() - datetime.timedelta(weeks=1)).strftime('%%Y-%%m-%%d') )]"
                 />
                 <filter
+                    name="last_month"
+                    string="Last Month"
+                    domain="[('is_last_month_search','=', True)]"
+                />
+                <filter
+                    name="this_month"
+                    string="This Month"
+                    domain="[('is_this_month_search','=', True)]"
+                />
+                <filter
+                    name="last_three_month"
+                    string="Last 3 Months"
+                    domain="[('is_last_three_month_search','=', True)]"
+                />
+                <filter
+                    name="last_quarter_search"
+                    string="Last Quarter"
+                    domain="[('is_last_quarter_search','=', True)]"
+                />
+                <filter
+                    name="this_quarter_search"
+                    string="This Quarter"
+                    domain="[('is_this_quarter_search','=', True)]"
+                />
+                <filter
                     name="late_processing"
                     string="Late Processing"
                     domain="[('is_processing_time_warning', '=', True)]"

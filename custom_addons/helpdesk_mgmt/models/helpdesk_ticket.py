@@ -1,5 +1,6 @@
 import datetime
 
+from dateutil.relativedelta import *
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError
 
@@ -44,6 +45,17 @@ class HelpdeskTicket(models.Model):
     partner_id = fields.Many2one(comodel_name="res.partner", string="Contact")
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
+
+    is_last_month_search = fields.Boolean(compute="_compute_is_last_month_search",
+                                          search="_search_is_last_month_search")
+    is_this_month_search = fields.Boolean(compute="_compute_is_this_month_search",
+                                          search="_search_is_this_month_search")
+    is_last_three_month_search = fields.Boolean(compute="_compute_is_last_three_month_search",
+                                                search="_search_is_last_three_month_search")
+    is_last_quarter_search = fields.Boolean(compute="_compute_is_last_quarter_search",
+                                            search="_search_is_last_quarter_search")
+    is_this_quarter_search = fields.Boolean(compute="_compute_is_this_quarter_search",
+                                            search="_search_is_this_quarter_search")
 
     last_stage_update = fields.Datetime(default=fields.Datetime.now)
     assigned_date = fields.Datetime()
@@ -120,6 +132,85 @@ class HelpdeskTicket(models.Model):
             print("action_schedule_processing_time_warning was done")
         except Exception as e:
             print("action_schedule_processing_time_warning error: " + str(e))
+
+    def _compute_is_last_month_search(self):
+        for rec in self:
+            rec.is_last_month_search = False
+
+    def _compute_is_this_month_search(self):
+        for rec in self:
+            rec.is_this_month_search = False
+
+    def _compute_is_last_three_month_search(self):
+        for rec in self:
+            rec.is_last_three_month_search = False
+
+    def _compute_is_last_quarter_search(self):
+        for rec in self:
+            rec.is_last_quarter_search = False
+
+    def _compute_is_this_quarter_search(self):
+        for rec in self:
+            rec.is_this_quarter_search = False
+
+    def _search_is_last_month_search(self, operator, value):
+        if operator not in ['=', '!=']:
+            raise ValueError(_('This operator is not supported'))
+        if not isinstance(value, bool):
+            raise ValueError(_('Value should be True or False (not %s)'), value)
+        now = fields.Datetime.now()
+        previous_month = now - relativedelta(months=1)
+        from_date = datetime.datetime(previous_month.year, previous_month.month, 1)
+        to_date = from_date + relativedelta(months=1)
+        tickets = self.env['helpdesk.ticket'].search([('create_date', '>=', from_date), ('create_date', '<', to_date)])
+        return [('id', 'in', tickets.ids)]
+
+    def _search_is_this_month_search(self, operator, value):
+        if operator not in ['=', '!=']:
+            raise ValueError(_('This operator is not supported'))
+        if not isinstance(value, bool):
+            raise ValueError(_('Value should be True or False (not %s)'), value)
+        now = fields.Datetime.now()
+        from_date = datetime.datetime(now.year, now.month, 1)
+        tickets = self.env['helpdesk.ticket'].search([('create_date', '>=', from_date)])
+        return [('id', 'in', tickets.ids)]
+
+    def _search_is_last_three_month_search(self, operator, value):
+        if operator not in ['=', '!=']:
+            raise ValueError(_('This operator is not supported'))
+        if not isinstance(value, bool):
+            raise ValueError(_('Value should be True or False (not %s)'), value)
+        now = fields.Datetime.now()
+        previous_3_months = now - relativedelta(months=3)
+        from_date = datetime.datetime(previous_3_months.year, previous_3_months.month, 1)
+        to_date = from_date + relativedelta(months=3)
+        tickets = self.env['helpdesk.ticket'].search([('create_date', '>=', from_date), ('create_date', '<', to_date)])
+        return [('id', 'in', tickets.ids)]
+
+    def _search_is_last_quarter_search(self, operator, value):
+        if operator not in ['=', '!=']:
+            raise ValueError(_('This operator is not supported'))
+        if not isinstance(value, bool):
+            raise ValueError(_('Value should be True or False (not %s)'), value)
+        now = fields.Datetime.now()
+        previous_3_months = now - relativedelta(months=3)
+        last_quarter = int((previous_3_months.month - 1) / 3 + 1)
+        from_date = datetime.datetime(previous_3_months.year, 3 * last_quarter - 2, 1)
+        to_date = from_date + relativedelta(months=3)
+        tickets = self.env['helpdesk.ticket'].search([('create_date', '>=', from_date), ('create_date', '<', to_date)])
+        return [('id', 'in', tickets.ids)]
+
+    def _search_is_this_quarter_search(self, operator, value):
+        if operator not in ['=', '!=']:
+            raise ValueError(_('This operator is not supported'))
+        if not isinstance(value, bool):
+            raise ValueError(_('Value should be True or False (not %s)'), value)
+        now = fields.Datetime.now()
+        this_quarter = int((now.month - 1) / 3 + 1)
+        from_date = datetime.datetime(now.year, 3 * this_quarter - 2, 1)
+        to_date = from_date + relativedelta(months=3)
+        tickets = self.env['helpdesk.ticket'].search([('create_date', '>=', from_date), ('create_date', '<', to_date)])
+        return [('id', 'in', tickets.ids)]
 
     @api.depends("processing_day", "last_stage_update")
     def _compute_is_processing_time_warning(self):
