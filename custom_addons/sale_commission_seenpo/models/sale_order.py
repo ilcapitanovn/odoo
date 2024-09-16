@@ -101,6 +101,12 @@ class SaleOrderLineAgent(models.Model):
                 # If subtotal (sale_price * quantity) is less than
                 # standard_price * quantity, it means that we are selling at
                 # lower price than we bought, so set amount_base to 0
-                subtotal = max([0, subtotal - self.object_id.product_id.standard_price * self.object_id.product_uom_qty])
+                # subtotal = max([0, subtotal - self.object_id.product_id.standard_price * self.object_id.product_uom_qty])
+                """
+                Changed on 2024/01/25: because cost of product (standard price) is not used to calculate margin, but
+                it's total of purchase amount, so selling at lower price is not suitable in this case. Let's user
+                decides based on subtotal for clear.
+                """
+                subtotal = max([0, subtotal])
             amount_max = subtotal * (self.commission_id.fix_qty_max / 100.0)
         return amount_max

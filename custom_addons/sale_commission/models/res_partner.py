@@ -10,6 +10,9 @@ class ResPartner(models.Model):
 
     _inherit = "res.partner"
 
+    def _default_commission(self):
+        return self.env['sale.commission'].sudo().search([], limit=1).id
+
     agent_ids = fields.Many2many(
         comodel_name="res.partner",
         relation="partner_agent_rel",
@@ -32,6 +35,7 @@ class ResPartner(models.Model):
     commission_id = fields.Many2one(
         string="Commission",
         comodel_name="sale.commission",
+        default=_default_commission,
         help="This is the default commission used in the sales where this "
         "agent is assigned. It can be changed on each operation if "
         "needed.",

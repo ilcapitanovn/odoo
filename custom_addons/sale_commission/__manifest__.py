@@ -3,7 +3,7 @@
 # Copyright 2022 Bao Thinh Software - Tuan Huynh
 {
     "name": "Sales commissions",
-    "version": "15.0.1.0.0",
+    "version": "15.0.1.0.1",
     "author": "Tuan Huynh," "Odoo Community Association (OCA)",
     "category": "Sales Management",
     "license": "AGPL-3",

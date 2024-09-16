@@ -10,6 +10,7 @@
             <field name="fix_qty" position="after">
                 <field
                     name="fix_qty_max"
+                    help="Calculating based on percentage maximum of subtotal in sale order line."
                     attrs="{'invisible': [('commission_type', '!=', 'fixed')], 'required': [('commission_type', '=', 'fixed')]}"
                 />
             </field>

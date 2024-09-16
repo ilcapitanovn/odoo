@@ -39,7 +39,7 @@
                 <attribute name="groups"></attribute>
             </xpath>
             <xpath expr="//field[@name='commission_id']" position="attributes">
-                <attribute name="attrs">{'invisible': [('user_ids', '!=', [])]}</attribute>
+                <attribute name="attrs">{'invisible': [('user_ids', '!=', [])], 'required': [('user_ids', '=', []), ('agent', '=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='agent_ids']" position="attributes">
                 <attribute name="domain">[("agent", "=", True),('user_ids','=',False)]</attribute>
