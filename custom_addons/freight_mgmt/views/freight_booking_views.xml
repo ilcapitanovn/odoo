@@ -31,6 +31,9 @@
                 />
                 <filter string="Open" name="open" domain="[('completed', '=', False )]" />
                 <separator />
+                <filter string="Original ETD" name="etd" date="etd"/>
+                <filter string="Revised ETD" name="etd_revised" date="etd_revised"/>
+                <separator />
                 <filter
                     string="My Bookings"
                     name="my_bookings"
@@ -298,6 +301,7 @@
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="branch_id" optional="hide" />
                 <field name="order_type" optional="show"/>
+                <field name="amount_total" optional="hide"/>
                 <field name="margin" optional="show"/>
                 <field name="stage_id" decoration-success="confirmed or completed" decoration-info="stage_name == 'Draft' or stage_name == 'Submitted'" widget="badge" optional="show" />
             </tree>
@@ -308,7 +312,7 @@
         <field name="model">freight.booking</field>
 <!--        <field name="priority" eval="100" />-->
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" default_group_by="stage_id">
+            <kanban class="o_kanban_mobile" default_group_by="stage_id" sample="1">
                 <field name="number" />
                 <field name="active" />
                 <field name="name" />
@@ -401,18 +405,26 @@
             </kanban>
         </field>
     </record>
-    <!--
     <record id="freight_booking_views_pivot" model="ir.ui.view">
         <field name="name">freight.booking.view.pivot</field>
         <field name="model">freight.booking</field>
         <field name="arch" type="xml">
-            <pivot string="Pivot Analysis" disable_linking="True">
-                <field name="team_id" type="row" />
-                <field name="issued_date" type="col" />
+            <pivot string="Pivot Analysis" disable_linking="True" sample="1">
+                <field name="etd_revised" type="row" />
+                <field name="margin" type="measure" />
             </pivot>
         </field>
     </record>
-    -->
+    <record id="freight_booking_views_graph" model="ir.ui.view">
+        <field name="name">freight.booking.view.graph</field>
+        <field name="model">freight.booking</field>
+        <field name="arch" type="xml">
+            <graph string="Graph Analysis" sample="1">
+                <field name="partner_id" />
+                <field name="margin" type="measure" />
+            </graph>
+        </field>
+    </record>
     <record id="freight_booking_view_tree_inherited" model="ir.ui.view">
        <field name="name">freight.booking.view.tree.inherited</field>
        <field name="model">freight.booking</field>

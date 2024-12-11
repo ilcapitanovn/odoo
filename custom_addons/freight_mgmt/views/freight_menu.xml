@@ -13,7 +13,7 @@
         <field name="name">Export - Bookings</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.booking</field>
-        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph</field>
         <field name="context">{'shipment_type_suffix': 'exp'}</field>
         <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>

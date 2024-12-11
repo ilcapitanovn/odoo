@@ -58,8 +58,10 @@ class FreightBooking(models.Model):
         tracking=True, index=True
     )
     currency_id = fields.Many2one("res.currency", string="Currency", readonly=True)
+    amount_total = fields.Monetary(related="order_id.amount_total", string="Total",
+                                   currency_field="currency_id", readonly=True, store=True)
     margin = fields.Monetary(related="order_id.margin", string="Profit",
-                             currency_field="currency_id", readonly=True, store=False)
+                             currency_field="currency_id", readonly=True, store=True)
 
     booking_type = fields.Selection([
         ('forwarding', 'Forwarding'),

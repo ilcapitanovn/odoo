@@ -83,18 +83,55 @@ var DynamicDashboard = AbstractAction.extend({
                 plugins: {      // Chart v3.0+
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    const value = context.parsed.y || '';
+                                    label += value.toLocaleString("en-US");
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
                 legend: {       // Chart v2.0
                     display: false
                 },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            // const title = data.labels[tooltipItem.index];
+                            const dataset = data.datasets[tooltipItem.datasetIndex];
+                            const value = dataset.data[tooltipItem.index];
+                            if (value) {
+                                return value.toLocaleString("en-US");
+                            }
+                            else {
+                                return 0.0;
+                            }
+                        }
+                    }
+                },
                 scales: {
                     y: {    // Chart v3.0+
-                        beginAtZero: true
+                        beginAtZero: true,
+                        callback: function (value, index, values) {
+                            return value.toLocaleString("en-US");
+                        }
                     },
                     yAxes: [{   // Chart v2.0
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            callback: function (value, index, values) {
+                                return value.toLocaleString("en-US");
+                            }
                         }
                     }]
                 }

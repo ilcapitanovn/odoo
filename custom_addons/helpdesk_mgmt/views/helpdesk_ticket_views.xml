@@ -52,6 +52,8 @@
                     domain="[('message_is_follower', '=', True)]"
                 />
                 <separator />
+                <filter string="Created Date" name="create_date" date="create_date"/>
+                <separator />
                 <filter
                     name="last_week"
                     string="Last Week"
