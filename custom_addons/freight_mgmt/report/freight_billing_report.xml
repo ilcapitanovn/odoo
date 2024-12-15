@@ -294,9 +294,20 @@
                 <t t-set="bank_acc_name" t-value="doc.bank_acc_name"/>
 
                 <div id="quote_content" class="col-12 col-lg justify-content-end">
-                    <div id="company-logo">
-                        <img t-if="doc.partner_id.lang == 'vi_VN'" t-att-src="'web/static/img/report_header_logo_vn.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
-                        <img t-if="doc.partner_id.lang != 'vi_VN'" t-att-src="'web/static/img/report_header_logo_en.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
+<!--                    <div id="company-logo">-->
+<!--                        <img t-if="doc.partner_id.lang == 'vi_VN'" t-att-src="'web/static/img/report_header_logo_vn.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>-->
+<!--                        <img t-if="doc.partner_id.lang != 'vi_VN'" t-att-src="'web/static/img/report_header_logo_en.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>-->
+<!--                    </div>-->
+                    <div id="header">
+                        <div class="header-left">
+                            <img t-att-src="'freight_mgmt/static/img/logo.png'" class="company-logo" alt="Logo"/>
+                        </div>
+                        <div class="header-right">
+                            CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>
+                            VIET TOAN JOINT STOCK COMPANY <br/>
+                            684/28A Tran Hung Dao, Ward 2, District 5, Ho Chi Minh, Vietnam <br/>
+                            Tel: (84) 28 38384168 MST: 0314859219
+                        </div>
                     </div>
 
                     <div id="introduction" t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}">

@@ -33,6 +33,9 @@ class SaleOrder(models.Model):
         string="Shipment Type", states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
         readonly=True, default="fcl-exp", tracking=True, help='Type of Shipment')
 
+    order_print_with_images = fields.Boolean('Print Product Image', default=False,
+                                             help='Selection to include product image in printing.')
+
     profit_sharing_percentage = fields.Float(
         string="Profit Sharing (%)",
         help="The margin will be shared by this percentage to the nominated order",

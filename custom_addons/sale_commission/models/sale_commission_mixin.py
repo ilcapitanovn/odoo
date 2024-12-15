@@ -49,14 +49,20 @@ class SaleCommissionMixin(models.AbstractModel):
         for line in self:
             if line.commission_free:
                 line.commission_status = _("Comm. free")
-            elif len(line.agent_ids) == 0:
+            elif len(line.agent_ids) == 0 or not line.ids:  # Set default status of product line just added
                 line.commission_status = _("No commission agents")
-            elif len(line.agent_ids) == 1:
-                line.commission_status = _("1 commission agent")
+            # elif len(line.agent_ids) == 1:
+            #     line.commission_status = _("1 commission agent")
             else:
-                line.commission_status = _("%s commission agents") % (
-                    len(line.agent_ids),
-                )
+                agents_has_commission = line.agent_ids.filtered(lambda a: a.amount > 0 or a.amount_custom > 0)
+                if len(agents_has_commission) == 0:
+                    line.commission_status = _("No commission agents")
+                elif len(agents_has_commission) == 1:
+                    line.commission_status = _("1 commission agent")
+                else:
+                    line.commission_status = _("%s commission agents") % (
+                        len(agents_has_commission),
+                    )
 
     def recompute_agents(self):
         self._compute_agent_ids()

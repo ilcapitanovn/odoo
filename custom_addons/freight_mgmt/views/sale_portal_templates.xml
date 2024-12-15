@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <template id="freight_sale_management_order_portal_content_custom" inherit_id="sale_management.sale_order_portal_content_inherit_sale_management">-->
+<!--        <xpath expr="//t[@t-else='']//span[@t-field='line.product_uom']" position="replace">-->
+<!--            &lt;!&ndash; Empty replacement to remove the element &ndash;&gt;-->
+<!--        </xpath>-->
+<!--    </template>-->
+
+    <template id="freight_sale_order_portal_content_custom" inherit_id="sale.sale_order_portal_content">
+        <!-- Add a new column to the table header -->
+        <xpath expr="//section[@id='details']//thead//tr" position="inside">
+            <t t-if="sale_order and sale_order.order_print_with_images">
+                <th class="text-center">Product Images</th>
+            </t>
+        </xpath>
+        <!-- Add a new column to the table body -->
+        <xpath expr="//section[@id='details']//tbody//tr//t[@t-if='not line.display_type']" position="inside">
+            <t t-if="sale_order and sale_order.order_print_with_images">
+                <td name="td_product_images" class="text-center">
+                    <img t-if="line.product_id.image_1920"
+                         t-att-src="'/web/image/product.product/%d/image_1920' % line.product_id.id"
+                         style="max-width: 50px; max-height: 50px;" />
+                </td>
+            </t>
+        </xpath>
+    </template>
+</odoo>

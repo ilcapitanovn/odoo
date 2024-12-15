@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="freight_report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='doc']" position="before">
+            <style>
+                .o_main_table td
+                {
+                    vertical-align: middle;
+                }
+            </style>
+        </xpath>
+        <xpath expr="//t[@t-set='display_discount']" position="after">
+            <t t-set="print_with_images" t-value="doc.order_print_with_images"/>
+        </xpath>
+        <xpath expr="//table[@class='table table-sm o_main_table']//th[@name='th_subtotal']" position="after">
+            <t t-if="print_with_images">
+                <th name="th_product_images" class="text-center">Product Images</th>
+            </t>
+        </xpath>
+        <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_subtotal']" position="after">
+            <t t-if="print_with_images">
+                <td name="td_product_images" class="text-center">
+                    <img t-if="line.product_id.image_1920"
+                         t-att-src="'/web/image/product.product/%d/image_1920' % line.product_id.id"
+                         style="max-width: 50px; max-height: 50px;" />
+                </td>
+            </t>
+        </xpath>
+    </template>
+</odoo>

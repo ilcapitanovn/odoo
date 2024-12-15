@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 00:50+0000\n"
-"PO-Revision-Date: 2024-04-19 00:50+0000\n"
+"POT-Creation-Date: 2024-12-13 04:39+0000\n"
+"PO-Revision-Date: 2024-12-13 04:39+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -481,7 +481,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__activity_ids
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__activity_ids
 msgid "Activities"
-msgstr ""
+msgstr "Các hoạt động"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__activity_exception_decoration
@@ -605,7 +605,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 msgid "Assign to me"
-msgstr ""
+msgstr "Phân công cho tôi"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__user_id
@@ -912,23 +912,23 @@ msgstr ""
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__state__cancel
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__state__cancel
 msgid "Cancelled"
-msgstr ""
+msgstr "Hủy"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__vehicle_number
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__vehicle_number
 msgid "Car Number"
-msgstr ""
+msgstr "Số xe"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
 msgid "Cargo Details"
-msgstr ""
+msgstr "Thông tin vận tải"
 
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_catalog_menu
 msgid "Catalogue"
-msgstr ""
+msgstr "Danh mục"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
@@ -939,7 +939,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__freight_charge_rate
 msgid "Charge types"
-msgstr ""
+msgstr "Loại phí"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__show_create_credit_button
@@ -990,7 +990,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vehicle_supplier__code
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__code
 msgid "Code"
-msgstr ""
+msgstr "Mã"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__color
@@ -1015,7 +1015,7 @@ msgstr "Mã HS"
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__commodity
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__commodity
 msgid "Commodity"
-msgstr "Hàng Hóa"
+msgstr "Hàng hóa"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__commodity_code
@@ -1055,7 +1055,7 @@ msgstr "Mã HS của hàng hóa phải là 6 số"
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__company_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Company"
-msgstr ""
+msgstr "Công ty"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__company_bank_id
@@ -1075,17 +1075,17 @@ msgstr ""
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__state__completed
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__state__completed
 msgid "Completed"
-msgstr ""
+msgstr "Hoàn thành"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__completed_date
 msgid "Completed Date"
-msgstr ""
+msgstr "Ngày hoàn thành"
 
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_configuration_menu
 msgid "Configuration"
-msgstr ""
+msgstr "Cấu hình"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
@@ -1099,33 +1099,33 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__confirmed
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__confirmed
 msgid "Confirmed"
-msgstr ""
+msgstr "Xác nhận"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__approved_date
 msgid "Confirmed Date"
-msgstr ""
+msgstr "Ngày xác nhận"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_id
 #: model:res.partner.category,name:freight_mgmt.res_partner_category_consignee_tag
 msgid "Consignee"
-msgstr ""
+msgstr "Người nhận hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_name
 msgid "Consignee Name"
-msgstr ""
+msgstr "Tên người nhận"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_address
 msgid "Consignee's Address"
-msgstr ""
+msgstr "Địa chỉ người nhận"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_email
 msgid "Consignee's Email"
-msgstr ""
+msgstr "Email người nhận"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__consignee_extra_info
@@ -1137,33 +1137,33 @@ msgstr ""
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_consignee_menu
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_res_partner_view_search
 msgid "Consignees"
-msgstr ""
+msgstr "Người nhận hàng"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_res_partner
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
 msgid "Contact"
-msgstr ""
+msgstr "Liên hệ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_name
 msgid "Contact Name"
-msgstr ""
+msgstr "Tên liên hệ"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 msgid "Contact information"
-msgstr ""
+msgstr "Thông tin liên hệ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_address
 msgid "Contact's Address"
-msgstr ""
+msgstr "Địa chỉ liên hệ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_email
 msgid "Contact's Email"
-msgstr ""
+msgstr "Email liên hệ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_extra_info
@@ -1217,7 +1217,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vehicle_supplier__country_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__country_id
 msgid "Country"
-msgstr ""
+msgstr "Quốc gia"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
@@ -1253,12 +1253,12 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_consignee_action
 msgid "Create a new consignee in your address book"
-msgstr ""
+msgstr "Tạo mới người nhận hàng trong sổ địa chỉ"
 
 #. module: freight_mgmt
 #: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_shipper_action
 msgid "Create a new shipper in your address book"
-msgstr ""
+msgstr "Tạo mới người gửi hàng trong sổ địa chỉ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__create_uid
@@ -1280,7 +1280,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__create_uid
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Tạo bởi"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__create_date
@@ -1302,7 +1302,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__create_date
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Được tạo vào"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__credit_count
@@ -1367,7 +1367,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__currency_name
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__order_line_currency_id
 msgid "Currency"
-msgstr ""
+msgstr "Tiền tệ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_sale_incentive_analysis_report_wizard__currency_name
@@ -1524,7 +1524,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__kanban_state__normal
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__kanban_state__normal
 msgid "Default"
-msgstr ""
+msgstr "Chuẩn"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_hr_employee__branch_id
@@ -1538,12 +1538,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_credit_note_kanban
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_debit_note_kanban
 msgid "Delete"
-msgstr ""
+msgstr "Xoá"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__contact_id
 msgid "Delivery Contact"
-msgstr ""
+msgstr "Liên hệ giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.actions.report,name:freight_mgmt.freight_delivery_order_report
@@ -1583,7 +1583,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_port_form
 msgid "Description"
-msgstr ""
+msgstr "Mô tả"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__place_of_delivery
@@ -1602,7 +1602,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_product__port_discharge_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_template__port_discharge_id
 msgid "Discharge Port"
-msgstr ""
+msgstr "Cảng dỡ hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__display_cus
@@ -1636,13 +1636,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_name
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__display_name
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: freight_mgmt
-#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__business_display_name
-#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__display_name
-#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__display_name
 msgid "Display Name"
 msgstr "Tên hiển thị"
 
@@ -1679,18 +1672,18 @@ msgstr ""
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__state__draft
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__state__draft
 msgid "Draft"
-msgstr ""
+msgstr "Bản nháp"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__due_date
 msgid "Due Date"
-msgstr ""
+msgstr "Ngày đáo hạn"
 
 #. module: freight_mgmt
 #: model:ir.actions.server,name:freight_mgmt.action_duplicate_freight_billing
 #: model:ir.actions.server,name:freight_mgmt.action_duplicate_freight_booking
 msgid "Duplicate"
-msgstr ""
+msgstr "Nhân bản"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
@@ -1728,7 +1721,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_credit_note_kanban
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_debit_note_kanban
 msgid "Edit"
-msgstr ""
+msgstr "Chỉnh sửa"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__partner_email
@@ -1755,12 +1748,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__partner_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_search
 msgid "Employee"
-msgstr ""
+msgstr "Nhân viên"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__eta
 msgid "Est. Time Arrival"
-msgstr ""
+msgstr "Thời gian dự kiến đến"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__exchange_rate
@@ -1782,7 +1775,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_executive_menu
 msgid "Export"
-msgstr ""
+msgstr "Hàng Xuất"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_billing_action
@@ -1812,7 +1805,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__transport_type__express
 msgid "Express"
-msgstr ""
+msgstr "Siếu tốc"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
@@ -1832,7 +1825,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "FOR DELIVERY, PLEASE CONTACT:"
-msgstr ""
+msgstr "Để giao hăng, vui lỏng liên hệ"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
@@ -1852,7 +1845,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__final_destination
 msgid "Final destination"
-msgstr ""
+msgstr "Điểm đến cuối"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_pricelist_item__fixed_price_vnd
@@ -2120,7 +2113,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "GROSS WEIGHT"
-msgstr ""
+msgstr "Trọng lượng thô"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_form_wo_template
@@ -2136,10 +2129,15 @@ msgid ""
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_views_graph
+msgid "Graph Analysis"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__gross_weight
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__gross_weight
 msgid "Gross Weight (KGS)"
-msgstr ""
+msgstr "Trọng lượng thô (KGS)"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_search
@@ -2156,7 +2154,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_search
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Group By"
-msgstr ""
+msgstr "Nhóm"
 
 #. module: freight_mgmt
 #: model:freight.catalog.port,name:freight_mgmt.freight_catalog_port_1
@@ -2315,7 +2313,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_import_menu
 msgid "Import"
-msgstr ""
+msgstr "Hàng Nhập"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_import_booking_action
@@ -2495,7 +2493,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_account_move
 msgid "Journal Entry"
-msgstr ""
+msgstr "Bút toán sổ nhật ký"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
@@ -2595,12 +2593,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard____last_update
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Cập nhật cuối lúc"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__last_stage_update
 msgid "Last Stage Update"
-msgstr ""
+msgstr "Cập nhật trạng thái lần cuối"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__write_uid
@@ -2622,7 +2620,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__write_uid
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Cập nhật cuối bởi"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__write_date
@@ -2644,7 +2642,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__write_date
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Cập nhật cuối lúc"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__vessel_id
@@ -2658,7 +2656,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_vessel_action
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_vessel_menu
 msgid "Lines"
-msgstr ""
+msgstr "Hãng tàu"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_billing__email_cc
@@ -2675,7 +2673,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_product__port_loading_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_template__port_loading_id
 msgid "Loading Port"
-msgstr ""
+msgstr "Cảng bốc hàng"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
@@ -2702,7 +2700,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "MEASUREMENT"
-msgstr ""
+msgstr "Đo lường"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
@@ -2737,7 +2735,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__measurement
 msgid "Measurement"
-msgstr ""
+msgstr "Đo lường"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__measurement_cbm
@@ -2765,7 +2763,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__message_ids
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Tin nhắn"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__my_activity_date_deadline
@@ -2784,7 +2782,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "My Bookings"
-msgstr ""
+msgstr "Bookings của tôi"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_search
@@ -2844,7 +2842,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "NOTIFY PARTY (Name and address)"
-msgstr ""
+msgstr "Thông báo đối tác (tên và địa chỉ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__name
@@ -2855,7 +2853,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vehicle_supplier__name
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_vessel__name
 msgid "Name"
-msgstr ""
+msgstr "Tên"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__net_weight
@@ -3071,13 +3069,13 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Ocean Vessel"
-msgstr ""
+msgstr "Hãng tàu"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__vessel_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__vessel_id
 msgid "Ocean vessel"
-msgstr ""
+msgstr "Hãng tàu"
 
 #. module: freight_mgmt
 #: model_terms:ir.actions.act_window,help:freight_mgmt.freight_catalog_consignee_action
@@ -3092,7 +3090,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "Open"
-msgstr ""
+msgstr "Mở"
 
 #. module: freight_mgmt
 #. openerp-web
@@ -3124,7 +3122,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__order_type
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree
 msgid "Order Type"
-msgstr ""
+msgstr "Loại hàng"
 
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_executive_orders_to_booking_menu
@@ -3134,6 +3132,7 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__etd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_tree
 msgid "Original ETD"
 msgstr ""
@@ -3141,13 +3140,13 @@ msgstr ""
 #. module: freight_mgmt
 #: model:freight.catalog.airline,name:freight_mgmt.freight_catalog_airline_other
 msgid "Other"
-msgstr ""
+msgstr "Khác"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_form
 msgid "Other Information"
-msgstr ""
+msgstr "Thông tin khác"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
@@ -3221,27 +3220,27 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__partner_name
 msgid "Partner Name"
-msgstr ""
+msgstr "Tên đối tác"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_name
 msgid "Party Name"
-msgstr ""
+msgstr "Tên đối tác"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_id
 msgid "Party Notification"
-msgstr ""
+msgstr "Đối tác thông báo"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_address
 msgid "Party's Address"
-msgstr ""
+msgstr "Địa chỉ đối tác"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_email
 msgid "Party's Email"
-msgstr ""
+msgstr "Email đối tác"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__party_extra_info
@@ -3256,7 +3255,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__payable_at
 msgid "Payable at"
-msgstr ""
+msgstr "Phải trả"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__payment_state
@@ -3277,10 +3276,15 @@ msgid "Phone"
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_views_pivot
+msgid "Pivot Analysis"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__delivery_place
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Place of delivery"
-msgstr ""
+msgstr "Địa điểm giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_form_wo_line__place_of_farm
@@ -3290,13 +3294,13 @@ msgstr "Nơi khai thác/đánh bắt/nuôi trồng"
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__payment_place
 msgid "Place of payment"
-msgstr ""
+msgstr "Địa điểm thanh toán"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__receipt_place
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Place of receipt"
-msgstr ""
+msgstr "Địa điểm nhân hảng"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
@@ -3307,34 +3311,34 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__port_type
 msgid "Port Type"
-msgstr ""
+msgstr "Loại cảng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_discharge_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Port of discharge"
-msgstr ""
+msgstr "Cảng dỡ hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_discharge_text
 msgid "Port of discharge text"
-msgstr ""
+msgstr "Cảng dỡ hàng (In B/L)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_loading_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Port of loading"
-msgstr ""
+msgstr "Cảng bốc hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_loading_text
 msgid "Port of loading text"
-msgstr ""
+msgstr "Cảng bốc hàng (In B/L)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_stopover_text
 msgid "Port of stopover text"
-msgstr ""
+msgstr "Cảng trung chuyển (In B/L)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__access_url
@@ -3347,20 +3351,20 @@ msgstr ""
 #: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_port_action
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_port_menu
 msgid "Ports"
-msgstr ""
+msgstr "Cảng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_billing__state__posted
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__state__posted
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__state__posted
 msgid "Posted"
-msgstr ""
+msgstr "Đã gửi"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__pre_carriage
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Pre-carriage by"
-msgstr ""
+msgstr "Vận chuyển bởi"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_form
@@ -3375,11 +3379,6 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__unit_price
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__unit_price
-#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__unit_price
-msgid "Price"
-msgstr ""
-
-#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__unit_price
 msgid "Price"
 msgstr "Đơn giá"
@@ -3410,12 +3409,12 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_product_pricelist
 msgid "Pricelist"
-msgstr ""
+msgstr "Bảng giá"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_product_pricelist_item
 msgid "Pricelist Rule"
-msgstr ""
+msgstr "Qui tắc bảng giá"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_products_pricelists_view_action
@@ -3434,6 +3433,11 @@ msgid "Print Form WO"
 msgstr "In tờ khai WO"
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__order_print_with_images
+msgid "Print Product Image"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_port__printing_name
 msgid "Printing Name"
 msgstr ""
@@ -3442,12 +3446,12 @@ msgstr ""
 #: model:ir.model,name:freight_mgmt.model_product_product
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_pricelist_item_view_search
 msgid "Product"
-msgstr ""
+msgstr "Sản phẩm"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_product_template
 msgid "Product Template"
-msgstr ""
+msgstr "Mẫu sản phẩm"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__product_uom_readonly
@@ -3460,7 +3464,7 @@ msgstr ""
 #: model:ir.ui.menu,name:freight_mgmt.freight_products_products_menu
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_pricelist_item_view_search
 msgid "Products"
-msgstr ""
+msgstr "Sản phẩm"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_pricelist_item_view_search
@@ -3534,12 +3538,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__purchase_order_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_tree
 msgid "Purchase Order"
-msgstr ""
+msgstr "Đơn mua hàng"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_purchase_order_line
 msgid "Purchase Order Line"
-msgstr ""
+msgstr "Chi tiết mua hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__sale_state
@@ -3582,7 +3586,7 @@ msgstr "SL (kg)"
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__quantity
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__quantity
 msgid "Quantity"
-msgstr ""
+msgstr "Số lượng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__quantity
@@ -3705,7 +3709,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.ui.menu,name:freight_mgmt.freight_mgmt_reporting_menu
 msgid "Reporting"
-msgstr ""
+msgstr "Báo cáo"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__responsible_buyer
@@ -3739,6 +3743,7 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__etd_revised
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "Revised ETD"
 msgstr ""
 
@@ -3766,7 +3771,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "SHIPPER (Name and address)"
-msgstr ""
+msgstr "Người giao hăng (tên và địa chỉ)"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_tree
@@ -3782,7 +3787,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__closing_time
 msgid "SI Cut Off Time"
-msgstr ""
+msgstr "Giờ cắt máng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_has_sms_error
@@ -3866,12 +3871,12 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "Đơn bán hàng"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_sale_order_line
 msgid "Sales Order Line"
-msgstr ""
+msgstr "Dòng đơn bán hàng"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_template_form_view_inherit
@@ -3907,6 +3912,11 @@ msgid "Select the period date to which you want to make the report:"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_sale_order__order_print_with_images
+msgid "Selection to include product image in printing."
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__seller
 msgid "Seller"
 msgstr "Người bán"
@@ -3922,7 +3932,7 @@ msgstr "Người bán"
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__sequence
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__sequence
 msgid "Sequence"
-msgstr ""
+msgstr "Trình tự"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_pricelist_item_view_search
@@ -3935,28 +3945,28 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__shipment_type
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__order_shipment_type
 msgid "Shipment Type"
-msgstr ""
+msgstr "Loại lô hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_id
 #: model:res.partner.category,name:freight_mgmt.res_partner_category_shipper_tag
 msgid "Shipper"
-msgstr ""
+msgstr "Người giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_name
 msgid "Shipper Name"
-msgstr ""
+msgstr "Tên người giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_address
 msgid "Shipper's Address"
-msgstr ""
+msgstr "Địa chỉ người giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_email
 msgid "Shipper's Email"
-msgstr ""
+msgstr "Email người giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipper_extra_info
@@ -3968,14 +3978,14 @@ msgstr ""
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_shipper_menu
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_res_partner_view_search
 msgid "Shippers"
-msgstr ""
+msgstr "Người giao hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__shipping_line
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_product__vessel_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_template__vessel_id
 msgid "Shipping Line"
-msgstr ""
+msgstr "Tuyến vận chuyển"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__shipping_mark
@@ -3995,7 +4005,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__size
 msgid "Size (ft)"
-msgstr ""
+msgstr "Kích cỡ"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_credit_note__swift_code
@@ -4019,27 +4029,27 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 #, python-format
 msgid "Stage"
-msgstr ""
+msgstr "Trạng thái"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__stage_name
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_stage__name
 msgid "Stage Name"
-msgstr ""
+msgstr "Tên trạng thái"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_stage_action
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_stage_menu
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_stage_form
 msgid "Stages"
-msgstr ""
+msgstr "Trạng thái"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__state
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__state
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__state
 msgid "Status"
-msgstr ""
+msgstr "Tình trạng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_state
@@ -4058,7 +4068,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__port_stopover_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__port_stopover_id
 msgid "Stopover Port"
-msgstr ""
+msgstr "Cảng trung chuyển"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__storage_days
@@ -4080,7 +4090,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:freight.catalog.stage,name:freight_mgmt.freight_catalog_stage_awaiting
 msgid "Submitted"
-msgstr ""
+msgstr "Đã nộp"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__price_subtotal
@@ -4088,12 +4098,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_purchase_order_line__price_subtotal_display
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__price_subtotal_display
 msgid "Subtotal"
-msgstr ""
+msgstr "Thành tiền"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_product_supplierinfo
 msgid "Supplier Pricelist"
-msgstr ""
+msgstr "Bảng giá nhà cung cấp"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__swift_code
@@ -4187,6 +4197,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_catalog_vessel_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_form_wo_form
 msgid "Tags"
+msgstr "Nhan"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_res_partner_view_form
+msgid "Tags..."
 msgstr ""
 
 #. module: freight_mgmt
@@ -4238,7 +4253,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__temperature
 msgid "Temperature (C)"
-msgstr ""
+msgstr "Nhiệt độ (C)"
 
 #. module: freight_mgmt
 #: code:addons/freight_mgmt/models/freight_billing.py:0
@@ -4250,12 +4265,12 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__note
 msgid "Terms and conditions"
-msgstr ""
+msgstr "Điều khoản và điều kiện"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 msgid "Terms and conditions..."
-msgstr ""
+msgstr "Điều khoản và điều kiện..."
 
 #. module: freight_mgmt
 #: code:addons/freight_mgmt/models/freight_billing.py:0
@@ -4437,7 +4452,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__name
 msgid "Title"
-msgstr ""
+msgstr "Tiêu đề"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_form_wo_template
@@ -4464,6 +4479,7 @@ msgid "Toggle dropdown"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__amount_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__amount_subtotal_vnd
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__amount_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__amount_total_vnd
@@ -4472,15 +4488,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__amount_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__amount_total_vnd
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__price_total
+#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__price_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_purchase_order_line__price_total_display
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_sum_all
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__sum_all
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__price_total_display
-msgid "Total"
-msgstr ""
-
-#. module: freight_mgmt
-#: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__price_total
 msgid "Total"
 msgstr "Tổng trị giá"
 
@@ -4511,7 +4523,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__total_packages_word
 msgid "Total Packs (in word)"
-msgstr ""
+msgstr "Tổng gói hàng (bằng chữ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__price_tax
@@ -4525,7 +4537,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Total no. of packages or container (in word)"
-msgstr ""
+msgstr "Tổng gói hàng (bằng chữ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_booking__booking_type__trading
@@ -4540,7 +4552,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__transport_type
 msgid "Transport Type"
-msgstr ""
+msgstr "Kiểu vận chuyển"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_form_wo_template
@@ -4555,7 +4567,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_catalog_port__port_type
 msgid "Type of Port"
-msgstr ""
+msgstr "Loại cảng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_billing__shipment_type
@@ -4563,27 +4575,27 @@ msgstr ""
 #: model:ir.model.fields,help:freight_mgmt.field_freight_debit_note__shipment_type
 #: model:ir.model.fields,help:freight_mgmt.field_sale_order__order_shipment_type
 msgid "Type of Shipment"
-msgstr ""
+msgstr "Loại lô hàng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_booking__transport_type
 msgid "Type of Transport"
-msgstr ""
+msgstr "Loại vận chuyển"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__issue_type
 msgid "Type of issue"
-msgstr ""
+msgstr "Loại vấn đề"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__movement_type
 msgid "Type of movement"
-msgstr ""
+msgstr "Kiểu di chuyển"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "Type of movement - Transport mode"
-msgstr ""
+msgstr "Kiểu vận chuyển"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_billing__activity_exception_decoration
@@ -4674,7 +4686,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "Unassigned"
-msgstr ""
+msgstr "Chưa chỉ định"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__uom
@@ -4686,7 +4698,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_purchase_order_line__price_unit_input
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__price_unit_input
 msgid "Unit Price"
-msgstr ""
+msgstr "Đơn giá"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__product_uom
@@ -4700,7 +4712,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__message_unread
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo__message_unread
 msgid "Unread Messages"
-msgstr ""
+msgstr "Tin nhắn chưa đọc"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_unread_counter
@@ -4729,12 +4741,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_search
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "User"
-msgstr ""
+msgstr "Người dùng"
 
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_res_users
 msgid "Users"
-msgstr ""
+msgstr "Người dùng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__partner_vat
@@ -4805,7 +4817,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__exchange_rate
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__exchange_rate
 msgid "VND/USD rate"
-msgstr ""
+msgstr "Tỉ giá VND/USD"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__volume
@@ -4818,7 +4830,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_3
 msgid "VOYAGE"
-msgstr ""
+msgstr "Số chuyến"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__vat_payable
@@ -4829,13 +4841,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__vehicle_supplier_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__vehicle_supplier_id
 msgid "Vehicle Supplier"
-msgstr ""
+msgstr "Nhà xe"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_vehicle_supplier_action
 #: model:ir.ui.menu,name:freight_mgmt.freight_catalog_vehicle_supplier_menu
 msgid "Vehicle Suppliers"
-msgstr ""
+msgstr "Nhà xe"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__supplier_id
@@ -4861,7 +4873,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__ventilation
 msgid "Ventilation (CBM/H)"
-msgstr ""
+msgstr "Độ thông gió (CBM/H)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_product__vnd_currency_id
@@ -4885,7 +4897,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__volume
 msgid "Volume (cbm)"
-msgstr ""
+msgstr "Số lượng"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__volumes_display
@@ -4896,7 +4908,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__voyage_number
 msgid "Voyage No."
-msgstr ""
+msgstr "Số chuyến"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
@@ -4934,7 +4946,7 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_container__weight
 msgid "Weight (kg)"
-msgstr ""
+msgstr "Trọng lượng (kg)"
 
 #. module: freight_mgmt
 #: model:freight.catalog.vessel,name:freight_mgmt.freight_catalog_vessel_4
