@@ -9,9 +9,24 @@ var TreeButton = ListController.extend({
        'click .open_booking_list': '_OpenLink',
    }),
    _OpenLink: function () {
-       var self = this;
-       var url = 'https://docs.google.com/spreadsheets/d/1z-KLNBBYyeAS140XLnC7rmBNa4EFoXox/edit?usp=sharing&ouid=108807027735159553699&rtpof=true&sd=true';
-       window.open(url, '_blank');
+        var self = this;
+        var param_name = 'open_booking_list_url';
+        self._rpc({
+                model: 'ir.config_parameter',
+                method: 'get_param',
+                args: [param_name]
+            }).then(function(result) {
+                console.log('Loading open_booking_list_url success:', result);
+                var url = 'https://docs.google.com/spreadsheets/d/1z-KLNBBYyeAS140XLnC7rmBNa4EFoXox/edit?usp=sharing&ouid=108807027735159553699&rtpof=true&sd=true';
+                if (result) {
+                    url = result
+                }
+                window.open(url, '_blank');
+            }).catch(error => {
+                console.error('Error when loading open_booking_list_url:', error);
+            }).finally(() => {
+                console.log('Loading open_booking_list_url completed');
+            });
    }
 });
 var FreightBookingListView = ListView.extend({

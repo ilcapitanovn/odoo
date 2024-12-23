@@ -24,5 +24,6 @@ from . import freight_credit_note_item
 from . import product
 from . import product_pricelist
 from . import account_move
+from . import crm_lead
 from . import freight_form_wo
 from . import freight_form_wo_line
