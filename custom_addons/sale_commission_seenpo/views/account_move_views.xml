@@ -22,4 +22,16 @@
             </xpath>
         </field>
     </record>
+    <!-- This view is needed for proper visualization of the popup / embedded one2many -->
+    <record id="view_account_invoice_line_agent_tree_inherit" model="ir.ui.view">
+        <field name="name">sale.account.invoice.line.agent.tree.inherit</field>
+        <field name="model">account.invoice.line.agent</field>
+        <field name="inherit_id" ref="sale_commission.invoice_line_agent_tree" />
+        <field name="arch" type="xml">
+            <field name="amount" position="after">
+                <field name="amount_custom" widget="monetary"
+                       options="{'currency_field': 'currency_id', 'field_digits': True}" />
+            </field>
+        </field>
+    </record>
 </odoo>
