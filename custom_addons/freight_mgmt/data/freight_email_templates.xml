@@ -1,121 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
+        <record id="freight_scheduled_action_notify_sales_follow_up_lead_n_days" model="ir.cron">
+            <field name="name">CRM: Notify / Nhắc sales follow up sau N ngày</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="state">code</field>
+            <field name="code">model.action_send_lead_follow_up_notification()</field>
+            <field name="user_id" ref="base.user_admin" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 18:00:00')" />
+            <field name="active">True</field>
+        </record>
         <record id="freight_automated_action_notify_sales_follow_up_lead" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up</field>
+            <field name="name">Notify / CRM Created or Updated</field>
             <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_create</field> <!-- Trigger: On Creation -->
+            <field name="trigger">on_create_or_write</field> <!-- Trigger: On Creation & Update -->
+            <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__user_id')])]"/>
             <field name="state">code</field> <!-- Action: Python Code -->
             <field name="active">True</field>
             <field name="code">
                 action = model.action_send_lead_creation_notification(record)
             </field>
         </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_5_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 5 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">5</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 5)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_10_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 10 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">10</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 10)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_20_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 20 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">20</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 20)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_30_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 30 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">30</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 30)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_40_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 40 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">40</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 40)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_50_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 50 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">50</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 50)
-            </field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead_60_days" model="base.automation">
-            <field name="name">Notify / Nhắc sales follow up 60 ngày sau</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_time</field> <!-- Trigger: Based On Time Condition -->
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="filter_domain">[]</field>
-            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>
-            <field name="trg_date_range">60</field> <!-- Frequency Interval -->
-            <field name="trg_date_range_type">day</field>
-            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>
-            <field name="code">
-                action = model.action_send_lead_follow_up_notification(record, 60)
-            </field>
-        </record>
+<!--        <record id="freight_automated_action_notify_sales_follow_up_lead_5_days" model="base.automation">-->
+<!--            <field name="name">Notify / Nhắc sales follow up 5 ngày sau</field>-->
+<!--            <field name="model_id" ref="crm.model_crm_lead"/> &lt;!&ndash; Model: crm.lead &ndash;&gt;-->
+<!--            <field name="trigger">on_time</field> &lt;!&ndash; Trigger: Based On Time Condition &ndash;&gt;-->
+<!--            <field name="state">code</field> &lt;!&ndash; Action: Python Code &ndash;&gt;-->
+<!--            <field name="active">True</field>-->
+<!--            <field name="filter_domain">[]</field>-->
+<!--            <field name="trg_date_id" ref="crm.field_crm_lead__create_date"/>-->
+<!--            <field name="trg_date_range">5</field> &lt;!&ndash; Frequency Interval &ndash;&gt;-->
+<!--            <field name="trg_date_range_type">day</field>-->
+<!--            <field name="trg_date_calendar_id" ref="resource.resource_calendar_std"/>-->
+<!--            <field name="code">-->
+<!--                action = model.action_send_lead_follow_up_notification(record, 5)-->
+<!--            </field>-->
+<!--        </record>-->
     </data>
     <data noupdate="1">
         <record id="freight_crm_lead_creation_notification_template" model="mail.template">
