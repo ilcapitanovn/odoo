@@ -9,6 +9,86 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     @api.model
+    def action_generate_activities_on_lead_creation(self, record):
+        """
+        An automated action to send a private message in the Discuss chatter and an email to notify
+        a lead has just been created or updated
+
+        :param record: a crm lead record just created or updated
+        """
+        try:
+            if not record:
+                return False
+
+            today = datetime.now()
+            salesperson = record.user_id
+            created_user = record.create_uid
+            assigned_user_id = salesperson.id if salesperson else created_user.id
+            notes = 'Báo cáo kết quả:'
+
+            activity_types = self.env['mail.activity.type'].search([('name', 'in', ['Need to do', 'Call', 'Meeting'])])
+            for activity_type in activity_types:
+                if activity_type.name == 'Need to do':
+                    # To do - send quotation
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Chào giá - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=5))
+                    )
+                elif activity_type.name == 'Call':
+                    # Call 1 after 3 days
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Gọi lần 1 - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=3))
+                    )
+                    # Call 2 after 10 days
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Gọi lần 2 - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=10))
+                    )
+                    # Call 3 after 15 days
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Gọi lần 3 - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=15))
+                    )
+                    # Call 4 after 30 days
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Gọi lần 4 - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=30))
+                    )
+                    # Call 5 after 45 days
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Gọi lần 5 - kết quả đạt được?',
+                        note=notes,
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=45))
+                    )
+                elif activity_type.name == 'Meeting':
+                    record.activity_schedule(
+                        activity_type_id=activity_type.id,
+                        summary='Cuộc họp - kết quả đạt được?',
+                        user_id=assigned_user_id,
+                        date_deadline=(today + timedelta(days=20))
+                    )
+        except Exception as e:
+            print("action_generate_activities_on_lead_creation - Exception: " + str(e))
+
+    @api.model
     def action_send_lead_creation_notification(self, record):
         """
         An automated action to send a private message in the Discuss chatter and an email to notify

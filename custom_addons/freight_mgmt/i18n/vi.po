@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-23 11:20+0000\n"
-"PO-Revision-Date: 2024-12-24 00:51+1300\n"
+"POT-Creation-Date: 2024-12-24 14:45+0000\n"
+"PO-Revision-Date: 2024-12-25 03:57+1300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: vi\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.4\n"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "%s days have passed, have you followed up with this Lead yet?<br>- Lead Name: <strong>%s</strong> <br>- Contact: %s <br>- Phone: %s"
+msgstr "%s ngày trôi qua, bạn đã chăm sóc khách hàng này chưa?<br>- Tên Lead: <strong>%s</strong> <br>- Liên lạc: %s <br>- Số điện thoại: %s"
 
 #. module: freight_mgmt
 #: model:ir.actions.report,print_report_name:freight_mgmt.freight_arrival_notice_report
@@ -1971,8 +1977,19 @@ msgid "CRM: 60 ngày trôi qua, bạn đã chăm sóc khách hàng này chưa - 
 msgstr ""
 
 #. module: freight_mgmt
+#: model:base.automation,name:freight_mgmt.freight_automated_action_generate_activities_on_lead_creation model:ir.actions.server,name:freight_mgmt.freight_automated_action_generate_activities_on_lead_creation_ir_actions_server
+msgid "CRM: Automate Generate Activities On Lead Creation"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:mail.template,name:freight_mgmt.freight_crm_lead_creation_notification_template
 msgid "CRM: Lead Creation Notification Template - Qweb"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.server,name:freight_mgmt.freight_scheduled_action_notify_sales_follow_up_lead_n_days_ir_actions_server model:ir.cron,cron_name:freight_mgmt.freight_scheduled_action_notify_sales_follow_up_lead_n_days
+#: model:ir.cron,name:freight_mgmt.freight_scheduled_action_notify_sales_follow_up_lead_n_days
+msgid "CRM: Notify / Nhắc sales follow up sau N ngày"
 msgstr ""
 
 #. module: freight_mgmt
@@ -3520,6 +3537,12 @@ msgid "Measurement (CBM)"
 msgstr ""
 
 #. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "Meeting - result?"
+msgstr "Cuộc họp - kết quả đạt được?"
+
+#. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_ir_ui_menu
 msgid "Menu"
 msgstr ""
@@ -3727,6 +3750,11 @@ msgstr "Ghi chú"
 #. module: freight_mgmt
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__sale_order__booking_status__no
 msgid "Nothing to Booking"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:base.automation,name:freight_mgmt.freight_automated_action_notify_sales_follow_up_lead model:ir.actions.server,name:freight_mgmt.freight_automated_action_notify_sales_follow_up_lead_ir_actions_server
+msgid "Notify / CRM Created or Updated"
 msgstr ""
 
 #. module: freight_mgmt
@@ -4349,6 +4377,12 @@ msgid "Report from"
 msgstr ""
 
 #. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "Report on achievements:"
+msgstr "Báo cáo kết quả:"
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report_wizard__date_to
 msgid "Report to"
 msgstr ""
@@ -4543,6 +4577,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__seller
 msgid "Seller"
 msgstr "Người bán"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "Send quotation - result?"
+msgstr "Chào giá - kết quả đạt được?"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__sequence model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__sequence model:ir.model.fields,field_description:freight_mgmt.field_freight_booking_volume__sequence
@@ -4844,6 +4884,36 @@ msgstr "Điều khoản và điều kiện"
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 msgid "Terms and conditions..."
 msgstr "Điều khoản và điều kiện..."
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "The 1st call - result?"
+msgstr "Gọi lần 1 - kết quả đạt được?"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "The 2nd call - result?"
+msgstr "Gọi lần 2 - kết quả đạt được?"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "The 3rd call - result?"
+msgstr "Gọi lần 3 - kết quả đạt được?"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "The 4th call - result?"
+msgstr "Gọi lần 4 - kết quả đạt được?"
+
+#. module: freight_mgmt
+#: code:addons/freight_mgmt/models/crm_lead.py:0
+#, python-format
+msgid "The 5th call - result?"
+msgstr "Gọi lần 5 - kết quả đạt được?"
 
 #. module: freight_mgmt
 #: code:addons/freight_mgmt/models/freight_billing.py:0

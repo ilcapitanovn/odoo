@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <data>
+    <data noupdate="1">
+        <record id="freight_automated_action_generate_activities_on_lead_creation" model="base.automation">
+            <field name="name">CRM: Automate Generate Activities On Lead Creation</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="trigger">on_create</field>
+            <field name="state">code</field>
+            <field name="active">True</field>
+            <field name="code">
+                action = model.action_generate_activities_on_lead_creation(record)
+            </field>
+        </record>
         <record id="freight_scheduled_action_notify_sales_follow_up_lead_n_days" model="ir.cron">
             <field name="name">CRM: Notify / Nhắc sales follow up sau N ngày</field>
             <field name="model_id" ref="crm.model_crm_lead"/>
