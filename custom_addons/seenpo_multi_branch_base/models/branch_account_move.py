@@ -27,7 +27,7 @@ class AccountMove(models.Model):
     """inherited account move"""
     _inherit = "account.move"
 
-    branch_id = fields.Many2one("res.branch", string='Branch', store=True)
+    branch_id = fields.Many2one("res.branch", string='Branch', tracking=True, store=True)
 
     @api.model
     def _init_default_account_move_branch(self):

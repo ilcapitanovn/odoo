@@ -3,7 +3,7 @@
 
 {
     "name": "Việt Toản Multi Branch Operations",
-    "version": "15.0.0.2.0",
+    "version": "15.0.0.2.1",
     "summary": """ Multiple Branch Unit Operation Setup for All 
                    Modules In Odoo""",
     "description": """Multiple Branch Unit Operation Setup for All 

@@ -4,7 +4,7 @@
 from odoo import _, api, fields, models
 
 
-class SaleCommissionMakeSettle(models.TransientModel):
+class SaleIncentiveAnalysisReportWiward(models.TransientModel):
     _name = "sale.incentive.analysis.report.wizard"
     _description = "Wizard for calculating sales incentive report"
 

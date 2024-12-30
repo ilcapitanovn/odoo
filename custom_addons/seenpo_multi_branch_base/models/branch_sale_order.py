@@ -29,7 +29,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     branch_id = fields.Many2one("res.branch", string='Branch', store=True, readonly=False,
-                                compute="_compute_branch_id")
+                                compute="_compute_branch_id", tracking=True)
     allowed_branch_ids = fields.Many2many('res.branch', string="Branches", store=True,
                                           compute='_compute_allowed_branch_ids')
 

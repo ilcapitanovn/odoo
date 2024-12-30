@@ -3,3 +3,5 @@ access_dashboard_block,access.dashboard.block,model_dashboard_block,base.group_u
 access_dashboard_menu,access.dashboard.menu,model_dashboard_menu,base.group_user,1,1,1,1
 access_dashboard_block_line,access.dashboard.block.line,model_dashboard_block_line,base.group_user,1,1,1,1
 access_dashboard_configuration_update_wizard,access.dashboard.configuration.update.wizard,model_dashboard_configuration_update_wizard,base.group_user,1,1,1,1
+access_dashboard_user_report,access.dashboard.user.report,model_dashboard_user_report,base.group_user,1,1,1,1
+access_dashboard_user_report_wizard,access.dashboard.user.report.wizard,model_dashboard_user_report_wizard,base.group_user,1,1,1,1

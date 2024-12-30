@@ -170,7 +170,7 @@ class FreightBilling(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
-    branch_id = fields.Many2one(related="booking_id.branch_id", string='Branch')
+    branch_id = fields.Many2one(related="booking_id.branch_id", string='Branch', store=True)
 
     debit_note_ids = fields.One2many('freight.debit.note', 'bill_id', string='Debit Note',
                                      copy=True, auto_join=True)

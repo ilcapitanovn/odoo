@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Odoo Dynamic Dashboard",
-    'version': '15.0.1.1.1',
+    'version': '15.0.1.2.0',
     'summary': """Create Configurable Dashboards Easily""",
     'description': """Create Configurable Dashboard Dynamically to get the information that are relevant to your business, department, or a specific process or need, Dynamic Dashboard, Dashboard, Dashboard Odoo""",
     'author': 'Cybrosys Techno Solutions',
@@ -29,10 +29,12 @@
     'maintainer': 'Cybrosys Techno Solutions',
     'depends': ['base', 'web'],
     'data': [
+        'report/dashboard_user_report_views.xml',
         'views/dashboard_view.xml',
         'views/dynamic_block_view.xml',
         'views/dashboard_menu_view.xml',
         'wizards/dashboard_configuration_update_wizard.xml',
+        'wizards/dashboard_user_report_wizard.xml',
         'security/ir.model.access.csv',
     ],
     'assets': {

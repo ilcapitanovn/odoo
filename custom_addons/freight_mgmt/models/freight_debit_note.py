@@ -126,7 +126,7 @@ class FreightDebitNote(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
-    branch_id = fields.Many2one(related="bill_id.branch_id", string='Branch')
+    branch_id = fields.Many2one(related="bill_id.branch_id", string='Branch', store=True)
 
     bank_ids = fields.One2many(related="company_id.bank_ids")
     company_bank_id = fields.Many2one('res.partner.bank', string="Bank Account",

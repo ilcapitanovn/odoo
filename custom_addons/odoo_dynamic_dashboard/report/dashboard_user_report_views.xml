@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dynamic_dashboard_user_report_view_graph" model="ir.ui.view">
+         <field name="name">dynamic.dashboard.user.report.view.graph</field>
+         <field name="model">dashboard.user.report</field>
+         <field name="arch" type="xml">
+             <graph string="Users Analysis" stacked="1" type="bar" sample="1">
+                 <field name="updated_date" interval="month" type="row"/>
+                 <field name="alias_total_freight" type="measure"/>
+             </graph>
+         </field>
+    </record>
+
+    <record id="dynamic_dashboard_user_report_view_pivot" model="ir.ui.view">
+         <field name="name">dynamic.dashboard.user.report.view.pivot</field>
+         <field name="model">dashboard.user.report</field>
+         <field name="arch" type="xml">
+             <pivot string="Users Analysis" sample="1">
+                 <field name="display_name" type="row"/>
+                 <field name="updated_date" interval="month"/>
+                 <field name="alias_total_discusses" type="measure"/>
+                 <field name="alias_total_calendars" type="measure"/>
+                 <field name="alias_total_tickets" type="measure"/>
+                 <field name="alias_total_partners" type="measure"/>
+                 <field name="alias_total_attendances" type="measure"/>
+                 <field name="alias_total_crms" type="measure"/>
+                 <field name="alias_total_sales" type="measure"/>
+                 <field name="alias_total_products" type="measure"/>
+                 <field name="alias_total_accountings" type="measure"/>
+                 <field name="alias_total_emails" type="measure"/>
+                 <field name="alias_total_purchases" type="measure"/>
+                 <field name="alias_total_inventory" type="measure"/>
+                 <field name="alias_total_employees" type="measure"/>
+                 <field name="alias_total_time_offs" type="measure"/>
+                 <field name="alias_total_freight" type="measure"/>
+                 <field name="alias_total_trading" type="measure"/>
+                 <field name="alias_total_langson" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+    <record id="dynamic_dashboard_user_report_view_tree" model="ir.ui.view">
+        <field name="name">dynamic.dashboard.user.report.view.tree</field>
+        <field name="model">dashboard.user.report</field>
+        <field name="arch" type="xml">
+            <tree string="Users Analysis">
+                <field name="login" optional="hide"/>
+                <field name="display_name" optional="show"/>
+                <field name="updated_date" widget="date"/>
+                <field name="alias_total_discusses" optional="show"/>
+                <field name="alias_total_calendars" optional="show"/>
+                <field name="alias_total_tickets" optional="show"/>
+                <field name="alias_total_partners" optional="show"/>
+                <field name="alias_total_attendances" optional="hide"/>
+                <field name="alias_total_crms" optional="show"/>
+                <field name="alias_total_sales" optional="show"/>
+                <field name="alias_total_products" optional="show"/>
+                <field name="alias_total_accountings" optional="hide"/>
+                <field name="alias_total_emails" optional="hide"/>
+                <field name="alias_total_purchases" optional="show"/>
+                <field name="alias_total_inventory" optional="hide"/>
+                <field name="alias_total_employees" optional="hide"/>
+                <field name="alias_total_time_offs" optional="show"/>
+                <field name="alias_total_freight" optional="show"/>
+                <field name="alias_total_trading" optional="show"/>
+                <field name="alias_total_langson" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="dynamic_dashboard_view_user_analysis_search" model="ir.ui.view">
+        <field name="name">dynamic.dashboard.user.analysis.report.search</field>
+        <field name="model">dashboard.user.report</field>
+        <field name="arch" type="xml">
+            <search string="Users Analysis">
+<!--                <filter string="Date" name="year" invisible="1" date="partner_date" default_period="this_year"/>-->
+<!--                <filter name="date" date="date" default_period="this_year"/>-->
+                <separator/>
+                <field name="user_id"/>
+                <field name="login"/>
+                <field name="display_name"/>
+                <field name="updated_date"/>
+                <filter string="Date" name="updated_date" date="updated_date"/>
+<!--                <field name="partner_name"/>-->
+<!--                <field name="order_id"/>-->
+<!--                <field name="order_name"/>-->
+<!--                <group expand="0" string="Extended Filters">-->
+<!--                    <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>-->
+<!--                    <field name="company_id" groups="base.group_multi_company"/>-->
+<!--                </group>-->
+                <group expand="1" string="Group By">
+                    <filter string="Employee" name="group_user" context="{'group_by':'user_id'}"/>
+                    <separator/>
+                    <filter string="Date" name="group_date" context="{'group_by':'updated_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="dynamic_dashboard_action_reporting_users" model="ir.actions.act_window">
+        <field name="name">User Analysis</field>
+        <field name="res_model">dashboard.user.report</field>
+        <field name="view_mode">graph,tree,pivot</field>
+        <field name="view_id"></field>  <!-- force empty -->
+<!--        <field name="search_view_id" ref="dynamic_dashboard_view_user_analysis_search"/>-->
+        <field name="help">This report performs analysis on your users. Analysis check the modules' user had activities.</field>
+    </record>
+</odoo>

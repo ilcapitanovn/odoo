@@ -28,7 +28,7 @@ class PurchaseOrder(models.Model):
     """inherited purchase order"""
     _inherit = 'purchase.order'
 
-    branch_id = fields.Many2one("res.branch", string='Branch', store=True,
+    branch_id = fields.Many2one("res.branch", string='Branch', store=True, tracking=True,
                                 compute="_compute_branch_id",
                                 help='Leave this field empty if the partner is shared between all branches'
                                 )

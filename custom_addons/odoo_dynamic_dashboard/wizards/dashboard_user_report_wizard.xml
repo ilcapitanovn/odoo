@@ -1,0 +1,54 @@
+<odoo>
+    <record id="dynamic_dashboard_user_report_wizard" model="ir.ui.view">
+        <field name="name">User Report Wizard</field>
+        <field name="model">dashboard.user.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Users report">
+                <group>
+                    <p colspan="2">Select a period to which you want to make the report:</p>
+                </group>
+                <group colspan="2">
+                    <field name="date_year_report" />
+                </group>
+                <footer>
+                    <button
+                        name="action_generate_report"
+                        string="View Report"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                    or
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        class="oe_link"
+                        special="cancel"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="dynamic_dashboard_action_user_report_wizard" model="ir.actions.act_window">
+        <field name="name">Dashboard User Report Wizard</field>
+        <field name="res_model">dashboard.user.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'no_breadcrumbs': True}</field>
+        <field name="binding_model_id" ref="model_dashboard_user_report_wizard" />
+    </record>
+
+    <menuitem
+        id="menu_dynamic_dashboard_reporting"
+        name="Reporting"
+        parent="odoo_dynamic_dashboard.menu_dashboard"
+        sequence="2"
+    />
+    <menuitem
+        id="menu_dynamic_dashboard_reporting_users"
+        name="Users"
+        action="dynamic_dashboard_action_user_report_wizard"
+        parent="menu_dynamic_dashboard_reporting"
+        sequence="10"
+    />
+</odoo>
