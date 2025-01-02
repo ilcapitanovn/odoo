@@ -12,9 +12,17 @@ class UserReportWizard(models.TransientModel):
     _name = "dashboard.user.report.wizard"
     _description = "Wizard for reporting users' usage"
 
-    date_year_report = fields.Selection([
-        (str(num), str(num)) for num in range(2020, datetime.now().year + 1)
-    ], 'Report year', default=str(datetime.now().year))
+    @staticmethod
+    def _get_year_selection():
+        """Generate year options dynamically."""
+        current_year = datetime.now().year
+        return [(str(year), str(year)) for year in range(2020, current_year + 1)]
+
+    date_year_report = fields.Selection(
+        selection=lambda self: self._get_year_selection(),
+        string="Report year",
+        default=lambda self: str(datetime.now().year)
+    )
 
     def action_generate_report(self):
         self.ensure_one()
@@ -55,7 +63,7 @@ class UserReportWizard(models.TransientModel):
     def _create_general_sql(self, report_year):
         """
         General: list users and dates,
-        Discuss: mail_message,
+        Discuss: mail_message (with model='mail.channel'),
         Calendar: calendar_event,
         Helpdesk: helpdesk_ticket, helpdesk_ticket_channel, helpdesk_ticket_category, helpdesk_ticket_tag
         Contacts: res_partner,
@@ -168,9 +176,13 @@ class UserReportWizard(models.TransientModel):
         A_LANGSON_CREDIT_COUNTS = "alias_total_langson_credits"
         A_LANGSON_COUNTS = "alias_total_langson"
 
+        """ Sub WHERE conditions """
+        S_WHERE_DISCUSS = f" model='mail.channel'"
+
+        """ Define sub-queries sql for views """
         sql_view_users = self._create_sql_view_list_users_dates(V_USERS, report_year, A_USER_ID, A_LOGIN, A_NAME, A_DATE)
         sql_view_discusses = self._create_sql_union_all(V_DISCUSS_COUNTS, A_USER_ID, A_DATE, A_DISCUSS_COUNTS,
-                                                        'mail_message')
+                                                        'mail_message', None, S_WHERE_DISCUSS)
         sql_view_calendars = self._create_sql_union_all(V_CALENDAR_COUNTS, A_USER_ID, A_DATE, A_CALENDAR_COUNTS,
                                                         'calendar_event')
         sql_view_tickets = self._create_sql_union_all(V_TICKET_COUNTS, A_USER_ID, A_DATE, A_TICKET_COUNTS,
@@ -261,7 +273,7 @@ class UserReportWizard(models.TransientModel):
                     u.{A_USER_ID},
                     u.{A_LOGIN},
                     u.{A_NAME},
-                    u.{A_DATE},
+                    CAST(u.{A_DATE} as TIMESTAMP) AS {A_DATE},
                     SUM(COALESCE({A_DISCUSS_COUNTS}, 0)) AS {A_DISCUSS_COUNTS},
                     SUM(COALESCE({A_CALENDAR_COUNTS}, 0)) AS {A_CALENDAR_COUNTS},
                     SUM(COALESCE({A_TICKET_COUNTS}, 0)) + SUM(COALESCE({A_TICKET_CHANNEL_COUNTS}, 0)) + SUM(COALESCE({A_TICKET_CATEGORY_COUNTS}, 0)) + SUM(COALESCE({A_TICKET_TAG_COUNTS}, 0)) AS {A_TICKET_COUNTS},
@@ -271,7 +283,7 @@ class UserReportWizard(models.TransientModel):
                     SUM(COALESCE({A_SALE_COUNTS}, 0)) AS {A_SALE_COUNTS},
                     SUM(COALESCE({A_PRODUCT_COUNTS}, 0)) + SUM(COALESCE({A_PRICELIST_COUNTS}, 0)) AS {A_PRODUCT_COUNTS},
                     SUM(COALESCE({A_ACCOUNTING_COUNTS}, 0)) + SUM(COALESCE({A_ACCOUNTING_PAYMENT_COUNTS}, 0)) + SUM(COALESCE({A_FORM_WO_COUNTS}, 0)) AS {A_ACCOUNTING_COUNTS},
-                    SUM(COALESCE({A_EMAIL_MARKETING_COUNTS}, 0)) + SUM(COALESCE({A_EMAIL_ACTIVITY_COUNTS}, 0)) + SUM(COALESCE({A_EMAIL_EMAIL_COUNTS}, 0)) + SUM(COALESCE({A_EMAIL_MESSAGE_COUNTS}, 0)) + SUM(COALESCE({A_EMAIL_TEMPLATE_COUNTS}, 0)) AS {A_EMAIL_MARKETING_COUNTS},
+                    SUM(COALESCE({A_EMAIL_MARKETING_COUNTS}, 0)) AS {A_EMAIL_MARKETING_COUNTS},
                     SUM(COALESCE({A_PURCHASE_COUNTS}, 0)) AS {A_PURCHASE_COUNTS},
                     SUM(COALESCE({A_INVENTORY_COUNTS}, 0)) AS {A_INVENTORY_COUNTS},
                     SUM(COALESCE({A_EMPLOYEES_COUNTS}, 0)) + SUM(COALESCE({A_DEPARTMENT_COUNTS}, 0)) AS {A_EMPLOYEES_COUNTS},
@@ -297,10 +309,6 @@ class UserReportWizard(models.TransientModel):
                     LEFT JOIN {V_ACCOUNTING_PAYMENT_COUNTS} acpac ON u.{A_USER_ID} = acpac.{A_USER_ID} AND u.{A_DATE} = acpac.{A_DATE}
                     LEFT JOIN {V_FORM_WO_COUNTS} foc ON u.{A_USER_ID} = foc.{A_USER_ID} AND u.{A_DATE} = foc.{A_DATE}
                     LEFT JOIN {V_EMAIL_MARKETING_COUNTS} emc ON u.{A_USER_ID} = emc.{A_USER_ID} AND u.{A_DATE} = emc.{A_DATE}
-                    LEFT JOIN {V_EMAIL_ACTIVITY_COUNTS} emacc ON u.{A_USER_ID} = emacc.{A_USER_ID} AND u.{A_DATE} = emacc.{A_DATE}
-                    LEFT JOIN {V_EMAIL_EMAIL_COUNTS} ememc ON u.{A_USER_ID} = ememc.{A_USER_ID} AND u.{A_DATE} = ememc.{A_DATE}
-                    LEFT JOIN {V_EMAIL_MESSAGE_COUNTS} emmec ON u.{A_USER_ID} = emmec.{A_USER_ID} AND u.{A_DATE} = emmec.{A_DATE}
-                    LEFT JOIN {V_EMAIL_TEMPLATE_COUNTS} emtec ON u.{A_USER_ID} = emtec.{A_USER_ID} AND u.{A_DATE} = emtec.{A_DATE}
                     LEFT JOIN {V_PURCHASE_COUNTS} poc ON u.{A_USER_ID} = poc.{A_USER_ID} AND u.{A_DATE} = poc.{A_DATE}
                     LEFT JOIN {V_INVENTORY_COUNTS} inc ON u.{A_USER_ID} = inc.{A_USER_ID} AND u.{A_DATE} = inc.{A_DATE}
                     LEFT JOIN {V_EMPLOYEES_COUNTS} empc ON u.{A_USER_ID} = empc.{A_USER_ID} AND u.{A_DATE} = empc.{A_DATE}
@@ -324,8 +332,7 @@ class UserReportWizard(models.TransientModel):
                     + COALESCE({A_ATTENDANCES_COUNTS}, 0) + COALESCE({A_CRM_COUNTS}, 0) + COALESCE({A_SALE_COUNTS}, 0) 
                     + COALESCE({A_PRODUCT_COUNTS}, 0) + COALESCE({A_PRICELIST_COUNTS}, 0)
                     + COALESCE({A_ACCOUNTING_COUNTS}, 0) + COALESCE({A_ACCOUNTING_PAYMENT_COUNTS}, 0) + COALESCE({A_FORM_WO_COUNTS}, 0)
-                    + COALESCE({A_EMAIL_MARKETING_COUNTS}, 0)+ COALESCE({A_EMAIL_ACTIVITY_COUNTS}, 0) + COALESCE({A_EMAIL_EMAIL_COUNTS}, 0)
-                    + COALESCE({A_EMAIL_MESSAGE_COUNTS}, 0) + COALESCE({A_EMAIL_TEMPLATE_COUNTS}, 0) + COALESCE({A_PURCHASE_COUNTS}, 0)
+                    + COALESCE({A_EMAIL_MARKETING_COUNTS}, 0) + COALESCE({A_PURCHASE_COUNTS}, 0)
                     + COALESCE({A_INVENTORY_COUNTS}, 0) + COALESCE({A_EMPLOYEES_COUNTS}, 0) + COALESCE({A_DEPARTMENT_COUNTS}, 0)
                     + COALESCE({A_TIME_OFF_COUNTS}, 0)
                     + COALESCE({A_BOOKING_COUNTS}, 0) + COALESCE({A_BILLING_COUNTS}, 0)
@@ -370,12 +377,14 @@ class UserReportWizard(models.TransientModel):
         return sql_list_users
 
     def _create_sql_union_all(self, view_name, alias_user_id, alias_updated_date, alias_count,
-                              table_name_of_model, branch_code=''):
+                              table_name_of_model, branch_code='', sub_where_conditions=''):
         report_year = int(self.date_year_report)
         create_date_counts = self._create_sql_view_count_create_date(report_year, alias_user_id, alias_updated_date,
-                                                                     alias_count, table_name_of_model, branch_code)
+                                                                     alias_count, table_name_of_model, branch_code,
+                                                                     sub_where_conditions)
         write_date_counts = self._create_sql_view_count_write_date(report_year, alias_user_id, alias_updated_date,
-                                                                   alias_count, table_name_of_model, branch_code)
+                                                                   alias_count, table_name_of_model, branch_code,
+                                                                   sub_where_conditions)
         record_counts = """
                 %s AS (%s UNION ALL %s)
             """ % (view_name, create_date_counts, write_date_counts)
@@ -383,10 +392,12 @@ class UserReportWizard(models.TransientModel):
 
     @staticmethod
     def _create_sql_view_count_create_date(report_year, alias_user_id, alias_updated_date, alias_count,
-                                           table_name_of_model, branch_code=''):
-        sub_query_branch = ''
+                                           table_name_of_model, branch_code='', sub_where_conditions=''):
+        sub_where = ''
         if branch_code:
-            sub_query_branch = f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+            sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+        if sub_where_conditions:
+            sub_where += f" AND {sub_where_conditions}"
 
         record_counts = f"""
                 SELECT
@@ -397,7 +408,7 @@ class UserReportWizard(models.TransientModel):
                     {table_name_of_model}
                 WHERE
                     DATE_PART('year', create_date) = {report_year}
-                    {sub_query_branch}
+                    {sub_where}
                 GROUP BY
                     create_uid, DATE(create_date)
             """
@@ -405,10 +416,12 @@ class UserReportWizard(models.TransientModel):
 
     @staticmethod
     def _create_sql_view_count_write_date(report_year, alias_user_id, alias_updated_date, alias_count,
-                                          table_name_of_model, branch_code=''):
-        sub_query_branch = ''
+                                          table_name_of_model, branch_code='', sub_where_conditions=''):
+        sub_where = ''
         if branch_code:
-            sub_query_branch = f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+            sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+        if sub_where_conditions:
+            sub_where += f" AND {sub_where_conditions}"
 
         record_counts = f"""
                 SELECT
@@ -419,7 +432,7 @@ class UserReportWizard(models.TransientModel):
                     {table_name_of_model}
                 WHERE
                     DATE_PART('year', write_date) = {report_year} AND create_date != write_date
-                    {sub_query_branch}
+                    {sub_where}
                 GROUP BY
                     write_uid, DATE(write_date)
             """
