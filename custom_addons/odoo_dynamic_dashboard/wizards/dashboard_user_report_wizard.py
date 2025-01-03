@@ -49,12 +49,12 @@ class UserReportWizard(models.TransientModel):
 
         # go to results
         res = {
-            "name": _("User Report"),
+            "name": _(f"Report for {report_year}"),
             "type": "ir.actions.act_window",
             "res_model": "dashboard.user.report",
             'view_mode': 'graph,tree,pivot',
             'context': context,
-            'target': 'current',
+            'target': 'self',
             'search_view_id': [self.env.ref('odoo_dynamic_dashboard.dynamic_dashboard_view_user_analysis_search').id],
         }
 
@@ -178,6 +178,7 @@ class UserReportWizard(models.TransientModel):
 
         """ Sub WHERE conditions """
         S_WHERE_DISCUSS = f" model='mail.channel'"
+        S_WHERE_TICKETS = f" model='helpdesk.ticket'"
 
         """ Define sub-queries sql for views """
         sql_view_users = self._create_sql_view_list_users_dates(V_USERS, report_year, A_USER_ID, A_LOGIN, A_NAME, A_DATE)
@@ -185,8 +186,10 @@ class UserReportWizard(models.TransientModel):
                                                         'mail_message', None, S_WHERE_DISCUSS)
         sql_view_calendars = self._create_sql_union_all(V_CALENDAR_COUNTS, A_USER_ID, A_DATE, A_CALENDAR_COUNTS,
                                                         'calendar_event')
+        # sql_view_tickets = self._create_sql_union_all(V_TICKET_COUNTS, A_USER_ID, A_DATE, A_TICKET_COUNTS,
+        #                                               'helpdesk_ticket')
         sql_view_tickets = self._create_sql_union_all(V_TICKET_COUNTS, A_USER_ID, A_DATE, A_TICKET_COUNTS,
-                                                      'helpdesk_ticket')
+                                                      'mail_message', None, S_WHERE_TICKETS)
         sql_view_tickets_channel = self._create_sql_union_all(V_TICKET_CHANNEL_COUNTS, A_USER_ID, A_DATE,
                                                               A_TICKET_CHANNEL_COUNTS, 'helpdesk_ticket_channel')
         sql_view_tickets_category = self._create_sql_union_all(V_TICKET_CATEGORY_COUNTS, A_USER_ID, A_DATE,
@@ -327,7 +330,7 @@ class UserReportWizard(models.TransientModel):
                     LEFT JOIN {V_LANGSON_DEBIT_COUNTS} ldnc ON u.{A_USER_ID} = ldnc.{A_USER_ID} AND u.{A_DATE} = ldnc.{A_DATE}
                     LEFT JOIN {V_LANGSON_CREDIT_COUNTS} lcnc ON u.{A_USER_ID} = lcnc.{A_USER_ID} AND u.{A_DATE} = lcnc.{A_DATE}
                 WHERE
-                    COALESCE({A_CALENDAR_COUNTS}, 0) + COALESCE({A_TICKET_COUNTS}, 0) + COALESCE({A_TICKET_CHANNEL_COUNTS}, 0) 
+                    COALESCE({A_DISCUSS_COUNTS}, 0) + COALESCE({A_CALENDAR_COUNTS}, 0) + COALESCE({A_TICKET_COUNTS}, 0) + COALESCE({A_TICKET_CHANNEL_COUNTS}, 0) 
                     + COALESCE({A_TICKET_CATEGORY_COUNTS}, 0)+ COALESCE({A_TICKET_TAG_COUNTS}, 0)  + COALESCE({A_PARTNER_COUNTS}, 0)
                     + COALESCE({A_ATTENDANCES_COUNTS}, 0) + COALESCE({A_CRM_COUNTS}, 0) + COALESCE({A_SALE_COUNTS}, 0) 
                     + COALESCE({A_PRODUCT_COUNTS}, 0) + COALESCE({A_PRICELIST_COUNTS}, 0)
@@ -385,9 +388,21 @@ class UserReportWizard(models.TransientModel):
         write_date_counts = self._create_sql_view_count_write_date(report_year, alias_user_id, alias_updated_date,
                                                                    alias_count, table_name_of_model, branch_code,
                                                                    sub_where_conditions)
-        record_counts = """
-                %s AS (%s UNION ALL %s)
-            """ % (view_name, create_date_counts, write_date_counts)
+        record_counts = f"""
+                    {view_name} AS (
+                        SELECT
+                            {alias_user_id},
+                            DATE({alias_updated_date}) AS {alias_updated_date},
+                            COUNT(*) AS {alias_count}
+                        FROM (
+                            {create_date_counts}
+                            UNION
+                            {write_date_counts}
+                        ) sub_counts
+                        GROUP BY
+                            {alias_user_id}, DATE({alias_updated_date})
+                    )
+                """
         return record_counts
 
     @staticmethod
@@ -402,15 +417,12 @@ class UserReportWizard(models.TransientModel):
         record_counts = f"""
                 SELECT
                     create_uid AS {alias_user_id},
-                    DATE(create_date) AS {alias_updated_date},
-                    COUNT(*) AS {alias_count}
+                    create_date AS {alias_updated_date}
                 FROM
                     {table_name_of_model}
                 WHERE
                     DATE_PART('year', create_date) = {report_year}
                     {sub_where}
-                GROUP BY
-                    create_uid, DATE(create_date)
             """
         return record_counts
 
@@ -426,14 +438,11 @@ class UserReportWizard(models.TransientModel):
         record_counts = f"""
                 SELECT
                     write_uid AS {alias_user_id},
-                    DATE(write_date) AS {alias_updated_date},
-                    COUNT(*) AS {alias_count}
+                    write_date AS {alias_updated_date}
                 FROM
                     {table_name_of_model}
                 WHERE
                     DATE_PART('year', write_date) = {report_year} AND create_date != write_date
                     {sub_where}
-                GROUP BY
-                    write_uid, DATE(write_date)
             """
         return record_counts
