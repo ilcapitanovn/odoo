@@ -94,6 +94,7 @@ class UserReportWizard(models.TransientModel):
         V_ATTENDANCES_COUNTS = "view_attendances_counts"
         V_CRM_COUNTS = "view_crm_counts"
         V_SALE_COUNTS = "view_sale_counts"
+        V_SALE_LINE_COUNTS = "view_sale_line_counts"
         V_PRODUCT_COUNTS = "view_product_counts"
         V_PRICELIST_COUNTS = "view_pricelist_counts"
         V_ACCOUNTING_COUNTS = "view_accounting_counts"
@@ -105,6 +106,7 @@ class UserReportWizard(models.TransientModel):
         V_EMAIL_MESSAGE_COUNTS = "view_email_message_counts"
         V_EMAIL_TEMPLATE_COUNTS = "view_email_template_counts"
         V_PURCHASE_COUNTS = "view_purchase_counts"
+        V_PURCHASE_LINE_COUNTS = "view_purchase_line_counts"
         V_INVENTORY_COUNTS = "view_inventory_counts"
         V_EMPLOYEES_COUNTS = "view_employees_counts"
         V_DEPARTMENT_COUNTS = "view_department_counts"
@@ -142,6 +144,7 @@ class UserReportWizard(models.TransientModel):
         A_ATTENDANCES_COUNTS = "alias_total_attendances"
         A_CRM_COUNTS = "alias_total_crms"
         A_SALE_COUNTS = "alias_total_sales"
+        A_SALE_LINE_COUNTS = "alias_total_sales_lines"
         A_PRODUCT_COUNTS = "alias_total_products"
         A_PRICELIST_COUNTS = "alias_total_pricelists"
         A_ACCOUNTING_COUNTS = "alias_total_accountings"
@@ -153,6 +156,7 @@ class UserReportWizard(models.TransientModel):
         A_EMAIL_MESSAGE_COUNTS = "alias_total_emails_message"
         A_EMAIL_TEMPLATE_COUNTS = "alias_total_emails_template"
         A_PURCHASE_COUNTS = "alias_total_purchases"
+        A_PURCHASE_LINE_COUNTS = "alias_total_purchases_lines"
         A_INVENTORY_COUNTS = "alias_total_inventory"
         A_EMPLOYEES_COUNTS = "alias_total_employees"
         A_DEPARTMENT_COUNTS = "alias_total_department"
@@ -179,6 +183,44 @@ class UserReportWizard(models.TransientModel):
         """ Sub WHERE conditions """
         S_WHERE_DISCUSS = f" model='mail.channel'"
         S_WHERE_TICKETS = f" model='helpdesk.ticket'"
+        S_WHERE_CRMS = f" model='crm.lead'"
+        S_WHERE_PRODUCTS = f" model='product.template'"
+        S_WHERE_ACCOUNTINGS = f" model='account.move'"
+        S_WHERE_PAYMENTS = f" model='account.payment'"
+        S_WHERE_FORM_WOS = f" model='freight.form.wo'"
+        S_WHERE_EMPLOYEES = f" model='hr.employee'"
+        S_WHERE_DEPARTMENTS = f" model='hr.department'"
+        S_WHERE_LEAVES = f" model='hr.leave'"
+
+        S_WHERE_SELECT_SG = "SELECT id FROM res_branch WHERE code='SG'"
+        S_WHERE_SUB_SG_BOOKINGS = f" res_id IN (SELECT id FROM freight_booking WHERE branch_id IN ({S_WHERE_SELECT_SG}))"
+        S_WHERE_SUB_SG_BILLINGS = f" res_id IN (SELECT id FROM freight_billing WHERE branch_id IN ({S_WHERE_SELECT_SG}))"
+        S_WHERE_SUB_SG_DEBITS = f" res_id IN (SELECT id FROM freight_debit_note WHERE branch_id IN ({S_WHERE_SELECT_SG}))"
+        S_WHERE_SUB_SG_CREDITS = f" res_id IN (SELECT id FROM freight_credit_note WHERE branch_id IN ({S_WHERE_SELECT_SG}))"
+        S_WHERE_BOOKINGS = f" model='freight.booking' AND {S_WHERE_SUB_SG_BOOKINGS}"
+        S_WHERE_BILLINGS = f" model='freight.billing' AND {S_WHERE_SUB_SG_BILLINGS}"
+        S_WHERE_DEBITS = f" model='freight.debit.note' AND {S_WHERE_SUB_SG_DEBITS}"
+        S_WHERE_CREDITS = f" model='freight.credit.note' AND {S_WHERE_SUB_SG_CREDITS}"
+
+        S_WHERE_SELECT_TRA = "SELECT id FROM res_branch WHERE code='TRA'"
+        S_WHERE_SUB_TRA_BOOKINGS = f" res_id IN (SELECT id FROM freight_booking WHERE branch_id IN ({S_WHERE_SELECT_TRA}))"
+        S_WHERE_SUB_TRA_BILLINGS = f" res_id IN (SELECT id FROM freight_billing WHERE branch_id IN ({S_WHERE_SELECT_TRA}))"
+        S_WHERE_SUB_TRA_DEBITS = f" res_id IN (SELECT id FROM freight_debit_note WHERE branch_id IN ({S_WHERE_SELECT_TRA}))"
+        S_WHERE_SUB_TRA_CREDITS = f" res_id IN (SELECT id FROM freight_credit_note WHERE branch_id IN ({S_WHERE_SELECT_TRA}))"
+        S_WHERE_TRA_BOOKINGS = f" model='freight.booking' AND {S_WHERE_SUB_TRA_BOOKINGS}"
+        S_WHERE_TRA_BILLINGS = f" model='freight.billing' AND {S_WHERE_SUB_TRA_BILLINGS}"
+        S_WHERE_TRA_DEBITS = f" model='freight.debit.note' AND {S_WHERE_SUB_TRA_DEBITS}"
+        S_WHERE_TRA_CREDITS = f" model='freight.credit.note' AND {S_WHERE_SUB_TRA_CREDITS}"
+
+        S_WHERE_SELECT_LS = "SELECT id FROM res_branch WHERE code='LS'"
+        S_WHERE_SUB_LS_BOOKINGS = f" res_id IN (SELECT id FROM freight_booking WHERE branch_id IN ({S_WHERE_SELECT_LS}))"
+        S_WHERE_SUB_LS_BILLINGS = f" res_id IN (SELECT id FROM freight_billing WHERE branch_id IN ({S_WHERE_SELECT_LS}))"
+        S_WHERE_SUB_LS_DEBITS = f" res_id IN (SELECT id FROM freight_debit_note WHERE branch_id IN ({S_WHERE_SELECT_LS}))"
+        S_WHERE_SUB_LS_CREDITS = f" res_id IN (SELECT id FROM freight_credit_note WHERE branch_id IN ({S_WHERE_SELECT_LS}))"
+        S_WHERE_LS_BOOKINGS = f" model='freight.booking' AND {S_WHERE_SUB_LS_BOOKINGS}"
+        S_WHERE_LS_BILLINGS = f" model='freight.billing' AND {S_WHERE_SUB_LS_BILLINGS}"
+        S_WHERE_LS_DEBITS = f" model='freight.debit.note' AND {S_WHERE_SUB_LS_DEBITS}"
+        S_WHERE_LS_CREDITS = f" model='freight.credit.note' AND {S_WHERE_SUB_LS_CREDITS}"
 
         """ Define sub-queries sql for views """
         sql_view_users = self._create_sql_view_list_users_dates(V_USERS, report_year, A_USER_ID, A_LOGIN, A_NAME, A_DATE)
@@ -186,8 +228,6 @@ class UserReportWizard(models.TransientModel):
                                                         'mail_message', None, S_WHERE_DISCUSS)
         sql_view_calendars = self._create_sql_union_all(V_CALENDAR_COUNTS, A_USER_ID, A_DATE, A_CALENDAR_COUNTS,
                                                         'calendar_event')
-        # sql_view_tickets = self._create_sql_union_all(V_TICKET_COUNTS, A_USER_ID, A_DATE, A_TICKET_COUNTS,
-        #                                               'helpdesk_ticket')
         sql_view_tickets = self._create_sql_union_all(V_TICKET_COUNTS, A_USER_ID, A_DATE, A_TICKET_COUNTS,
                                                       'mail_message', None, S_WHERE_TICKETS)
         sql_view_tickets_channel = self._create_sql_union_all(V_TICKET_CHANNEL_COUNTS, A_USER_ID, A_DATE,
@@ -200,18 +240,22 @@ class UserReportWizard(models.TransientModel):
                                                        'res_partner')
         sql_view_attendances = self._create_sql_union_all(V_ATTENDANCES_COUNTS, A_USER_ID, A_DATE, A_ATTENDANCES_COUNTS,
                                                           'seenpo_hr_attendance_bio_log')
-        sql_view_crms = self._create_sql_union_all(V_CRM_COUNTS, A_USER_ID, A_DATE, A_CRM_COUNTS, 'crm_lead')
+        sql_view_crms = self._create_sql_union_all(V_CRM_COUNTS, A_USER_ID, A_DATE, A_CRM_COUNTS,
+                                                   'mail_message', None, S_WHERE_CRMS)
         sql_view_sales = self._create_sql_union_all(V_SALE_COUNTS, A_USER_ID, A_DATE, A_SALE_COUNTS, 'sale_order')
+        sql_view_sales_lines = self._create_sql_union_all(V_SALE_LINE_COUNTS, A_USER_ID, A_DATE, A_SALE_LINE_COUNTS,
+                                                          'sale_order_line')
         sql_view_products = self._create_sql_union_all(V_PRODUCT_COUNTS, A_USER_ID, A_DATE, A_PRODUCT_COUNTS,
-                                                       'product_template')
+                                                       'mail_message', None, S_WHERE_PRODUCTS)
         sql_view_pricelists = self._create_sql_union_all(V_PRICELIST_COUNTS, A_USER_ID, A_DATE, A_PRICELIST_COUNTS,
                                                          'product_pricelist')
         sql_view_accountings = self._create_sql_union_all(V_ACCOUNTING_COUNTS, A_USER_ID, A_DATE, A_ACCOUNTING_COUNTS,
-                                                          'account_move')
+                                                          'mail_message', None, S_WHERE_ACCOUNTINGS)
         sql_view_accountings_payment = self._create_sql_union_all(V_ACCOUNTING_PAYMENT_COUNTS, A_USER_ID, A_DATE,
-                                                                  A_ACCOUNTING_PAYMENT_COUNTS, 'account_payment')
+                                                                  A_ACCOUNTING_PAYMENT_COUNTS,
+                                                                  'mail_message', None, S_WHERE_PAYMENTS)
         sql_view_form_wos = self._create_sql_union_all(V_FORM_WO_COUNTS, A_USER_ID, A_DATE, A_FORM_WO_COUNTS,
-                                                       'freight_form_wo')
+                                                       'mail_message', None, S_WHERE_FORM_WOS)
         sql_view_email_marketing = self._create_sql_union_all(V_EMAIL_MARKETING_COUNTS, A_USER_ID, A_DATE,
                                                               A_EMAIL_MARKETING_COUNTS, 'mailing_mailing')
         sql_view_email_activity = self._create_sql_union_all(V_EMAIL_ACTIVITY_COUNTS, A_USER_ID, A_DATE,
@@ -224,49 +268,51 @@ class UserReportWizard(models.TransientModel):
                                                              A_EMAIL_TEMPLATE_COUNTS, 'mail_template')
         sql_view_purchases = self._create_sql_union_all(V_PURCHASE_COUNTS, A_USER_ID, A_DATE, A_PURCHASE_COUNTS,
                                                         'purchase_order')
+        sql_view_purchases_lines = self._create_sql_union_all(V_PURCHASE_LINE_COUNTS, A_USER_ID, A_DATE,
+                                                              A_PURCHASE_LINE_COUNTS, 'purchase_order_line')
         sql_view_inventory = self._create_sql_union_all(V_INVENTORY_COUNTS, A_USER_ID, A_DATE, A_INVENTORY_COUNTS,
                                                         'stock_picking')
         sql_view_employees = self._create_sql_union_all(V_EMPLOYEES_COUNTS, A_USER_ID, A_DATE, A_EMPLOYEES_COUNTS,
-                                                        'hr_employee')
+                                                        'mail_message', None, S_WHERE_EMPLOYEES)
         sql_view_department = self._create_sql_union_all(V_DEPARTMENT_COUNTS, A_USER_ID, A_DATE, A_DEPARTMENT_COUNTS,
-                                                         'hr_department')
+                                                         'mail_message', None, S_WHERE_DEPARTMENTS)
         sql_view_time_offs = self._create_sql_union_all(V_TIME_OFF_COUNTS, A_USER_ID, A_DATE, A_TIME_OFF_COUNTS,
-                                                        'hr_leave')
+                                                        'mail_message', None, S_WHERE_LEAVES)
 
         sql_view_bookings = self._create_sql_union_all(V_BOOKING_COUNTS, A_USER_ID, A_DATE, A_BOOKING_COUNTS,
-                                                       'freight_booking', 'SG')
+                                                       'mail_message', 'SG', S_WHERE_BOOKINGS)
         sql_view_billings = self._create_sql_union_all(V_BILLING_COUNTS, A_USER_ID, A_DATE, A_BILLING_COUNTS,
-                                                       'freight_billing', 'SG')
+                                                       'mail_message', 'SG', S_WHERE_BILLINGS)
         sql_view_debits = self._create_sql_union_all(V_DEBIT_COUNTS, A_USER_ID, A_DATE, A_DEBIT_COUNTS,
-                                                     'freight_debit_note', 'SG')
+                                                     'mail_message', 'SG', S_WHERE_DEBITS)
         sql_view_credits = self._create_sql_union_all(V_CREDIT_COUNTS, A_USER_ID, A_DATE, A_CREDIT_COUNTS,
-                                                      'freight_credit_note', 'SG')
+                                                      'mail_message', 'SG', S_WHERE_CREDITS)
 
         sql_view_tra_bookings = self._create_sql_union_all(V_TRADING_BOOKING_COUNTS, A_USER_ID, A_DATE,
-                                                           A_TRADING_BOOKING_COUNTS, 'freight_booking', 'TRA')
+                                                           A_TRADING_BOOKING_COUNTS, 'mail_message', 'TRA', S_WHERE_TRA_BOOKINGS)
         sql_view_tra_billings = self._create_sql_union_all(V_TRADING_BILLING_COUNTS, A_USER_ID, A_DATE,
-                                                           A_TRADING_BILLING_COUNTS, 'freight_billing', 'TRA')
+                                                           A_TRADING_BILLING_COUNTS, 'mail_message', 'TRA', S_WHERE_TRA_BILLINGS)
         sql_view_tra_debits = self._create_sql_union_all(V_TRADING_DEBIT_COUNTS, A_USER_ID, A_DATE,
-                                                         A_TRADING_DEBIT_COUNTS, 'freight_debit_note', 'TRA')
+                                                         A_TRADING_DEBIT_COUNTS, 'mail_message', 'TRA', S_WHERE_TRA_DEBITS)
         sql_view_tra_credits = self._create_sql_union_all(V_TRADING_CREDIT_COUNTS, A_USER_ID, A_DATE,
-                                                          A_TRADING_CREDIT_COUNTS, 'freight_credit_note', 'TRA')
+                                                          A_TRADING_CREDIT_COUNTS, 'mail_message', 'TRA', S_WHERE_TRA_CREDITS)
 
         sql_view_ls_bookings = self._create_sql_union_all(V_LANGSON_BOOKING_COUNTS, A_USER_ID, A_DATE,
-                                                          A_LANGSON_BOOKING_COUNTS, 'freight_booking', 'LS')
+                                                          A_LANGSON_BOOKING_COUNTS, 'mail_message', 'LS', S_WHERE_LS_BOOKINGS)
         sql_view_ls_billings = self._create_sql_union_all(V_LANGSON_BILLING_COUNTS, A_USER_ID, A_DATE,
-                                                          A_LANGSON_BILLING_COUNTS, 'freight_billing', 'LS')
+                                                          A_LANGSON_BILLING_COUNTS, 'mail_message', 'LS', S_WHERE_LS_BILLINGS)
         sql_view_ls_debits = self._create_sql_union_all(V_LANGSON_DEBIT_COUNTS, A_USER_ID, A_DATE,
-                                                        A_LANGSON_DEBIT_COUNTS, 'freight_debit_note', 'LS')
+                                                        A_LANGSON_DEBIT_COUNTS, 'mail_message', 'LS', S_WHERE_LS_DEBITS)
         sql_view_ls_credits = self._create_sql_union_all(V_LANGSON_CREDIT_COUNTS, A_USER_ID, A_DATE,
-                                                         A_LANGSON_CREDIT_COUNTS, 'freight_credit_note', 'LS')
+                                                         A_LANGSON_CREDIT_COUNTS, 'mail_message', 'LS', S_WHERE_LS_CREDITS)
 
         general_sql = f"""
                 WITH {sql_view_users}, {sql_view_discusses}, {sql_view_calendars}, {sql_view_tickets}
                 , {sql_view_tickets_channel}, {sql_view_tickets_category}, {sql_view_tickets_tag}
-                , {sql_view_partners}, {sql_view_attendances}, {sql_view_crms}, {sql_view_sales}
+                , {sql_view_partners}, {sql_view_attendances}, {sql_view_crms}, {sql_view_sales}, {sql_view_sales_lines}
                 , {sql_view_products}, {sql_view_pricelists}, {sql_view_accountings}, {sql_view_accountings_payment}
                 , {sql_view_form_wos}, {sql_view_email_marketing}, {sql_view_email_activity}, {sql_view_email_email}
-                , {sql_view_email_messsage}, {sql_view_email_template}, {sql_view_purchases}
+                , {sql_view_email_messsage}, {sql_view_email_template}, {sql_view_purchases}, {sql_view_purchases_lines}
                 , {sql_view_inventory}, {sql_view_employees}, {sql_view_department}, {sql_view_time_offs}
                 , {sql_view_bookings}, {sql_view_billings}, {sql_view_debits}, {sql_view_credits}
                 , {sql_view_tra_bookings}, {sql_view_tra_billings}, {sql_view_tra_debits}, {sql_view_tra_credits}
@@ -283,11 +329,11 @@ class UserReportWizard(models.TransientModel):
                     SUM(COALESCE({A_PARTNER_COUNTS}, 0)) AS {A_PARTNER_COUNTS},
                     SUM(COALESCE({A_ATTENDANCES_COUNTS}, 0)) AS {A_ATTENDANCES_COUNTS},
                     SUM(COALESCE({A_CRM_COUNTS}, 0)) AS {A_CRM_COUNTS},
-                    SUM(COALESCE({A_SALE_COUNTS}, 0)) AS {A_SALE_COUNTS},
+                    SUM(COALESCE({A_SALE_COUNTS}, 0)) + SUM(COALESCE({A_SALE_LINE_COUNTS}, 0)) AS {A_SALE_COUNTS},
                     SUM(COALESCE({A_PRODUCT_COUNTS}, 0)) + SUM(COALESCE({A_PRICELIST_COUNTS}, 0)) AS {A_PRODUCT_COUNTS},
                     SUM(COALESCE({A_ACCOUNTING_COUNTS}, 0)) + SUM(COALESCE({A_ACCOUNTING_PAYMENT_COUNTS}, 0)) + SUM(COALESCE({A_FORM_WO_COUNTS}, 0)) AS {A_ACCOUNTING_COUNTS},
                     SUM(COALESCE({A_EMAIL_MARKETING_COUNTS}, 0)) AS {A_EMAIL_MARKETING_COUNTS},
-                    SUM(COALESCE({A_PURCHASE_COUNTS}, 0)) AS {A_PURCHASE_COUNTS},
+                    SUM(COALESCE({A_PURCHASE_COUNTS}, 0)) + SUM(COALESCE({A_PURCHASE_LINE_COUNTS}, 0)) AS {A_PURCHASE_COUNTS},
                     SUM(COALESCE({A_INVENTORY_COUNTS}, 0)) AS {A_INVENTORY_COUNTS},
                     SUM(COALESCE({A_EMPLOYEES_COUNTS}, 0)) + SUM(COALESCE({A_DEPARTMENT_COUNTS}, 0)) AS {A_EMPLOYEES_COUNTS},
                     SUM(COALESCE({A_TIME_OFF_COUNTS}, 0)) AS {A_TIME_OFF_COUNTS},
@@ -306,6 +352,7 @@ class UserReportWizard(models.TransientModel):
                     LEFT JOIN {V_ATTENDANCES_COUNTS} atc ON u.{A_USER_ID} = atc.{A_USER_ID} AND u.{A_DATE} = atc.{A_DATE}
                     LEFT JOIN {V_CRM_COUNTS} crmc ON u.{A_USER_ID} = crmc.{A_USER_ID} AND u.{A_DATE} = crmc.{A_DATE}
                     LEFT JOIN {V_SALE_COUNTS} soc ON u.{A_USER_ID} = soc.{A_USER_ID} AND u.{A_DATE} = soc.{A_DATE}
+                    LEFT JOIN {V_SALE_LINE_COUNTS} solc ON u.{A_USER_ID} = solc.{A_USER_ID} AND u.{A_DATE} = solc.{A_DATE}
                     LEFT JOIN {V_PRODUCT_COUNTS} proc ON u.{A_USER_ID} = proc.{A_USER_ID} AND u.{A_DATE} = proc.{A_DATE}
                     LEFT JOIN {V_PRICELIST_COUNTS} pric ON u.{A_USER_ID} = pric.{A_USER_ID} AND u.{A_DATE} = pric.{A_DATE}
                     LEFT JOIN {V_ACCOUNTING_COUNTS} acc ON u.{A_USER_ID} = acc.{A_USER_ID} AND u.{A_DATE} = acc.{A_DATE}
@@ -313,6 +360,7 @@ class UserReportWizard(models.TransientModel):
                     LEFT JOIN {V_FORM_WO_COUNTS} foc ON u.{A_USER_ID} = foc.{A_USER_ID} AND u.{A_DATE} = foc.{A_DATE}
                     LEFT JOIN {V_EMAIL_MARKETING_COUNTS} emc ON u.{A_USER_ID} = emc.{A_USER_ID} AND u.{A_DATE} = emc.{A_DATE}
                     LEFT JOIN {V_PURCHASE_COUNTS} poc ON u.{A_USER_ID} = poc.{A_USER_ID} AND u.{A_DATE} = poc.{A_DATE}
+                    LEFT JOIN {V_PURCHASE_LINE_COUNTS} polc ON u.{A_USER_ID} = polc.{A_USER_ID} AND u.{A_DATE} = polc.{A_DATE}
                     LEFT JOIN {V_INVENTORY_COUNTS} inc ON u.{A_USER_ID} = inc.{A_USER_ID} AND u.{A_DATE} = inc.{A_DATE}
                     LEFT JOIN {V_EMPLOYEES_COUNTS} empc ON u.{A_USER_ID} = empc.{A_USER_ID} AND u.{A_DATE} = empc.{A_DATE}
                     LEFT JOIN {V_DEPARTMENT_COUNTS} depc ON u.{A_USER_ID} = depc.{A_USER_ID} AND u.{A_DATE} = depc.{A_DATE}
@@ -332,10 +380,12 @@ class UserReportWizard(models.TransientModel):
                 WHERE
                     COALESCE({A_DISCUSS_COUNTS}, 0) + COALESCE({A_CALENDAR_COUNTS}, 0) + COALESCE({A_TICKET_COUNTS}, 0) + COALESCE({A_TICKET_CHANNEL_COUNTS}, 0) 
                     + COALESCE({A_TICKET_CATEGORY_COUNTS}, 0)+ COALESCE({A_TICKET_TAG_COUNTS}, 0)  + COALESCE({A_PARTNER_COUNTS}, 0)
-                    + COALESCE({A_ATTENDANCES_COUNTS}, 0) + COALESCE({A_CRM_COUNTS}, 0) + COALESCE({A_SALE_COUNTS}, 0) 
+                    + COALESCE({A_ATTENDANCES_COUNTS}, 0) + COALESCE({A_CRM_COUNTS}, 0)
+                    + COALESCE({A_SALE_COUNTS}, 0) + COALESCE({A_SALE_LINE_COUNTS}, 0) 
                     + COALESCE({A_PRODUCT_COUNTS}, 0) + COALESCE({A_PRICELIST_COUNTS}, 0)
                     + COALESCE({A_ACCOUNTING_COUNTS}, 0) + COALESCE({A_ACCOUNTING_PAYMENT_COUNTS}, 0) + COALESCE({A_FORM_WO_COUNTS}, 0)
-                    + COALESCE({A_EMAIL_MARKETING_COUNTS}, 0) + COALESCE({A_PURCHASE_COUNTS}, 0)
+                    + COALESCE({A_EMAIL_MARKETING_COUNTS}, 0)
+                    + COALESCE({A_PURCHASE_COUNTS}, 0) + COALESCE({A_PURCHASE_LINE_COUNTS}, 0)
                     + COALESCE({A_INVENTORY_COUNTS}, 0) + COALESCE({A_EMPLOYEES_COUNTS}, 0) + COALESCE({A_DEPARTMENT_COUNTS}, 0)
                     + COALESCE({A_TIME_OFF_COUNTS}, 0)
                     + COALESCE({A_BOOKING_COUNTS}, 0) + COALESCE({A_BILLING_COUNTS}, 0)
@@ -409,8 +459,8 @@ class UserReportWizard(models.TransientModel):
     def _create_sql_view_count_create_date(report_year, alias_user_id, alias_updated_date, alias_count,
                                            table_name_of_model, branch_code='', sub_where_conditions=''):
         sub_where = ''
-        if branch_code:
-            sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+        # if branch_code:
+        #     sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
         if sub_where_conditions:
             sub_where += f" AND {sub_where_conditions}"
 
@@ -430,8 +480,8 @@ class UserReportWizard(models.TransientModel):
     def _create_sql_view_count_write_date(report_year, alias_user_id, alias_updated_date, alias_count,
                                           table_name_of_model, branch_code='', sub_where_conditions=''):
         sub_where = ''
-        if branch_code:
-            sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
+        # if branch_code:
+        #     sub_where += f" AND branch_id IN (SELECT id FROM res_branch WHERE code = '{branch_code}')"
         if sub_where_conditions:
             sub_where += f" AND {sub_where_conditions}"
 
