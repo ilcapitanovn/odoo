@@ -29,7 +29,7 @@ from odoo.tools import ustr, pycompat, formataddr, email_normalize, encapsulate_
 _logger = logging.getLogger(__name__)
 _test_logger = logging.getLogger('odoo.tests')
 
-SMTP_TIMEOUT = 60
+SMTP_TIMEOUT = 15   # TODO: Reduce timeout of SMTP connection to avoid loading on screen in case connection failed
 
 
 class MailDeliveryException(Exception):
