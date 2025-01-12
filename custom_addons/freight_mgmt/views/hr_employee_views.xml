@@ -15,4 +15,18 @@
             </xpath>
         </field>
     </record>
+
+    <record id="freight_hr_employee_view_tree_inherit" model="ir.ui.view">
+        <field name="name">Freight HR Employee View Tree Inherited</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='work_location_id']" position="after">
+                <field name="contract_date_start" optional="hide"/>
+                <field name="departure_date" optional="hide"/>
+                <field name="departure_description" optional="hide"/>
+                <field name="create_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

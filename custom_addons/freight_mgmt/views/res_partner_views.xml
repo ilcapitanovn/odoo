@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <odoo>
+        <record id="contacts.action_contacts" model="ir.actions.act_window">
+            <field name="context">{'default_is_company': True, 'search_default_my_contacts': 1}</field>
+        </record>
+
         <record id="freight_res_partner_view_search" model="ir.ui.view">
             <field name="name">freight.res.partner.view.search.inherit</field>
             <field name="model">res.partner</field>

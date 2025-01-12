@@ -68,7 +68,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='margin']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="groups">freight_mgmt.group_freight_manager</attribute>
             </xpath>
         </field>
     </record>

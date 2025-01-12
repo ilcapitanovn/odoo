@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="freight_view_crm_case_leads_filter_inherit" model="ir.ui.view">
+        <field name="name">Freight CRM Case Leads Search Inherited</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search//filter[@name='filter_creation_date']" position="after">
+                <filter string="Last Updated on" name="filter_write_date" date="write_date" default_period="this_month"/>
+            </xpath>
+            <xpath expr="//search//group//filter[@name='month']" position="after">
+                <filter string="Last Updated on" context="{'group_by':'write_date:month'}" name="write_date_month"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_crm_case_tree_view_leads_inherit" model="ir.ui.view">
+        <field name="name">Freight CRM Case Tree View Leads Inherited</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='create_date']" position="after">
+                <field name="write_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_crm_case_tree_view_oppor_inherit" model="ir.ui.view">
+        <field name="name">Freight CRM View Tree Opportunities Inherited</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='create_date']" position="after">
+                <field name="write_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

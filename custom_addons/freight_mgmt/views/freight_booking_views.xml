@@ -100,6 +100,20 @@
                         domain="[]"
                         context="{'group_by':'partner_id'}"
                     />
+                    <separator />
+                    <filter
+                        string="Original ETD"
+                        name="group_original_etd"
+                        domain="[]"
+                        context="{'group_by':'etd'}"
+                    />
+                    <filter
+                        string="Revised ETD"
+                        name="group_revised_etd"
+                        domain="[]"
+                        context="{'group_by':'etd_revised'}"
+                    />
+                    <separator />
                     <filter
                         string="Stage"
                         name="group_stage"
@@ -301,8 +315,8 @@
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="branch_id" optional="hide" />
                 <field name="order_type" optional="show"/>
-                <field name="amount_total" optional="hide"/>
-                <field name="margin" optional="show"/>
+                <field name="amount_total" optional="hide" groups="freight_mgmt.group_freight_manager"/>
+                <field name="margin" optional="show" groups="freight_mgmt.group_freight_manager"/>
                 <field name="stage_id" decoration-success="confirmed or completed" decoration-info="stage_name == 'Draft' or stage_name == 'Submitted'" widget="badge" optional="show" />
             </tree>
         </field>

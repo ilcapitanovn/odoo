@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="freight_view_slide_slide_form_custom" model="ir.ui.view">
+        <field name="name">freight.view.slide.slide.form.custom</field>
+        <field name="model">slide.slide</field>
+        <field name="inherit_id" ref="website_slides.view_slide_slide_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='document']//field[@name='datas']" position="attributes">
+                <attribute name="options">{'accepted_file_extensions': 'application/pdf'}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

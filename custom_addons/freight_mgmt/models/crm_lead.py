@@ -140,12 +140,12 @@ class CrmLead(models.Model):
         follow up with leads after N days
         """
         try:
-            days_alert = [5, 10, 20, 30, 40, 50, 60]
+            days_alert = [5, 10, 20, 30]
 
             now = datetime.now()
             domain = [
                 ('active', '=', True),
-                ('create_date', '>=', (now - timedelta(days=60)))  # Get records not older than 60 days
+                ('write_date', '>=', (now - timedelta(days=30)))  # Get records not older than 30 days
             ]
             records = self.env['crm.lead'].search(domain)
             for record in records:
@@ -155,6 +155,28 @@ class CrmLead(models.Model):
 
         except Exception as e:
             print("action_send_lead_creation_notification - Exception: " + str(e))
+
+    @api.model
+    def action_auto_mark_lost_and_archive_leads(self):
+        """
+        A scheduled action to automate mark leads after 30 days as LOST and archive leads after 60 days
+        without any activities
+        """
+        try:
+            now = datetime.now()
+            domain = [
+                ('active', '=', True),
+                ('type', '=', 'lead'),
+                ('write_date', '<', (now - timedelta(days=10)))  # Get records older than 60 days
+            ]
+            records = self.env['crm.lead'].search(domain, limit=100)
+            if records:
+                records.write({'active': False})
+
+            print("action_auto_mark_lost_and_archive_leads - executed successful.")
+
+        except Exception as e:
+            print("action_auto_mark_lost_and_archive_leads - Exception: " + str(e))
 
     def _send_notifications(self, record, days_passed):
         # Get the responsible salesperson (user) and record

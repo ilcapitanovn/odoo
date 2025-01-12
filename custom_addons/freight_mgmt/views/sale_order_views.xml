@@ -171,6 +171,9 @@
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_shipment_type" optional="hide" />
                         </xpath>
+                        <xpath expr="//field[@name='amount_total']" position="after">
+                            <field name="margin" widget="monetary" optional="show"/>
+                        </xpath>
                 </field>
         </record>
 
@@ -184,6 +187,9 @@
                         </xpath>
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_shipment_type" optional="hide" />
+                        </xpath>
+                        <xpath expr="//field[@name='amount_total']" position="after">
+                            <field name="margin" widget="monetary" optional="show"/>
                         </xpath>
                 </field>
         </record>

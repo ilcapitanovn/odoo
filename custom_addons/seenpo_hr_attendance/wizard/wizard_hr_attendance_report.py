@@ -13,10 +13,18 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
     def _get_default_report_type(self):
         return self._context.get("report_type")
 
+    @staticmethod
+    def _get_year_selection():
+        """Generate year options dynamically."""
+        current_year = datetime.datetime.now().year
+        return [(str(year), str(year)) for year in range(2010, current_year + 1)]
+
     date_month_report = fields.Date("Report month", default=fields.Date.today())
-    date_year_report = fields.Selection([
-        (str(num), str(num)) for num in range(2010, datetime.datetime.now().year + 1)
-    ], 'Report year', default=str(datetime.datetime.now().year))
+    date_year_report = fields.Selection(
+        selection=lambda self: self._get_year_selection(),
+        string="Report year",
+        default=lambda self: str(datetime.datetime.now().year)
+    )
     report_type = fields.Char(string="Report Type", readonly=True, store=False,
                               default=_get_default_report_type)
 
