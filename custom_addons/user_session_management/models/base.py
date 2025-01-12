@@ -32,6 +32,16 @@ class Base(models.AbstractModel):
     _inherit = 'base'
 
     @api.model
+    def _auth_timeout_get_ignored_urls(self):
+        """Pluggable method for calculating ignored urls
+        Defaults to stored config param
+        """
+        ignored_urls = self.env["ir.config_parameter"].sudo().get_param('user_session_management.ignored_urls', '')
+        return ignored_urls.split(",")
+        # TODO: Need to refactor to implement caching for reading config_parameter similar in auth_session_timeout
+        # return params._auth_timeout_get_parameter_ignored_urls()
+
+    @api.model
     def create(self, vals_list):
         """
         Overrides the default create method to create a user session activity
@@ -71,38 +81,41 @@ class Base(models.AbstractModel):
         """
         res = super().read(fields, load)
         if log:
-            models_to_track = self.env['ir.config_parameter'].sudo().get_param(
-                'user_session_management.model_ids')
-            if models_to_track:
-                try:
-                    model_ids = self.env['ir.model'].sudo().browse(
-                        literal_eval(models_to_track))
-                    if model_ids and self._name in model_ids.mapped('model'):
-                        name = ''
-                        if self._context.get('params'):
-                            if self._context['params'].get('action'):
-                                name = self.env['ir.actions.act_window'].sudo()\
-                                           .browse(
-                                    self._context['params'][
-                                        'action']).name or ''
-                        record = False
-                        records = ''
-                        if len(self) == 1:
-                            name = self.name if self._fields.get(
-                                'name') else name
-                            record = self.id
-                        else:
-                            records = self.ids
-                        log_vals = {'name': name,
-                                    'model': self._name,
-                                    'record': record,
-                                    'records': records,
-                                    'action': 'read',
-                                    'login_id': request.session.usm_session_id,
-                                    }
-                        self.env['user.session.activity'].create(log_vals)
-                except:
-                    pass
+            try:
+                ignored_urls = self._auth_timeout_get_ignored_urls()
+                if request.httprequest.path not in ignored_urls:
+                    models_to_track = self.env['ir.config_parameter'].sudo().get_param(
+                        'user_session_management.model_ids')
+                    if models_to_track:
+
+                        model_ids = self.env['ir.model'].sudo().browse(
+                            literal_eval(models_to_track))
+                        if model_ids and self._name in model_ids.mapped('model'):
+                            name = ''
+                            if self._context.get('params'):
+                                if self._context['params'].get('action'):
+                                    name = self.env['ir.actions.act_window'].sudo()\
+                                               .browse(
+                                        self._context['params'][
+                                            'action']).name or ''
+                            record = False
+                            records = ''
+                            if len(self) == 1:
+                                name = self.name if self._fields.get(
+                                    'name') else name
+                                record = self.id
+                            else:
+                                records = self.ids
+                            log_vals = {'name': name,
+                                        'model': self._name,
+                                        'record': record,
+                                        'records': records,
+                                        'action': 'read',
+                                        'login_id': request.session.usm_session_id,
+                                        }
+                            self.env['user.session.activity'].create(log_vals)
+            except:
+                pass
         return res
 
     def write(self, vals):
