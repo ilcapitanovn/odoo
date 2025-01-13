@@ -27,3 +27,10 @@ class FreightBookingController(http.Controller):
         booking.stage_id = values.get("stage_id")
 
         return werkzeug.utils.redirect("/my/booking/" + str(booking.id))
+
+    @http.route("/freight/booking/get_url", type="json", auth="user", methods=['POST'], csrf=False)
+    def get_booking_list_url(self, **kw):
+        url = request.env['ir.config_parameter'].sudo().get_param('open_booking_list_url', False)
+        return {
+            'booking_url': url
+        }

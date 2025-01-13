@@ -10,16 +10,14 @@ var TreeButton = ListController.extend({
    }),
    _OpenLink: function () {
         var self = this;
-        var param_name = 'open_booking_list_url';
         self._rpc({
-                model: 'ir.config_parameter',
-                method: 'get_param',
-                args: [param_name]
+                route: '/freight/booking/get_url',
+                params: {}
             }).then(function(result) {
                 console.log('Loading open_booking_list_url success:', result);
                 var url = 'https://docs.google.com/spreadsheets/d/1z-KLNBBYyeAS140XLnC7rmBNa4EFoXox/edit?usp=sharing&ouid=108807027735159553699&rtpof=true&sd=true';
-                if (result) {
-                    url = result
+                if (result && result.booking_url) {
+                    url = result.booking_url
                 }
                 window.open(url, '_blank');
             }).catch(error => {
