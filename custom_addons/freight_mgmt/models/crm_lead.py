@@ -167,7 +167,7 @@ class CrmLead(models.Model):
             domain = [
                 ('active', '=', True),
                 ('type', '=', 'lead'),
-                ('write_date', '<', (now - timedelta(days=10)))  # Get records older than 60 days
+                ('write_date', '<', (now - timedelta(days=60)))  # Get records older than 60 days
             ]
             records = self.env['crm.lead'].search(domain, limit=100)
             if records:

@@ -58,6 +58,7 @@
                 <separator />
                 <field name="customer_id" />
                 <field name="sale_partner_id" />
+                <field name="bill_no" />
 <!--                <group expand="0" string="Extended Filters">-->
 <!--                    <field-->
 <!--                        name="categ_id"-->

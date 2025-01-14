@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import time
+from datetime import datetime, timedelta
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round
@@ -301,6 +304,55 @@ class SaleOrder(models.Model):
     # def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
     #     # OVERRIDE to remove readonly state of the order_type field if user logged in is manager.
     #     res = super().fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+
+    @api.model
+    def action_automate_recalculate_margin(self):
+        """
+        A scheduled action to automate recalculate margin that is less than zero due to sales input data incorrect
+        """
+        try:
+            now = datetime.now()
+            domain = [
+                ('state', 'in', ['sale', 'done']),
+                ('margin', '<', 0),
+                ('write_date', '<', (now - timedelta(days=7)))  # Get records older than 1 week
+            ]
+            orders = self.env['sale.order'].sudo().search(domain)
+            if orders and orders.ids:
+                """ 
+                Write SQL to retrieve orders without latest recalculate margin to avoid
+                recalculating an order many times
+                """
+                order_ids = str(tuple(orders.ids))
+                query = f"""
+                    SELECT
+                        mm.res_id
+                    FROM
+                        mail_message mm
+                    WHERE
+                        model = 'sale.order'
+                        AND res_id IN {order_ids}
+                        AND write_date = (
+                                SELECT MAX(write_date)
+                                FROM mail_message sub_mm
+                                WHERE mm.res_id = sub_mm.res_id
+                        )
+                        AND body NOT LIKE '%Tính lại biên lợi nhuận%'
+                """
+                self._cr.execute(query)
+                records = self._cr.fetchall()
+                red_ids = (row[0] for row in records)
+                need_recalculate_order_ids = list(red_ids)
+                for order in orders:
+                    if order.id in need_recalculate_order_ids:
+                        print(f"Processing recalculate margin for order {order.name}")
+                        order.recompute_margin()
+                        time.sleep(2)
+
+            print("action_automate_recalculate_margin - executed successful.")
+
+        except Exception as e:
+            print("action_automate_recalculate_margin - Exception: " + str(e))
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='tree', toolbar=False, submenu=False):
