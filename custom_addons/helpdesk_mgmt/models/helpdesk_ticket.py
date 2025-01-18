@@ -21,8 +21,8 @@ class HelpdeskTicket(models.Model):
         stage_ids = self.env["helpdesk.ticket.stage"].search([])
         return stage_ids
 
-    number = fields.Char(string="Ticket number", default="/", readonly=True)
-    name = fields.Char(string="Title", required=True)
+    number = fields.Char(string="Ticket number", default="/", readonly=True, tracking=True)
+    name = fields.Char(string="Title", required=True, tracking=True)
     description = fields.Html(required=True, sanitize_style=True, default="Commodity: <br/>ETD: <br/>Volume per month: <br/>Service: (Direct/ Indirect): <br/>Competitors: <br/>Free time at origin: <br/>Free time at destination: <br/>Requested rates: <br/>Others:<br/>Explanation:")
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -42,9 +42,9 @@ class HelpdeskTicket(models.Model):
     )
     processing_day = fields.Integer(related="stage_id.processing_day", readonly=True, store=False)
     is_processing_time_warning = fields.Boolean(compute="_compute_is_processing_time_warning", store=True)
-    partner_id = fields.Many2one(comodel_name="res.partner", string="Contact")
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Contact", tracking=True)
     partner_name = fields.Char()
-    partner_email = fields.Char(string="Email")
+    partner_email = fields.Char(string="Email", tracking=True)
 
     is_last_month_search = fields.Boolean(compute="_compute_is_last_month_search",
                                           search="_search_is_last_month_search")
@@ -62,7 +62,7 @@ class HelpdeskTicket(models.Model):
     closed_date = fields.Datetime()
     closed = fields.Boolean(related="stage_id.closed")
     unattended = fields.Boolean(related="stage_id.unattended", store=True)
-    tag_ids = fields.Many2many(comodel_name="helpdesk.ticket.tag", string="Tags")
+    tag_ids = fields.Many2many(comodel_name="helpdesk.ticket.tag", string="Tags", tracking=True)
     company_id = fields.Many2one(
         comodel_name="res.company",
         string="Company",
@@ -74,14 +74,17 @@ class HelpdeskTicket(models.Model):
         string="Channel",
         help="Channel indicates where the source of a ticket"
         "comes from (it could be a phone call, an email...)",
+        tracking=True
     )
     category_id = fields.Many2one(
         comodel_name="helpdesk.ticket.category",
         string="Category",
+        tracking = True
     )
     team_id = fields.Many2one(
         comodel_name="helpdesk.ticket.team",
         string="Team",
+        tracking=True
     )
     priority = fields.Selection(
         selection=[
@@ -91,6 +94,7 @@ class HelpdeskTicket(models.Model):
             ("3", "Very High"),
         ],
         default="1",
+        tracking=True
     )
     attachment_ids = fields.One2many(
         comodel_name="ir.attachment",
@@ -106,7 +110,7 @@ class HelpdeskTicket(models.Model):
             ("blocked", "Blocked"),
         ],
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
 
     def name_get(self):
         res = []
