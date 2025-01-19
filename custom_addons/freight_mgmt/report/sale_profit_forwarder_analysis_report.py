@@ -39,6 +39,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     etd = fields.Date("ETD", readonly=True)
     order_type = fields.Char("Freehand <br/>or <br/>Nominated", readonly=True)
     date_order = fields.Date("Date Order", readonly=True)
+    order_number = fields.Char("Order", readonly=True)
 
     payment_state = fields.Char("Payment Status", readonly=True)
     invoice_date = fields.Date("Invoice Date", readonly=True)
@@ -217,6 +218,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             DATE(fdn.invoice_date) AS invoice_date,
             CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
             so.date_order AS date_order,
+            so.name AS order_number,
             
             CASE WHEN po.amount_untaxed IS NULL THEN 0 ELSE po.amount_untaxed END AS po_amount_untaxed,
             CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
@@ -262,6 +264,13 @@ class SaleProfitForwarderAnalysisReport(models.Model):
         """
         return from_str
 
+    def _where(self):
+        where_str = """
+            WHERE
+                so.state in ('sale', 'done')
+        """
+        return where_str
+
     # def _group_by(self):
     #     group_by_str = """
     #         GROUP BY ai.partner_id,
@@ -282,11 +291,12 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     def init(self):
         tools.drop_view_if_exists(self._cr, self._table)
         self._cr.execute(
-            "CREATE or REPLACE VIEW %s AS ( %s FROM ( %s ) )",
+            "CREATE or REPLACE VIEW %s AS ( %s FROM ( %s ) %s )",
             (
                 AsIs(self._table),
                 AsIs(self._select()),
                 AsIs(self._from()),
+                AsIs(self._where()),
                 # AsIs(self._group_by()),
             ),
         )

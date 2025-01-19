@@ -6,7 +6,7 @@ from odoo import api, fields, models
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    vessel_bol_number = fields.Char(compute="_compute_vessel_bol_number", string="B/L Number", readonly=True, store=False)
+    vessel_bol_number = fields.Char(compute="_compute_vessel_bol_number", string="B/L Number", readonly=True, store=True)
 
     def _compute_vessel_bol_number(self):
         for rec in self:

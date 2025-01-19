@@ -108,6 +108,16 @@
             </search>
         </field>
     </record>
+    <record id="view_sale_profit_forwarder_analysis_view_graph" model="ir.ui.view">
+         <field name="name">sale.profit.forwarder.analysis.view.graph</field>
+         <field name="model">sale.profit.forwarder.analysis.report</field>
+         <field name="arch" type="xml">
+             <graph string="Sale Analysis" stacked="1" type="bar" sample="1">
+                 <field name="etd" interval="month" type="row"/>
+                 <field name="margin" type="measure" operator="+"/>
+             </graph>
+         </field>
+    </record>
     <record id="view_sale_profit_forwarder_analysis_view_list" model="ir.ui.view">
         <field name="name">sale.profit.forwarder.analysis.view.list</field>
         <field name="model">sale.profit.forwarder.analysis.report</field>
@@ -123,6 +133,7 @@
                 <field name="sale_partner_id" invisible="1"/>
 <!--                <field name="customer_id" widget="many2one_avatar"/>-->
                 <field name="bill_no"/>
+                <field name="order_number" optional="hide"/>
                 <field name="volumes" optional="hide"/>
                 <field name="display_pod" string="POL/D" />
                 <field name="etd" optional="show"/>
@@ -188,8 +199,8 @@
     <record id="action_sale_profit_forwarder_analysis_report" model="ir.actions.act_window">
         <field name="name">Profit Forwarder Report</field>
         <field name="res_model">sale.profit.forwarder.analysis.report</field>
-        <field name="view_mode">tree</field>
-        <field name="binding_view_types">list</field>
+        <field name="view_mode">tree,graph</field>
+        <field name="binding_view_types">list,graph</field>
         <field name="context">{'search_default_filter_order_closed': 1, 'search_default_filter_invoice_date': 1, 'search_default_group_by_customer': 1}</field>
         <field name="search_view_id" ref="view_sale_profit_forwarder_analysis_search" />
         <field name="view_id" ref="view_sale_profit_forwarder_analysis_view_list" />

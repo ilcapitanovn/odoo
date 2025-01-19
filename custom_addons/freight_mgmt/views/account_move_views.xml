@@ -1,5 +1,16 @@
 <?xml version="1.0"?>
 <odoo>
+        <record id="freight_view_account_invoice_filter_inherit" model="ir.ui.view">
+                <field name="name">freight.view.account.invoice.filter.inherited</field>
+                <field name="model">account.move</field>
+                <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//search//field[@name='journal_id']" position="after">
+                                <field string="B/L Number" name="vessel_bol_number"/>
+                        </xpath>
+                </field>
+        </record>
+
         <record id="freight_view_move_form_inherit" model="ir.ui.view">
                 <field name="name">freight.view.move.form.inherited</field>
                 <field name="model">account.move</field>
