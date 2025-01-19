@@ -21,7 +21,7 @@
 #############################################################################
 import pickle
 from ast import literal_eval
-from datetime import timedelta
+from datetime import datetime, timedelta
 import odoo
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -129,18 +129,74 @@ class UserSessionLogin(models.Model):
         except FileNotFoundError:
             self.update({'logout_date': fields.Datetime.now()})
 
-    def clear_records(self):
+    # TODO: Original method
+    # def clear_records(self):
+    #     """
+    #     Clears all the user session records that have a logout_date older
+    #     than the number of days specified in the settings.
+    #     """
+    #     records = self.search([])
+    #     for rec in records:
+    #         if rec.logout_date and fields.Datetime.now() > rec.logout_date + \
+    #                 timedelta(days=literal_eval(
+    #                     self.env['ir.config_parameter'].sudo().get_param(
+    #                         'user_session_management.records_retain_period')))\
+    #                 and self.env['ir.config_parameter'].sudo().get_param(
+    #                         'user_session_management.clear_log'):
+    #             rec.activity_ids.unlink()
+    #             rec.unlink()
+
+    # TODO: Refactor method to clear only duplicate records. Keep logs for analysing.
+    def clear_records(self, num_days_of_records=30):
         """
-        Clears all the user session records that have a logout_date older
+        Clears duplicate records of the user activities on previous dates.
+        Force inactive for user sessions that have a login_date older
         than the number of days specified in the settings.
+        num_days_of_records: processing records in last number of days to avoid query too many records
         """
-        records = self.search([])
-        for rec in records:
-            if rec.logout_date and fields.Datetime.now() > rec.logout_date + \
-                    timedelta(days=literal_eval(
-                        self.env['ir.config_parameter'].sudo().get_param(
-                            'user_session_management.records_retain_period')))\
-                    and self.env['ir.config_parameter'].sudo().get_param(
-                            'user_session_management.clear_log'):
-                rec.activity_ids.unlink()
+        # TODO: I don't want to modify UI, so re-using these parameters in config
+        records_retain_period = literal_eval(self.env['ir.config_parameter'].sudo().get_param(
+            'user_session_management.records_retain_period'))
+        is_clear_log = self.env['ir.config_parameter'].sudo().get_param('user_session_management.clear_log')
+
+        if not is_clear_log:
+            return
+
+        # Process deleting duplicate records
+        now = datetime.now()
+        recent_date = now - timedelta(days=num_days_of_records)
+        domain = [('performed_date', '>=', recent_date)]  # Get records not older than [num_days_of_records] days
+        activity_records = self.env["user.session.activity"].search(domain, order="performed_date asc, name asc, action asc")
+        previous_performed_date = now.replace(second=0, microsecond=0)
+        previous_session = previous_record_name = previous_user = \
+            previous_records = previous_action = previous_model = ''
+        previous_record = 0
+        for rec in activity_records:
+            session = rec.login_id.id if rec.login_id else False
+            user = rec.user_id.id if rec.user_id else False
+            performed_date = rec.performed_date.replace(second=0, microsecond=0)
+            is_duplicate = previous_performed_date == performed_date \
+                           and previous_session == session \
+                           and previous_record_name == rec.name \
+                           and previous_user == user \
+                           and previous_action == rec.action \
+                           and previous_model == rec.model \
+                           and (previous_record == rec.record or previous_records == rec.records)
+
+            if is_duplicate:
                 rec.unlink()
+            else:
+                previous_performed_date = performed_date
+                previous_session = session
+                previous_record_name = rec.name
+                previous_user = user
+                previous_records = rec.records
+                previous_action = rec.action
+                previous_model = rec.model
+                previous_record = rec.record
+
+        # Force active session log out after retain period but not delete
+        records = self.search([('create_date', '>=', recent_date)])
+        for rec in records:
+            if is_clear_log and not rec.logout_date and now > rec.login_date + timedelta(days=records_retain_period):
+                rec.action_button_force_logout()
