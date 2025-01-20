@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data noupdate="1">
+        <record id="freight_automated_action_update_bl_number_invoice" model="base.automation">
+            <field name="name">Freight: Automate Update BL Number in Invoice On Billing Change</field>
+            <field name="model_id" ref="freight_mgmt.model_freight_billing"/>
+            <field name="trigger">on_write</field>
+            <field name="trigger_field_ids" eval="[(6, 0, [ref('freight_mgmt.field_freight_billing__vessel_bol_number')])]"/>
+            <field name="state">code</field>
+            <field name="active">True</field>
+            <field name="code">
+                action = model.automate_action_update_bl_number_invoice(record)
+            </field>
+        </record>
         <record id="freight_automated_action_generate_activities_on_lead_creation" model="base.automation">
             <field name="name">CRM: Automate Generate Activities On Lead Creation</field>
             <field name="model_id" ref="crm.model_crm_lead"/>

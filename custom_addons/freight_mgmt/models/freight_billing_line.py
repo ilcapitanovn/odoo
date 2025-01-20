@@ -16,22 +16,23 @@ class FreightBillingLine(models.Model):
     _order = 'billing_id, sequence, id'
     _check_company_auto = True
 
-    billing_id = fields.Many2one('freight.billing', string='Billing Reference', required=True, ondelete='cascade', index=True, copy=False)
-    name = fields.Text(string='Name')
-    sequence = fields.Integer(string='Sequence', default=10)
+    billing_id = fields.Many2one('freight.billing', string='Billing Reference', required=True, ondelete='cascade',
+                                 index=True, copy=False, tracking=True)
+    name = fields.Text(string='Name', tracking=True)
+    sequence = fields.Integer(string='Sequence', default=10, tracking=True)
 
-    container_no = fields.Text(string='Container No.')
-    seal_nos = fields.Text(string='Seal No.')
+    container_no = fields.Text(string='Container No.', tracking=True)
+    seal_nos = fields.Text(string='Seal No.', tracking=True)
     number_packages = fields.Text(string='Number of Packages')     # Deprecated
-    packages_number = fields.Float(string='Number of Packages')
-    package_types = fields.Text(string='Package Types')
-    product_uom = fields.Many2one('uom.uom', string='Unit of Measure', ondelete="restrict")
+    packages_number = fields.Float(string='Number of Packages', tracking=True)
+    package_types = fields.Text(string='Package Types', tracking=True)
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure', ondelete="restrict", tracking=True)
     product_uom_readonly = fields.Boolean(compute='_compute_product_uom_readonly')
-    description = fields.Text(string='Description')
-    gross_weight = fields.Float(string='Gross Weight (KGS)')
-    net_weight = fields.Float(string='Net Weight (KGS)')
+    description = fields.Text(string='Description', tracking=True)
+    gross_weight = fields.Float(string='Gross Weight (KGS)', tracking=True)
+    net_weight = fields.Float(string='Net Weight (KGS)', tracking=True)
     measurement = fields.Text(string='Measurement')     # Deprecated
-    measurement_cbm = fields.Float(string='Measurement (CBM)')
+    measurement_cbm = fields.Float(string='Measurement (CBM)', tracking=True)
 
     company_id = fields.Many2one(related='billing_id.company_id', string='Company', store=True, index=True)
     branch_id = fields.Many2one(related="billing_id.branch_id", string='Branch')

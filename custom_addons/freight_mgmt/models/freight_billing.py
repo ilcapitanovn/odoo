@@ -55,38 +55,38 @@ class FreightBilling(models.Model):
 
     # number = fields.Char(string="Bill number")
     name = fields.Char(string='Bill Number', default="#", readonly=True, store=True, index=True, required=True)
-    vessel_bol_number = fields.Char(string="B/L Number")
-    description = fields.Char(translate=True)
+    vessel_bol_number = fields.Char(string="B/L Number", tracking=True)
+    description = fields.Char(translate=True, tracking=True)
 
     shipper_id = fields.Many2one(comodel_name="res.partner",
                                  domain=["|", ("category_id.name", "=", "Shipper"), ('category_id.name','=ilike', 'Người giao hàng')],
-                                 string="Shipper")
+                                 string="Shipper", tracking=True)
     shipper_name = fields.Char()
     shipper_email = fields.Char(string="Shipper's Email")
-    shipper_address = fields.Char(string="Shipper's Address")
-    shipper_extra_info = fields.Char(string="Shipper's Information")
+    shipper_address = fields.Char(string="Shipper's Address", tracking=True)
+    shipper_extra_info = fields.Char(string="Shipper's Information", tracking=True)
 
     consignee_id = fields.Many2one(comodel_name="res.partner",
                                    domain=["|", ("category_id.name", "=", "Consignee"), ('category_id.name','=ilike', 'Người nhận hàng')],
-                                   string="Consignee")
+                                   string="Consignee", tracking=True)
     consignee_name = fields.Char()
     consignee_email = fields.Char(string="Consignee's Email")
-    consignee_address = fields.Char(string="Consignee's Address")
-    consignee_extra_info = fields.Char(string="Consignee's Information")
+    consignee_address = fields.Char(string="Consignee's Address", tracking=True)
+    consignee_extra_info = fields.Char(string="Consignee's Information", tracking=True)
 
-    party_id = fields.Many2one(comodel_name="res.partner", string="Party Notification")
+    party_id = fields.Many2one(comodel_name="res.partner", string="Party Notification", tracking=True)
     party_name = fields.Char()
     party_email = fields.Char(string="Party's Email")
-    party_address = fields.Char(string="Party's Address")
-    party_extra_info = fields.Char(string="Party's Information")
+    party_address = fields.Char(string="Party's Address", tracking=True)
+    party_extra_info = fields.Char(string="Party's Information", tracking=True)
 
-    contact_id = fields.Many2one(comodel_name="res.partner", string="Delivery Contact")
+    contact_id = fields.Many2one(comodel_name="res.partner", string="Delivery Contact", tracking=True)
     contact_name = fields.Char()
     contact_email = fields.Char(string="Contact's Email")
-    contact_address = fields.Char(string="Contact's Address")
-    contact_extra_info = fields.Char(string="Contact's Information")
+    contact_address = fields.Char(string="Contact's Address", tracking=True)
+    contact_extra_info = fields.Char(string="Contact's Information", tracking=True)
 
-    note = fields.Html('Terms and conditions', default=_default_note)
+    note = fields.Html('Terms and conditions', default=_default_note, tracking=True)
 
     billing_type = fields.Selection([
         ('mbl', 'Master B/L'),
@@ -124,30 +124,30 @@ class FreightBilling(models.Model):
     shipment_type = fields.Selection(related="booking_id.shipment_type", string="Shipment Type", store=False,
                                      readonly=True, help='Type of Shipment')
     eta = fields.Datetime(related="booking_id.eta", string="ETA", store=False, readonly=True)
-    port_loading_text = fields.Char(string="Port of loading text")
-    port_discharge_text = fields.Char(string="Port of discharge text")
-    port_stopover_text = fields.Char(string="Port of stopover text")
-    pre_carriage = fields.Char(string="Pre-carriage by")
-    delivery_place = fields.Char(string="Place of delivery")
-    receipt_place = fields.Char(string="Place of receipt")
-    container_number = fields.Char(string="Container No.")
-    final_destination = fields.Char(string="Final destination")
+    port_loading_text = fields.Char(string="Port of loading text", tracking=True)
+    port_discharge_text = fields.Char(string="Port of discharge text", tracking=True)
+    port_stopover_text = fields.Char(string="Port of stopover text", tracking=True)
+    pre_carriage = fields.Char(string="Pre-carriage by", tracking=True)
+    delivery_place = fields.Char(string="Place of delivery", tracking=True)
+    receipt_place = fields.Char(string="Place of receipt", tracking=True)
+    container_number = fields.Char(string="Container No.", tracking=True)
+    final_destination = fields.Char(string="Final destination", tracking=True)
 
     billing_line = fields.One2many('freight.billing.line', 'billing_id', string='Item Lines',
                                    states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True,
-                                   auto_join=True)
+                                   auto_join=True, tracking=True)
 
-    total_packages_word = fields.Char(string="Total Packs (in word)")
-    freight_charge_rate = fields.Char(string="Charge types")
-    rated_as = fields.Char(string="Rated as")
-    payment_place = fields.Char(string="Place of payment")
-    issue_type = fields.Char(string="Type of issue")
-    movement_type = fields.Char(string="Type of movement")
-    payable_at = fields.Char(string="Payable at")
-    shipping_mark = fields.Char(string="Shipping mark")
+    total_packages_word = fields.Char(string="Total Packs (in word)", tracking=True)
+    freight_charge_rate = fields.Char(string="Charge types", tracking=True)
+    rated_as = fields.Char(string="Rated as", tracking=True)
+    payment_place = fields.Char(string="Place of payment", tracking=True)
+    issue_type = fields.Char(string="Type of issue", tracking=True)
+    movement_type = fields.Char(string="Type of movement", tracking=True)
+    payable_at = fields.Char(string="Payable at", tracking=True)
+    shipping_mark = fields.Char(string="Shipping mark", tracking=True)
 
-    bill_date = fields.Datetime(string="Bill Date", default=fields.Datetime.now)
-    due_date = fields.Datetime(string="Due Date")
+    bill_date = fields.Datetime(string="Bill Date", default=fields.Datetime.now, tracking=True)
+    due_date = fields.Datetime(string="Due Date", tracking=True)
 
     sale_order_count = fields.Integer("Sale Count", compute='_compute_sale_order_count')
     purchase_order_count = fields.Integer("Purchase Count", compute='_compute_purchase_order_count')
@@ -188,7 +188,7 @@ class FreightBilling(models.Model):
             ("blocked", "Blocked")
         ],
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
 
     def name_get(self):
         res = []
@@ -490,6 +490,42 @@ class FreightBilling(models.Model):
             result['view_mode'] = 'form'
             result['res_id'] = credit_notes.id
         return result
+
+    @api.model
+    def automate_action_update_bl_number_invoice(self, record):
+        """
+        An automated action to update BL number in invoice when this field has just been updated.
+        This automated action is necessary because it doesn't automate update the field in invoice accordingly.
+
+        :param record: a billing record just updated (no need to trigger for creation)
+        """
+        try:
+            if not record or not record.vessel_bol_number:
+                return False
+
+            related_so_name = record.order_id.name if record.order_id else ''
+            related_po_name = ''
+            if related_so_name:
+                related_purchase_order = self.env['purchase.order'].sudo().search([
+                    ('origin', '=', related_so_name)
+                ], limit=1)
+                if related_purchase_order:
+                    related_po_name = related_purchase_order.name
+
+            if related_so_name or related_po_name:
+                array_origins = []
+                if related_so_name:
+                    array_origins.append(related_so_name)
+                if related_po_name:
+                    array_origins.append(related_po_name)
+
+                related_invoices = self.env['account.move'].sudo().search([('invoice_origin', 'in', array_origins)])
+                if related_invoices:
+                    related_invoices.write({'vessel_bol_number': record.vessel_bol_number})
+
+            print("automate_action_update_bl_number_invoice - executed successful.")
+        except Exception as e:
+            print("automate_action_update_bl_number_invoice - Exception: " + str(e))
 
     def _get_starting_sequence(self):
         self.ensure_one()

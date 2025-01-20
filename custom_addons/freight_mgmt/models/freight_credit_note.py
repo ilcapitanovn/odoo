@@ -44,7 +44,7 @@ class FreightCreditNote(models.Model):
         return self.env.company.currency_id.id
 
     # ==== Business fields ====
-    number = fields.Char(string='Credit Number', default="#", readonly=True, store=True, index=True, required=True)
+    number = fields.Char(string='Credit Number', default="#", readonly=True, store=True, index=True, required=True, tracking=True)
     bill_id = fields.Many2one(
         comodel_name="freight.billing", string="Bill Reference",
         # domain="['&',('state', 'in', ['posted', 'completed']), ('credit_note_ids', '=', False)]",
@@ -52,9 +52,9 @@ class FreightCreditNote(models.Model):
         tracking=True, index=True, required=True
     )
 
-    credit_date = fields.Datetime(string="Credit date", default=fields.Datetime.now)
+    credit_date = fields.Datetime(string="Credit date", default=fields.Datetime.now, tracking=True)
     exchange_rate = fields.Float(string='Exchange rate', default=_get_default_exchange_rate, readonly=False,
-                        help='The rate of the currency to the currency of rate 1.', store=True)
+                        help='The rate of the currency to the currency of rate 1.', store=True, tracking=True)
 
     bill_no = fields.Char(related="bill_id.vessel_bol_number",
                           string="BL Number", readonly=True, store=False)
@@ -63,7 +63,7 @@ class FreightCreditNote(models.Model):
     origin_name = fields.Char(related="sale_order_id.name", string="Source Document", readonly=True, store=False)
     related_purchase_order_ids = fields.Many2many('purchase.order', compute="_compute_related_purchase_order_ids")
     purchase_order_id = fields.Many2one(
-        'purchase.order', string="Purchase Orders",
+        'purchase.order', string="Purchase Orders", tracking=True,
         domain="[('origin', '=', origin_name), ('id', 'not in', related_purchase_order_ids), ('state', 'in', ['purchase', 'done'])]"
     )
     partner_id = fields.Many2one(related="purchase_order_id.partner_id", string="Partner", readonly=True)
@@ -82,18 +82,18 @@ class FreightCreditNote(models.Model):
     supplier_id = fields.Many2one(related="partner_id", string="Vendor", readonly=False, store=False)
     invoice_partner_id = fields.Many2one('res.partner', compute='_get_invoice_partner_id',
                                          string='Invoice Address')
-    partner_vat = fields.Char(related="partner_id.vat", store=True, string="VAT", readonly=False)
+    partner_vat = fields.Char(related="partner_id.vat", store=True, string="VAT", readonly=False, tracking=True)
     partner_name = fields.Char(string="Vendor Name", compute="_get_partner_name",
-                               store=True, readonly=False)
+                               store=True, readonly=False, tracking=True)
     partner_address = fields.Char(string="Vendor Address", compute="_parse_address_from_contact_address",
-                                  store=True, readonly=False)
+                                  store=True, readonly=False, tracking=True)
 
     credit_items = fields.One2many('freight.credit.note.item', 'credit_id', string='Credit Note Items',
-                                  store=True, copy=True, auto_join=True)
+                                   store=True, copy=True, auto_join=True, tracking=True)
     # amount_total = fields.Monetary(related="purchase_order_id.amount_total", string="Total", readonly=True, store=True)
     amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True)
+    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True, tracking=True)
 
     # user_id = fields.Many2one(
     #     comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -123,7 +123,7 @@ class FreightCreditNote(models.Model):
 
     payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
                                      readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
-    invoice_date = fields.Date(string="Bill Date", readonly=True, store=True, compute='_compute_payment_state')
+    invoice_date = fields.Date(string="Bill Date", readonly=True, store=True, compute='_compute_payment_state', tracking=True)
     payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
     state = fields.Selection(selection=[
@@ -141,7 +141,7 @@ class FreightCreditNote(models.Model):
             ("blocked", "Blocked")
         ],
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
 
     def name_get(self):
         res = []

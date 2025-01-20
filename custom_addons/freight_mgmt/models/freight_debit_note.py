@@ -52,7 +52,7 @@ class FreightDebitNote(models.Model):
         return self.env.company.currency_id.id
 
     # ==== Business fields ====
-    number = fields.Char(string='Debit Number', default="#", readonly=True, store=True, index=True, required=True)
+    number = fields.Char(string='Debit Number', default="#", readonly=True, store=True, index=True, required=True, tracking=True)
     bill_id = fields.Many2one(
         comodel_name="freight.billing", string="Bill Reference",
         # domain="['&',('state', 'in', ['posted', 'completed']), ('debit_note_ids', '=', False)]",
@@ -114,7 +114,7 @@ class FreightDebitNote(models.Model):
     # amount_total = fields.Monetary(related="order_id.amount_total", string="Total", readonly=True, store=True)
     amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
     amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True)
+    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True, tracking=True)
 
     # user_id = fields.Many2one(
     #     comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -164,7 +164,7 @@ class FreightDebitNote(models.Model):
             ("blocked", "Blocked")
         ],
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
 
     def name_get(self):
         res = []

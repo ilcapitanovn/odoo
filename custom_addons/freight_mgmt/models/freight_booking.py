@@ -20,12 +20,12 @@ class FreightBooking(models.Model):
         return stage_ids
 
     number = fields.Char(string="SHPTMT Number", default="#", tracking=True, required=True)
-    name = fields.Char(string="Title")
-    description = fields.Char(translate=True)
+    name = fields.Char(string="Title", tracking=True)
+    description = fields.Char(translate=True, tracking=True)
 
-    vessel_booking_number = fields.Char(string="Booking Number")
+    vessel_booking_number = fields.Char(string="Booking Number", tracking=True)
 
-    parent_id = fields.Many2one('freight.booking', string='Parent Booking', index=True)
+    parent_id = fields.Many2one('freight.booking', string='Parent Booking', index=True, tracking=True)
     child_ids = fields.One2many('freight.booking', 'parent_id', string="Sub-bookings")
 
     billing_id = fields.One2many('freight.billing', 'booking_id', string='Bill Reference', auto_join=True)
@@ -39,10 +39,10 @@ class FreightBooking(models.Model):
     partner_name = fields.Char()
     partner_email = fields.Char(string="Email")
 
-    transport_route = fields.Char(string="Transport Route")
+    transport_route = fields.Char(string="Transport Route", tracking=True)
     transport_type = fields.Selection(
         selection=[("ocean", "Ocean"), ("land", "Land"), ("air", "Air"), ("express", "Express")],
-        string="Transport Type", default="ocean", help='Type of Transport')
+        string="Transport Type", default="ocean", help='Type of Transport', tracking=True)
 
     # shipment_type = fields.Selection(
     #     selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
@@ -74,7 +74,7 @@ class FreightBooking(models.Model):
     # ], string='Order Type')
     order_type = fields.Selection(related="order_id.order_type", string="Order Type", store=True, readonly=True)
 
-    booking_volumes = fields.One2many('freight.booking.volume', 'booking_id', string="Booking volumes")
+    booking_volumes = fields.One2many('freight.booking.volume', 'booking_id', string="Booking volumes", tracking=True)
     volumes_display = fields.Char(compute="_compute_volumes_display", string="Volumes", store=False)
 
     # TODO: Should delete this field since it's replaced by o2m booking_volumes
@@ -155,7 +155,7 @@ class FreightBooking(models.Model):
             ("blocked", "Blocked")
         ],
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(default=True, tracking=True)
 
     _sql_constraints = [('uniq_booking_number', 'unique(number)',
                          'A booking number already exists with this name. Please choose another one!')]
@@ -166,6 +166,18 @@ class FreightBooking(models.Model):
             # res.append((rec.id, rec.number + " - " + rec.name))
             res.append((rec.id, rec.number))
         return res
+
+    # def popup_notification(self):
+    #     target = self.env['res.users'].search([('login', '=', 'hat726@gmail.com')])
+    #     test_msg = {
+    #         "message": "message",
+    #         "title": "title",
+    #         "sticky": True,
+    #         "target": target.partner_id if target else False,
+    #         "html": False,
+    #         "action": None,
+    #     }
+    #     self.env.user.notify_success(**test_msg)
 
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})

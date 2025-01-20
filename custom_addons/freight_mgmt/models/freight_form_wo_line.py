@@ -8,8 +8,8 @@ class FreightFormWOLine(models.Model):
     _check_company_auto = True
 
     form_wo_id = fields.Many2one('freight.form.wo', string='Form WO Reference', required=True, ondelete='cascade',
-                                 index=True, copy=False)
-    sequence = fields.Integer(string='Sequence', default=10)
+                                 index=True, copy=False, tracking=True)
+    sequence = fields.Integer(string='Sequence', default=10, tracking=True)
 
     buy_date = fields.Datetime(string="Buy Date", tracking=True)
     seller = fields.Many2one(comodel_name="res.partner", string="Seller", tracking=True)

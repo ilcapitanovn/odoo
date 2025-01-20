@@ -12,23 +12,23 @@ class FreightCreditNoteItem(models.Model):
     _check_company_auto = True
 
     credit_id = fields.Many2one('freight.credit.note', string='Credit Note', required=True, ondelete='cascade',
-                               index=True, copy=False)
+                                index=True, copy=False, tracking=True)
 
-    external_id = fields.Integer(string="Related Purchase Order Line ID", store=True)
-    sequence = fields.Integer(string='Sequence', default=10)
-    name = fields.Text(string='Item Name')
-    quantity = fields.Float(string="Quantity")
-    uom = fields.Text(string='Unit Of Measure')
-    unit_price = fields.Float(string='Price')
+    external_id = fields.Integer(string="Related Purchase Order Line ID", store=True, tracking=True)
+    sequence = fields.Integer(string='Sequence', default=10, tracking=True)
+    name = fields.Text(string='Item Name', tracking=True)
+    quantity = fields.Float(string="Quantity", tracking=True)
+    uom = fields.Text(string='Unit Of Measure', tracking=True)
+    unit_price = fields.Float(string='Price', tracking=True)
     # currency_id = fields.Many2one(related='credit_id.currency_id', depends=['credit_id.currency_id'], store=True,
     #                               string='Currency')
-    currency_id = fields.Many2one("res.currency", store=True, string='Currency')
-    tax_id = fields.Many2many('account.tax', string='Taxes', context={'active_test': False}, store=True)
+    currency_id = fields.Many2one("res.currency", store=True, string='Currency', tracking=True)
+    tax_id = fields.Many2many('account.tax', string='Taxes', context={'active_test': False}, store=True, tracking=True)
     tax_amount = fields.Float(related="tax_id.amount", string="Tax Amount")
     tax_amount_percent = fields.Char(compute="_format_tax_amount", string="VAT TAX")
     price_subtotal = fields.Monetary(string='Subtotal', store=True)
     price_tax = fields.Float(string='Total Tax', store=True)
-    price_total = fields.Monetary(string='Total', store=True)
+    price_total = fields.Monetary(string='Total', store=True, tracking=True)
 
     company_id = fields.Many2one(related='credit_id.company_id', string='Company', store=True, index=True)
     branch_id = fields.Many2one(related="credit_id.branch_id", string='Branch')
