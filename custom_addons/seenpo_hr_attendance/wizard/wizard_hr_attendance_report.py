@@ -50,7 +50,7 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
 
         report_date = datetime.date(report_year, to_month, 31 if to_month == 12 else today.day)
 
-        employees = self.env['hr.employee'].search(
+        employees = self.env['hr.employee'].sudo().search(
             [
                 '&',
                 ("bio_user_id", "!=", False),
@@ -186,13 +186,13 @@ class SeenpoHrAttendanceReportWizard(models.TransientModel):
             arr_dates_in_header[current_date.strftime('%Y-%m-%d')] = day_of_week_text
             current_date = current_date + relativedelta(days=1)
 
-        logs = self.env['seenpo.hr.attendance.bio.log'].search(
+        logs = self.env['seenpo.hr.attendance.bio.log'].sudo().search(
             [
                 ("check_in_date", ">=", first_date_of_month),
                 ("check_in_date", "<=", last_date_of_month)
             ]
         )
-        employees = self.env['hr.employee'].search(
+        employees = self.env['hr.employee'].sudo().search(
             [
                 '&',
                 ("bio_user_id", "!=", False),

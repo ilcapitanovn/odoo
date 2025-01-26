@@ -9,7 +9,7 @@ class AccountTaxIncome(models.Model):
     _description = "Income taxes in Account"
 
     def _get_default_currency_id(self):
-        vnd = self.env['res.currency'].search([('name', '=', 'VND')])
+        vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')])
         if vnd:
             return vnd.id
         return self.env.company.currency_id.id

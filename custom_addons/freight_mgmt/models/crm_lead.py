@@ -26,7 +26,7 @@ class CrmLead(models.Model):
             assigned_user_id = salesperson.id if salesperson else created_user.id
             notes = 'Báo cáo kết quả:'
 
-            activity_types = self.env['mail.activity.type'].search([('name', 'in', ['Need to do', 'Call', 'Meeting'])])
+            activity_types = self.env['mail.activity.type'].sudo().search([('name', 'in', ['Need to do', 'Call', 'Meeting'])])
             for activity_type in activity_types:
                 if activity_type.name == 'Need to do':
                     # To do - send quotation
@@ -147,7 +147,7 @@ class CrmLead(models.Model):
                 ('active', '=', True),
                 ('write_date', '>=', (now - timedelta(days=30)))  # Get records not older than 30 days
             ]
-            records = self.env['crm.lead'].search(domain)
+            records = self.env['crm.lead'].sudo().search(domain)
             for record in records:
                 days_passed = (now - record.create_date).days
                 if days_passed in days_alert:
@@ -169,7 +169,7 @@ class CrmLead(models.Model):
                 ('type', '=', 'lead'),
                 ('write_date', '<', (now - timedelta(days=60)))  # Get records older than 60 days
             ]
-            records = self.env['crm.lead'].search(domain, limit=100)
+            records = self.env['crm.lead'].sudo().search(domain, limit=100)
             if records:
                 records.write({'active': False})
 

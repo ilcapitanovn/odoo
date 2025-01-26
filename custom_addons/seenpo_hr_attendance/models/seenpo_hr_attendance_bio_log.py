@@ -50,7 +50,7 @@ class SeenpoHrAttendanceBioLog(models.Model):
 
     @api.model
     def _update_hr_employee_id_by_upgrading(self):
-        employees = self.env["hr.employee"].search(
+        employees = self.env["hr.employee"].sudo().search(
             [
                 '&',
                 ("bio_user_id", "!=", False),
@@ -76,7 +76,7 @@ class SeenpoHrAttendanceBioLog(models.Model):
 
     @api.depends('is_permission_group_user')
     def _compute_is_permission_group_user(self):
-        res_user = self.env['res.users'].search([('id', '=', self._uid)])
+        res_user = self.env['res.users'].sudo().search([('id', '=', self._uid)])
         if res_user.has_group('seenpo_hr_attendance.group_seenpo_hr_attendance_user') \
                 and not res_user.has_group('seenpo_hr_attendance.group_seenpo_hr_attendance_manager'):
             self.is_permission_group_user = True
@@ -126,6 +126,52 @@ class SeenpoHrAttendanceBioLog(models.Model):
             rec.hr_employee_name = rec.hr_employee_name_related
             rec.active = rec.hr_employee_active
 
+    '''
+    This method will be used by the scheduled actions to sync missing previous attendances of a user.
+    '''
+    def manual_refresh_bio_attendance_log_by_month(self, date_specified=fields.Date.today()):
+        try:
+            print(f"Manual refresh bio attendance for month of date: {date_specified}")
+            today = date_specified
+            last_month_start = today + relativedelta(months=-1, day=1)
+            last_month_end = last_month_start + relativedelta(months=1, days=-1)
+            current_month_start = today.replace(day=1)
+            print(f"last_month_start = {last_month_start}")
+            print(f"last_month_end = {last_month_end}")
+            print(f"current_month_start = {current_month_start}")
+            print(f"current_month_end = {today}")
+            from_date = last_month_start
+            to_date = date_specified
+            add_day = datetime.timedelta(days=1)
+            while from_date <= to_date:
+                print(f"It's calling the [refresh_bio_attendance_log] of date: {from_date}")
+                result = self.refresh_bio_attendance_log(from_date)
+                if result:
+                    print('---SUCCESS---')
+                else:
+                    print('---FAILED---')
+                from_date += add_day
+
+            # from_date = (today + datetime.timedelta(days=1))  # .strftime('%Y-%m-%d')
+            # to_date = (today + datetime.timedelta(days=31))  # .strftime('%Y-%m-%d')
+            # addDay = datetime.timedelta(days=1)
+            # while from_date <= to_date:
+            #     log(from_date, level='info')
+            #     # model.refresh_bio_attendance_log(datetime.datetime.strptime("2024-03-30", "%Y-%m-%d"))
+            #     # action = model.refresh_bio_attendance_log(from_date)
+            #     action = True
+            #     if action:
+            #         log('SUCCESS', level='info')
+            #     else:
+            #         log('FAILED', level='info')
+            #     from_date += addDay
+        except requests.Timeout as e:
+            print("Exception Timeout - manual_refresh_bio_attendance_log_by_month: " + str(e))
+            return "There is timeout issue in bio log refreshing."
+        except Exception as e:
+            print("Exception general - manual_refresh_bio_attendance_log_by_month: " + str(e))
+            return "There are errors in bio log refreshing."
+
     def refresh_bio_attendance_log(self, date_specified=fields.Date.today()):
         try:
             print(f"Refresh bio attendance for date: {date_specified}")
@@ -154,7 +200,7 @@ class SeenpoHrAttendanceBioLog(models.Model):
                 ]
             )
 
-            employees = self.env["hr.employee"].search([("bio_user_id", "!=", False)])
+            employees = self.env["hr.employee"].sudo().search([("bio_user_id", "!=", False)])
 
             create_vals_list = []
 
@@ -356,7 +402,7 @@ class SeenpoHrAttendanceBioLog(models.Model):
     def _action_import_all_bio_log_from_local_files(self, csv_directory):
         try:
             BioLog = self.env['seenpo.hr.attendance.bio.log']
-            logs = BioLog.search([], limit=1)
+            logs = BioLog.sudo().search([], limit=1)
             if logs:
                 print("This action should be run at the first time bio log table just created and empty.")
                 return

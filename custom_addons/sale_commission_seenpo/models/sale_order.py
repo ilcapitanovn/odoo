@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
             #         if po.commission_total > 0:
             #             new_margin -= po.commission_total
             # else:
-            purchase_orders = self.env["purchase.order"].search([("origin", "=", order.name)])
+            purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", order.name)])
             if purchase_orders:
                 for po in purchase_orders:
                     if po.commission_total > 0:

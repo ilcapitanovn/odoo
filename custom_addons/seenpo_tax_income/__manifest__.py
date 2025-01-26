@@ -3,7 +3,7 @@
 
 {
     "name": "Define income taxes",
-    "version": "15.0.1.0.0",
+    "version": "15.0.1.0.1",
     "author": "Tuan Huynh, " "Odoo Community Association (OCA)",
     "category": "Accounting",
     "website": "https://github.com/OCA/taxes",

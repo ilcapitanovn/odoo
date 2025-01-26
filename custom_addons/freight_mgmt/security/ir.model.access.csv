@@ -54,3 +54,6 @@ access_freight_sale_order_line_agent,freight.sale.order.line.agent,model_sale_or
 access_freight_purchase_order_line_agent,freight.purchase.order.line.agent,model_purchase_order_line_agent,group_freight_user,1,0,0,0
 access_freight_form_wo_account_user,freight.form.wo.account.user,model_freight_form_wo,account.group_account_user,1,1,1,1
 access_freight_form_wo_line_account_user,freight.form.wo.line.account.user,model_freight_form_wo_line,account.group_account_user,1,1,1,1
+access_freight_hr_employee_manager,freight.hr.employee.manager,model_hr_employee,group_freight_manager,1,0,0,0
+access_freight_hr_employee_operation,freight.hr.employee.operation,model_hr_employee,group_freight_operation,1,0,0,0
+access_freight_hr_employee_user,freight.hr.employee.user,model_hr_employee,group_freight_user,1,0,0,0
