@@ -3,7 +3,7 @@
 
 {
     "name": "Việt Toản Attendances Bio History",
-    "version": "15.0.0.2.2",
+    "version": "15.0.0.2.3",
     "author": "Tuan Huynh, " "Odoo Community Association (OCA)",
     "category": 'Human Resources/Seenpo Attendances',
     "website": "https://github.com/OCA/",

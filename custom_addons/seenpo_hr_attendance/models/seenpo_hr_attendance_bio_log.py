@@ -92,7 +92,7 @@ class SeenpoHrAttendanceBioLog(models.Model):
     def _compute_is_check_in_late(self):
         accepted_check_in_time_late = '08:15:00'
         for rec in self:
-            rec.is_check_in_late = rec.first_in_time > accepted_check_in_time_late
+            rec.is_check_in_late = rec.first_in_time and rec.first_in_time > accepted_check_in_time_late
 
     @api.depends('is_check_in_late', 'reason')
     def _compute_reason_display(self):
