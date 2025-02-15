@@ -16,6 +16,10 @@ class HelpdeskTicket(models.Model):
     def _get_default_stage_id(self):
         return self.env["helpdesk.ticket.stage"].search([], limit=1).id
 
+    def _get_default_description(self):
+        description = self.env['ir.config_parameter'].sudo().get_param('helpdesk_mgmt.ticket_default_description', False)
+        return description
+
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         stage_ids = self.env["helpdesk.ticket.stage"].search([])
@@ -23,7 +27,7 @@ class HelpdeskTicket(models.Model):
 
     number = fields.Char(string="Ticket number", default="/", readonly=True, tracking=True)
     name = fields.Char(string="Title", required=True, tracking=True)
-    description = fields.Html(required=True, sanitize_style=True, default="Commodity: <br/>ETD: <br/>Volume per month: <br/>Service: (Direct/ Indirect): <br/>Competitors: <br/>Free time at origin: <br/>Free time at destination: <br/>Requested rates: <br/>Others:<br/>Explanation:")
+    description = fields.Html(required=True, sanitize_style=True, default=_get_default_description)
     user_id = fields.Many2one(
         comodel_name="res.users", string="Assigned user", tracking=True, index=True
     )

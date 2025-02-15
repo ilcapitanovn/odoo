@@ -8,6 +8,25 @@
         </record>
     </data>
     <data noupdate="1">
+        <record id="helpdesk_mgmt.ticket_default_description" model="ir.config_parameter">
+            <field name="key">helpdesk_mgmt.ticket_default_description</field>
+            <field name="value">
+                <![CDATA[
+                    Commodity: <br/>
+                    ETD: <br/>
+                    Volume per month: <br/>
+                    Service: (Direct/ Indirect): <br/>
+                    Competitors: <br/>
+                    Free time at origin: <br/>
+                    Free time at destination: <br/>
+                    Requested rates: <br/>
+                    Others:<br/>
+                    Explanation:<br/>
+                    <a href='https://www.sample1.com/' target='_blank'>Local charges &amp; Free time</a><br/>
+                    <a href='https://www.sample2.com/' target='_blank'>Sales Kit</a>
+                ]]>
+            </field>
+        </record>
         <!--Email template -->
         <record id="assignment_email_template" model="mail.template">
             <field name="name">Ticket Assignment</field>
