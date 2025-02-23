@@ -37,8 +37,8 @@
 <!--                    name="year"-->
 <!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
 <!--                />-->
-                <filter name="filter_date_order" date="date_order"/>
-                <filter name="filter_etd" date="etd"/>
+                <filter name="filter_date_order" date="date_order" default_period="this_year"/>
+                <filter name="filter_etd" date="etd" default_period="this_year"/>
                 <filter name="filter_invoice_date" date="invoice_date" default_period="this_year"/>
                 <separator />
                 <filter name="filter_order_closed" string="Paid" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
@@ -113,8 +113,7 @@
          <field name="model">sale.profit.forwarder.analysis.report</field>
          <field name="arch" type="xml">
              <graph string="Sale Analysis" stacked="1" type="bar" sample="1">
-                 <field name="etd" interval="month" type="row"/>
-                 <field name="margin" type="measure" operator="+"/>
+                 <field name="so_amount_untaxed_vnd" type="measure"/>
              </graph>
          </field>
     </record>
@@ -137,29 +136,29 @@
                 <field name="volumes" optional="hide"/>
                 <field name="display_pod" string="POL/D" />
                 <field name="etd" optional="show"/>
-                <field name="invoice_date" optional="show"/>
-                <field name="display_sale_name" string="Sale" optional="show"/>
-                <field name="order_type" string="F or N" optional="show"/>
-                <field name="po_amount_untaxed_vnd" optional="show"/>
-                <field name="po_amount_total_vnd" optional="show"/>
-                <field name="po_amount_tax_vnd" optional="show"/>
-                <field name="cost_no_vat" optional="show"/>
-                <field name="display_cus" string="CUS" optional="show"/>
-                <field name="so_commission_total" optional="show"/>
-                <field name="so_commission_total_vnd" optional="show"/>
-                <field name="display_line" string="LINE" optional="show"/>
-                <field name="po_commission_total" optional="show"/>
-                <field name="po_commission_total_vnd" optional="show"/>
-                <field name="so_amount_untaxed_vnd" optional="show"/>
-                <field name="so_amount_total_vnd" optional="show"/>
-                <field name="so_amount_tax_vnd" optional="show"/>
-                <field name="revenue_no_vat" optional="show"/>
-                <field name="profit_before_tax_no_vat" string="LN THUE (TT)" optional="show"/>
-                <field name="profit_before_tax_vat" string="LN THUC TE (TT)" optional="show"/>
-                <field name="vat_payable" string="VAT PHAI NOP" optional="show"/>
-                <field name="business_tax_amount" string="THUE TNDN" optional="show"/>
-                <field name="profit_after_tax_no_vat" string="LN THUE (ST)" optional="show"/>
-                <field name="profit_after_tax_vat" string="LN THUC TE (ST)" optional="show"/>
+                <field name="invoice_date" optional="hide"/>
+                <field name="display_sale_name" string="SALE" optional="show"/>
+                <field name="order_type" string="Freehand or Nominated" optional="show"/>
+                <field name="po_amount_untaxed_vnd" string="COST Input (No_VAT)" digits="[12,0]" optional="show"/>
+                <field name="po_amount_total_vnd" string="COST Input (With_VAT)" digits="[12,0]" optional="hide"/>
+                <field name="po_amount_tax_vnd" string="COST Input (VAT)" digits="[12,0]" optional="hide"/>
+                <field name="cost_no_vat" string="COST (No_Invoice)" digits="[12,0]" optional="hide"/>
+                <field name="display_cus" string="COST COM CUS (CUS)" optional="hide"/>
+                <field name="so_commission_total" string="COST COM CUS (USD)" optional="hide"/>
+                <field name="so_commission_total_vnd" string="COST COM CUS (VND)" digits="[12,0]" optional="hide"/>
+                <field name="display_line" string="COST COM LINE (LINE)" optional="hide"/>
+                <field name="po_commission_total" string="COST COM LINE (USD)" optional="hide"/>
+                <field name="po_commission_total_vnd" string="COST COM LINE (VND)" digits="[12,0]" optional="hide"/>
+                <field name="so_amount_untaxed_vnd" string="REVENUE Output (No_VAT)" digits="[12,0]" optional="show"/>
+                <field name="so_amount_total_vnd" string="REVENUE Output (With_VAT)" digits="[12,0]" optional="hide"/>
+                <field name="so_amount_tax_vnd" string="REVENUE Output (VAT)" digits="[12,0]" optional="hide"/>
+                <field name="revenue_no_vat" string="REVENUE (No_Invoice)" digits="[12,0]" optional="hide"/>
+                <field name="profit_before_tax_no_vat" string="PROFIT UNTAXED (No_VAT)" digits="[12,0]" optional="show"/>
+                <field name="profit_before_tax_vat" string="PROFIT UNTAXED (GROSS)" digits="[12,0]" optional="show"/>
+                <field name="vat_payable" string="VAT Payment" digits="[12,0]" optional="hide"/>
+                <field name="business_tax_amount" string="Income TAX)" digits="[12,0]" optional="hide"/>
+                <field name="profit_after_tax_no_vat" string="PROFIT TAXED (Excluded_VAT)" digits="[12,0]" optional="show"/>
+                <field name="profit_after_tax_vat" string="PROFIT TAXED (NET)" digits="[12,0]" optional="show"/>
 <!--                <field name="currency_id" invisible="1"/>-->
 <!--                <field name="state"-->
 <!--                       widget="badge"-->
@@ -201,7 +200,7 @@
         <field name="res_model">sale.profit.forwarder.analysis.report</field>
         <field name="view_mode">tree,graph</field>
         <field name="binding_view_types">list,graph</field>
-        <field name="context">{'search_default_filter_order_closed': 1, 'search_default_filter_invoice_date': 1, 'search_default_group_by_customer': 1}</field>
+        <field name="context">{'search_default_filter_etd': 1, 'search_default_group_by_customer': 1}</field>
         <field name="search_view_id" ref="view_sale_profit_forwarder_analysis_search" />
         <field name="view_id" ref="view_sale_profit_forwarder_analysis_view_list" />
         <field

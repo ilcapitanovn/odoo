@@ -28,20 +28,144 @@
 }
 .o_report_profits_tree [data-name="bill_no"] {
     text-align: center !important;
+    width: 130px !important;
+    max-width: 150px !important;
+}
+.o_report_profits_tree [data-name="display_pod"] {
+    text-align: center !important;
     width: 120px !important;
-    max-width: 120px !important;
+    max-width: 150px !important;
+}
+.o_report_profits_tree [data-name="etd"] {
+    text-align: center !important;
+    width: 90px !important;
+    max-width: 100px !important;
+}
+.o_report_profits_tree [data-name="invoice_date"] {
+    text-align: center !important;
+    width: 90px !important;
+    max-width: 100px !important;
 }
 .o_report_profits_tree [data-name="display_sale_name"] {
     width: 70px !important;
     max-width: 70px !important;
 }
+.o_report_profits_tree [data-name="order_type"] {
+    width: 80px !important;
+    max-width: 100px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="po_amount_untaxed_vnd"] {
+    width: 100px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="po_amount_total_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="po_amount_tax_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="cost_no_vat"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
 .o_report_profits_tree [data-name="display_cus"] {
     width: 70px !important;
     max-width: 70px !important;
 }
+.o_report_profits_tree [data-name="so_commission_total"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="so_commission_total_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
 .o_report_profits_tree [data-name="display_line"] {
     width: 70px !important;
     max-width: 70px !important;
+}
+.o_report_profits_tree [data-name="po_commission_total"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="po_commission_total_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="so_amount_untaxed_vnd"] {
+    width: 110px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="so_amount_total_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="so_amount_tax_vnd"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="revenue_no_vat"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="profit_before_tax_no_vat"] {
+    width: 100px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="profit_before_tax_vat"] {
+    width: 100px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="vat_payable"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="business_tax_amount"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="profit_after_tax_no_vat"] {
+    width: 100px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
+.o_report_profits_tree [data-name="profit_after_tax_vat"] {
+    width: 100px !important;
+    max-width: 150px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
 }
 .btn-view-incentive-detail {
     margin-left: 10px;

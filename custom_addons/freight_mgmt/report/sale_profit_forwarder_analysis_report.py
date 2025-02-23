@@ -37,7 +37,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     bill_no = fields.Char("BILL NO", readonly=True)
     volumes = fields.Char("CONT", readonly=True)
     etd = fields.Date("ETD", readonly=True)
-    order_type = fields.Char("Freehand <br/>or <br/>Nominated", readonly=True)
+    order_type = fields.Char("Freehand or Nominated", readonly=True)
     date_order = fields.Date("Date Order", readonly=True)
     order_number = fields.Char("Order", readonly=True)
 
@@ -48,42 +48,42 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     po_amount_total = fields.Float("Co VAT (I)", readonly=True)
     po_amount_tax = fields.Float("VAT (I)", readonly=True)
 
-    po_amount_untaxed_vnd = fields.Float("Chua VAT (I)", readonly=True)
-    po_amount_total_vnd = fields.Float("Co VAT (I)", readonly=True)
-    po_amount_tax_vnd = fields.Float("VAT (I)", readonly=True)
+    po_amount_untaxed_vnd = fields.Float("COST Input (No_VAT)", readonly=True)
+    po_amount_total_vnd = fields.Float("COST Input (With_VAT)", readonly=True)
+    po_amount_tax_vnd = fields.Float("COST Input (VAT)", readonly=True)
 
     so_amount_untaxed = fields.Float("Chua VAT (O)", readonly=True)
     so_amount_total = fields.Float("Co VAT (O)", readonly=True)
     so_amount_tax = fields.Float("VAT (O)", readonly=True)
 
-    so_amount_untaxed_vnd = fields.Float("Chua VAT (O)", readonly=True)
-    so_amount_total_vnd = fields.Float("Co VAT (O)", readonly=True)
-    so_amount_tax_vnd = fields.Float("VAT (O)", readonly=True)
+    so_amount_untaxed_vnd = fields.Float("REVENUE Output (No_VAT)", readonly=True)
+    so_amount_total_vnd = fields.Float("REVENUE Output (With_VAT)", readonly=True)
+    so_amount_tax_vnd = fields.Float("REVENUE Output (VAT)", readonly=True)
 
     po_exchange_rate = fields.Float("Ti Gia (I)", readonly=True)
     so_exchange_rate = fields.Float("Ti Gia (O)", readonly=True)
 
-    cost_no_vat = fields.Float("Chi phi (ko hd)", readonly=True)
-    revenue_no_vat = fields.Float("Doanh thu dv (ko hd)", readonly=True)
+    cost_no_vat = fields.Float("COST (No_Invoice)", readonly=True)
+    revenue_no_vat = fields.Float("REVENUE (No_Invoice)", readonly=True)
 
-    so_commission_total = fields.Float("USD (COM KH)", readonly=True)
-    so_commission_total_vnd = fields.Float(compute="_compute_so_commission_in_vnd", string="VND (COM KH)")
-    po_commission_total = fields.Float("USD (COM LINE)", readonly=True)
-    po_commission_total_vnd = fields.Float(compute="_compute_po_commission_in_vnd", string="VND (COM LINE)")
+    so_commission_total = fields.Float("COST COM CUS (USD)", readonly=True)
+    so_commission_total_vnd = fields.Float(compute="_compute_so_commission_in_vnd", string="COST COM CUS (VND)")
+    po_commission_total = fields.Float("COST COM LINE (USD)", readonly=True)
+    po_commission_total_vnd = fields.Float(compute="_compute_po_commission_in_vnd", string="COST COM LINE (VND)")
 
     margin = fields.Float("Margin", readonly=True)
 
-    profit_before_tax_no_vat = fields.Float(compute="_compute_profits", readonly=True)
-    profit_before_tax_vat = fields.Float(compute="_compute_profits", readonly=True)
-    vat_payable = fields.Float(compute="_compute_profits", readonly=True)
-    business_tax_amount = fields.Float(compute="_compute_profits", readonly=True)
-    profit_after_tax_no_vat = fields.Float(compute="_compute_profits", readonly=True)
-    profit_after_tax_vat = fields.Float(compute="_compute_profits", readonly=True)
+    profit_before_tax_no_vat = fields.Float(compute="_compute_profits", string="PROFIT UNTAXED (No_VAT)", readonly=True)
+    profit_before_tax_vat = fields.Float(compute="_compute_profits", string="PROFIT UNTAXED (GROSS)", readonly=True)
+    vat_payable = fields.Float(compute="_compute_profits", string="VAT Payment", readonly=True)
+    business_tax_amount = fields.Float(compute="_compute_profits", string="Income TAX)", readonly=True)
+    profit_after_tax_no_vat = fields.Float(compute="_compute_profits", string="PROFIT TAXED (Excluded_VAT)", readonly=True)
+    profit_after_tax_vat = fields.Float(compute="_compute_profits", string="PROFIT TAXED (NET)", readonly=True)
 
     display_pod = fields.Char(compute="_compute_display_pod", readonly=True)
     display_sale_name = fields.Char(compute="_compute_display_sale_name", readonly=True)
-    display_cus = fields.Char(compute="_compute_display_cus", readonly=True)
-    display_line = fields.Char(compute="_compute_display_line", readonly=True)
+    display_cus = fields.Char(compute="_compute_display_cus", string="COST COM CUS (CUS)", readonly=True)
+    display_line = fields.Char(compute="_compute_display_line", string="COST COM LINE (LINE)", readonly=True)
 
     # invoice_line_id = fields.Many2one(
     #     "account.move.line", "Invoice line", readonly=True

@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': "Freight Management",
-    'version': '15.0.5.3.2',
+    'version': '15.0.5.3.3',
     'summary': """Create Freight Management System""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',
