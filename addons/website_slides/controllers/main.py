@@ -768,8 +768,13 @@ class WebsiteSlides(WebsiteProfile):
         fetch_res = self._fetch_slide(slide_id)
         if fetch_res.get('error'):
             return fetch_res
+        # TODO: Fix issue cannot view in full screen because html content is empty
+        html_content = fetch_res['slide'].html_content
+        if not html_content:
+            html_content = fetch_res['slide'].description
+
         return {
-            'html_content': fetch_res['slide'].html_content
+            'html_content': html_content
         }
 
     @http.route('/slides/slide/<model("slide.slide"):slide>/set_completed', website=True, type="http", auth="user")
