@@ -19,8 +19,11 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
+import logging
 from odoo import models
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class IrHttp(models.AbstractModel):
@@ -40,7 +43,11 @@ class IrHttp(models.AbstractModel):
         u_sid = request.session.sid
         usm_session_id = request.session.get('usm_session_id')
         if usm_session_id:
-            request.env['user.session.login'].browse(usm_session_id).write({
-                'sid': u_sid
-            })
+            try:
+                request.env['user.session.login'].browse(usm_session_id).write({
+                    'sid': u_sid
+                })
+            except Exception as e:
+                # Ignore logging if transaction blocked error occurred
+                _logger.exception("user_session_management.ir_http._authenticate - Exception: %s" % e)
         return res
