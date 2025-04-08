@@ -26,7 +26,7 @@ class CrmLead(models.Model):
             assigned_user_id = salesperson.id if salesperson else created_user.id
             notes = 'Báo cáo kết quả:'
 
-            activity_types = self.env['mail.activity.type'].sudo().search([('name', 'in', ['Need to do', 'Call', 'Meeting'])])
+            activity_types = self.env['mail.activity.type'].sudo().with_context(lang='en_US').search([('name', 'in', ['Need to do', 'Call', 'Meeting'])])
             for activity_type in activity_types:
                 if activity_type.name == 'Need to do':
                     # To do - send quotation
