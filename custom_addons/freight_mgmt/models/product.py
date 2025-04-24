@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 from odoo.tools import float_round
+
+_logger = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
@@ -112,6 +116,87 @@ class ProductTemplate(models.Model):
         self.ensure_one()
         self.exchange_rate = self._get_default_exchange_rate()
 
+    @api.model
+    def action_automate_configure_mto_product(self):
+        try:
+            mto_route = self.env.ref('stock.route_warehouse0_mto', raise_if_not_found=False)
+            buy_route = self.env.ref('purchase_stock.route_warehouse0_buy', raise_if_not_found=False)
+
+            if not mto_route or not buy_route:
+                raise UserError("Buy route or MTO route not found. Ensure the stock module is installed.")
+
+            # Get the supplier (res.partner)
+            default_supplier = self.env['res.partner'].search([('name', '=', 'VIETTOAN')], limit=1)
+            if not default_supplier.exists():
+                raise UserError("Default supplier [VIETTOAN] not found.")
+
+            domain = [
+                ('detailed_type', '=', 'consu')
+            ]
+            products = self.env['product.template'].sudo().search(domain)
+            products_empty_routes = products.filtered(lambda p: not p.route_ids)
+            products_missing_routes = products.filtered(
+                lambda p: p.route_ids and (mto_route.id not in p.route_ids.ids or buy_route.id not in p.route_ids.ids)
+            )
+
+            count_empty_processed = 0
+            for pro in products_empty_routes:
+                if not pro.route_ids:
+                    # Assign Buy and MTO route
+                    obj = {'route_ids': [(4, buy_route.id), (4, mto_route.id)]}
+
+                    # Make sure at least one seller is assigned
+                    if not pro.seller_ids:
+                        supplier_info = {
+                            'name': default_supplier.id,
+                            'company_id': self.env.company.id,
+                            'product_tmpl_id': pro.id,
+                            'price': pro.standard_price,
+                            'min_qty': 0
+                        }
+                        obj['seller_ids'] = [(0, 0, supplier_info)]
+
+                    pro.write(obj)
+                    print(f"Empty Buy and MTO route assigned to product: {pro.name}")
+                    count_empty_processed += 1
+
+            count_missing_processed = 0
+            for pro in products_missing_routes:
+                obj = {}
+                if mto_route.id not in pro.route_ids.ids and buy_route.id not in pro.route_ids.ids:
+                    obj['route_ids'] = [(4, buy_route.id), (4, mto_route.id)]
+                    print(f"Both missing Buy and MTO route assigned to product: {pro.name}")
+                    count_empty_processed += 1
+                elif mto_route.id not in pro.route_ids.ids:
+                    obj['route_ids'] = [(4, mto_route.id)]
+                    print(f"Missing MTO route assigned to product: {pro.name}")
+                    count_missing_processed += 1
+                elif buy_route.id not in pro.route_ids.ids:
+                    obj['route_ids'] = [(4, buy_route.id)]
+                    print(f"Missing Buy route assigned to product: {pro.name}")
+                    count_missing_processed += 1
+
+                # Make sure at least one seller is assigned
+                if not pro.seller_ids:
+                    supplier_info = {
+                        'name': default_supplier.id,
+                        'company_id': self.env.company.id,
+                        'product_tmpl_id': pro.id,
+                        'price': pro.standard_price,
+                        'min_qty': 0
+                    }
+                    obj['seller_ids'] = [(0, 0, supplier_info)]
+
+                if obj:
+                    pro.write(obj)
+
+            print(f"action_automate_configure_mto_product - executed successful. "
+                  f"Empty products processed: {count_empty_processed}. "
+                  f"Missing products processed: {count_missing_processed}")
+
+        except Exception as e:
+            _logger.exception("action_automate_configure_mto_product - Exception: " + str(e))
+
 
 class ProductSupplierinfo(models.Model):
     _inherit = "product.supplierinfo"
@@ -141,5 +226,3 @@ class ProductSupplierinfo(models.Model):
 
 class ProductProduct(models.Model):
     _inherit = "product.product"
-
-
