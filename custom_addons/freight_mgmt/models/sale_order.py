@@ -405,6 +405,31 @@ class SaleOrder(models.Model):
             _logger.exception("action_automate_recalculate_margin - Exception: " + str(e))
 
     @api.model
+    def action_automate_fix_margin_description(self):
+        try:
+            domain = [
+                ('state', 'in', ['sale', 'done']),
+                ('margin_calculate_description', '=', MARGIN_BY_PRODUCT_COST)
+            ]
+            orders = self.env['sale.order'].sudo().search(domain, limit=500)
+            if orders:
+                order_names = list(map(lambda o: o.name, orders))
+                purchase_orders = self.env["purchase.order"].sudo().search([
+                    ("origin", "in", order_names),
+                    ("state", 'in', ('purchase', 'done'))
+                ])
+                if purchase_orders:
+                    order_names_have_po_confirmed = list(set(map(lambda o: o.origin, purchase_orders)))
+                    for so in orders:
+                        if so.name in order_names_have_po_confirmed:
+                            so._compute_margin()    # Call this method to include message_post
+
+            _logger.info("action_automate_fix_margin_description - executed successful.")
+
+        except Exception as e:
+            _logger.exception("action_automate_fix_margin_description - Exception: " + str(e))
+
+    @api.model
     def fields_view_get(self, view_id=None, view_type='tree', toolbar=False, submenu=False):
         res = super(SaleOrder, self).fields_view_get(
             view_id=view_id, view_type=view_type, toolbar=toolbar,

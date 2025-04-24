@@ -108,7 +108,7 @@ class PurchaseOrder(models.Model):
                 sale_order = self.env["sale.order"].sudo().search([("name", "=", rec.origin)])
                 if sale_order:
                     print("Automated execute the recompute_margin action of Sale Order - " + sale_order.name)
-                    sale_order.recompute_margin()
+                    sale_order.recompute_margin_button()
 
     def write(self, vals):
         current_state = self.state
