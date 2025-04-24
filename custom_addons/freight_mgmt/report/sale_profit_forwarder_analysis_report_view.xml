@@ -113,6 +113,13 @@
          <field name="model">sale.profit.forwarder.analysis.report</field>
          <field name="arch" type="xml">
              <graph string="Sale Analysis" stacked="1" type="bar" sample="1">
+                 <field name="po_amount_untaxed" type="measure" invisible="1"/>
+                 <field name="po_amount_total" type="measure" invisible="1"/>
+                 <field name="so_amount_untaxed" type="measure" invisible="1"/>
+                 <field name="so_amount_total" type="measure" invisible="1"/>
+                 <field name="po_exchange_rate" type="measure" invisible="1"/>
+                 <field name="so_exchange_rate" type="measure" invisible="1"/>
+                 <field name="profit_after_tax_vat" type="measure"/>
                  <field name="so_amount_untaxed_vnd" type="measure"/>
              </graph>
          </field>

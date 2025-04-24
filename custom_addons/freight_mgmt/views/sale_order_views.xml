@@ -21,22 +21,34 @@
                         </xpath>
                         <xpath expr="//button[@name='action_confirm']" position="after">
                             <button
-                                name="recompute_margin"
+                                name="recompute_margin_button"
                                 type="object"
                                 string="Recalculate Margin"
                                 states="draft,sent,sale"
                             />
+                        </xpath>
+                        <xpath expr="//tree//field[@name='purchase_price']" position="attributes">
+                            <attribute name="invisible">1</attribute>
+                        </xpath>
+                        <xpath expr="//tree//field[@name='qty_delivered']" position="after">
+                            <field name="purchase_price_custom" invisible="1"/>
+                            <field name="purchase_price_custom_display" readonly="True"
+                                   attrs="{'column_invisible': [('parent.state', 'not in', ('sale','done'))]}"/>
                         </xpath>
                         <xpath expr="//tree//field[@name='price_unit']" position="after">
                             <field name="price_tax_vnd" invisible="1" force_save="1" />
                             <field name="price_total_display" invisible="1" force_save="1" />
                             <field name="price_unit_input"
                                    attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
-                            <field name="order_line_currency_id" />
+                            <field name="order_line_currency_id"
+                                   attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
                         </xpath>
                         <xpath expr="//tree//field[@name='price_subtotal']" position="before">
                             <field name="price_subtotal_display" widget='monetary' force_save="1"
                                     options="{'currency_field': 'order_line_currency_id'}"/>
+                        </xpath>
+                        <xpath expr="//tree//field[@name='qty_delivered']" position="attributes">
+                            <attribute name="invisible">1</attribute>
                         </xpath>
                         <xpath expr="//tree//field[@name='price_unit']" position="attributes">
                             <attribute name="invisible">1</attribute>
@@ -48,11 +60,11 @@
                             <label for="exchange_rate" class="o_field_padding_top" />
                             <div class="o_row o_field_padding_top">
                                 <field name="exchange_rate" digits="[12,0]"
-                                       attrs="{'readonly': [('state', 'in', ('sale','done','cancel'))]}"
+                                       attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"
                                 />
                                 <button name="update_exchange_rate" type="object"
                                         string=" Refresh"
-                                        attrs="{'invisible': [('state', 'in', ('sale','done','cancel'))]}"
+                                        attrs="{'invisible': [('state', 'in', ('done','cancel'))]}"
                                         help="Recompute exchange rate"
                                         class="btn-link mb-1 px-0" icon="fa-refresh"
                                         confirm="This will update exchange and re-calculate total amount in VND." />
@@ -88,6 +100,12 @@
                                    attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
                             <field name="total_amount_vnd_summary" widget='monetary'
                                    attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+                        </xpath>
+                        <xpath expr="//label[@for='margin']" position="replace">
+                            <div class="text-nowrap">
+                                <field name="margin_calculate_description" nolabel="1" class="oe_inline o_sale_margin_description"/>
+                                <span class="oe_inline o_sale_margin_label">  Margin:</span>
+                            </div>
                         </xpath>
                 </field>
         </record>
@@ -280,7 +298,7 @@
                         <xpath expr="//button[@name='button_edit_agents']" position="attributes">
                                 <attribute name="attrs">{'invisible': 1}</attribute>
                         </xpath>
-                        <xpath expr="//button[@name='recompute_margin']" position="attributes">
+                        <xpath expr="//button[@name='recompute_margin_button']" position="attributes">
                                 <attribute name="invisible">1</attribute>
                         </xpath>
                         <xpath expr="//field[@name='order_type']" position="attributes">

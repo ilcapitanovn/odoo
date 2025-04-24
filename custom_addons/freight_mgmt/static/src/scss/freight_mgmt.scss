@@ -160,13 +160,22 @@
     word-break: normal;
     text-align: center !important;
 }
-.o_report_profits_tree [data-name="profit_after_tax_vat"] {
-    width: 100px !important;
-    max-width: 150px !important;
-    white-space: normal !important;
-    word-break: normal;
-    text-align: center !important;
+
+.o_report_incentive_tree [name="display_target_sales"] {
+    opacity: 0 !important;
 }
+.o_report_incentive_tree [name="display_achieve"] {
+    opacity: 0 !important;
+}
+
+.o_sale_margin_label {
+    font-weight: bold;
+}
+.o_sale_margin_description {
+    font-size: smaller;
+    color: gray;
+}
+
 .btn-view-incentive-detail {
     margin-left: 10px;
 }

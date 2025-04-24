@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
 from odoo import api, fields, models
 from odoo.tools import float_round
+
+_logger = logging.getLogger(__name__)
 
 
 class PurchaseOrder(models.Model):
@@ -106,3 +109,19 @@ class PurchaseOrder(models.Model):
                 if sale_order:
                     print("Automated execute the recompute_margin action of Sale Order - " + sale_order.name)
                     sale_order.recompute_margin()
+
+    def write(self, vals):
+        current_state = self.state
+        res = super(PurchaseOrder, self).write(vals)
+
+        try:
+            # If there is change in state, then doing margin calculation again
+            if vals.get("state"):
+                new_state = vals.get("state")
+                if current_state != new_state:
+                    self.recalculate_margin()
+                    _logger.info("freight_mgmt.purchase.write - Calling recalculate margin in sales order")
+        except Exception as e:
+            _logger.exception("freight_mgmt.purchase.write - Exception: %s" % e)
+
+        return res

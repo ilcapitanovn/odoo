@@ -224,17 +224,17 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
             CASE WHEN po.amount_total - po.amount_untaxed IS NULL THEN 0 ELSE po.amount_total - po.amount_untaxed END AS po_amount_tax,
 
-            CASE WHEN po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE po.amount_untaxed * fcn.exchange_rate END AS po_amount_untaxed_vnd,
-			CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END AS po_amount_total_vnd,
-            CASE WHEN fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate END AS po_amount_tax_vnd,
+            ROUND((CASE WHEN po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE po.amount_untaxed * fcn.exchange_rate END)::numeric, 2)::numeric AS po_amount_untaxed_vnd,
+			ROUND((CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END)::numeric, 2)::numeric AS po_amount_total_vnd,
+            ROUND((CASE WHEN fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate END)::numeric, 2)::numeric AS po_amount_tax_vnd,
             
             CASE WHEN so.amount_untaxed IS NULL THEN 0 ELSE so.amount_untaxed END AS so_amount_untaxed,
             CASE WHEN so.amount_total IS NULL THEN 0 ELSE so.amount_total END AS so_amount_total,
             CASE WHEN so.amount_total - so.amount_untaxed IS NULL THEN 0 ELSE so.amount_total - so.amount_untaxed END AS so_amount_tax,
             
-            CASE WHEN so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE so.amount_untaxed * fdn.exchange_rate END AS so_amount_untaxed_vnd,
-			CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END AS so_amount_total_vnd,
-            CASE WHEN fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate END AS so_amount_tax_vnd,
+            ROUND((CASE WHEN so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE so.amount_untaxed * fdn.exchange_rate END)::numeric, 2)::numeric AS so_amount_untaxed_vnd,
+			ROUND((CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END)::numeric, 2)::numeric AS so_amount_total_vnd,
+            ROUND((CASE WHEN fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate END)::numeric, 2)::numeric AS so_amount_tax_vnd,
 			
 			CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
 			CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,
@@ -267,7 +267,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     def _where(self):
         where_str = """
             WHERE
-                so.state in ('sale', 'done')
+                so.state in ('sale', 'done') AND po.state in ('purchase', 'done')
         """
         return where_str
 

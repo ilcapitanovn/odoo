@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
 from odoo import api, models, _
 from datetime import datetime, timedelta
+
+_logger = logging.getLogger(__name__)
 
 
 class CrmLead(models.Model):
@@ -154,7 +157,7 @@ class CrmLead(models.Model):
                     self._send_notifications(record, days_passed)
 
         except Exception as e:
-            print("action_send_lead_creation_notification - Exception: " + str(e))
+            _logger.exception("action_send_lead_creation_notification - Exception: %s" % e)
 
     @api.model
     def action_auto_mark_lost_and_archive_leads(self):

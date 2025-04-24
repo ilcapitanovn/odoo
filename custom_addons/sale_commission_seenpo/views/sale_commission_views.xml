@@ -36,4 +36,28 @@
         groups="sales_team.group_sale_salesman"
         sequence="4"
     />
+    <menuitem
+        id="sale_commission.menu_agent_form"
+        parent="sale_commission.menu_sale_commissions_management"
+        action="sale_commission.action_agent_form"
+        groups="sales_team.group_sale_manager"
+    />
+    <menuitem
+        id="sale_commission.menu_settle_commissions"
+        parent="sale_commission.menu_sale_commissions_management"
+        action="sale_commission.action_settle_commission"
+        groups="base.group_no_one"
+    />
+    <menuitem
+        id="sale_commission.menu_agents_settlement"
+        parent="sale_commission.menu_sale_commissions_management"
+        action="sale_commission.action_agents_settlement"
+        groups="base.group_no_one"
+    />
+    <menuitem
+        id="sale_commission.menu_commission_make_invoices"
+        parent="sale_commission.menu_sale_commissions_management"
+        action="sale_commission.action_commission_make_invoices"
+        groups="base.group_no_one"
+    />
 </odoo>

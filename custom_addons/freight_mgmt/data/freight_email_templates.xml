@@ -57,6 +57,18 @@
                 action = model.action_send_lead_creation_notification(record)
             </field>
         </record>
+        <record id="freight_scheduled_action_automate_fix_price_subtotal_display" model="ir.cron">
+            <field name="name">Sales: Automate Fix Price Subtotal Display Zero</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="state">code</field>
+            <field name="code">model.action_automate_fix_price_subtotal_display_zero()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 19:25:00')" />
+            <field name="active">True</field>
+        </record>
         <record id="freight_scheduled_action_automate_recalculate_margin" model="ir.cron">
             <field name="name">Sales: Automate Recalculate Margin</field>
             <field name="model_id" ref="sale.model_sale_order"/>

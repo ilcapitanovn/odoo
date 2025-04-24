@@ -16,15 +16,12 @@ class SaleOrder(models.Model):
             '''
             Deduce commission total from Purchase Order if any
             '''
-            # purchase_orders = order._get_purchase_orders()
-            # if purchase_orders:
-            #     for po in purchase_orders:
-            #         if po.commission_total > 0:
-            #             new_margin -= po.commission_total
-            # else:
             purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", order.name)])
             if purchase_orders:
                 for po in purchase_orders:
+                    if po.state not in ('purchase', 'done'):
+                        continue
+
                     if po.commission_total > 0:
                         new_margin -= po.commission_total
             if 'profit_sharing_percentage' in order and order.profit_sharing_percentage > 0:

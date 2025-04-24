@@ -154,6 +154,7 @@
                     <field
                         name="stage_id"
                         widget="statusbar"
+                        groups="freight_mgmt.group_freight_operation"
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />
                 </header>

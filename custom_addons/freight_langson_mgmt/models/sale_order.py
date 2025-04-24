@@ -155,7 +155,7 @@ class FreightLangSonSaleOrder(models.Model):
             so.saigon_margin_percent = 0
             if related_purchase_orders:
                 for po in related_purchase_orders:
-                    if po.state == 'cancel':
+                    if po.state not in ('purchase', 'done'):
                         continue
 
                     po_total_amount_untaxed_vnd += po.saigon_amount_untaxed_vnd_summary

@@ -13,7 +13,7 @@
                     name="recalculate_margin"
                     type="object"
                     string="Recalculate Margin"
-                    states="draft,sent,purchase"
+                    states="purchase"
                 />
             </xpath>
             <xpath expr="//field[@name='currency_id']" position="attributes">

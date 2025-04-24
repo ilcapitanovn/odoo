@@ -13,15 +13,15 @@ class SaleIncentiveAnalysisReport(models.Model):
     _auto = False
     _rec_name = "user_id"
 
-    def _get_default_currency(self):
-        cur_id = self.env.context.get('wizard_currency_id')
-        return cur_id
+    # def _get_default_currency(self):
+    #     cur_id = self.env.context.get('wizard_currency_id')
+    #     return cur_id
 
-    @api.model
-    def _get_selection_invoice_state(self):
-        return self.env["account.move"].fields_get(allfields=["state"])["state"][
-            "selection"
-        ]
+    # @api.model
+    # def _get_selection_invoice_state(self):
+    #     return self.env["account.move"].fields_get(allfields=["state"])["state"][
+    #         "selection"
+    #     ]
 
     user_id = fields.Many2one("res.users", "User", readonly=True)
     company_id = fields.Many2one("res.company", "Company", readonly=True)
@@ -31,8 +31,13 @@ class SaleIncentiveAnalysisReport(models.Model):
     tax_income_id = fields.Many2one("account.tax.income", "Tax Income", readonly=True)
     # tax_income_section_id = fields.Many2one("account.tax.income.section", "Tax Income Section", readonly=True)
 
-    # date_invoice = fields.Date("Date Invoice", readonly=True)
-    #display_name = fields.Char("Name", readonly=True)
+    bill_no = fields.Char("BILL NO", readonly=True)
+    pod_id = fields.Many2one("freight.catalog.port", "POL/D", readonly=True)
+    date_order = fields.Date("Order Date", readonly=True)
+    etd = fields.Date("ETD", readonly=True)
+    invoice_date = fields.Date("Invoice Date", readonly=True)
+    payment_state = fields.Char("Payment Status", readonly=True)
+
     incentive_name = fields.Char("Incentive Type", readonly=True)
     target_sales = fields.Float("Target Sales", readonly=True)
 
@@ -41,40 +46,73 @@ class SaleIncentiveAnalysisReport(models.Model):
     sum_activities = fields.Float("Sales Activities", readonly=True)
     sum_all = fields.Float("Total", readonly=True)
 
+    display_pod = fields.Char(compute="_compute_display_pod", readonly=True)
     display_target_sales = fields.Float(compute="_compute_display_target_sales", string="Target Sales", readonly=True)
-    display_sum_freehand = fields.Float(compute="_compute_incentive_and_tax", string="Freehand", readonly=True)
-    display_sum_nominated = fields.Float(compute="_compute_incentive_and_tax", string="Nominated", readonly=True)
-    display_sum_activities = fields.Float(compute="_compute_incentive_and_tax", string="Sales Activities", readonly=True)
-    display_sum_all = fields.Float(compute="_compute_incentive_and_tax", string="Total", readonly=True)
 
     incentive = fields.Float(compute="_compute_incentive_and_tax", readonly=True)
     incentive_tax_amount = fields.Float(compute="_compute_incentive_and_tax", readonly=True)
     incentive_after_tax = fields.Float(compute="_compute_incentive_and_tax", readonly=True)
 
-    # currency_id = fields.Many2one('res.currency', default=_get_default_currency, readonly=True)
+    display_achieve = fields.Integer(compute="_compute_display_achieve", string="Achieve", readonly=True)
 
-    # invoice_line_id = fields.Many2one(
-    #     "account.move.line", "Invoice line", readonly=True
-    # )
-    # commission_id = fields.Many2one("sale.commission", "Sale commission", readonly=True)
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        '''
+        Calculate to display total if using group by
+        '''
+        exchange_rate = 22000
+        res = super(SaleIncentiveAnalysisReport, self).read_group(domain, fields, groupby, offset=offset,
+                                                                  limit=limit, orderby=orderby, lazy=lazy)
 
-    # def _compute_currency(self):
-    #     usd = self.env['res.currency'].search([('name', '=', 'USD')])
-    #     return usd.id
+        fields_to_calculate_total = [
+            'display_target_sales',
+            'sum_freehand',
+            'sum_nominated',
+            'sum_all',
+            'incentive',
+            'incentive_tax_amount',
+            'incentive_after_tax',
+            'display_achieve'
+        ]
+        for field in fields_to_calculate_total:
+            if field in fields:
+                for line in res:
+                    if '__domain' in line:
+                        lines = self.search(line['__domain'])
+                        total = 0.0
+                        for record in lines:
+                            if field == 'display_target_sales':
+                                total = record['target_sales'] * exchange_rate
+                                break
+                            elif field == 'display_achieve':
+                                break
+                            else:
+                                total += record[field]
+                        line[field] = total
+
+                        if field == 'display_achieve':
+                            sum_all = line['sum_all']
+                            target = line['display_target_sales']
+                            val = 1 if sum_all > target * 0.5 else 0
+                            line[field] = val
+
+        return res
+
+    @api.depends('pod_id')
+    def _compute_display_pod(self):
+        for record in self:
+            display_pod = record.pod_id.name if record.pod_id else ''
+            record.display_pod = " ".join(display_pod.split()[:3])    # get first two words
+
+    @api.depends('target_sales', 'sum_all')
+    def _compute_display_achieve(self):
+        for record in self:
+            record.display_achieve = 0  # Khong dat
 
     @api.depends('target_sales')
     def _compute_display_target_sales(self):
-        cur = self.env.context.get('wizard_currency')
-        rate = self.env.context.get('wizard_exchange_rate')
-
         for rec in self:
-            if cur == 'VND':
-                if rate > 0:
-                    rec.display_target_sales = float_round(rec.target_sales * rate, precision_digits=0)
-                else:
-                    rec.display_target_sales = rec.target_sales
-            else:
-                rec.display_target_sales = rec.target_sales
+            rec.display_target_sales = 0
 
     @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all', 'target_sales')
     def _compute_incentive_and_tax(self):
@@ -83,15 +121,18 @@ class SaleIncentiveAnalysisReport(models.Model):
         # if cur != 'VND' or rate <= 0:
         #     rate = 1
         rate = 1    # VND
+        exchange_rate_vnd = 22000
 
         for rec in self:
             incentive = 0.0
             tax_amount = 0.0
 
+            target_sales_vnd = rec.target_sales * exchange_rate_vnd
+
             if rec.incentive_id and rec.incentive_id.section_ids:
                 for sec in rec.incentive_id.section_ids:
-                    amount_from = sec.percent_from * rec.display_target_sales / 100
-                    amount_to = sec.percent_to * rec.display_target_sales / 100
+                    amount_from = sec.percent_from * target_sales_vnd / 100
+                    amount_to = sec.percent_to * target_sales_vnd / 100
                     if amount_from <= rec.sum_all and rec.sum_all < amount_to:
                         incentive = (sec.incentive_percent_month / 100) * \
                                     ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
@@ -115,10 +156,10 @@ class SaleIncentiveAnalysisReport(models.Model):
                         tax_amount = incentive_tmp * rec.tax_income_id.fix_percent / 100
 
             """ Assign returned data """
-            rec.display_sum_freehand = rec.sum_freehand * rate
-            rec.display_sum_nominated = rec.sum_nominated * rate
-            rec.display_sum_activities = rec.sum_activities * rate
-            rec.display_sum_all = rec.sum_all * rate
+            # rec.display_sum_freehand = rec.sum_freehand * rate
+            # rec.display_sum_nominated = rec.sum_nominated * rate
+            # rec.display_sum_activities = rec.sum_activities * rate
+            # rec.display_sum_all = rec.sum_all * rate
             rec.incentive = incentive * rate
             rec.incentive_tax_amount = float_round(tax_amount * rate, precision_digits=0)
             rec.incentive_after_tax = rec.incentive - rec.incentive_tax_amount
@@ -146,7 +187,8 @@ class SaleIncentiveAnalysisReport(models.Model):
                 context['search_default_filter_freehand'] = 1
 
         domain = [('user_id', '=', user_id),
-                  ('invoice_date', '>=', wizard_date_from), ('invoice_date', '<=', wizard_date_to)]
+                  #('invoice_date', '>=', wizard_date_from), ('invoice_date', '<=', wizard_date_to)
+                  ]
 
         profit_tree = self.env.ref('freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree', False)
         view_id_tree = self.env['ir.ui.view'].sudo().search([('name', '=', "freight.view.profit.forwarder.detail.by.incentive.tree")])
@@ -267,35 +309,6 @@ class SaleIncentiveAnalysisReport(models.Model):
 
         return select_str
 
-    # def _select(self):
-    #     select_str = """
-    #         SELECT DISTINCT
-    #             u.id AS id
-    #             , u.id AS user_id
-    #             , u.company_id AS company_id
-    #             , u.partner_id AS partner_id
-    #             , si.id AS incentive_id
-    #             , ati.id AS tax_income_id
-    #
-    #             , si.name AS incentive_name
-    #             , p.target_sales AS target_sales
-    #
-    #             , CASE WHEN order_type = 'freehand' THEN margin ELSE 0 END as sum_freehand
-    #             , CASE WHEN order_type = 'nominated' THEN margin ELSE 0 END as sum_nominated
-    #             , 0 as sum_activities
-    #         FROM sale_profit_forwarder_analysis_report tblView
-    #         INNER JOIN res_users u ON tblView.user_id = u.id
-    #         INNER JOIN res_partner p ON u.partner_id = p.id
-    #         LEFT JOIN sale_incentive si ON p.incentive_id = si.id
-    #         LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
-    #         LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
-    #         LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
-    #     """
-    #
-    #     # GROUP BY u.login, si.name, p.target_sales, sum_freehand, sum_nominated, sum_activities, sum_all
-    #
-    #     return select_str
-
     def _from(self):
         from_str = """
             freight_billing fbl
@@ -310,31 +323,94 @@ class SaleIncentiveAnalysisReport(models.Model):
         """
         return from_str
 
-    # def _group_by(self):
-    #     group_by_str = """
-    #         GROUP BY ai.partner_id,
-    #         ai.state,
-    #         ai.date,
-    #         ail.company_id,
-    #         rp.id,
-    #         pt.categ_id,
-    #         ail.product_id,
-    #         pt.uom_id,
-    #         ail.id,
-    #         aila.settled,
-    #         aila.commission_id
-    #     """
-    #     return group_by_str
+    @staticmethod
+    def _select_v2():
+        '''
+        New incentive policy is available since 01 June 2023.
+         Updates to make it more similar excel file from accounting
+        '''
+        select_str = """
+            SELECT DISTINCT
+                tblSum.id AS id,
+                u.id AS user_id,
+                u.company_id AS company_id,
+                u.partner_id AS partner_id,
+                si.id AS incentive_id,
+                ati.id AS tax_income_id,
+                
+                si.name AS incentive_name,
+                p.target_sales AS target_sales,
+
+                tblSum.bill_no AS bill_no,
+                tblSum.pod_id AS pod_id,
+                tblSum.date_order AS date_order,
+                tblSum.etd AS etd,
+                tblSum.invoice_date AS invoice_date,
+                tblSum.payment_state AS payment_state,
+
+                sum_freehand,
+                sum_nominated,
+                sum_activities,
+                sum_freehand + sum_nominated + sum_activities AS sum_all
+        """
+
+        return select_str
+
+    @staticmethod
+    def _subquery_profit_forwarder_report():
+        subquery_str = """
+            SELECT id
+                , user_id
+                , bill_no
+                , pod_id
+                , date_order
+                , etd
+                , invoice_date
+                , payment_state
+                , CASE WHEN order_type = 'freehand' THEN 
+                        ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                        - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                        - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                        ELSE 0 END as sum_freehand
+                , CASE WHEN order_type = 'nominated' THEN 
+                        ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+                        - (so_amount_tax_vnd - po_amount_tax_vnd) 
+                        - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
+                        ELSE 0 END as sum_nominated
+                , 0 as sum_activities
+            FROM sale_profit_forwarder_analysis_report
+        """
+
+        return subquery_str
+
+    def _from_v2(self):
+        from_str = f"""
+            ({self._subquery_profit_forwarder_report()}) tblSum
+            INNER JOIN res_users u ON tblSum.user_id = u.id
+            INNER JOIN res_partner p ON u.partner_id = p.id
+            LEFT JOIN sale_incentive si ON p.incentive_id = si.id
+            LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
+            LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
+            LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
+        """
+        return from_str
+
+    def _where_v2(self):
+        where_str = """
+            WHERE si.target_freehand * sum_freehand + si.target_nominated * sum_nominated + si.target_activities * sum_activities > 0
+        """
+        return where_str
 
     @api.model
     def init(self):
         tools.drop_view_if_exists(self._cr, self._table)
         self._cr.execute(
-            "CREATE or REPLACE VIEW %s AS ( %s )",
+            "CREATE or REPLACE VIEW %s AS ( %s FROM ( %s ) )",
             (
                 AsIs(self._table),
-                AsIs(self._select()),
-                # AsIs(self._from()),
+                AsIs(self._select_v2()),
+                AsIs(self._from_v2()),
+                # AsIs(self._where_v2()),
                 # AsIs(self._group_by()),
             ),
         )

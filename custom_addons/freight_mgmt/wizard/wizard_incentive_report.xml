@@ -44,11 +44,12 @@
         <field name="context">{'no_breadcrumbs': True}</field>
         <field name="binding_model_id" ref="model_sale_incentive_analysis_report_wizard" />
     </record>
-    <menuitem
-        action="action_sale_incentive_analysis_wizard"
-        name="Sales Incentive"
-        id="menu_sale_incentive_analysis_wizard"
-        parent="sale_commission.menu_sale_commissions_management"
-        sequence="16"
-    />
+    <!-- TODO: This wizard is deprecated - consider delete it -->
+<!--    <menuitem-->
+<!--        action="action_sale_incentive_analysis_wizard"-->
+<!--        name="Sales Incentive"-->
+<!--        id="menu_sale_incentive_analysis_wizard"-->
+<!--        parent="sale_commission.menu_sale_commissions_management"-->
+<!--        sequence="16"-->
+<!--    />-->
 </odoo>

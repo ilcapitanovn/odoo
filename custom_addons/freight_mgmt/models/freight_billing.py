@@ -450,10 +450,7 @@ class FreightBilling(models.Model):
             action.update({
                 'name': _("Purchase Order generated from %s", self.order_id.name),
                 'domain': [('id', 'in', purchase_orders.ids)],
-                'view_type': 'list',
-                'view_mode': 'list,form',
-                'views': [(False, 'list'), (purchase_order_view_form.id, 'form')],
-                'view_id': purchase_order_view_form.id
+                'view_mode': 'tree,form'
             })
         return action
 

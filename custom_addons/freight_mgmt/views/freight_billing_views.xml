@@ -81,6 +81,7 @@
                     <field
                         name="state"
                         widget="statusbar"
+                        groups="freight_mgmt.group_freight_operation"
                         statusbar_visible="draft,posted,completed,cancel"
                         options="{'clickable': '1', 'fold_field': 'fold'}"
                     />

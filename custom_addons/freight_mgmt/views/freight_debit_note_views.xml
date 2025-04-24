@@ -12,6 +12,9 @@
                     name="my_debit_notes"
                     domain="[('user_id','=',uid)]"
                 />
+                <separator/>
+                <filter string="Paid" name="paid_debit_notes" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
+                <filter string="Not Paid" name="unpaid_debit_notes" domain="[('payment_state', 'not in', ('in_payment', 'paid'))]"/>
                 <separator />
                 <group expand="0" string="Group By">
                     <!--

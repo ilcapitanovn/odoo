@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
 import time
 from datetime import datetime, timedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round
+
+_logger = logging.getLogger(__name__)
+
+MARGIN_BY_PRODUCT_COST = "(by Product Cost)"
+MARGIN_BY_PURCHASE_COST = "(by Purchase Cost)"
 
 
 class SaleOrder(models.Model):
@@ -56,19 +62,39 @@ class SaleOrder(models.Model):
                                      currency_field='vnd_currency_id')
     amount_total_vnd = fields.Monetary(string='Total (VND)', store=True, compute='_amount_all_usd_vnd',
                                        currency_field='vnd_currency_id')
-    has_tax_totals_usd = fields.Boolean(compute='_amount_all_usd_vnd')
-    has_tax_totals_vnd = fields.Boolean(compute='_amount_all_usd_vnd')
+    has_tax_totals_usd = fields.Boolean(compute='_amount_all_usd_vnd', store=True)
+    has_tax_totals_vnd = fields.Boolean(compute='_amount_all_usd_vnd', store=True)
 
     vnd_currency_id = fields.Many2one('res.currency', 'Vietnamese Currency', compute="_compute_vnd_currency_id")
     total_amount_vnd_summary = fields.Monetary(string='Total Amount (VND)', store=True,
                                                currency_field='vnd_currency_id',
                                                compute='_compute_total_amount_vnd_summary')
 
+    margin_calculate_description = fields.Char(
+        string="", readonly=True, default=MARGIN_BY_PRODUCT_COST,
+        help="To indicate which cost is deducted - Product Cost or Purchase Cost. Product Cost is used to "
+             "calculate margin no confirmed Purchase Order linked to the Sale Order. Purchase Cost is used to "
+             "calculate margin if there is at least one Purchase Order linked to the Sale Order is confirmed.")
+
     booking_count = fields.Integer("Booking Count", compute='_compute_booking_count')
 
     def update_exchange_rate(self):
         self.ensure_one()
         self.exchange_rate = self._get_default_exchange_rate()
+
+    def update_prices(self):
+        '''
+        Calling super to update unit price when pricelist changed and user clicks the update prices button.
+        This action needs to update price_unit_input in each of order line to avoid inconsistent data.
+        '''
+        self.ensure_one()
+        res = super().update_prices()
+        for line in self.order_line:
+            if line.order_line_currency_id and line.order_line_currency_id.name == 'VND':
+                line.price_unit_input = line.price_unit * line.exchange_rate
+            else:
+                line.price_unit_input = line.price_unit
+        return res
 
     def _compute_vnd_currency_id(self):
         vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')], limit=1)
@@ -81,7 +107,7 @@ class SaleOrder(models.Model):
                 ('order_id', '=', order.id)
             ])
 
-    @api.depends('amount_total_usd', 'amount_total_vnd', 'exchange_rate')
+    @api.depends('amount_total_usd', 'amount_total_vnd')
     def _compute_total_amount_vnd_summary(self):
         for rec in self:
             rec.total_amount_vnd_summary = rec.amount_total_usd * rec.exchange_rate + rec.amount_total_vnd
@@ -117,45 +143,72 @@ class SaleOrder(models.Model):
                 'has_tax_totals_vnd': len(order_line_vnd_only) > 0,
             })
 
+    @api.depends('order_line.margin', 'amount_untaxed')
+    def _compute_margin(self):
+        # Logging message as OdooBot. Need to check self.id to avoid error when temporary request
+        # such as onchange or changes in order line but no saving yet.
+        if self.id:
+            self.message_post(author_id=self.env.ref('base.user_admin').id, body="Tính lại biên lợi nhuận")
+        self.recompute_margin()
+
+    def recompute_margin_button(self):
+        # Logging message as user clicked the button
+        if self.id:
+            self.message_post(body="Tính lại biên lợi nhuận")
+        self.recompute_margin()
+
     def recompute_margin(self):
         '''
         Deprecated: Update purchase price by the latest price unit from purchase order line if there is different
         so that recalculate profit will get the latest values
         Updated - 2023-11-03: recalculate margin of sale order based on total amount of SO and PO (if SO has related PO),
         skip margin of every line item because it doesn't map SO and PO lines in some cases.
+        Updated - 2025-04-19: Only count PO was confirmed
         '''
-        # related_purchase_orders = self._get_purchase_orders()
-        related_purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.name)])
-        if related_purchase_orders:
-            # for so_line in self.order_line:
-            #     for po in related_purchase_orders:
-            #         if po.state == 'cancel':
-            #             continue
-            #
-            #         for po_line in po.order_line:
-            #             if po_line.product_id and so_line.product_id and po_line.product_id.id == so_line.product_id.id \
-            #                     and po_line.price_unit != so_line.purchase_price:
-            #                 so_line.purchase_price = po_line.price_unit
+        _logger.info("freight_mgmt.sale_order.recompute_margin has been called.")
 
+        related_purchase_orders = self.env["purchase.order"].sudo().search([
+            ("origin", "=", self.name),
+            ("state", 'in', ('purchase', 'done'))
+        ])
+        if related_purchase_orders:
             # by USD currency only
+            # don't use price_unit of each PO line because some cases it doesn't match
             for so in self:
                 so_commission_total = so.commission_total if so.commission_total > 0 else 0.0
                 po_total_amount_untaxed = 0.0
                 for po in related_purchase_orders:
-                    if po.state == 'cancel':
-                        continue
-
                     po_total_amount_untaxed += po.amount_untaxed
                     if po.commission_total > 0:
                         po_total_amount_untaxed += po.commission_total
 
                 so.margin = so.amount_untaxed - so_commission_total - po_total_amount_untaxed
                 so.margin_percent = so.amount_untaxed and so.margin / so.amount_untaxed
+                so.margin_calculate_description = MARGIN_BY_PURCHASE_COST
+
+                # TODO: Re-update purchase_price_custom and price_subtotal_display if 0.0
+                try:
+                    for so_line in so.order_line:
+                        purchase_price = -99  # This value is defined as N/A
+                        for po in related_purchase_orders:
+                            for po_line in po.order_line:
+                                if po_line.sale_line_id and po_line.sale_line_id.id == so_line.id \
+                                        or po_line.product_id and so_line.product_id and po_line.product_id.id == so_line.product_id.id:
+                                    purchase_price = po_line.price_unit
+                        so_line.purchase_price_custom = purchase_price
+
+                        so_line._compute_amount_display()
+                except Exception as e:
+                    _logger.exception("sale_order.recompute_margin - Exception: %s" % e)
 
         else:   # lets it is calculated in parent method if a sale order doesn't have a related purchase order
             super(SaleOrder, self)._compute_margin()
+            for rec in self:
+                rec.margin_calculate_description = MARGIN_BY_PRODUCT_COST
 
-        self.message_post(body="Tính lại biên lợi nhuận")
+                # Update purchase_price_custom by purchase_price of product
+                for so_line in rec.order_line:
+                    so_line.purchase_price_custom = so_line.purchase_price
 
     def create_bookings(self):
         """
@@ -283,14 +336,11 @@ class SaleOrder(models.Model):
     def _onchange_profit_sharing_percentage(self):
         if self.order_type == 'nominated':
             if 0 <= self.profit_sharing_percentage <= 100:
-                super(SaleOrder, self)._compute_margin()
-                # new_margin = self.margin * (100 - self.profit_sharing_percentage) / 100
-                # self.margin = new_margin
-                # self.margin_percent = self.amount_untaxed and self.margin / self.amount_untaxed
+                self.recompute_margin()
             else:
                 raise ValidationError(_("The input value is invalid. The profit sharing percentage must be 0 to 100%."))
         else:
-            super(SaleOrder, self)._compute_margin()
+            self.recompute_margin()
 
     @api.model
     def default_get(self, fields_list):
@@ -347,12 +397,12 @@ class SaleOrder(models.Model):
                     if order.id in need_recalculate_order_ids:
                         print(f"Processing recalculate margin for order {order.name}")
                         order.recompute_margin()
-                        time.sleep(2)
+                        time.sleep(1)
 
-            print("action_automate_recalculate_margin - executed successful.")
+            _logger.info("action_automate_recalculate_margin - executed successful.")
 
         except Exception as e:
-            print("action_automate_recalculate_margin - Exception: " + str(e))
+            _logger.exception("action_automate_recalculate_margin - Exception: " + str(e))
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='tree', toolbar=False, submenu=False):
