@@ -163,7 +163,7 @@
                 <field name="profit_before_tax_no_vat" string="PROFIT UNTAXED (No_VAT)" digits="[12,0]" optional="show"/>
                 <field name="profit_before_tax_vat" string="PROFIT UNTAXED (GROSS)" digits="[12,0]" optional="show"/>
                 <field name="vat_payable" string="VAT Payment" digits="[12,0]" optional="hide"/>
-                <field name="business_tax_amount" string="Income TAX)" digits="[12,0]" optional="hide"/>
+                <field name="business_tax_amount" string="Income TAX" digits="[12,0]" optional="hide"/>
                 <field name="profit_after_tax_no_vat" string="PROFIT TAXED (Excluded_VAT)" digits="[12,0]" optional="show"/>
                 <field name="profit_after_tax_vat" string="PROFIT TAXED (NET)" digits="[12,0]" optional="show"/>
 <!--                <field name="currency_id" invisible="1"/>-->

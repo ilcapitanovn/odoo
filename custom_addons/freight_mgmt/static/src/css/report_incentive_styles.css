@@ -1,0 +1,124 @@
+* {
+    font-family: 'Times New Roman', Times, serif;
+}
+#quote_content {
+    background-color: white;
+    font-weight: 500;
+    font-family: minion-pro;
+}
+#company-logo {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 50px;
+}
+#header {
+    display: flex;
+    align-items: center;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 50px;
+    height: 80px;
+    max-height: 80px;
+}
+.header-logo {
+    float: left;
+    width: 25%;
+    text-align: right;
+    padding-right: 10px;
+}
+.header-text {
+    float: right;
+    width: 75%;
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 10px;
+    padding-top: 25px;
+}
+.company-logo {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+.no-spacing {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.borderless {
+    border: 0px !important;
+}
+#introduction {
+    text-align: center;
+    font-weight: 800;
+}
+#incentive-table {
+    margin-top: 10px;
+    border-width: 5px;
+}
+#incentive-table th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    background-color: #92CDDC;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+#incentive-table td {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+    font-size: 12px;
+    margin: 0 !important;
+    border: 1px solid black;
+    vertical-align: middle;
+}
+#incentive-table .stt {
+    text-align: center;
+}
+#incentive-table .etd {
+    text-align: center;
+}
+#incentive-table .monetary {
+    text-align: right;
+}
+#incentive-table .o_incentive_name {
+    text-align: left;
+    text-transform: uppercase;
+    padding-left: 0.2rem !important;
+}
+#incentive-table .o_total_i_t {
+    text-align: right;
+    padding-right: 0.2rem !important;
+}
+#incentive-table .salesman_incentive {
+    background-color: #D8E4BC;
+    font-weight: 700;
+}
+#incentive-table .o_sum_blue {
+    text-align: right;
+    color: #0177BE;
+}
+#incentive-table .o_sum_black {
+    text-align: right;
+}
+#incentive-table .o_sum_red {
+    text-align: right;
+    color: #C00005;
+}
+#incentive-table .total {
+    padding-right: 0.2rem !important;
+    font-weight: 700;
+    color: #203764;
+}
+#sign-table .sign_content {
+    font-size: 12px;
+    text-align: center;
+    border: 0;
+    font-weight: 700;
+}

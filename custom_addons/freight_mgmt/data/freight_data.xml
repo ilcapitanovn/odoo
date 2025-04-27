@@ -8,6 +8,10 @@
         </record>
     </data>
     <data noupdate="1">
+        <record id="freight_default_usd_vnd_exchange_rate" model="ir.config_parameter">
+            <field name="key">freight_mgmt.default_usd_vnd_exchange_rate</field>
+            <field name="value">22000</field>
+        </record>
         <record id="res_partner_category_shipper_tag" model="res.partner.category">
             <field name="name">Shipper</field>
             <field name="color" eval="6"/>

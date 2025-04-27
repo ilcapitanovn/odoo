@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="freight_sale_incentive_report_template_action" model="ir.actions.report">
+        <field name="name">Sale Incentive Report</field>
+        <field name="model">sale.incentive.analysis.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">freight_mgmt.report_print_sale_incentive_template</field>
+        <field name="report_file">freight_mgmt.report_print_sale_incentive_template</field>
+        <field name="print_report_name">'Sale Incentive Report'</field>
+        <field name="binding_model_id" ref="model_sale_incentive_analysis_report"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_sale_incentive"/>
+    </record>
+
+    <template id="report_print_sale_incentive_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/freight_mgmt/static/src/css/report_incentive_styles.css"/>
+
+                <div id="quote_content" class="col-12 col-lg justify-content-end">
+                    <div id="header">
+                        <div class="header-logo">
+                            <img t-att-src="'freight_mgmt/static/img/logo.png'" class="company-logo" alt="Logo"/>
+                        </div>
+                        <div class="header-text">
+                            CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>
+                            684/28A Trần Hưng Đạo, Phường 2, Quận 5, TP.HCM <br/>
+                        </div>
+                    </div>
+
+                    <div id="introduction">
+                        <h4 class="my-0">
+                            BẢNG KÊ HOA HỒNG SALE VIỆT TOẢN - THÁNG <span t-esc="incentive_month"/>
+                        </h4>
+                    </div>
+                    <br/>
+
+                    <table class="table no-spacing" id="incentive-table">
+                        <tr>
+                            <th width="2%" rowspan="2">STT</th>
+                            <th width="22%" rowspan="2">TÊN</th>
+                            <th width="14%" rowspan="2">CHỈ TIÊU <br/> LỢI NHUẬN</th>
+                            <th width="8%" rowspan="2">ETD</th>
+                            <th width="24%" colspan="2">CÁC CHỈ TIÊU DOANH SỐ</th>
+                            <th width="10%" rowspan="2">TỔNG <br/>DOANH SỐ</th>
+                            <th width="10%" rowspan="2">HOA HỒNG</th>
+                            <th width="10%" rowspan="2">TÌNH TRẠNG</th>
+                        </tr>
+                        <tr>
+                            <th width="12%">Freehand</th>
+                            <th width="12%">Nominated</th>
+                        </tr>
+
+                        <t t-set="i" t-value="1"/>
+                        <t t-set="total" t-value="0"/>
+                        <t t-foreach="grouped_records" t-as="incentive">
+                            <t t-set="incentive_name" t-value="incentive['incentive_type']"/>
+                            <t t-set="total_incentive_type" t-value="incentive['total_incentive_type']"/>
+                            <tr>
+                                <th class="o_incentive_name" colspan="2"><span t-esc="incentive_name"/></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th class="o_total_i_t"><span t-esc="'{:,.0f}'.format(total_incentive_type).replace(',', '.')"/></th>
+                                <th></th>
+                            </tr>
+                            <t t-foreach="incentive['incentive_data']" t-as="salesman">
+                                <t t-set="sale_name" t-value="salesman['sale_name']"/>
+                                <t t-set="display_target_sales" t-value="salesman['display_target_sales']"/>
+                                <t t-set="sum_freehand_total" t-value="salesman['sum_freehand_total']"/>
+                                <t t-set="sum_nominated_total" t-value="salesman['sum_nominated_total']"/>
+                                <t t-set="sum_revenue_total" t-value="salesman['sum_revenue_total']"/>
+                                <t t-set="incentive_after_tax_total" t-value="salesman['incentive_after_tax_total']"/>
+                                <t t-set="achieve" t-value="salesman['achieve']"/>
+                                <tr class="salesman_incentive">
+                                    <td colspan="2"><span t-esc="sale_name"/></td>
+                                    <td class="o_sum_blue"><span t-esc="'{:,.0f}'.format(display_target_sales).replace(',', '.')"/></td>
+                                    <td></td>
+                                    <td class="o_sum_black"><span t-esc="'{:,.0f}'.format(sum_freehand_total).replace(',', '.')"/></td>
+                                    <td class="o_sum_black"><span t-esc="'{:,.0f}'.format(sum_nominated_total).replace(',', '.')"/></td>
+                                    <td class="o_sum_blue"><span t-esc="'{:,.0f}'.format(sum_revenue_total).replace(',', '.')"/></td>
+                                    <td class="o_sum_red"><span t-esc="'{:,.0f}'.format(incentive_after_tax_total).replace(',', '.')"/></td>
+                                    <t t-if="achieve">
+                                        <td class="text-center">Đạt</td>
+                                    </t>
+                                    <t t-else="">
+                                        <td class="text-center">Không Đạt</td>
+                                    </t>
+                                </tr>
+
+                                <t t-foreach="salesman['incentives']" t-as="line">
+                                    <t t-set="bill_no" t-value="line.bill_no"/>
+                                    <t t-set="display_pod" t-value="line.display_pod"/>
+                                    <t t-set="etd" t-value="line.etd"/>
+                                    <t t-set="sum_freehand" t-value="line.sum_freehand"/>
+                                    <t t-set="sum_nominated" t-value="line.sum_nominated"/>
+
+                                    <tr>
+                                        <td class="stt"><span t-esc="i"/></td>
+                                        <td><span t-esc="bill_no"/></td>
+                                        <td><span t-esc="display_pod"/></td>
+                                        <t t-if="etd">
+                                            <td class="etd"><span t-esc="etd.strftime('%d/%m/%Y')"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td></td>
+                                        </t>
+
+                                        <t t-if="sum_freehand != 0">
+                                            <td class="monetary"><span t-esc="'{:,.0f}'.format(sum_freehand).replace(',', '.')"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td></td>
+                                        </t>
+
+                                        <t t-if="sum_nominated != 0">
+                                            <td class="monetary"><span t-esc="'{:,.0f}'.format(sum_nominated).replace(',', '.')"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td></td>
+                                        </t>
+
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-set="i" t-value="i + 1"/>
+                                </t>
+
+                                <t t-set="total" t-value="total + incentive_after_tax_total"/>
+                            </t>
+                        </t>
+                        <tr>
+                            <th colspan="7" class="total">TỔNG CỘNG</th>
+                            <th class="total text-right"><span t-esc="'{:,.0f}'.format(total).replace(',', '.')"/></th>
+                            <th></th>
+                        </tr>
+                    </table>
+
+                    <br/><br/><br/>
+
+                    <table class="table no-spacing borderless" id="sign-table">
+                        <tr>
+                            <td width="50%" class="sign_content">Người duyệt</td>
+                            <td class="sign_content">Người nhận</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="borderless"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="borderless"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="borderless"></td>
+                        </tr>
+                        <tr>
+                            <td class="sign_content">Lê Quang Hữu Dụng</td>
+                            <td class="borderless"></td>
+                        </tr>
+                    </table>
+
+                </div>
+<!--                </t>-->
+            </div>
+        </t>
+    </template>
+</odoo>

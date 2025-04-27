@@ -76,7 +76,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     profit_before_tax_no_vat = fields.Float(compute="_compute_profits", string="PROFIT UNTAXED (No_VAT)", readonly=True)
     profit_before_tax_vat = fields.Float(compute="_compute_profits", string="PROFIT UNTAXED (GROSS)", readonly=True)
     vat_payable = fields.Float(compute="_compute_profits", string="VAT Payment", readonly=True)
-    business_tax_amount = fields.Float(compute="_compute_profits", string="Income TAX)", readonly=True)
+    business_tax_amount = fields.Float(compute="_compute_profits", string="Income TAX", readonly=True)
     profit_after_tax_no_vat = fields.Float(compute="_compute_profits", string="PROFIT TAXED (Excluded_VAT)", readonly=True)
     profit_after_tax_vat = fields.Float(compute="_compute_profits", string="PROFIT TAXED (NET)", readonly=True)
 
@@ -141,14 +141,14 @@ class SaleProfitForwarderAnalysisReport(models.Model):
         # usd = self.env['res.currency'].search([('name', '=', 'USD')])
         # vnd = self.env['res.currency'].search([('name', '=', 'VND')])
         # now = fields.Datetime.now()
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
         for record in self:
             # amount_vnd = usd._convert(record.so_commission_total, vnd, record.company_id, now)
             '''
-            Use default exchange at 22,000 VND based on accounting profit calculation file
-            TODO: may need to define in system parameter
+            Use default exchange in configuration based on accounting profit calculation file
             '''
-            amount_vnd = record.so_commission_total * 22000
+            amount_vnd = record.so_commission_total * exchange_rate
             record.so_commission_total_vnd = amount_vnd
 
     @api.depends('po_commission_total')
@@ -156,14 +156,14 @@ class SaleProfitForwarderAnalysisReport(models.Model):
         # usd = self.env['res.currency'].search([('name', '=', 'USD')])
         # vnd = self.env['res.currency'].search([('name', '=', 'VND')])
         # now = fields.Datetime.now()
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
         for record in self:
             # amount_vnd = usd._convert(record.po_commission_total, vnd, record.company_id, now)
             '''
-            Use default exchange at 22,000 VND based on accounting profit calculation file
-            TODO: may need to define in system parameter
+            Use default exchange in configuration based on accounting profit calculation file
             '''
-            amount_vnd = record.po_commission_total * 22000
+            amount_vnd = record.po_commission_total * exchange_rate
             record.po_commission_total_vnd = amount_vnd
 
     @api.model

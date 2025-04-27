@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-21 08:20+0000\n"
-"PO-Revision-Date: 2025-04-21 08:20+0000\n"
+"POT-Creation-Date: 2025-04-27 13:58+0000\n"
+"PO-Revision-Date: 2025-04-27 13:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -49,6 +49,11 @@ msgstr ""
 #: model:ir.actions.report,print_report_name:freight_mgmt.freight_form_wo_report
 msgid "'Form WO - %s' % (object.export_form_number or '').replace('/', '')"
 msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.report,print_report_name:freight_mgmt.freight_sale_incentive_report_template_action
+msgid "'Sale Incentive Report'"
+msgstr "'Báo Cáo Hoa Hồng Kinh Doanh'"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
@@ -147,6 +152,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
 msgid "<small><b class=\"text-muted\">Your advantage</b></small>"
 msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_sale_order_form_total_customize_inherited
+msgid "<span class=\"oe_inline o_sale_margin_label\">  Margin:</span>"
+msgstr "<span class=\"oe_inline o_sale_margin_label\">  Biên lợi nhuận:</span>"
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
@@ -1525,6 +1535,11 @@ msgid ""
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_achieve
+msgid "Achieve"
+msgstr "Tình trạng"
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__message_needaction
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__message_needaction
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__message_needaction
@@ -1734,6 +1749,7 @@ msgid "BENEFICIARY:"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__bill_no
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__bill_no
 msgid "BILL NO"
 msgstr ""
@@ -1944,9 +1960,19 @@ msgid "Buyer Identity Number"
 msgstr "CCCD Số"
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "BẢNG KÊ HOA HỒNG SALE VIỆT TOẢN - THÁNG"
+msgstr ""
+
+#. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
 msgid "CBM"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "CHỈ TIÊU <br/> LỢI NHUẬN"
 msgstr ""
 
 #. module: freight_mgmt
@@ -2016,53 +2042,63 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__cost_no_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST (No_Invoice)"
-msgstr ""
+msgstr "CHI_PHÍ ĐẦU_VÀO (ko_hđ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__display_cus
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM CUS (CUS)"
-msgstr ""
+msgstr "CHI_PHÍ COM_KH (CUS)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__so_commission_total
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM CUS (USD)"
-msgstr ""
+msgstr "CHI_PHÍ COM_KH (USD)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__so_commission_total_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM CUS (VND)"
-msgstr ""
+msgstr "CHI_PHÍ COM_KH (VND)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__display_line
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM LINE (LINE)"
-msgstr ""
+msgstr "CHI_PHÍ COM_LINE (LINE)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__po_commission_total
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM LINE (USD)"
-msgstr ""
+msgstr "CHI_PHÍ COM_LINE (USD)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__po_commission_total_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST COM LINE (VND)"
-msgstr ""
+msgstr "CHI_PHÍ COM_LINE (VND)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__po_amount_untaxed_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST Input (No_VAT)"
-msgstr "CHI PHÍ Đầu vào (Chưa_VAT)"
+msgstr "CHI_PHÍ ĐẦU_VÀO (Chưa_VAT)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__po_amount_tax_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST Input (VAT)"
-msgstr "CHI PHÍ ĐẦU VÀO (Có VAT)"
+msgstr "CHI_PHÍ ĐẦU_VÀO (VAT_Vào)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__po_amount_total_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "COST Input (With_VAT)"
-msgstr ""
+msgstr "CHI_PHÍ ĐẦU_VÀO (Có_VAT)"
 
 #. module: freight_mgmt
 #: model:mail.template,subject:freight_mgmt.freight_crm_lead_reminder_notification_template_10_days
@@ -2465,17 +2501,22 @@ msgid "Containers"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__purchase_price_custom_display
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_supplierinfo_tree_view_inherit
+msgid "Cost"
+msgstr "Chi phí"
+
+#. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_supplierinfo_tree_view_inherit
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_template_form_view_inherit
 msgid "Cost (USD)"
-msgstr ""
+msgstr "Chi phí (USD)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_product__standard_price_vnd
 #: model:ir.model.fields,field_description:freight_mgmt.field_product_template__standard_price_vnd
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_product_supplierinfo_tree_view_inherit
 msgid "Cost (VND)"
-msgstr ""
+msgstr "Chi phí (VND)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_catalog_airline__country_id
@@ -2673,6 +2714,18 @@ msgstr ""
 #: model:ir.model.fields,help:freight_mgmt.field_freight_credit_note__access_url
 #: model:ir.model.fields,help:freight_mgmt.field_freight_debit_note__access_url
 msgid "Customer Portal URL"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "CÁC CHỈ TIÊU DOANH SỐ"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid ""
+"CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>\n"
+"                            684/28A Trần Hưng Đạo, Phường 2, Quận 5, TP.HCM <br/>"
 msgstr ""
 
 #. module: freight_mgmt
@@ -2929,6 +2982,7 @@ msgid "Display Name"
 msgstr "Tên hiển thị"
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_pod
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__display_pod
 msgid "Display Pod"
 msgstr ""
@@ -2987,9 +3041,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__etd_formatted
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__etd
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__etd_formatted
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__etd
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__etd
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_debit_note_template
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "ETD"
 msgstr ""
@@ -3216,9 +3272,9 @@ msgid "Free Storage:"
 msgstr ""
 
 #. module: freight_mgmt
-#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_sum_freehand
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__sum_freehand
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__sale_order__order_type__freehand
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Freehand"
 msgstr ""
@@ -3446,6 +3502,11 @@ msgstr "Nhóm"
 #: model:freight.catalog.port,name:freight_mgmt.freight_catalog_port_1
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_bill_lading_template
 msgid "HO CHI MINH PORT, VIETNAM"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "HOA HỒNG"
 msgstr ""
 
 #. module: freight_mgmt
@@ -3681,8 +3742,9 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__business_tax_amount
-msgid "Income TAX)"
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
+msgid "Income TAX"
+msgstr "LỢI_NHUẬN SAU_THUẾ (Thuế_TNDN)"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.freight_catalog_incoterm_action
@@ -3694,7 +3756,7 @@ msgstr ""
 #: model:ir.model.fields,help:freight_mgmt.field_purchase_order_line__price_unit_input
 #: model:ir.model.fields,help:freight_mgmt.field_sale_order_line__price_unit_input
 msgid "Input either USD or VND based on selected currency."
-msgstr ""
+msgstr "Nhập USD hoặc VND dựa trên loại tiền tệ đã chọn."
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__invoice_partner_id
@@ -3711,6 +3773,7 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__invoice_date
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__invoice_date
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__invoice_date
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Invoice Date"
@@ -3808,6 +3871,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__kanban_state
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__kanban_state
 msgid "Kanban State"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "Không Đạt"
 msgstr ""
 
 #. module: freight_mgmt
@@ -3951,7 +4019,13 @@ msgstr "Cảng bốc hàng"
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_debit_note_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
 msgid "Logo"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "Lê Quang Hữu Dụng"
 msgstr ""
 
 #. module: freight_mgmt
@@ -3962,36 +4036,6 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
 msgid "LỆNH GIAO HÀNG"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN SAU_THUẾ (LN_THUẾ)"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN SAU_THUẾ (LN_THỰC_TẾ)"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN SAU_THUẾ (Thuế_TNDN)"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN SAU_THUẾ (VAT_phải_nộp)"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN TRƯỚC_THUẾ (LN_THUẾ)"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
-msgid "LỢI_NHUẬN TRƯỚC_THUẾ (LN_THỰC_TẾ)"
 msgstr ""
 
 #. module: freight_mgmt
@@ -4030,6 +4074,11 @@ msgstr "Người quản lý"
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__margin
 msgid "Margin"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__margin_calculate_description
+msgid "Margin Calculate Description"
 msgstr ""
 
 #. module: freight_mgmt
@@ -4088,6 +4137,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_booking_view_search
 msgid "My Bookings"
 msgstr "Bookings của tôi"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_search
+msgid "My Credit Notes"
+msgstr ""
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_search
@@ -4218,6 +4272,16 @@ msgid "Người bán"
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "Người duyệt"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "Người nhận"
+msgstr ""
+
+#. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
 msgid "Người nhận:"
 msgstr ""
@@ -4263,9 +4327,9 @@ msgid "No. of original B/Ls"
 msgstr ""
 
 #. module: freight_mgmt
-#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_sum_nominated
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__sum_nominated
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__sale_order__order_type__nominated
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Nominated"
 msgstr ""
@@ -4273,6 +4337,8 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_credit_note__payment_state__not_paid
 #: model:ir.model.fields.selection,name:freight_mgmt.selection__freight_debit_note__payment_state__not_paid
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_search
 msgid "Not Paid"
 msgstr ""
 
@@ -4419,6 +4485,11 @@ msgid "Order"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__date_order
+msgid "Order Date"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_booking__order_type
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__order_type
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree
@@ -4481,31 +4552,37 @@ msgid "POL"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__pod_id
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__pod_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_view_list
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "POL/D"
 msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__profit_after_tax_no_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "PROFIT TAXED (Excluded_VAT)"
-msgstr ""
+msgstr "LỢI_NHUẬN SAU_THUẾ (LN_THUẾ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__profit_after_tax_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "PROFIT TAXED (NET)"
-msgstr ""
+msgstr "LỢI_NHUẬN SAU_THUẾ (LN_THỰC_TẾ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__profit_before_tax_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "PROFIT UNTAXED (GROSS)"
-msgstr ""
+msgstr "LỢI_NHUẬN TRƯỚC_THUẾ (LN_THỰC_TẾ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__profit_before_tax_no_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "PROFIT UNTAXED (No_VAT)"
-msgstr ""
+msgstr "LỢI_NHUẬN TRƯỚC_THUẾ (LN_THUẾ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__package_types
@@ -4519,6 +4596,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_search
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_search
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_search
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Paid"
 msgstr ""
@@ -4583,6 +4661,7 @@ msgstr "Phải trả"
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note__payment_state
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note__payment_state
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__payment_state
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__payment_state
 msgid "Payment Status"
 msgstr ""
@@ -4746,8 +4825,14 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_view_list
 msgid "Print"
-msgstr ""
+msgstr "In"
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_freight_form_wo_form
+msgid "Print Form WO"
+msgstr "In tờ khai WO"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order__order_print_with_images
@@ -4779,6 +4864,13 @@ msgstr "Mẫu sản phẩm"
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__product_uom_readonly
 msgid "Product Uom Readonly"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.server,name:freight_mgmt.freight_scheduled_action_automate_configure_mto_product_ir_actions_server
+#: model:ir.cron,cron_name:freight_mgmt.freight_scheduled_action_automate_configure_mto_product
+#: model:ir.cron,name:freight_mgmt.freight_scheduled_action_automate_configure_mto_product
+msgid "Product: Automate Configure MTO Product - Run Manually"
 msgstr ""
 
 #. module: freight_mgmt
@@ -4919,23 +5011,27 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__revenue_no_vat
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "REVENUE (No_Invoice)"
-msgstr ""
+msgstr "DOANH_THU DỊCH_VỤ (ko_xuất_hđ)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__so_amount_untaxed_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "REVENUE Output (No_VAT)"
-msgstr "DOANH THU Đầu ra (Chưa_VAT)"
+msgstr "DOANH_THU ĐẦU_RA (Chưa_VAT)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__so_amount_tax_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "REVENUE Output (VAT)"
-msgstr "DOANH THU ĐẦU RA (Có VAT)"
+msgstr "DOANH_THU ĐẦU_RA (VAT_Ra)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__so_amount_total_vnd
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "REVENUE Output (With_VAT)"
-msgstr ""
+msgstr "DOANH_THU ĐẦU_RA (Có_VAT)"
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing__rated_as
@@ -5127,6 +5223,11 @@ msgid "SMS Delivery error"
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "STT"
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__sale_partner_id
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_billing_view_form
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
@@ -5146,6 +5247,16 @@ msgstr ""
 #. module: freight_mgmt
 #: model:ir.model,name:freight_mgmt.model_sale_incentive_analysis_report
 msgid "Sale Incentive Analysis Report"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.report,name:freight_mgmt.freight_sale_incentive_report_template_action
+msgid "Sale Incentive Report"
+msgstr "Báo Cáo Hoa Hồng Kinh Doanh"
+
+#. module: freight_mgmt
+#: model:ir.model,name:freight_mgmt.model_report_freight_mgmt_report_print_sale_incentive_template
+msgid "Sale Incentive Report With Grouping"
 msgstr ""
 
 #. module: freight_mgmt
@@ -5177,23 +5288,18 @@ msgid "Sale User"
 msgstr ""
 
 #. module: freight_mgmt
-#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_sum_activities
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__sum_activities
 msgid "Sales Activities"
 msgstr ""
 
 #. module: freight_mgmt
-#: model:ir.actions.act_window,name:freight_mgmt.action_sale_incentive_analysis_report
-#: model:ir.ui.menu,name:freight_mgmt.menu_sale_incentive_analysis_wizard
-msgid "Sales Incentive"
-msgstr ""
-
-#. module: freight_mgmt
 #: code:addons/freight_mgmt/wizard/wizard_incentive_report.py:0
+#: model:ir.actions.act_window,name:freight_mgmt.action_sale_incentive_analysis_report
+#: model:ir.ui.menu,name:freight_mgmt.menu_sale_incentive_analysis
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_incentive_analysis_search
 #, python-format
 msgid "Sales Incentive Report"
-msgstr ""
+msgstr "Báo Cáo Hoa Hồng Kinh Doanh"
 
 #. module: freight_mgmt
 #: model:ir.actions.act_window,name:freight_mgmt.action_sale_incentive_analysis_wizard
@@ -5224,6 +5330,20 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_search
 msgid "Sales Profit Forwarder Report"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.server,name:freight_mgmt.freight_scheduled_action_automate_fix_margin_description_ir_actions_server
+#: model:ir.cron,cron_name:freight_mgmt.freight_scheduled_action_automate_fix_margin_description
+#: model:ir.cron,name:freight_mgmt.freight_scheduled_action_automate_fix_margin_description
+msgid "Sales: Automate Fix Margin Description"
+msgstr ""
+
+#. module: freight_mgmt
+#: model:ir.actions.server,name:freight_mgmt.freight_scheduled_action_automate_fix_price_subtotal_display_ir_actions_server
+#: model:ir.cron,cron_name:freight_mgmt.freight_scheduled_action_automate_fix_price_subtotal_display
+#: model:ir.cron,name:freight_mgmt.freight_scheduled_action_automate_fix_price_subtotal_display
+msgid "Sales: Automate Fix Price Subtotal Display Zero"
 msgstr ""
 
 #. module: freight_mgmt
@@ -5763,6 +5883,14 @@ msgid ""
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.actions.act_window,help:freight_mgmt.action_sale_incentive_analysis_report
+msgid ""
+"This report performs analysis on sales incentive by ETD dates. You can check"
+" the incentive amount of salesperson based on bills have been posted. Use "
+"this report performs analysis on bills not being posted yet."
+msgstr ""
+
+#. module: freight_mgmt
 #: model:ir.model.fields,help:freight_mgmt.field_freight_catalog_stage__fold
 msgid ""
 "This stage is folded in the kanban view when there are no records in that "
@@ -5826,6 +5954,15 @@ msgid "To Booking"
 msgstr ""
 
 #. module: freight_mgmt
+#: model:ir.model.fields,help:freight_mgmt.field_sale_order__margin_calculate_description
+msgid ""
+"To indicate which cost is deducted - Product Cost or Purchase Cost. Product "
+"Cost is used to calculate margin no confirmed Purchase Order linked to the "
+"Sale Order. Purchase Cost is used to calculate margin if there is at least "
+"one Purchase Order linked to the Sale Order is confirmed."
+msgstr ""
+
+#. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.debit_note_portal_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_debit_note_template
 msgid "To:"
@@ -5851,7 +5988,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__price_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_form_wo_line__price_total
 #: model:ir.model.fields,field_description:freight_mgmt.field_purchase_order_line__price_total_display
-#: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__display_sum_all
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_incentive_analysis_report__sum_all
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__price_total_display
 msgid "Total"
@@ -5968,6 +6104,16 @@ msgid "Type of the exception activity on record."
 msgstr ""
 
 #. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "TÊN"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "TÌNH TRẠNG"
+msgstr ""
+
+#. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_form_wo_template
 msgid "Tên Thương nhân:"
 msgstr ""
@@ -5991,6 +6137,16 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_arrival_notice_template
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_delivery_order_template
 msgid "Từ cảng xếp:<br/>(POL)"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "TỔNG <br/>DOANH SỐ"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "TỔNG CỘNG"
 msgstr ""
 
 #. module: freight_mgmt
@@ -6040,6 +6196,11 @@ msgid "Unassigned"
 msgstr "Chưa chỉ định"
 
 #. module: freight_mgmt
+#: model:ir.model.fields,field_description:freight_mgmt.field_sale_order_line__purchase_price_custom
+msgid "Unit Cost"
+msgstr "Giá mua"
+
+#. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_credit_note_item__uom
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_debit_note_item__uom
 msgid "Unit Of Measure"
@@ -6054,12 +6215,6 @@ msgstr "Đơn giá"
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_freight_billing_line__product_uom
 msgid "Unit of Measure"
-msgstr ""
-
-#. module: freight_mgmt
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_credit_note_view_search
-#: model_terms:ir.ui.view,arch_db:freight_mgmt.freight_debit_note_view_search
-msgid "Unpaid"
 msgstr ""
 
 #. module: freight_mgmt
@@ -6123,6 +6278,7 @@ msgstr ""
 
 #. module: freight_mgmt
 #: model:ir.model.fields,field_description:freight_mgmt.field_sale_profit_forwarder_analysis_report__vat_payable
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.view_sale_profit_forwarder_analysis_view_list
 msgid "VAT Payment"
 msgstr ""
 
@@ -6386,6 +6542,11 @@ msgstr ""
 #. module: freight_mgmt
 #: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_form_wo_template
 msgid "Đơn giá"
+msgstr ""
+
+#. module: freight_mgmt
+#: model_terms:ir.ui.view,arch_db:freight_mgmt.report_print_sale_incentive_template
+msgid "Đạt"
 msgstr ""
 
 #. module: freight_mgmt

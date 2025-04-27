@@ -41,10 +41,14 @@
                   delete="false"
                   duplicate="false"
                   import="false">
+                <header>
+                    <button string="Print" name="action_print_sale_incentive_report"
+                            type="object" class="btn-primary" icon="fa-print"/>
+                    <button string="View" name="action_view_sale_incentive_details"
+                            type="object" class="btn-secondary" icon="fa-eye"/>
+                </header>
                 <field name="user_id" invisible="1"/>
-<!--                <field name="currency_id" invisible="1"/>-->
                 <field name="incentive_name" optional="hide"/>
-<!--                <field name="partner_id" widget="many2one_avatar"/>-->
                 <field name="partner_id" invisible="1"/>
                 <field name="bill_no"/>
                 <field name="display_target_sales" digits="[12,0]" class="class_t_sales" />
@@ -59,17 +63,6 @@
                 <field name="incentive_tax_amount" digits="[12,0]" />
                 <field name="incentive_after_tax" digits="[12,0]" />
                 <field name="display_achieve"/>
-<!--                <button name="action_view_sale_incentive"-->
-<!--                        class="btn btn-primary btn-view-incentive-detail"-->
-<!--                        type="object"-->
-<!--                        string="View" />-->
-<!--                <field name="currency_id" invisible="1"/>-->
-<!--                <field name="state"-->
-<!--                       widget="badge"-->
-<!--                       decoration-info="state == 'draft'"-->
-<!--                       decoration-warning="state == 'close'"-->
-<!--                       decoration-success="state == 'open'"/>-->
-<!--                <field name="contract_count"/>-->
             </tree>
         </field>
     </record>

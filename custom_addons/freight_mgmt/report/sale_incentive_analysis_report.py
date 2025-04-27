@@ -4,6 +4,7 @@
 from psycopg2.extensions import AsIs
 
 from odoo import api, fields, models, tools
+from odoo.exceptions import UserError
 from odoo.tools import float_round
 
 
@@ -12,16 +13,6 @@ class SaleIncentiveAnalysisReport(models.Model):
     _description = "Sale Incentive Analysis Report"
     _auto = False
     _rec_name = "user_id"
-
-    # def _get_default_currency(self):
-    #     cur_id = self.env.context.get('wizard_currency_id')
-    #     return cur_id
-
-    # @api.model
-    # def _get_selection_invoice_state(self):
-    #     return self.env["account.move"].fields_get(allfields=["state"])["state"][
-    #         "selection"
-    #     ]
 
     user_id = fields.Many2one("res.users", "User", readonly=True)
     company_id = fields.Many2one("res.company", "Company", readonly=True)
@@ -60,7 +51,7 @@ class SaleIncentiveAnalysisReport(models.Model):
         '''
         Calculate to display total if using group by
         '''
-        exchange_rate = 22000
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
         res = super(SaleIncentiveAnalysisReport, self).read_group(domain, fields, groupby, offset=offset,
                                                                   limit=limit, orderby=orderby, lazy=lazy)
 
@@ -82,7 +73,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                         total = 0.0
                         for record in lines:
                             if field == 'display_target_sales':
-                                total = record['target_sales'] * exchange_rate
+                                total = record['target_sales'] * exchange_rate  # Only need first record, no sum
                                 break
                             elif field == 'display_achieve':
                                 break
@@ -102,7 +93,7 @@ class SaleIncentiveAnalysisReport(models.Model):
     def _compute_display_pod(self):
         for record in self:
             display_pod = record.pod_id.name if record.pod_id else ''
-            record.display_pod = " ".join(display_pod.split()[:3])    # get first two words
+            record.display_pod = (" ".join(display_pod.split()[:3])).capitalize()    # get first two words
 
     @api.depends('target_sales', 'sum_all')
     def _compute_display_achieve(self):
@@ -116,104 +107,89 @@ class SaleIncentiveAnalysisReport(models.Model):
 
     @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all', 'target_sales')
     def _compute_incentive_and_tax(self):
-        # cur = self.env.context.get('wizard_currency')
-        # rate = self.env.context.get('wizard_exchange_rate')
-        # if cur != 'VND' or rate <= 0:
-        #     rate = 1
-        rate = 1    # VND
-        exchange_rate_vnd = 22000
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
         for rec in self:
-            incentive = 0.0
-            tax_amount = 0.0
+            res = self.calculate_incentive_and_tax(rec, exchange_rate)
+            rec.incentive = res['incentive']
+            rec.incentive_tax_amount = res['incentive_tax_amount']
+            rec.incentive_after_tax = res['incentive_after_tax']
 
-            target_sales_vnd = rec.target_sales * exchange_rate_vnd
+    @staticmethod
+    def calculate_incentive_and_tax(rec, exchange_rate_vnd):
+        incentive = 0.0
+        tax_amount = 0.0
 
-            if rec.incentive_id and rec.incentive_id.section_ids:
-                for sec in rec.incentive_id.section_ids:
-                    amount_from = sec.percent_from * target_sales_vnd / 100
-                    amount_to = sec.percent_to * target_sales_vnd / 100
-                    if amount_from <= rec.sum_all and rec.sum_all < amount_to:
-                        incentive = (sec.incentive_percent_month / 100) * \
-                                    ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
-                                     (rec.sum_nominated * rec.incentive_id.target_nominated / 100) +
-                                     (rec.sum_activities * rec.incentive_id.target_activities / 100))
+        target_sales_vnd = rec.target_sales * exchange_rate_vnd
 
-                if incentive and rec.tax_income_id and rec.tax_income_id.section_ids:
-                    incentive_tmp = incentive
-                    if rec.tax_income_id.tax_income_type == 'section':
-                        if len(rec.tax_income_id.section_ids) > 1:
-                            sortedDescSections = sorted(rec.tax_income_id.section_ids, key=lambda x: x.amount_to, reverse=True)
-                        else:
-                            sortedDescSections = rec.tax_income_id.section_ids
+        if rec.incentive_id and rec.incentive_id.section_ids:
+            for sec in rec.incentive_id.section_ids:
+                amount_from = sec.percent_from * target_sales_vnd / 100
+                amount_to = sec.percent_to * target_sales_vnd / 100
+                if amount_from <= rec.sum_all < amount_to:
+                    incentive = (sec.incentive_percent_month / 100) * \
+                                ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
+                                 (rec.sum_nominated * rec.incentive_id.target_nominated / 100) +
+                                 (rec.sum_activities * rec.incentive_id.target_activities / 100))
 
-                        for sec in sortedDescSections:
-                            if sec.amount_from < incentive_tmp and incentive_tmp <= sec.amount_to:
-                                incentive_to_tax = incentive_tmp - sec.amount_from
-                                tax_amount += incentive_to_tax * sec.tax_rate_percent / 100
-                                incentive_tmp -= incentive_to_tax
-                    else:  # 'fixed'
-                        tax_amount = incentive_tmp * rec.tax_income_id.fix_percent / 100
+            if incentive and rec.tax_income_id and rec.tax_income_id.section_ids:
+                incentive_tmp = incentive
+                if rec.tax_income_id.tax_income_type == 'section':
+                    if len(rec.tax_income_id.section_ids) > 1:
+                        sortedDescSections = sorted(rec.tax_income_id.section_ids, key=lambda x: x.amount_to,
+                                                    reverse=True)
+                    else:
+                        sortedDescSections = rec.tax_income_id.section_ids
 
-            """ Assign returned data """
-            # rec.display_sum_freehand = rec.sum_freehand * rate
-            # rec.display_sum_nominated = rec.sum_nominated * rate
-            # rec.display_sum_activities = rec.sum_activities * rate
-            # rec.display_sum_all = rec.sum_all * rate
-            rec.incentive = incentive * rate
-            rec.incentive_tax_amount = float_round(tax_amount * rate, precision_digits=0)
-            rec.incentive_after_tax = rec.incentive - rec.incentive_tax_amount
+                    for sec in sortedDescSections:
+                        if sec.amount_from < incentive_tmp <= sec.amount_to:
+                            incentive_to_tax = incentive_tmp - sec.amount_from
+                            tax_amount += incentive_to_tax * sec.tax_rate_percent / 100
+                            incentive_tmp -= incentive_to_tax
+                else:  # 'fixed'
+                    tax_amount = incentive_tmp * rec.tax_income_id.fix_percent / 100
 
-
-                    # @api.depends("incentive")
-
-    def action_view_sale_incentive(self):
-        # self.ensure_one()
-        # pricelist_id = self.env.context.get('active_id', False)
-        user_id = self.id
-        title_name = self.display_name
-
-        wizard_date_from = self.env.context.get('wizard_date_from')
-        wizard_date_to = self.env.context.get('wizard_date_to')
-
-        context = {
-            'search_default_group_by_sale': 1,
-            'search_default_filter_order_closed': 1
-        }
-        if self.incentive_id:
-            if self.incentive_id.target_nominated > 0:
-                context['search_default_filter_nominated'] = 1
-            if self.incentive_id.target_freehand > 0:
-                context['search_default_filter_freehand'] = 1
-
-        domain = [('user_id', '=', user_id),
-                  #('invoice_date', '>=', wizard_date_from), ('invoice_date', '<=', wizard_date_to)
-                  ]
-
-        profit_tree = self.env.ref('freight_mgmt.freight_view_profit_forwarder_detail_by_incentive_tree', False)
-        view_id_tree = self.env['ir.ui.view'].sudo().search([('name', '=', "freight.view.profit.forwarder.detail.by.incentive.tree")])
-        return {
-            'name': title_name,
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.profit.forwarder.analysis.report',
-            'binding_view_types': 'list',
-            'view_mode': 'tree',
-            'views': [(view_id_tree[0].id, 'tree')],
-            'view_id': profit_tree.id,
-            'target': 'main',
-            'context': context,
-            'domain': domain,
+        result = {
+            'incentive': incentive,
+            'incentive_tax_amount': float_round(tax_amount, precision_digits=0),
+            'incentive_after_tax': rec.incentive - rec.incentive_tax_amount
         }
 
-    # @api.depends('po_commission_total')
-    # def _compute_po_commission_in_vnd(self):
-    #     usd = self.env['res.currency'].search([('name', '=', 'USD')])
-    #     vnd = self.env['res.currency'].search([('name', '=', 'VND')])
-    #     now = fields.Datetime.now()
-    #
-    #     for record in self:
-    #         amount_vnd = usd._convert(record.po_commission_total, vnd, record.company_id, now)
-    #         record.po_commission_total_vnd = amount_vnd
+        return result
+
+    def action_print_sale_incentive_report(self):
+        return self.env.ref('freight_mgmt.freight_sale_incentive_report_template_action').report_action(self)
+
+    def action_view_sale_incentive_details(self):
+        active_ids = self.env.context.get('active_ids', [])
+        if len(active_ids) == 1:
+            title_name = self.display_name
+            context = {
+                'search_default_group_by_customer': 1,
+            }
+
+            domain = [('id', '=', self.id)]
+
+            profit_tree = self.env.ref('freight_mgmt.view_sale_profit_forwarder_analysis_view_list', False)
+            view_id_tree = self.env['ir.ui.view'].sudo().search(
+                [('name', '=', "sale.profit.forwarder.analysis.view.list")])
+            return {
+                'name': title_name,
+                'type': 'ir.actions.act_window',
+                'res_model': 'sale.profit.forwarder.analysis.report',
+                'binding_view_types': 'list',
+                'view_mode': 'tree',
+                'views': [(view_id_tree[0].id, 'tree')],
+                'view_id': profit_tree.id,
+                'target': 'main',
+                'context': context,
+                'domain': domain,
+            }
+        elif len(active_ids) > 1:
+            raise UserError("You can only select one record to view details.")
+        else:
+            raise UserError("Please select a record to view its details.")
+
 
     def _select(self):
         ''' This has been deprecated due to new policy of incentive is applied from 01 June 2023 '''
@@ -414,3 +390,95 @@ class SaleIncentiveAnalysisReport(models.Model):
                 # AsIs(self._group_by()),
             ),
         )
+
+
+class ReportSaleIncentiveAnalysis(models.AbstractModel):
+    _name = 'report.freight_mgmt.report_print_sale_incentive_template'
+    _description = 'Sale Incentive Report With Grouping'
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        docs = self.env["sale.incentive.analysis.report"].browse(docids)
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
+
+        ''' Method 1: Manual Nested Grouping (More Control) '''
+        grouped_incentives = {}
+        for doc in docs:
+            grouping_incentive_name = doc.incentive_name
+            grouping_sale_name = doc.display_name
+
+            if grouping_incentive_name not in grouped_incentives:
+                grouped_incentives[grouping_incentive_name] = {}
+
+            if grouping_sale_name not in grouped_incentives[grouping_incentive_name]:
+                grouped_incentives[grouping_incentive_name][grouping_sale_name] = []
+
+            grouped_incentives[grouping_incentive_name][grouping_sale_name].append(doc)
+
+        processed_groups = []
+        months = []
+        years = []
+        for grouping_incentive_type, sale_groups in grouped_incentives.items():
+            incentive_data = []
+            total_incentive_type = 0.0
+            for grouping_salesman, incentives in sale_groups.items():
+                # salesman_sum_freehand_total = sum(incentive.sum_freehand for incentive in incentives)
+                salesman_sum_freehand_total = 0.0
+                salesman_sum_nominated_total = 0.0
+                salesman_incentive_after_tax_total = 0.0
+                display_target_sales = 0.0
+                for incentive in incentives:
+                    salesman_sum_freehand_total += incentive.sum_freehand
+                    salesman_sum_nominated_total += incentive.sum_nominated
+                    res = SaleIncentiveAnalysisReport.calculate_incentive_and_tax(incentive, exchange_rate)
+                    salesman_incentive_after_tax_total += res['incentive_after_tax']
+                    if display_target_sales == 0.0:
+                        display_target_sales = incentive.target_sales * exchange_rate
+                    if incentive.etd:
+                        month = incentive.etd.strftime('%m')
+                        year = incentive.etd.strftime('%Y')
+                        if month not in months:
+                            months.append(month)
+                        if year not in years:
+                            years.append(year)
+
+                salesman_sum_revenue_total = salesman_sum_freehand_total + salesman_sum_nominated_total
+                achieve = salesman_sum_revenue_total > display_target_sales * 0.5
+
+                incentive_data.append({
+                    'sale_name': grouping_salesman,
+                    'display_target_sales': display_target_sales,
+                    'sum_freehand_total': salesman_sum_freehand_total,
+                    'sum_nominated_total': salesman_sum_nominated_total,
+                    'sum_revenue_total': salesman_sum_revenue_total,
+                    'incentive_after_tax_total': salesman_incentive_after_tax_total,
+                    'achieve': achieve,
+                    'incentives': incentives
+                })
+                total_incentive_type += salesman_incentive_after_tax_total
+
+            processed_groups.append({
+                'incentive_type': grouping_incentive_type,
+                'incentive_data': incentive_data,
+                'total_incentive_type': total_incentive_type
+            })
+
+        ''' Method 2: Using read_group with Multiple groupby Fields: '''
+        # grouped_records = self.env['sale.incentive.analysis.report'].read_group(
+        #     domain=[('id', 'in', docs.ids)],
+        #     fields=['sum_freehand:sum', 'sum_nominated:sum', 'sum_all:sum'],
+        #     groupby=['incentive_name', 'partner_id']
+        # )
+
+        if len(months) > 1:
+            months.sort()
+        if len(years) > 1:
+            years.sort()
+        report_time = ",".join(months) + "/" + ",".join(years)
+
+        return {
+            'doc_ids': docs.ids,
+            'docs': docs,
+            'incentive_month': report_time,
+            'grouped_records': processed_groups
+        }

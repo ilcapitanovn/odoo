@@ -5,6 +5,7 @@ from odoo import _, api, fields, models
 
 
 class SaleIncentiveAnalysisReportWiward(models.TransientModel):
+    ''' TODO: This model deprecated due to changing directly search incentives '''
     _name = "sale.incentive.analysis.report.wizard"
     _description = "Wizard for calculating sales incentive report"
 
@@ -12,11 +13,15 @@ class SaleIncentiveAnalysisReportWiward(models.TransientModel):
         vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')])
         return vnd.id
 
+    def _get_default_exchange_rate(self):
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
+        return exchange_rate
+
     date_from = fields.Date("Report from", required=True, default=fields.Date.today())
     date_to = fields.Date("Report to", required=True, default=fields.Date.today())
     currency_ids = fields.Many2one('res.currency', default=_get_default_currency)
     currency_name = fields.Char(related="currency_ids.name")
-    exchange_rate = fields.Float("Exchange Rate", default=22000)
+    exchange_rate = fields.Float("Exchange Rate", default=_get_default_exchange_rate)
 
     # @api.onchange('currency_ids')
     # def _onchange_methods(self):
