@@ -152,7 +152,7 @@ class SaleIncentiveAnalysisReport(models.Model):
         result = {
             'incentive': incentive,
             'incentive_tax_amount': float_round(tax_amount, precision_digits=0),
-            'incentive_after_tax': rec.incentive - rec.incentive_tax_amount
+            'incentive_after_tax': incentive - tax_amount
         }
 
         return result
@@ -181,7 +181,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                 'view_mode': 'tree',
                 'views': [(view_id_tree[0].id, 'tree')],
                 'view_id': profit_tree.id,
-                'target': 'main',
+                'target': 'self',
                 'context': context,
                 'domain': domain,
             }
