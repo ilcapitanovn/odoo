@@ -192,6 +192,9 @@
                         <xpath expr="//field[@name='amount_total']" position="after">
                             <field name="margin" widget="monetary" optional="show"/>
                         </xpath>
+                        <xpath expr="//tree" position="attributes">
+                            <attribute name="decoration-danger">(margin &lt; 0)</attribute>
+                        </xpath>
                 </field>
         </record>
 
@@ -209,6 +212,9 @@
                         <xpath expr="//field[@name='amount_total']" position="after">
                             <field name="margin" widget="monetary" optional="show"/>
                         </xpath>
+                        <xpath expr="//tree" position="attributes">
+                            <attribute name="decoration-danger">(margin &lt; 0)</attribute>
+                        </xpath>
                 </field>
         </record>
 
@@ -222,6 +228,7 @@
                 <field name="arch" type="xml">
                         <xpath expr="//tree" position="attributes">
                             <attribute name="decoration-info">(booking_status == 'to booking')</attribute>
+                            <attribute name="decoration-danger">(margin &lt; 0)</attribute>
                             <attribute name="create">false</attribute>
                             <attribute name="edit">false</attribute>
                             <attribute name="delete">false</attribute>

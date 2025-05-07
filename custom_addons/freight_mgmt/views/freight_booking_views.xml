@@ -447,6 +447,7 @@
        <field name="arch" type="xml">
            <xpath expr="//tree" position="attributes">
                <attribute name="js_class">button_in_tree</attribute>
+               <attribute name="decoration-danger">(margin &lt; 0)</attribute>
            </xpath>
        </field>
    </record>
