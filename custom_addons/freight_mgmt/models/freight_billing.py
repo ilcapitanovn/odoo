@@ -795,11 +795,11 @@ class FreightBilling(models.Model):
     @staticmethod
     def generate_delivery_order_no_of_pkgs(dict_to_concat):
         res = ''
-        # if self.booking_id and self.booking_id.volumes_display:
-        #     res += self.booking_id.volumes_display.replace(',', '<br/>') + '<br/><br/>'
         if dict_to_concat:
-            res += ''.join('{:,.2f}'.format(dict_to_concat[key]) + ' ' + key + '<br/>' for key in dict_to_concat.keys())
-
+            for key in dict_to_concat.keys():
+                # Remove trailing .0 or . at the end
+                quantity_formatted = '{:,.2f}'.format(dict_to_concat[key]).rstrip('0').rstrip('.')
+                res += ''.join(quantity_formatted + ' ' + key + '<br/>')
         return res
 
     # ---------------------------------------------------

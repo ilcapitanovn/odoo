@@ -92,6 +92,7 @@ class FreightDebitNote(models.Model):
                                   tracking=True, store=True, readonly=False, default=7)
     storage_time = fields.Datetime(related="booking_id.storage_time", string="Storage Time",
                                    tracking=True, store=True, readonly=False)       # Deprecated, consider to delete
+    remark = fields.Char(string="Remark")
     eta = fields.Datetime(related="booking_id.eta", string="ETA", tracking=True, store=True, readonly=False)
 
     pol = fields.Char(related="bill_id.port_loading_id.name", string="POL", readonly=True, store=False)

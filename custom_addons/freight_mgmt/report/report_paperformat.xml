@@ -30,6 +30,21 @@
             <field name="header_spacing">20</field>
             <field name="dpi">90</field>
         </record>
+        <record id="freight_paperformat_arrival_notice" model="report.paperformat">
+            <field name="name">Arrival Notice</field>
+            <field name="default" eval="False"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">216</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">20</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">18</field>
+            <field name="margin_right">18</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">20</field>
+            <field name="dpi">90</field>
+        </record>
         <record id="freight_paperformat_form_wo" model="report.paperformat">
             <field name="name">Form WO</field>
             <field name="default" eval="False"/>

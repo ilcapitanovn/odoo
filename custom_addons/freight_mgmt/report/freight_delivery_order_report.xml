@@ -123,6 +123,9 @@
                         <t t-set="total_pkgs_dict" t-value="{}"/>
                         <t t-foreach="doc.billing_line" t-as="line">
                             <t t-if="line.container_no or line.seal_nos">
+                                <t t-if="mark_seal_nos">
+                                    <t t-set="mark_seal_nos" t-value="mark_seal_nos + '&lt;br/&gt;'"/>
+                                </t>
                                 <t t-if="line.container_no">
                                     <t t-set="mark_seal_nos" t-value="mark_seal_nos + line.container_no"/>
                                 </t>

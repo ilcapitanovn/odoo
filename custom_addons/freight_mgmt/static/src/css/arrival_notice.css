@@ -1,14 +1,14 @@
 * {
-    font-size: 13px;
+    font-size: 14px;
+    font-family: 'Times New Roman', Times, serif;
 }
 h2 {
     font-weight: 600;
-    font-size: 22px;
+    font-size: 20px;
 }
 #quote_content {
     background-color: white;
     font-weight: 500;
-    font-family: Serif;
 }
 #header {
     padding-top: 0 !important;
@@ -23,15 +23,40 @@ h2 {
 .header-right {
     float: right;
     width: 80%;
-    font-size: 16px;
     font-weight: bold;
     text-align: center;
+}
+#header-arrival-notice {
+    display: flex;
+    align-items: center;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 22px;
+    height: 80px;
+    max-height: 80px;
+}
+.header-logo {
+    float: left;
+    width: 24%;
+    text-align: right;
+    padding-right: 10px;
+}
+.header-text {
+    float: right;
+    width: 76%;
+    font-size: 15px;
+    text-align: left;
+    padding-left: 20px;
 }
 .company-logo {
     padding-top: 0 !important;
     margin-top: 0 !important;
+    width: 100%;
 }
-
+.horizontal-line {
+    border: 1.5px solid black;
+    width: 100%;
+}
 #introduction {
     text-align: center;
     padding-top: 0 !important;
@@ -45,43 +70,53 @@ h2 {
     -webkit-box-pack: end; /* wkhtmltopdf uses this one */
 }
 
+#address-table th {
+    border: none;
+    font-weight: bold;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 13%;
+}
 #address-table td {
     border: none;
-    padding-bottom: 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
-}
-#address-table td:nth-child(odd) {
-    width: 15%;
-}
-#address-table .address-content {
-    padding-left: 20px;
-}
-
-#do-table {
-    margin-left: 40px;
-}
-#do-table td {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    margin: 0 !important;
-    border: none;
-    vertical-align: middle;
-}
-#do-table td:nth-child(odd) {
-    font-weight: bold;
-    width: 18%;
-}
-#do-table td:nth-child(even) {
-    font-weight: bold;
     text-transform: uppercase;
 }
 
-#order-table {
-    margin-top: 40px;
+#do-table th {
+    border: none;
+    font-weight: bold;
+    padding: 0 !important;
+    width: 13%;
 }
+#do-table td {
+    border: none;
+    padding: 0 !important;
+    margin: 0 !important;
+    vertical-align: middle;
+    text-transform: uppercase;
+    width: 44%;
+}
+#do-table .del-place {
+    text-align: right;
+}
+#do-table .col-3 {
+    text-align: right;
+}
+#do-table .col-4 {
+    text-align: right;
+}
+
+#order-table {
+    margin-top: 20px;
+}
+
 #order-table span {
     white-space: pre-wrap;
+    text-align: left;
 }
+
 #order-table th {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
@@ -100,6 +135,16 @@ h2 {
 }
 #order-table td:nth-child(1) {
     white-space: nowrap;
+}
+
+.arrival-date {
+    text-transform: uppercase;
+}
+.issue-date {
+    text-transform: uppercase;
+}
+.free-time {
+    color: red;
 }
 
 #note {

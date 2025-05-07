@@ -248,6 +248,7 @@
                                 <field name="eta" />
                                 <field name="storage_days" />
                                 <field name="storage_time" invisible="1" />
+                                <field name="remark" />
                             </group>
                         </group>
                     </page>
