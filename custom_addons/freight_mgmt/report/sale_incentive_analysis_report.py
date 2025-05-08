@@ -1,6 +1,8 @@
 # Copyright 2022 Bao Thinh Software - Tuan Huynh
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import pytz
+from datetime import datetime
 from psycopg2.extensions import AsIs
 
 from odoo import api, fields, models, tools
@@ -26,16 +28,33 @@ class SaleIncentiveAnalysisReport(models.Model):
     pod_id = fields.Many2one("freight.catalog.port", "POL/D", readonly=True)
     date_order = fields.Date("Order Date", readonly=True)
     etd = fields.Date("ETD", readonly=True)
+    etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
     invoice_date = fields.Date("Invoice Date", readonly=True)
     payment_state = fields.Char("Payment Status", readonly=True)
 
     incentive_name = fields.Char("Incentive Type", readonly=True)
     target_sales = fields.Float("Target Sales", readonly=True)
 
-    sum_freehand = fields.Float("Freehand", readonly=True)
-    sum_nominated = fields.Float("Nominated", readonly=True)
-    sum_activities = fields.Float("Sales Activities", readonly=True)
-    sum_all = fields.Float("Total", readonly=True)
+    po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
+    so_amount_untaxed = fields.Float("Chua VAT (O)", readonly=True)
+    margin = fields.Float("Margin", readonly=True)
+
+    order_type = fields.Char("Freehand or Nominated", readonly=True)
+    po_amount_untaxed_vnd = fields.Float("COST Input (No_VAT)", readonly=True)
+    po_amount_total_vnd = fields.Float("COST Input (With_VAT)", readonly=True)
+    po_amount_tax_vnd = fields.Float("COST Input (VAT)", readonly=True)
+    cost_no_vat = fields.Float("COST (No_Invoice)", readonly=True)
+    po_commission_total = fields.Float("COST COM LINE (USD)", readonly=True)
+    so_commission_total = fields.Float("COST COM CUS (USD)", readonly=True)
+    so_amount_untaxed_vnd = fields.Float("REVENUE Output (No_VAT)", readonly=True)
+    so_amount_total_vnd = fields.Float("REVENUE Output (With_VAT)", readonly=True)
+    so_amount_tax_vnd = fields.Float("REVENUE Output (VAT)", readonly=True)
+    revenue_no_vat = fields.Float("REVENUE (No_Invoice)", readonly=True)
+
+    sum_freehand = fields.Float("Freehand", compute="_compute_sums", readonly=True)
+    sum_nominated = fields.Float("Nominated", compute="_compute_sums", readonly=True)
+    sum_activities = fields.Float("Sales Activities", compute="_compute_sums", readonly=True)
+    sum_all = fields.Float("Total", compute="_compute_sums", readonly=True)
 
     display_pod = fields.Char(compute="_compute_display_pod", readonly=True)
     display_target_sales = fields.Float(compute="_compute_display_target_sales", string="Target Sales", readonly=True)
@@ -100,6 +119,47 @@ class SaleIncentiveAnalysisReport(models.Model):
         for record in self:
             record.display_achieve = 0  # Khong dat
 
+    @api.depends('etd')
+    def _compute_format_etd(self):
+        for rec in self:
+            rec.etd_formatted = ''
+            if rec.etd:
+                etd_local = self._convert_utc_to_local(rec.etd)
+                if etd_local:
+                    rec.etd_formatted = etd_local.strftime('%d/%m/%Y')
+
+    def _convert_utc_to_local(self, utc_date):
+        result = utc_date
+        if result:
+            try:
+                fmt = "%Y-%m-%d %H:%M:%S"
+                utc_date_str = utc_date.strftime(fmt)
+
+                ########################################################
+                # OPTION 1
+                ########################################################
+                # now_utc = datetime.now(pytz.timezone('UTC'))
+                # tz = pytz.timezone(self.env.user.tz)      # Consider get tz correct
+                # now_tz = now_utc.astimezone(tz) or pytz.utc
+                # utc_offset_timedelta = datetime.strptime(now_tz.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+                # # local_date = datetime.strptime(utc_date_str, fmt)
+                # result = utc_date + utc_offset_timedelta
+
+                ########################################################
+                # OPTION 2
+                ########################################################
+                timezone = 'UTC'
+                if self.env.user.tz:
+                    timezone = self.env.user.tz
+                elif self.user_id and self.user_id.partner_id.tz:
+                    timezone = self.user_id.partner_id.tz
+                tz = pytz.timezone(timezone)
+                result = pytz.utc.localize(datetime.strptime(utc_date_str, fmt)).astimezone(tz)
+            except:
+                print("ERROR in _convert_utc_to_local")
+
+            return result
+
     @api.depends('target_sales')
     def _compute_display_target_sales(self):
         for rec in self:
@@ -114,6 +174,41 @@ class SaleIncentiveAnalysisReport(models.Model):
             rec.incentive = res['incentive']
             rec.incentive_tax_amount = res['incentive_tax_amount']
             rec.incentive_after_tax = res['incentive_after_tax']
+
+    @api.depends('so_amount_untaxed', 'po_amount_untaxed', 'margin')
+    def _compute_sums(self):
+        ''' Business Income Tax - default is 20% if no configuration in system parameters '''
+        biz_tax_percentage = float(
+            self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.business_income_tax_in_percentage', 20))
+        exchange_rate = int(
+            self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
+
+        biz_income_tax = biz_tax_percentage / 100
+
+        for rec in self:
+            sum_freehand = sum_nominated = sum_activities = 0.0
+
+            po_commission_total_vnd = rec.po_commission_total * exchange_rate
+            so_commission_total_vnd = rec.so_commission_total * exchange_rate
+
+            real_profit_before_tax = (
+                (rec.so_amount_total_vnd + rec.revenue_no_vat) -
+                (rec.po_amount_total_vnd + rec.cost_no_vat + po_commission_total_vnd + so_commission_total_vnd)
+            )
+            untaxed_profit_before_tax = rec.so_amount_untaxed_vnd - rec.po_amount_untaxed_vnd
+            vat_payable = rec.so_amount_tax_vnd - rec.po_amount_tax_vnd
+            income_tax_amount = untaxed_profit_before_tax * biz_income_tax if untaxed_profit_before_tax > 0 else 0
+            final_real_profit_after_tax = real_profit_before_tax - vat_payable - income_tax_amount
+
+            if rec.order_type == 'freehand':
+                sum_freehand = final_real_profit_after_tax
+            elif rec.order_type == 'nominated':
+                sum_nominated = final_real_profit_after_tax
+
+            rec.sum_freehand = sum_freehand
+            rec.sum_nominated = sum_nominated
+            rec.sum_activities = sum_activities
+            rec.sum_all = sum_freehand + sum_nominated + sum_nominated
 
     @staticmethod
     def calculate_incentive_and_tax(rec, exchange_rate_vnd):
@@ -166,6 +261,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             title_name = self.display_name
             context = {
                 'search_default_group_by_customer': 1,
+                'search_default_filter_etd': 0
             }
 
             domain = [('id', '=', self.id)]
@@ -189,115 +285,6 @@ class SaleIncentiveAnalysisReport(models.Model):
             raise UserError("You can only select one record to view details.")
         else:
             raise UserError("Please select a record to view its details.")
-
-
-    def _select(self):
-        ''' This has been deprecated due to new policy of incentive is applied from 01 June 2023 '''
-
-        # select_str = """
-        #     SELECT DISTINCT
-        #         u.id AS id,
-        #         u.id AS user_id,
-        #         u.company_id AS company_id,
-        #         u.partner_id AS partner_id,
-        #         si.id AS incentive_id,
-        #         ati.id AS tax_income_id,
-        #
-        #         si.name AS incentive_name,
-        #         p.target_sales AS target_sales,
-        #
-        #         sum_freehand,
-        #         sum_nominated,
-        #         sum_activities,
-        #         sum_freehand + sum_nominated + sum_activities AS sum_all
-        #     FROM (
-        #         SELECT user_id
-        #             , SUM(CASE WHEN order_type = 'freehand' THEN
-        #                     ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-        #                     - (so_amount_tax_vnd - po_amount_tax_vnd)
-        #                     - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-        #                     ELSE 0 END) as sum_freehand
-        #             , SUM(CASE WHEN order_type = 'nominated' THEN
-        #                     ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-        #                     - (so_amount_tax_vnd - po_amount_tax_vnd)
-        #                     - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-        #                     ELSE 0 END) as sum_nominated
-        #             , 0 as sum_activities
-        #         FROM sale_profit_forwarder_analysis_report
-        #         WHERE etd >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-        #             AND etd <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-        #         GROUP BY user_id
-        #     ) tblSum
-        #     INNER JOIN res_users u ON tblSum.user_id = u.id
-        #     INNER JOIN res_partner p ON u.partner_id = p.id
-        #     LEFT JOIN sale_incentive si ON p.incentive_id = si.id
-        #     LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
-        #     LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
-        #     LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
-        # """
-
-        ''' New incentive policy is available since 01 June 2023 '''
-        select_str = """
-                    SELECT DISTINCT
-                        u.id AS id,
-                        u.id AS user_id,
-                        u.company_id AS company_id,
-                        u.partner_id AS partner_id,
-                        si.id AS incentive_id,
-                        ati.id AS tax_income_id,
-
-                        si.name AS incentive_name,
-                        p.target_sales AS target_sales,
-
-                        CASE WHEN si.target_freehand > 0 THEN sum_freehand ELSE 0 END sum_freehand,
-                        CASE WHEN si.target_nominated > 0 THEN sum_nominated ELSE 0 END sum_nominated,
-                        CASE WHEN si.target_activities > 0 THEN sum_activities ELSE 0 END sum_activities,
-                        (CASE WHEN si.target_freehand > 0 THEN sum_freehand ELSE 0 END + CASE WHEN si.target_nominated > 0 THEN sum_nominated ELSE 0 END + CASE WHEN si.target_activities > 0 THEN sum_activities ELSE 0 END) AS sum_all
-                    FROM (
-                        SELECT user_id
-                            , SUM(CASE WHEN order_type = 'freehand' THEN 
-                                    ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                                    - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                                    - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                                    ELSE 0 END) as sum_freehand
-                            , SUM(CASE WHEN order_type = 'nominated' THEN 
-                                    ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                                    - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                                    - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                                    ELSE 0 END) as sum_nominated
-                            , 0 as sum_activities
-                        FROM sale_profit_forwarder_analysis_report
-                        WHERE payment_state in ('in_payment', 'paid')
-                            AND invoice_date >= (SELECT date_from FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                            AND invoice_date <= (SELECT date_to FROM sale_incentive_analysis_report_wizard ORDER BY id DESC FETCH FIRST 1 ROWS ONLY)
-                        GROUP BY user_id
-                    ) tblSum
-                    INNER JOIN res_users u ON tblSum.user_id = u.id
-                    INNER JOIN res_partner p ON u.partner_id = p.id
-                    LEFT JOIN sale_incentive si ON p.incentive_id = si.id
-                    LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
-                    LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
-                    LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
-                    WHERE si.target_freehand * sum_freehand + si.target_nominated * sum_nominated + si.target_activities * sum_activities > 0
-                """
-
-        # GROUP BY u.login, si.name, p.target_sales, sum_freehand, sum_nominated, sum_activities, sum_all
-
-        return select_str
-
-    def _from(self):
-        from_str = """
-            freight_billing fbl
-            INNER JOIN freight_booking fbk ON fbk.id = fbl.booking_id
-            LEFT JOIN res_partner cus ON cus.id = fbl.partner_id
-            LEFT JOIN freight_catalog_port pod ON fbk.port_discharge_id = pod.id
-            LEFT JOIN freight_catalog_vessel fline ON fbk.vessel_id = fline.id
-            LEFT JOIN res_users usale ON usale.id = fbl.user_id
-            INNER JOIN res_partner psale ON usale.partner_id = psale.id
-            LEFT JOIN sale_order so ON fbl.order_id = so.id
-            LEFT JOIN purchase_order po on so.name = po.origin
-        """
-        return from_str
 
     @staticmethod
     def _select_v2():
@@ -323,18 +310,52 @@ class SaleIncentiveAnalysisReport(models.Model):
                 tblSum.etd AS etd,
                 tblSum.invoice_date AS invoice_date,
                 tblSum.payment_state AS payment_state,
-
-                sum_freehand,
-                sum_nominated,
-                sum_activities,
-                sum_freehand + sum_nominated + sum_activities AS sum_all
+                
+                tblSum.po_amount_untaxed AS po_amount_untaxed,
+                tblSum.so_amount_untaxed AS so_amount_untaxed,
+                tblSum.margin AS margin,
+                
+                tblSum.order_type AS order_type,
+                tblSum.po_amount_untaxed_vnd AS po_amount_untaxed_vnd,
+                tblSum.po_amount_total_vnd AS po_amount_total_vnd,
+                tblSum.po_amount_tax_vnd AS po_amount_tax_vnd,
+                tblSum.cost_no_vat AS cost_no_vat,
+                tblSum.po_commission_total AS po_commission_total,
+                tblSum.so_commission_total AS so_commission_total,
+                tblSum.so_amount_untaxed_vnd AS so_amount_untaxed_vnd,
+                tblSum.so_amount_total_vnd AS so_amount_total_vnd,
+                tblSum.so_amount_tax_vnd AS so_amount_tax_vnd,
+                tblSum.revenue_no_vat AS revenue_no_vat
         """
 
         return select_str
 
     @staticmethod
     def _subquery_profit_forwarder_report():
-        subquery_str = """
+        # subquery_str = f"""
+        #     SELECT id
+        #         , user_id
+        #         , bill_no
+        #         , pod_id
+        #         , date_order
+        #         , etd
+        #         , invoice_date
+        #         , payment_state
+        #         , CASE WHEN order_type = 'freehand' THEN
+        #                 ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+        #                 - (so_amount_tax_vnd - po_amount_tax_vnd)
+        #                 - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.2)
+        #                 ELSE 0 END as sum_freehand
+        #         , CASE WHEN order_type = 'nominated' THEN
+        #                 ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
+        #                 - (so_amount_tax_vnd - po_amount_tax_vnd)
+        #                 - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.2)
+        #                 ELSE 0 END as sum_nominated
+        #         , 0 as sum_activities
+        #     FROM sale_profit_forwarder_analysis_report
+        # """
+
+        subquery_str = f"""
             SELECT id
                 , user_id
                 , bill_no
@@ -343,17 +364,20 @@ class SaleIncentiveAnalysisReport(models.Model):
                 , etd
                 , invoice_date
                 , payment_state
-                , CASE WHEN order_type = 'freehand' THEN 
-                        ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                        - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                        - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                        ELSE 0 END as sum_freehand
-                , CASE WHEN order_type = 'nominated' THEN 
-                        ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-                        - (so_amount_tax_vnd - po_amount_tax_vnd) 
-                        - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.15)
-                        ELSE 0 END as sum_nominated
-                , 0 as sum_activities
+                , po_amount_untaxed
+                , so_amount_untaxed
+                , margin
+                , order_type
+                , po_amount_untaxed_vnd
+                , po_amount_total_vnd
+                , po_amount_tax_vnd
+                , cost_no_vat
+                , po_commission_total
+                , so_commission_total
+                , so_amount_untaxed_vnd
+                , so_amount_total_vnd
+                , so_amount_tax_vnd
+                , revenue_no_vat
             FROM sale_profit_forwarder_analysis_report
         """
 

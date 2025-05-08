@@ -90,8 +90,13 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     # )
     # commission_id = fields.Many2one("sale.commission", "Sale commission", readonly=True)
 
-    @api.depends('so_amount_untaxed', 'margin')
+    @api.depends('so_amount_untaxed', 'po_amount_untaxed', 'margin')
     def _compute_profits(self):
+        ''' Business Income Tax - default is 20% if no configuration in system parameters '''
+        biz_tax_percentage = float(
+            self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.business_income_tax_in_percentage', 20))
+        biz_income_tax = biz_tax_percentage / 100
+
         for rec in self:
             # rec.profit_before_tax_no_vat = rec.so_amount_untaxed - rec.po_amount_untaxed
             # rec.profit_before_tax_vat = rec.margin
@@ -100,7 +105,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             rec.profit_before_tax_vat = (rec.so_amount_total_vnd + rec.revenue_no_vat) - \
                 (rec.po_amount_total_vnd + rec.cost_no_vat + rec.po_commission_total_vnd + rec.so_commission_total_vnd)
             rec.vat_payable = rec.so_amount_tax_vnd - rec.po_amount_tax_vnd
-            rec.business_tax_amount = rec.profit_before_tax_no_vat * 0.15
+            rec.business_tax_amount = rec.profit_before_tax_no_vat * biz_income_tax
             rec.profit_after_tax_no_vat = rec.profit_before_tax_no_vat - rec.business_tax_amount
             rec.profit_after_tax_vat = rec.profit_before_tax_vat - rec.vat_payable - rec.business_tax_amount
 
@@ -224,17 +229,17 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
             CASE WHEN po.amount_total - po.amount_untaxed IS NULL THEN 0 ELSE po.amount_total - po.amount_untaxed END AS po_amount_tax,
 
-            ROUND((CASE WHEN po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE po.amount_untaxed * fcn.exchange_rate END)::numeric, 2)::numeric AS po_amount_untaxed_vnd,
+            ROUND((CASE WHEN fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_untaxed_vnd,
 			ROUND((CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END)::numeric, 2)::numeric AS po_amount_total_vnd,
-            ROUND((CASE WHEN fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate IS NULL THEN 0 ELSE fcn.amount_total_vnd - po.amount_untaxed * fcn.exchange_rate END)::numeric, 2)::numeric AS po_amount_tax_vnd,
+            ROUND((CASE WHEN fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_tax_vnd,
             
             CASE WHEN so.amount_untaxed IS NULL THEN 0 ELSE so.amount_untaxed END AS so_amount_untaxed,
             CASE WHEN so.amount_total IS NULL THEN 0 ELSE so.amount_total END AS so_amount_total,
             CASE WHEN so.amount_total - so.amount_untaxed IS NULL THEN 0 ELSE so.amount_total - so.amount_untaxed END AS so_amount_tax,
             
-            ROUND((CASE WHEN so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE so.amount_untaxed * fdn.exchange_rate END)::numeric, 2)::numeric AS so_amount_untaxed_vnd,
+            ROUND((CASE WHEN fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_untaxed_vnd,
 			ROUND((CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END)::numeric, 2)::numeric AS so_amount_total_vnd,
-            ROUND((CASE WHEN fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate IS NULL THEN 0 ELSE fdn.amount_total_vnd - so.amount_untaxed * fdn.exchange_rate END)::numeric, 2)::numeric AS so_amount_tax_vnd,
+            ROUND((CASE WHEN fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_tax_vnd,
 			
 			CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
 			CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,

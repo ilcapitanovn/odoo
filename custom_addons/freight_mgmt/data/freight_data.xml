@@ -12,6 +12,10 @@
             <field name="key">freight_mgmt.default_usd_vnd_exchange_rate</field>
             <field name="value">22000</field>
         </record>
+        <record id="freight_business_income_tax_in_percentage" model="ir.config_parameter">
+            <field name="key">freight_mgmt.business_income_tax_in_percentage</field>
+            <field name="value">20</field>
+        </record>
         <record id="res_partner_category_shipper_tag" model="res.partner.category">
             <field name="name">Shipper</field>
             <field name="color" eval="6"/>
@@ -455,6 +459,16 @@
                 action = model.automate_action_update_bl_number_invoice(record)
             </field>
         </record>
+        <record id="freight_automate_action_set_bl_number_on_invoice_creation" model="base.automation">
+            <field name="name">Freight: Automate Set BL Number On Invoice Creation</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="trigger">on_create</field>
+            <field name="state">code</field>
+            <field name="active">True</field>
+            <field name="code">
+                action = model.automate_action_set_bl_number_on_invoice_creation(record)
+            </field>
+        </record>
         <record id="freight_automated_action_generate_activities_on_lead_creation" model="base.automation">
             <field name="name">CRM: Automate Generate Activities On Lead Creation</field>
             <field name="model_id" ref="crm.model_crm_lead"/>
@@ -505,6 +519,39 @@
             <field name="model_id" ref="sale.model_product_template"/>
             <field name="state">code</field>
             <field name="code">model.action_automate_configure_mto_product()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+        </record>
+        <record id="freight_scheduled_action_fix_totals_untaxed_debit_note" model="ir.cron">
+            <field name="name">Freight: Debit Note - Manual Fix Totals Untaxed</field>
+            <field name="model_id" ref="freight_mgmt.model_freight_debit_note"/>
+            <field name="state">code</field>
+            <field name="code">model.action_fix_totals_untaxed()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+        </record>
+        <record id="freight_scheduled_action_manual_update_exchange_rate_vnd_debit_note" model="ir.cron">
+            <field name="name">Freight: Debit Note - Manual Update Exchange Rate</field>
+            <field name="model_id" ref="freight_mgmt.model_freight_debit_note"/>
+            <field name="state">code</field>
+            <field name="code">model.action_manual_update_exchange_rate_vnd(0, 22000)</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+        </record>
+        <record id="freight_scheduled_action_manual_update_exchange_rate_vnd_credit_note" model="ir.cron">
+            <field name="name">Freight: Credit Note - Manual Update Exchange Rate</field>
+            <field name="model_id" ref="freight_mgmt.model_freight_credit_note"/>
+            <field name="state">code</field>
+            <field name="code">model.action_manual_update_exchange_rate_vnd(0, 22000)</field>
             <field name="user_id" ref="base.user_root" />
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>

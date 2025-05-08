@@ -91,9 +91,12 @@ class FreightCreditNote(models.Model):
     credit_items = fields.One2many('freight.credit.note.item', 'credit_id', string='Credit Note Items',
                                    store=True, copy=True, auto_join=True, tracking=True)
     # amount_total = fields.Monetary(related="purchase_order_id.amount_total", string="Total", readonly=True, store=True)
-    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True, tracking=True)
+    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total (USD)", readonly=True, store=True)
+    amount_total_untaxed = fields.Monetary(compute="_compute_subtotal", string="Total Untaxed (USD)", readonly=True, store=True)
+    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total (VND)", readonly=True, store=True)
+    amount_subtotal_vnd_untaxed = fields.Monetary(compute="_compute_subtotal", string="Total Untaxed (VND)", readonly=True, store=True)
+    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total Amount (VND)", readonly=True, store=True, tracking=True)
+    amount_total_vnd_untaxed = fields.Monetary(compute="_compute_amount_total_vnd", string="Total Amount Untaxed (VND)", readonly=True, store=True, tracking=True)
 
     # user_id = fields.Many2one(
     #     comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -216,6 +219,16 @@ class FreightCreditNote(models.Model):
             ))
 
     @api.model
+    def action_manual_update_exchange_rate_vnd(self, rec_id=0, vnd_rate=0.0):
+        if not rec_id and not vnd_rate:
+            return False
+
+        domain = [('id', '=', rec_id)]
+        record = self.env['freight.credit.note'].sudo().search(domain, limit=1)
+        if record:
+            record.write({'exchange_rate': vnd_rate})
+
+    @api.model
     def _get_bill_id_domain(self):
         # if self.env.context.get("shipment_type_suffix") == 'imp':
         #     res = [('booking_id.shipment_type', 'in', ('fcl-imp', 'lcl-imp', 'air-imp')),
@@ -301,22 +314,29 @@ class FreightCreditNote(models.Model):
         """
         for credit in self:
             amount_subtotal_usd = amount_subtotal_vnd = 0.0
+            amount_subtotal_usd_untaxed = amount_subtotal_vnd_untaxed = 0.0
             for item in credit.credit_items:
                 if item.currency_id and item.currency_id.name == 'USD':
                     amount_subtotal_usd += item.price_total
+                    amount_subtotal_usd_untaxed += item.price_subtotal
                 elif item.currency_id and item.currency_id.name == 'VND':
                     amount_subtotal_vnd += item.price_total
+                    amount_subtotal_vnd_untaxed += item.price_subtotal
             credit.update({
                 'amount_total': amount_subtotal_usd,
+                'amount_total_untaxed': amount_subtotal_usd_untaxed,
                 'amount_subtotal_vnd': amount_subtotal_vnd,
+                'amount_subtotal_vnd_untaxed': amount_subtotal_vnd_untaxed
             })
 
     @api.depends('amount_total', 'exchange_rate')
     def _compute_amount_total_vnd(self):
         for rec in self:
             rec.amount_total_vnd = float_round(rec.amount_total * rec.exchange_rate, precision_digits=0)
+            rec.amount_total_vnd_untaxed = float_round(rec.amount_total_untaxed * rec.exchange_rate, precision_digits=0)
             if rec.amount_subtotal_vnd > 0:
                 rec.amount_total_vnd += rec.amount_subtotal_vnd
+                rec.amount_total_vnd_untaxed += rec.amount_subtotal_vnd_untaxed
 
     @api.depends('purchase_order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):

@@ -27,6 +27,15 @@
                                 states="draft,sent,sale"
                             />
                         </xpath>
+                        <xpath expr="//div[@name='button_box']" position="inside">
+                                <button name="action_view_booking"
+                                        type="object"
+                                        class="oe_stat_button"
+                                        icon="fa-pencil-square-o"
+                                        attrs="{'invisible': [('booking_count', '=', 0)]}">
+                                        <field name="booking_count" widget="statinfo" string="Booking"/>
+                                </button>
+                        </xpath>
                         <xpath expr="//tree//field[@name='purchase_price']" position="attributes">
                             <attribute name="invisible">1</attribute>
                         </xpath>

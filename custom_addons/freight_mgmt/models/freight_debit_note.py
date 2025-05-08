@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import pytz
 from datetime import datetime
 
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import html_keep_url, float_round
+
+_logger = logging.getLogger(__name__)
 
 PAYMENT_STATE_SELECTION = [
         ('not_paid', 'Not Paid'),
@@ -113,9 +116,12 @@ class FreightDebitNote(models.Model):
     debit_items = fields.One2many('freight.debit.note.item', 'debit_id', string='Debit Note Items',
                                   store=True, copy=True, tracking=True, auto_join=True)
     # amount_total = fields.Monetary(related="order_id.amount_total", string="Total", readonly=True, store=True)
-    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total", readonly=True, store=True)
-    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total", readonly=True, store=True, tracking=True)
+    amount_total = fields.Monetary(compute="_compute_subtotal", string="Total (USD)", readonly=True, store=True)
+    amount_total_untaxed = fields.Monetary(compute="_compute_subtotal", string="Total Untaxed (USD)", readonly=True, store=True)
+    amount_subtotal_vnd = fields.Monetary(compute="_compute_subtotal", string="Total (VND)", readonly=True, store=True)
+    amount_subtotal_vnd_untaxed = fields.Monetary(compute="_compute_subtotal", string="Total Untaxed (VND)", readonly=True, store=True)
+    amount_total_vnd = fields.Monetary(compute="_compute_amount_total_vnd", string="Total Amount (VND)", readonly=True, store=True, tracking=True)
+    amount_total_vnd_untaxed = fields.Monetary(compute="_compute_amount_total_vnd", string="Total Amount Untaxed (VND)", readonly=True, store=True, tracking=True)
 
     # user_id = fields.Many2one(
     #     comodel_name="res.users", string="Assigned user", tracking=True, index=True
@@ -174,6 +180,9 @@ class FreightDebitNote(models.Model):
             res.append((rec.id, rec.number))
         return res
 
+    def action_confirm(self):
+        self.write({'state': 'posted'})
+
     def preview_debit_note(self):
         self.ensure_one()
         return {
@@ -222,6 +231,16 @@ class FreightDebitNote(models.Model):
             raise UserError(_(
                 "A valid exchange rate is required."
             ))
+
+    @api.model
+    def action_manual_update_exchange_rate_vnd(self, rec_id=0, vnd_rate=0.0):
+        if not rec_id and not vnd_rate:
+            return False
+
+        domain = [('id', '=', rec_id)]
+        record = self.env['freight.debit.note'].sudo().search(domain, limit=1)
+        if record:
+            record.write({'exchange_rate': vnd_rate})
 
     @api.model
     def _get_bill_id_domain(self):
@@ -302,24 +321,62 @@ class FreightDebitNote(models.Model):
         for debit in self:
             # amount_untaxed = amount_tax = 0.0
             amount_subtotal_usd = amount_subtotal_vnd = 0.0
+            amount_subtotal_usd_untaxed = amount_subtotal_vnd_untaxed = 0.0
             for item in debit.debit_items:
                 # amount_untaxed += item.price_subtotal
                 # amount_tax += item.price_tax
                 if item.currency_id and item.currency_id.name == 'USD':
                     amount_subtotal_usd += item.price_total
+                    amount_subtotal_usd_untaxed += item.price_subtotal
                 elif item.currency_id and item.currency_id.name == 'VND':
                     amount_subtotal_vnd += item.price_total
+                    amount_subtotal_vnd_untaxed += item.price_subtotal
             debit.update({
                 'amount_total': amount_subtotal_usd,
+                'amount_total_untaxed': amount_subtotal_usd_untaxed,
                 'amount_subtotal_vnd': amount_subtotal_vnd,
+                'amount_subtotal_vnd_untaxed': amount_subtotal_vnd_untaxed
             })
+
+    @api.model
+    def action_fix_totals_untaxed(self):
+        try:
+            domain = [
+                ('active', '=', True)
+            ]
+            records = self.env['freight.debit.note'].sudo().search(domain)
+
+            for debit in records:
+                amount_subtotal_usd_untaxed = amount_subtotal_vnd_untaxed = 0.0
+                for item in debit.debit_items:
+                    if item.currency_id and item.currency_id.name == 'USD':
+                        amount_subtotal_usd_untaxed += item.price_subtotal
+                    elif item.currency_id and item.currency_id.name == 'VND':
+                        amount_subtotal_vnd_untaxed += item.price_subtotal
+
+                amount_total_vnd_untaxed = float_round(amount_subtotal_usd_untaxed * debit.exchange_rate,
+                                                       precision_digits=0)
+                if amount_subtotal_vnd_untaxed > 0:
+                    amount_total_vnd_untaxed += amount_subtotal_vnd_untaxed
+
+                debit.update({
+                    'amount_total_untaxed': amount_subtotal_usd_untaxed,
+                    'amount_subtotal_vnd_untaxed': amount_subtotal_vnd_untaxed,
+                    'amount_total_vnd_untaxed': amount_total_vnd_untaxed
+                })
+
+            _logger.info("action_fix_totals_untaxed executed successful")
+        except Exception as e:
+            _logger.exception("action_fix_totals_untaxed - Exception: %s" % e)
 
     @api.depends('amount_total', 'exchange_rate')
     def _compute_amount_total_vnd(self):
         for rec in self:
             rec.amount_total_vnd = float_round(rec.amount_total * rec.exchange_rate, precision_digits=0)
+            rec.amount_total_vnd_untaxed = float_round(rec.amount_total_untaxed * rec.exchange_rate, precision_digits=0)
             if rec.amount_subtotal_vnd > 0:
                 rec.amount_total_vnd += rec.amount_subtotal_vnd
+                rec.amount_total_vnd_untaxed += rec.amount_subtotal_vnd_untaxed
 
     @api.depends('order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):

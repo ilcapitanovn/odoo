@@ -1,28 +1,39 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    vessel_bol_number = fields.Char(compute="_compute_vessel_bol_number", string="B/L Number", readonly=True, store=True)
+    vessel_bol_number = fields.Char(string="B/L Number", readonly=True, store=True)
 
-    def _compute_vessel_bol_number(self):
-        for rec in self:
-            rec.vessel_bol_number = ''
-            sale_line_ids = rec.invoice_line_ids.mapped('sale_line_ids')
+    @api.model
+    def automate_action_set_bl_number_on_invoice_creation(self, record):
+        try:
+            if not record:
+                return False
+
+            sale_line_ids = record.invoice_line_ids.mapped('sale_line_ids')
             if sale_line_ids:
                 sale_order = sale_line_ids[0].order_id
                 if sale_order and sale_order.booking_id:
-                    rec.vessel_bol_number = sale_order.booking_id[0].vessel_bol_no
+                    record.vessel_bol_number = sale_order.booking_id[0].vessel_bol_no
             else:
-                purchase_order = rec.invoice_line_ids.mapped('purchase_order_id')
+                purchase_order = record.invoice_line_ids.mapped('purchase_order_id')
                 if purchase_order:
                     order_name = purchase_order[0].origin
                     sale_order = self.env['sale.order'].sudo().search([('name', '=', order_name)])
                     if sale_order and sale_order[0].booking_id:
-                        rec.vessel_bol_number = sale_order[0].booking_id[0].vessel_bol_no
+                        record.vessel_bol_number = sale_order[0].booking_id[0].vessel_bol_no
+
+            _logger.info("automate_action_set_bl_number_on_creation executed successful")
+        except Exception as e:
+            _logger.exception("automate_action_set_bl_number_on_creation - Exception: %s" % e)
+
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -195,6 +195,9 @@
                                             attrs="{'invisible': [('amount_subtotal_vnd', '=', 0)]}"/>
                                         <field name="amount_total_vnd" string="Total Amount (VND)"
                                             attrs="{'invisible': [('amount_total_vnd', '=', 0)]}"/>
+                                        <field name="amount_total_untaxed" string="Total Untaxed (USD)" invisible="1"/>
+                                        <field name="amount_subtotal_vnd_untaxed" string="Total Untaxed (VND)" invisible="1"/>
+                                        <field name="amount_total_vnd_untaxed" string="Total Amount Untaxed (VND)" invisible="1"/>
                                     </group>
                                     <div class="oe_clear"/>
                                 </group>

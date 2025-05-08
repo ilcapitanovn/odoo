@@ -59,6 +59,9 @@
 <!--                        type="object"-->
 <!--                        attrs="{'invisible' : [('user_id', '!=', False)]}"-->
 <!--                    />-->
+                    <button name="action_confirm" id="action_confirm" class="btn-primary"
+                            string="Confirm" type="object" data-hotkey="c" groups="freight_mgmt.group_freight_operation"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button string="Create Invoice" type="object" name="action_create_invoice" class="oe_highlight"
                             attrs="{'invisible': ['|', '|', ('payment_state', 'in', ('in_payment', 'paid')), ('invoice_status', 'in', ('no', 'invoiced')), ('state', 'not in', ['posted', 'completed'])]}" data-hotkey="q"/>
                     <!-- Preview (only customer debit note) -->
@@ -190,6 +193,9 @@
                                             attrs="{'invisible': [('amount_subtotal_vnd', '=', 0)]}"/>
                                         <field name="amount_total_vnd" string="Total Amount (VND)"
                                             attrs="{'invisible': [('show_amount_total_vnd', '=', False)]}"/>
+                                        <field name="amount_total_untaxed" string="Total Untaxed (USD)" invisible="1"/>
+                                        <field name="amount_subtotal_vnd_untaxed" string="Total Untaxed (VND)" invisible="1"/>
+                                        <field name="amount_total_vnd_untaxed" string="Total Amount Untaxed (VND)" invisible="1"/>
                                     </group>
                                     <div class="oe_clear"/>
                                 </group>

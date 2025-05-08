@@ -7,6 +7,7 @@
             <search string="Sales Incentive Report">
                 <separator />
                 <field name="user_id" invisible="1" />
+                <field name="bill_no"/>
                 <field name="partner_id" />
                 <field name="incentive_id" />
                 <separator />
@@ -53,7 +54,7 @@
                 <field name="bill_no"/>
                 <field name="display_target_sales" digits="[12,0]" class="class_t_sales" />
                 <field name="display_pod" string="POL/D" />
-                <field name="etd" optional="show"/>
+                <field name="etd_formatted" optional="show"/>
                 <field name="invoice_date" optional="hide"/>
                 <field name="sum_freehand" digits="[12,0]" />
                 <field name="sum_nominated" digits="[12,0]" />
