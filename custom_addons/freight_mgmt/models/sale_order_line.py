@@ -12,12 +12,6 @@ _logger = logging.getLogger(__name__)
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    # def _get_default_price_unit_input(self):
-    #     if self.order_line_currency_id and self.order_line_currency_id.name == 'VND':
-    #         self.price_unit_input = self.price_unit * self.exchange_rate
-    #     else:
-    #         self.price_unit_input = self.price_unit
-
     exchange_rate = fields.Float(related="order_id.exchange_rate")
     price_unit_input = fields.Float('Unit Price', readonly=False, compute="_compute_price_unit_input",
                                     digits='Product Price', store=True, required=True,
@@ -27,7 +21,7 @@ class SaleOrderLine(models.Model):
     price_total_display = fields.Monetary(compute='_compute_amount_display', string='Total', store=True, readonly=False)
     order_line_currency_id = fields.Many2one('res.currency', 'Currency', tracking=True, required=True,
                                              compute="_compute_product_id_changed", store=True, readonly=False)
-
+    product_is_no_vat = fields.Boolean(compute="_compute_product_is_no_vat")
     purchase_price_custom = fields.Float(
         string='Unit Cost', compute="_compute_purchase_price_custom",
         digits='Product Price', store=True, readonly=True)
@@ -53,6 +47,14 @@ class SaleOrderLine(models.Model):
             self.price_unit = self.price_unit_input / self.exchange_rate if self.exchange_rate else 0.0
         else:
             self.price_unit = self.price_unit_input
+
+    @api.depends("product_id.product_tmpl_id.is_no_vat")
+    def _compute_product_is_no_vat(self):
+        for rec in self:
+            if rec.product_id:
+                rec.product_is_no_vat = rec.product_id.product_tmpl_id.is_no_vat
+            else:
+                rec.product_is_no_vat = False
 
     @api.depends('purchase_price_custom')
     def _compute_purchase_price_custom_display(self):

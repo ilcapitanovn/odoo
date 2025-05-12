@@ -53,8 +53,12 @@
                                    attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
                         </xpath>
                         <xpath expr="//tree//field[@name='price_subtotal']" position="before">
+                            <field name="product_is_no_vat" invisible="1"/>
                             <field name="price_subtotal_display" widget='monetary' force_save="1"
                                     options="{'currency_field': 'order_line_currency_id'}"/>
+                        </xpath>
+                        <xpath expr="//page[@name='order_lines']//tree//field[@name='tax_id']" position="attributes">
+                            <attribute name="attrs">{'readonly': [('product_is_no_vat', '=', True)]}</attribute>
                         </xpath>
                         <xpath expr="//tree//field[@name='qty_delivered']" position="attributes">
                             <attribute name="invisible">1</attribute>

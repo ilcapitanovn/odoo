@@ -37,6 +37,15 @@
                 <xpath expr="//label[@for='list_price']" position="attributes">
                     <attribute name="string">Sales Price (USD)</attribute>
                 </xpath>
+                <xpath expr="//label[@for='purchase_ok']" position="after">
+                    <div>
+                        <field name="is_no_vat" />
+                        <label for="is_no_vat" />
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='taxes_id']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('is_no_vat', '=', True)]}</attribute>
+                </xpath>
                 <xpath expr="//div[@name='pricing']" position="after">
                     <label for="list_price_vnd" class="mt-1"/>
                     <div name="pricing_vnd">

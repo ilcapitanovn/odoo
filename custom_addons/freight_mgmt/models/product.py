@@ -43,6 +43,7 @@ class ProductTemplate(models.Model):
     vessel_id = fields.Many2one(
         comodel_name="freight.catalog.vessel", string="Shipping Line"
     )
+    is_no_vat = fields.Boolean(string="No Customer Taxes", default=False)
 
     exchange_rate = fields.Float(string='VND/USD rate', default=_get_default_exchange_rate, readonly=True,
                                  help='The rate of VND per USD.', tracking=True, store=True)
@@ -70,6 +71,11 @@ class ProductTemplate(models.Model):
         vnd = self.env['res.currency'].sudo().search([('name', '=', 'VND')], limit=1)
         for rec in self:
             rec.vnd_currency_id = vnd.id or False
+
+    @api.onchange('is_no_vat')
+    def _onchange_is_no_vat(self):
+        if self.is_no_vat:
+            self.taxes_id = [(6, 0, [])]    # Mark empty if no vat
 
     @api.onchange('seller_ids')
     def _onchange_supplier_price(self):
