@@ -44,9 +44,11 @@ class IrHttp(models.AbstractModel):
         usm_session_id = request.session.get('usm_session_id')
         if usm_session_id:
             try:
-                request.env['user.session.login'].browse(usm_session_id).write({
-                    'sid': u_sid
-                })
+                current_session = request.env['user.session.login'].sudo().browse(usm_session_id)
+                if current_session and current_session.sid != u_sid:    # sid changed after user logged in successful
+                    request.env['user.session.login'].browse(usm_session_id).write({
+                        'sid': u_sid
+                    })
             except Exception as e:
                 # Ignore logging if transaction blocked error occurred
                 _logger.exception("user_session_management.ir_http._authenticate - Exception: %s" % e)
