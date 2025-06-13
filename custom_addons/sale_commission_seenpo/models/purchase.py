@@ -74,12 +74,18 @@ class PurchaseOrderLine(models.Model):
 
     @api.depends("order_id")
     def _compute_agent_ids(self):
-        self.agent_ids = False  # for resetting previous agents
-        for record in self.filtered(lambda x: x.order_id.partner_id):
-            if not record.commission_free:
-                record.agent_ids = record._prepare_agents_vals_partner(
-                    record.order_id.partner_id
-                )
+        filtered_rec = self.filtered(lambda x: x.order_id.partner_id)
+        for record in filtered_rec:
+            record.agent_ids = False  # for resetting previous agents
+            '''
+            # TODO: Comment out to fix error cannot confirm SO due to this code. The error says:
+            # bad query: INSERT INTO "purchase_order_line_agent"...
+            # psycopg2.errors.NotNullViolation: null value in column "commission_id" violates not-null constraint
+            '''
+            # if not record.commission_free:
+            #     record.agent_ids = record._prepare_agents_vals_partner(
+            #         record.order_id.partner_id
+            #     )
 
     def _prepare_invoice_line(self, **optional_values):
         vals = super()._prepare_invoice_line(**optional_values)
