@@ -150,26 +150,26 @@
                 <field name="invoice_date" optional="hide"/>
                 <field name="display_sale_name" string="SALE" optional="show"/>
                 <field name="order_type" string="Freehand or Nominated" optional="show"/>
-                <field name="po_amount_untaxed_vnd" string="COST Input (No_VAT)" digits="[12,0]" optional="show"/>
-                <field name="po_amount_total_vnd" string="COST Input (With_VAT)" digits="[12,0]" optional="hide"/>
-                <field name="po_amount_tax_vnd" string="COST Input (VAT)" digits="[12,0]" optional="hide"/>
-                <field name="cost_no_vat" string="COST (No_Invoice)" digits="[12,0]" optional="hide"/>
-                <field name="display_cus" string="COST COM CUS (CUS)" optional="hide"/>
-                <field name="so_commission_total" string="COST COM CUS (USD)" optional="hide"/>
-                <field name="so_commission_total_vnd" string="COST COM CUS (VND)" digits="[12,0]" optional="hide"/>
-                <field name="display_line" string="COST COM LINE (LINE)" optional="hide"/>
-                <field name="po_commission_total" string="COST COM LINE (USD)" optional="hide"/>
-                <field name="po_commission_total_vnd" string="COST COM LINE (VND)" digits="[12,0]" optional="hide"/>
-                <field name="so_amount_untaxed_vnd" string="REVENUE Output (No_VAT)" digits="[12,0]" optional="show"/>
-                <field name="so_amount_total_vnd" string="REVENUE Output (With_VAT)" digits="[12,0]" optional="hide"/>
-                <field name="so_amount_tax_vnd" string="REVENUE Output (VAT)" digits="[12,0]" optional="hide"/>
-                <field name="revenue_no_vat" string="REVENUE (No_Invoice)" digits="[12,0]" optional="hide"/>
-                <field name="profit_before_tax_no_vat" string="PROFIT UNTAXED (No_VAT)" digits="[12,0]" optional="show"/>
-                <field name="profit_before_tax_vat" string="PROFIT UNTAXED (GROSS)" digits="[12,0]" optional="show"/>
-                <field name="vat_payable" string="VAT Payment" digits="[12,0]" optional="hide"/>
-                <field name="business_tax_amount" string="Income TAX" digits="[12,0]" optional="hide"/>
-                <field name="profit_after_tax_no_vat" string="PROFIT TAXED (Excluded_VAT)" digits="[12,0]" optional="show"/>
-                <field name="profit_after_tax_vat" string="PROFIT TAXED (NET)" digits="[12,0]" optional="show"/>
+                <field name="po_amount_untaxed_vnd" placeholder="COST Input (No_VAT)" string="CHI_PHÍ ĐẦU_VÀO (Chưa_VAT)" digits="[12,0]" optional="show"/>
+                <field name="po_amount_total_vnd" placeholder="COST Input (With_VAT)" string="CHI_PHÍ ĐẦU_VÀO (Có_VAT)" digits="[12,0]" optional="hide"/>
+                <field name="po_amount_tax_vnd" placeholder="COST Input (VAT)" string="CHI_PHÍ ĐẦU_VÀO (VAT_Vào)" digits="[12,0]" optional="hide"/>
+                <field name="cost_no_vat" placeholder="COST (No_Invoice)" string="CHI_PHÍ ĐẦU_VÀO (ko_hđ)" digits="[12,0]" optional="hide"/>
+                <field name="display_cus" placeholder="COST COM CUS (CUS)" string="CHI_PHÍ COM_KH (CUS)" optional="hide"/>
+                <field name="so_commission_total" placeholder="COST COM CUS (USD)" string="CHI_PHÍ COM_KH (USD)" optional="hide"/>
+                <field name="so_commission_total_vnd" placeholder="COST COM CUS (VND)" string="CHI_PHÍ COM_KH (VND)" digits="[12,0]" optional="hide"/>
+                <field name="display_line" placeholder="COST COM LINE (LINE)" string="CHI_PHÍ COM_LINE (LINE)" optional="hide"/>
+                <field name="po_commission_total" placeholder="COST COM LINE (USD)" string="CHI_PHÍ COM_LINE (USD)" optional="hide"/>
+                <field name="po_commission_total_vnd" placeholder="COST COM LINE (VND)" string="CHI_PHÍ COM_LINE (VND)" digits="[12,0]" optional="hide"/>
+                <field name="so_amount_untaxed_vnd" placeholder="REVENUE Output (No_VAT)" string="DOANH_THU ĐẦU_RA (Chưa_VAT)" digits="[12,0]" optional="show"/>
+                <field name="so_amount_total_vnd" placeholder="REVENUE Output (With_VAT)" string="DOANH_THU ĐẦU_RA (Có_VAT)" digits="[12,0]" optional="hide"/>
+                <field name="so_amount_tax_vnd" placeholder="REVENUE Output (VAT)" string="DOANH_THU ĐẦU_RA (VAT_Ra)" digits="[12,0]" optional="hide"/>
+                <field name="revenue_no_vat" placeholder="REVENUE (No_Invoice)" string="DOANH_THU DỊCH_VỤ (ko_xuất_hđ)" digits="[12,0]" optional="hide"/>
+                <field name="profit_before_tax_no_vat" placeholder="PROFIT UNTAXED (No_VAT)" string="LỢI_NHUẬN TRƯỚC_THUẾ (LN_THUẾ)" digits="[12,0]" optional="show"/>
+                <field name="profit_before_tax_vat" placeholder="PROFIT UNTAXED (GROSS)" string="LỢI_NHUẬN TRƯỚC_THUẾ (LN_THỰC_TẾ)" digits="[12,0]" optional="show"/>
+                <field name="vat_payable" placeholder="VAT Payment" string="LỢI_NHUẬN SAU_THUẾ (VAT_PHẢI_NỘP)" digits="[12,0]" optional="hide"/>
+                <field name="business_tax_amount" placeholder="Income TAX" string="LỢI_NHUẬN SAU_THUẾ (Thuế_TNDN)" digits="[12,0]" optional="hide"/>
+                <field name="profit_after_tax_no_vat" placeholder="PROFIT TAXED (Excluded_VAT)" string="LỢI_NHUẬN SAU_THUẾ (LN_THUẾ)" digits="[12,0]" optional="show"/>
+                <field name="profit_after_tax_vat" placeholder="PROFIT TAXED (NET)" string="LỢI_NHUẬN SAU_THUẾ (LN_THỰC_TẾ)" digits="[12,0]" optional="show"/>
 <!--                <field name="currency_id" invisible="1"/>-->
 <!--                <field name="state"-->
 <!--                       widget="badge"-->

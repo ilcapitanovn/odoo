@@ -60,9 +60,9 @@
                 <field name="sum_nominated" digits="[12,0]" />
                 <field name="sum_activities" digits="[12,0]" optional="hide"/>
                 <field name="sum_all" digits="[12,0]" />
-                <field name="incentive" digits="[12,0]" optional="hide"/>
+                <field name="incentive" digits="[12,0]"/>
                 <field name="incentive_tax_amount" digits="[12,0]" optional="hide"/>
-                <field name="incentive_after_tax" digits="[12,0]" />
+                <field name="incentive_after_tax" digits="[12,0]" optional="hide"/>
                 <field name="display_achieve"/>
             </tree>
         </field>

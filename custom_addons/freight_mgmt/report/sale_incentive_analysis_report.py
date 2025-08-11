@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import pytz
+import itertools
 from datetime import datetime
 from psycopg2.extensions import AsIs
 
@@ -15,6 +16,7 @@ class SaleIncentiveAnalysisReport(models.Model):
     _description = "Sale Incentive Analysis Report"
     _auto = False
     _rec_name = "user_id"
+    _order = "incentive_name DESC"
 
     user_id = fields.Many2one("res.users", "User", readonly=True)
     company_id = fields.Many2one("res.company", "Company", readonly=True)
@@ -70,11 +72,14 @@ class SaleIncentiveAnalysisReport(models.Model):
         '''
         Calculate to display total if using group by
         '''
+        orderby = "incentive_name DESC"
         exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
         res = super(SaleIncentiveAnalysisReport, self).read_group(domain, fields, groupby, offset=offset,
                                                                   limit=limit, orderby=orderby, lazy=lazy)
+        # Check read_group is on level 1 (grouping by incentive) or level 2 (grouping by salesman)
+        is_level_1 = 'incentive_name' in res[0].keys() if len(res) > 0 else False
 
-        fields_to_calculate_total = [
+        fields_to_calculate_total = [   # level 2
             'display_target_sales',
             'sum_freehand',
             'sum_nominated',
@@ -84,27 +89,89 @@ class SaleIncentiveAnalysisReport(models.Model):
             'incentive_after_tax',
             'display_achieve'
         ]
+        if is_level_1:
+            fields_to_calculate_total = ['incentive']
+
         for field in fields_to_calculate_total:
             if field in fields:
                 for line in res:
                     if '__domain' in line:
-                        lines = self.search(line['__domain'])
-                        total = 0.0
-                        for record in lines:
-                            if field == 'display_target_sales':
-                                total = record['target_sales'] * exchange_rate  # Only need first record, no sum
-                                break
-                            elif field == 'display_achieve':
-                                break
-                            else:
-                                total += record[field]
-                        line[field] = total
+                        records = self.search(line['__domain'])
+                        if is_level_1:      # Only column incentive need to calculate
+                            total = 0.0
+                            if records:
+                                # Sort the recordset by the grouping field (here is partner name)
+                                # For Many2one fields, you often need to sort by the actual value/name
+                                # or the ID if the field is defined with sortable=False
+                                sorted_records = records.sorted(key=lambda r: r.display_name if r.display_name else '')
 
-                        if field == 'display_achieve':
-                            sum_all = line['sum_all']
-                            target = line['display_target_sales']
-                            val = 1 if sum_all > target * 0.5 else 0
-                            line[field] = val
+                                # Group using itertools.groupby
+                                grouped_items = {}
+                                for key, group in itertools.groupby(sorted_records, key=lambda r: r.partner_id):
+                                    category_name = key.name if key else 'No Category'
+                                    grouped_items[category_name] = list(group)  # Convert group iterator to a list of records
+
+                                for salesman, items in grouped_items.items():
+                                    sum_freehand_total = 0.0
+                                    sum_nominated_total = 0.0
+                                    sum_all_total = 0.0
+                                    target_sales_vnd = 0.0
+                                    incentive_record = None
+                                    if len(items) > 0:
+                                        target_sales_vnd = items[0].target_sales * exchange_rate
+                                        incentive_record = items[0].incentive_id
+
+                                    for item in items:
+                                        sum_freehand_total += item.sum_freehand
+                                        sum_nominated_total += item.sum_nominated
+                                        sum_all_total += item.sum_all
+
+                                    incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                                                            sum_freehand_total, sum_nominated_total,
+                                                                            sum_all_total, exchange_rate)
+                                    total += incentive
+                            line[field] = total
+
+                        else:
+                            total = 0.0
+                            for record in records:
+                                if field == 'display_target_sales':
+                                    total = record['target_sales'] * exchange_rate  # Only need first record, no sum
+                                    break
+                                elif field == 'display_achieve':
+                                    break
+                                elif field == 'incentive':
+                                    incentive_record = records[0].incentive_id if len(records) > 0 else None
+                                    target_sales_vnd = line['display_target_sales']
+                                    sum_freehand = line['sum_freehand']
+                                    sum_nominated = line['sum_nominated']
+                                    sum_all = line['sum_all']
+                                    incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                                                            sum_freehand, sum_nominated, sum_all,
+                                                                            exchange_rate)
+                                    total = incentive
+                                    break
+                                elif field == 'incentive_tax_amount':
+                                    tax_record = records[0].tax_income_id if len(records) > 0 else None
+                                    incentive = line['incentive']
+                                    incentive_tax_amount = self.calculate_incentive_tax_amount_v2(tax_record, incentive)
+                                    total = incentive_tax_amount
+                                    break
+                                elif field == 'incentive_after_tax':
+                                    incentive = line['incentive']
+                                    incentive_tax_amount = line['incentive_tax_amount']
+                                    incentive_after_tax = incentive - incentive_tax_amount
+                                    total = incentive_after_tax
+                                    break
+                                else:
+                                    total += record[field]
+                            line[field] = total
+
+                            if field == 'display_achieve':
+                                sum_all = line['sum_all']
+                                target = line['display_target_sales']
+                                val = 1 if sum_all > target * 0.5 else 0
+                                line[field] = val
 
         return res
 
@@ -167,13 +234,16 @@ class SaleIncentiveAnalysisReport(models.Model):
 
     @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all', 'target_sales')
     def _compute_incentive_and_tax(self):
-        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
+        # exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
         for rec in self:
-            res = self.calculate_incentive_and_tax(rec, exchange_rate)
-            rec.incentive = res['incentive']
-            rec.incentive_tax_amount = res['incentive_tax_amount']
-            rec.incentive_after_tax = res['incentive_after_tax']
+            # res = self.calculate_incentive_and_tax(rec, exchange_rate)
+            # rec.incentive = res['incentive']
+            # rec.incentive_tax_amount = res['incentive_tax_amount']
+            # rec.incentive_after_tax = res['incentive_after_tax']
+            rec.incentive = 0
+            rec.incentive_tax_amount = 0
+            rec.incentive_after_tax = 0
 
     @api.depends('so_amount_untaxed', 'po_amount_untaxed', 'margin')
     def _compute_sums(self):
@@ -211,6 +281,45 @@ class SaleIncentiveAnalysisReport(models.Model):
             rec.sum_all = sum_freehand + sum_nominated + sum_nominated
 
     @staticmethod
+    def calculate_incentive_v2(incentive_record, target_sales_vnd, sum_freehand, sum_nominated, sum_all, exchange_rate_vnd):
+        incentive = 0.0
+
+        if incentive_record and incentive_record.section_ids:
+            for sec in incentive_record.section_ids:
+                amount_from = sec.percent_from * target_sales_vnd / 100
+                amount_to = sec.percent_to * target_sales_vnd / 100
+                if amount_from <= sum_all < amount_to or target_sales_vnd == 0.0 and amount_from == 0.0:
+                    incentive = (sec.incentive_percent_month / 100) * \
+                                ((sum_freehand * incentive_record.target_freehand / 100) +
+                                 (sum_nominated * incentive_record.target_nominated / 100))
+                    break
+
+        return incentive
+
+    @staticmethod
+    def calculate_incentive_tax_amount_v2(tax_record, incentive):
+        tax_amount = 0.0
+
+        if incentive and tax_record and tax_record.section_ids:
+            incentive_tmp = incentive
+            if tax_record.tax_income_type == 'section':
+                if len(tax_record.section_ids) > 1:
+                    sortedDescSections = sorted(tax_record.section_ids, key=lambda x: x.amount_to, reverse=True)
+                else:
+                    sortedDescSections = tax_record.section_ids
+
+                for sec in sortedDescSections:
+                    if sec.amount_from < incentive_tmp <= sec.amount_to:
+                        incentive_to_tax = incentive_tmp - sec.amount_from
+                        tax_amount += incentive_to_tax * sec.tax_rate_percent / 100
+                        incentive_tmp -= incentive_to_tax
+            else:  # 'fixed'
+                tax_amount = incentive_tmp * tax_record.fix_percent / 100
+
+        return tax_amount
+
+    '''TODO: This method is deprecated'''
+    @staticmethod
     def calculate_incentive_and_tax(rec, exchange_rate_vnd):
         incentive = 0.0
         tax_amount = 0.0
@@ -226,6 +335,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                                 ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
                                  (rec.sum_nominated * rec.incentive_id.target_nominated / 100) +
                                  (rec.sum_activities * rec.incentive_id.target_activities / 100))
+                    break
 
             if incentive and rec.tax_income_id and rec.tax_income_id.section_ids:
                 incentive_tmp = incentive
@@ -451,11 +561,16 @@ class ReportSaleIncentiveAnalysis(models.AbstractModel):
                 salesman_sum_nominated_total = 0.0
                 salesman_incentive_after_tax_total = 0.0
                 display_target_sales = 0.0
+                incentive_record = None
+                tax_record = None
                 for incentive in incentives:
                     salesman_sum_freehand_total += incentive.sum_freehand
                     salesman_sum_nominated_total += incentive.sum_nominated
-                    res = SaleIncentiveAnalysisReport.calculate_incentive_and_tax(incentive, exchange_rate)
-                    salesman_incentive_after_tax_total += res['incentive_after_tax']
+                    # res = SaleIncentiveAnalysisReport.calculate_incentive_and_tax(incentive, exchange_rate)
+                    if not incentive_record:
+                        incentive_record = incentive.incentive_id    # Take first record because all is same
+                    if not tax_record:
+                        tax_record = incentive.tax_income_id
                     if display_target_sales == 0.0:
                         display_target_sales = incentive.target_sales * exchange_rate
                     if incentive.etd:
@@ -466,6 +581,15 @@ class ReportSaleIncentiveAnalysis(models.AbstractModel):
                         if year not in years:
                             years.append(year)
 
+                sum_all = salesman_sum_freehand_total + salesman_sum_nominated_total
+                incentive_amount = SaleIncentiveAnalysisReport.calculate_incentive_v2(
+                    incentive_record, display_target_sales, salesman_sum_freehand_total,
+                    salesman_sum_nominated_total, sum_all, exchange_rate)
+                incentive_tax_amount = SaleIncentiveAnalysisReport.calculate_incentive_tax_amount_v2(
+                    tax_record, incentive_amount)
+                incentive_after_tax = incentive_amount - incentive_tax_amount
+                salesman_incentive_after_tax_total += incentive_after_tax
+
                 salesman_sum_revenue_total = salesman_sum_freehand_total + salesman_sum_nominated_total
                 achieve = salesman_sum_revenue_total > display_target_sales * 0.5
 
@@ -475,11 +599,13 @@ class ReportSaleIncentiveAnalysis(models.AbstractModel):
                     'sum_freehand_total': salesman_sum_freehand_total,
                     'sum_nominated_total': salesman_sum_nominated_total,
                     'sum_revenue_total': salesman_sum_revenue_total,
+                    'incentive_before_tax_total': incentive_amount,
+                    'incentive_tax_amount': incentive_tax_amount,
                     'incentive_after_tax_total': salesman_incentive_after_tax_total,
                     'achieve': achieve,
                     'incentives': incentives
                 })
-                total_incentive_type += salesman_incentive_after_tax_total
+                total_incentive_type += incentive_amount
 
             processed_groups.append({
                 'incentive_type': grouping_incentive_type,
