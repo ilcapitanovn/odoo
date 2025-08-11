@@ -36,7 +36,7 @@
         <field name="model">sale.incentive.analysis.report</field>
         <field name="arch" type="xml">
             <tree string="Incentives" class="o_report_incentive_tree"
-                  default_order = 'etd desc'
+                  default_order = 'etd asc'
                   create="false"
                   edit="false"
                   delete="false"

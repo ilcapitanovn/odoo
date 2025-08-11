@@ -1,6 +1,8 @@
 # Copyright 2022 Bao Thinh Software - Tuan Huynh
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import pytz
+from datetime import datetime
 from psycopg2.extensions import AsIs
 
 from odoo import api, fields, models, tools
@@ -37,6 +39,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     bill_no = fields.Char("BILL NO", readonly=True)
     volumes = fields.Char("CONT", readonly=True)
     etd = fields.Date("ETD", readonly=True)
+    etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
     order_type = fields.Char("Freehand or Nominated", readonly=True)
     date_order = fields.Date("Date Order", readonly=True)
     order_number = fields.Char("Order", readonly=True)
@@ -114,6 +117,47 @@ class SaleProfitForwarderAnalysisReport(models.Model):
         for record in self:
             display_pod = record.pod_id.name if record.pod_id else ''
             record.display_pod = display_pod
+
+    @api.depends('etd')
+    def _compute_format_etd(self):
+        for rec in self:
+            rec.etd_formatted = ''
+            if rec.etd:
+                etd_local = self._convert_utc_to_local(rec.etd)
+                if etd_local:
+                    rec.etd_formatted = etd_local.strftime('%d/%m/%Y')
+
+    def _convert_utc_to_local(self, utc_date):
+        result = utc_date
+        if result:
+            try:
+                fmt = "%Y-%m-%d %H:%M:%S"
+                utc_date_str = utc_date.strftime(fmt)
+
+                ########################################################
+                # OPTION 1
+                ########################################################
+                # now_utc = datetime.now(pytz.timezone('UTC'))
+                # tz = pytz.timezone(self.env.user.tz)      # Consider get tz correct
+                # now_tz = now_utc.astimezone(tz) or pytz.utc
+                # utc_offset_timedelta = datetime.strptime(now_tz.strftime(fmt), fmt) - datetime.strptime(now_utc.strftime(fmt), fmt)
+                # # local_date = datetime.strptime(utc_date_str, fmt)
+                # result = utc_date + utc_offset_timedelta
+
+                ########################################################
+                # OPTION 2
+                ########################################################
+                timezone = 'UTC'
+                if self.env.user.tz:
+                    timezone = self.env.user.tz
+                elif self.user_id and self.user_id.partner_id.tz:
+                    timezone = self.user_id.partner_id.tz
+                tz = pytz.timezone(timezone)
+                result = pytz.utc.localize(datetime.strptime(utc_date_str, fmt)).astimezone(tz)
+            except:
+                print("ERROR in _convert_utc_to_local")
+
+            return result
 
     @api.depends('sale_partner_id')
     def _compute_display_sale_name(self):
@@ -276,6 +320,9 @@ class SaleProfitForwarderAnalysisReport(models.Model):
         """
         return where_str
 
+    def action_print_internal_budget_report(self):
+        return self.env.ref('freight_mgmt.freight_sale_internal_budget_report_template_action').report_action(self)
+
     # def _group_by(self):
     #     group_by_str = """
     #         GROUP BY ai.partner_id,
@@ -305,3 +352,89 @@ class SaleProfitForwarderAnalysisReport(models.Model):
                 # AsIs(self._group_by()),
             ),
         )
+
+
+class ReportPrintInternalBudget(models.AbstractModel):
+    _name = 'report.freight_mgmt.report_print_internal_budget_template'
+    _description = 'Internal Budget Report With Grouping'
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        docs = self.env["sale.profit.forwarder.analysis.report"].browse(docids)
+
+        ''' Method 1: Manual Nested Grouping (More Control) '''
+        grouped_customers = {}
+        for doc in docs:
+            grouping_customer_name = doc.customer_id.display_name if doc.customer_id else "N/A"
+
+            if grouping_customer_name not in grouped_customers:
+                grouped_customers[grouping_customer_name] = []
+
+            grouped_customers[grouping_customer_name].append(doc)
+
+        processed_groups = []
+        months = []
+        years = []
+        for grouping_customer_name_key, customer_data_value in grouped_customers.items():
+            customer_data_list = []
+            total_by_customer = 0.0
+            for rec_cus in customer_data_value:
+                tmp_rec_cus = {
+                    'bill_no': rec_cus.bill_no,
+                    'display_pod': rec_cus.display_pod,
+                    'etd_formatted': rec_cus.etd_formatted,
+                    'order_type': rec_cus.order_type,
+                    'profit_after_tax_vat': rec_cus.profit_after_tax_vat,
+                }
+                total_by_customer += rec_cus.profit_after_tax_vat
+
+                if rec_cus.etd:
+                    month = rec_cus.etd.strftime('%m')
+                    year = rec_cus.etd.strftime('%Y')
+                    if month not in months:
+                        months.append(month)
+                    if year not in years:
+                        years.append(year)
+
+                volume = ''
+                if rec_cus.booking_id and rec_cus.booking_id.booking_volumes:
+                    for item in rec_cus.booking_id.booking_volumes:
+                        if item.container_id:
+                            if volume:
+                                volume += ', %sx%s' % (item.quantity, item.container_id.code)
+                            else:
+                                volume = '%sx%s' % (item.quantity, item.container_id.code)
+                tmp_rec_cus["volume"] = volume
+
+                display_sale_name = rec_cus.display_sale_name
+                if rec_cus.user_id:
+                    display_sale_name = rec_cus.user_id.display_name    # Display full name
+                tmp_rec_cus["display_sale_name"] = display_sale_name
+
+                customer_data_list.append(tmp_rec_cus)
+
+            processed_groups.append({
+                'customer_name': grouping_customer_name_key,
+                'customer_data': customer_data_list,
+                'total_by_customer': total_by_customer
+            })
+
+        ''' Method 2: Using read_group with Multiple groupby Fields: '''
+        # grouped_records = self.env['sale.incentive.analysis.report'].read_group(
+        #     domain=[('id', 'in', docs.ids)],
+        #     fields=['sum_freehand:sum', 'sum_nominated:sum', 'sum_all:sum'],
+        #     groupby=['incentive_name', 'partner_id']
+        # )
+
+        if len(months) > 1:
+            months.sort()
+        if len(years) > 1:
+            years.sort()
+        report_time = "Tháng " + ",".join(months) + " Năm " + ",".join(years)
+
+        return {
+            'doc_ids': docs.ids,
+            'docs': docs,
+            'report_time': report_time,
+            'grouped_records': processed_groups
+        }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="freight_sale_internal_budget_report_template_action" model="ir.actions.report">
+        <field name="name">Internal Budget Report</field>
+        <field name="model">sale.profit.forwarder.analysis.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">freight_mgmt.report_print_internal_budget_template</field>
+        <field name="report_file">freight_mgmt.report_print_internal_budget_template</field>
+        <field name="print_report_name">'Internal Budget Report'</field>
+        <field name="binding_model_id" ref="model_sale_profit_forwarder_analysis_report"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="freight_mgmt.freight_paperformat_sale_incentive"/>
+    </record>
+
+    <template id="report_print_internal_budget_template">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <link rel="stylesheet" href="/freight_mgmt/static/src/css/report_internal_budget_styles.css"/>
+
+                <div id="quote_content" class="col-12 col-lg justify-content-end">
+                    <div id="header">
+                        <div class="header-logo">
+                            <img t-att-src="'freight_mgmt/static/img/logo.png'" class="company-logo" alt="Logo"/>
+                        </div>
+                        <div class="header-text">
+                            CÔNG TY CỔ PHẦN VIỆT TOẢN <br/>
+                            684/28A Trần Hưng Đạo, Phường 2, Quận 5, TP.HCM <br/>
+                            Tel: (028) 38384168
+                        </div>
+                    </div>
+
+                    <div id="introduction">
+                        <h2 class="my-0">
+                            BẢNG TRÍCH QUỸ NỘI BỘ <br/>
+                            <span t-esc="report_time"/> - Bộ phận: Phòng Logistics
+                        </h2>
+                    </div>
+                    <br/>
+
+                    <table class="table no-spacing" id="budget-table">
+                        <tr>
+                            <th width="4%">No</th>
+                            <th width="22%">BILL NO</th>
+                            <th width="12%">CONT</th>
+                            <th width="14%">POL/D</th>
+                            <th width="10%">ETD</th>
+                            <th width="12%">SALE</th>
+                            <th width="12%">Freehand <br/> or <br/>Nominated</th>
+                            <th width="14%">LN THỰC TẾ</th>
+                        </tr>
+
+                        <t t-set="cus_count" t-value="1"/>
+                        <t t-set="total" t-value="0"/>
+                        <t t-foreach="grouped_records" t-as="customer">
+                            <t t-set="i" t-value="1"/>
+                            <t t-set="customer_name" t-value="customer['customer_name']"/>
+                            <t t-set="total_by_customer" t-value="customer['total_by_customer']"/>
+                            <tr>
+                                <th class="o_customer_name" colspan="7"><span t-esc="cus_count"/>. <span t-esc="customer_name"/></th>
+                                <th class="o_total_b_c"><span t-esc="'{:,.0f}'.format(total_by_customer).replace(',', '.')"/></th>
+                            </tr>
+                            <t t-foreach="customer['customer_data']" t-as="line">
+                                    <t t-set="bill_no" t-value="line['bill_no']"/>
+                                    <t t-set="display_cont" t-value="line['volume']"/>
+                                    <t t-set="display_pod" t-value="line['display_pod']"/>
+                                    <t t-set="etd_formatted" t-value="line['etd_formatted']"/>
+                                    <t t-set="sale_name" t-value="line['display_sale_name']"/>
+                                    <t t-set="order_type" t-value="line['order_type']"/>
+                                    <t t-set="profit" t-value="line['profit_after_tax_vat']"/>
+
+                                    <tr>
+                                        <td class="stt"><span t-esc="i"/></td>
+                                        <td><span t-esc="bill_no"/></td>
+                                        <td><span t-esc="display_cont"/></td>
+                                        <td><span t-esc="display_pod"/></td>
+                                        <td><span t-esc="etd_formatted"/></td>
+                                        <td class="o_salesman_name"><span t-esc="sale_name"/></td>
+                                        <td><span t-esc="order_type"/></td>
+                                        <t t-if="profit != 0">
+                                            <td class="monetary"><span t-esc="'{:,.0f}'.format(profit).replace(',', '.')"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td></td>
+                                        </t>
+                                    </tr>
+                                    <t t-set="i" t-value="i + 1"/>
+                                    <t t-set="total" t-value="total + profit"/>
+                                </t>
+                            <t t-set="cus_count" t-value="cus_count + 1"/>
+                        </t>
+                        <tr>
+                            <th colspan="7" class="total">TỔNG CỘNG</th>
+                            <th class="total text-right"><span t-esc="'{:,.0f}'.format(total).replace(',', '.')"/></th>
+                        </tr>
+                        <tr>
+                            <th colspan="7" class="total">Trích 6% LN lập quỹ nội bộ - Phòng Logistic</th>
+                            <t t-set="budget" t-value="total * 0.06"/>
+                            <th class="total text-right"><span t-esc="'{:,.0f}'.format(budget).replace(',', '.')"/></th>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

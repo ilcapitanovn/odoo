@@ -135,6 +135,10 @@
                   delete="false"
                   duplicate="false"
                   import="false">
+                <header>
+                    <button string="Print" name="action_print_internal_budget_report"
+                            type="object" class="btn-primary" icon="fa-print"/>
+                </header>
                 <field name="bill_id" invisible="1"/>
                 <field name="sale_partner_id" invisible="1"/>
 <!--                <field name="customer_id" widget="many2one_avatar"/>-->
@@ -142,7 +146,7 @@
                 <field name="order_number" optional="hide"/>
                 <field name="volumes" optional="hide"/>
                 <field name="display_pod" string="POL/D" />
-                <field name="etd" optional="show"/>
+                <field name="etd_formatted" optional="show"/>
                 <field name="invoice_date" optional="hide"/>
                 <field name="display_sale_name" string="SALE" optional="show"/>
                 <field name="order_type" string="Freehand or Nominated" optional="show"/>

@@ -221,7 +221,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             for sec in rec.incentive_id.section_ids:
                 amount_from = sec.percent_from * target_sales_vnd / 100
                 amount_to = sec.percent_to * target_sales_vnd / 100
-                if amount_from <= rec.sum_all < amount_to:
+                if amount_from <= rec.sum_all < amount_to or target_sales_vnd == 0.0 and amount_from == 0.0:
                     incentive = (sec.incentive_percent_month / 100) * \
                                 ((rec.sum_freehand * rec.incentive_id.target_freehand / 100) +
                                  (rec.sum_nominated * rec.incentive_id.target_nominated / 100) +
