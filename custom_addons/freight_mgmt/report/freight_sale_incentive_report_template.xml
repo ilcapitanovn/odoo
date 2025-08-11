@@ -67,11 +67,13 @@
                                 <th></th>
                             </tr>
                             <t t-foreach="incentive['incentive_data']" t-as="salesman">
+                                <t t-set="i" t-value="1"/>
                                 <t t-set="sale_name" t-value="salesman['sale_name']"/>
                                 <t t-set="display_target_sales" t-value="salesman['display_target_sales']"/>
                                 <t t-set="sum_freehand_total" t-value="salesman['sum_freehand_total']"/>
                                 <t t-set="sum_nominated_total" t-value="salesman['sum_nominated_total']"/>
                                 <t t-set="sum_revenue_total" t-value="salesman['sum_revenue_total']"/>
+                                <t t-set="incentive_before_tax_total" t-value="salesman['incentive_before_tax_total']"/>
                                 <t t-set="incentive_after_tax_total" t-value="salesman['incentive_after_tax_total']"/>
                                 <t t-set="achieve" t-value="salesman['achieve']"/>
                                 <tr class="salesman_incentive">
@@ -81,7 +83,7 @@
                                     <td class="o_sum_black"><span t-esc="'{:,.0f}'.format(sum_freehand_total).replace(',', '.')"/></td>
                                     <td class="o_sum_black"><span t-esc="'{:,.0f}'.format(sum_nominated_total).replace(',', '.')"/></td>
                                     <td class="o_sum_blue"><span t-esc="'{:,.0f}'.format(sum_revenue_total).replace(',', '.')"/></td>
-                                    <td class="o_sum_red"><span t-esc="'{:,.0f}'.format(incentive_after_tax_total).replace(',', '.')"/></td>
+                                    <td class="o_sum_red"><span t-esc="'{:,.0f}'.format(incentive_before_tax_total).replace(',', '.')"/></td>
                                     <t t-if="achieve">
                                         <td class="text-center">Đạt</td>
                                     </t>
@@ -129,7 +131,7 @@
                                     <t t-set="i" t-value="i + 1"/>
                                 </t>
 
-                                <t t-set="total" t-value="total + incentive_after_tax_total"/>
+                                <t t-set="total" t-value="total + incentive_before_tax_total"/>
                             </t>
                         </t>
                         <tr>
