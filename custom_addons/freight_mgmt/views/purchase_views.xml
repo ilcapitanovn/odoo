@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_create_invoice']" position="attributes">
                 <attribute name="invisible">1</attribute>
+                <attribute name="groups">base.group_no_one</attribute>
             </xpath>
             <xpath expr="//button[@name='button_confirm']" position="after">
                 <button

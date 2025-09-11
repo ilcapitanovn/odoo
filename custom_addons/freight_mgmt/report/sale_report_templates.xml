@@ -8,6 +8,7 @@
                     vertical-align: middle;
                 }
             </style>
+            <link rel="stylesheet" href="/freight_mgmt/static/src/css/arrival_notice.css"/>
         </xpath>
         <xpath expr="//t[@t-set='display_discount']" position="after">
             <t t-set="print_with_images" t-value="doc.order_print_with_images"/>

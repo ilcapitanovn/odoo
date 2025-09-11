@@ -10,6 +10,21 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     vessel_bol_number = fields.Char(string="B/L Number", readonly=True, store=True)
+    related_billing_id = fields.Many2one("freight.billing", string="B/L Number", readonly=True,
+                                         compute="_compute_related_billing_id", store=False)
+
+    @api.depends("vessel_bol_number")
+    def _compute_related_billing_id(self):
+        ''' This compute method makes a clickable link of vessel bol number in
+        the accounting module to open the related billing within invoice form '''
+        for rec in self:
+            domain = [('vessel_bol_number', '=', rec.vessel_bol_number)]
+            billing_id = self.env["freight.billing"].sudo().search(domain, limit=1)
+            if billing_id:
+                billing_id['display_name'] = rec.vessel_bol_number
+                rec.related_billing_id = billing_id
+            else:
+                rec.related_billing_id = None
 
     @api.model
     def automate_action_set_bl_number_on_invoice_creation(self, record):

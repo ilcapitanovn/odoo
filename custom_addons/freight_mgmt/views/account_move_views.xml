@@ -23,7 +23,8 @@
                             <attribute name="invisible">1</attribute>
                         </xpath>
                         <xpath expr="//label[@for='journal_id']" position="before">
-                            <field name="vessel_bol_number"></field>
+                            <field name="vessel_bol_number" invisible="1"/>
+                            <field name="related_billing_id" context="{'display_by': 'vessel_bol_number'}"/>
                         </xpath>
                 </field>
         </record>

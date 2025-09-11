@@ -5,6 +5,7 @@ from datetime import datetime
 
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
+from odoo.osv import expression
 from odoo.tools import html_keep_url
 
 from datetime import date, timedelta
@@ -13,7 +14,7 @@ from collections import defaultdict
 class FreightBilling(models.Model):
     _name = "freight.billing"
     _description = "Freight Billing"
-    _rec_name = "name"
+    _rec_name = "display_name"
     _order = "name desc"
     _mail_post_access = "read"
     _inherit = ["portal.mixin", "mail.thread.cc", "mail.activity.mixin"]
@@ -55,6 +56,7 @@ class FreightBilling(models.Model):
 
     # number = fields.Char(string="Bill number")
     name = fields.Char(string='Bill Number', default="#", readonly=True, store=True, index=True, required=True)
+    display_name = fields.Char(string='Bill Number', compute="_compute_display_name")
     vessel_bol_number = fields.Char(string="B/L Number", tracking=True)
     description = fields.Char(translate=True, tracking=True)
 
@@ -194,8 +196,38 @@ class FreightBilling(models.Model):
         res = []
         for rec in self:
             # res.append((rec.id, rec.number + " - " + rec.name))
-            res.append((rec.id, rec.name))
+            if rec.env.context.get('display_by') == "vessel_bol_number":
+                res.append((rec.id, rec.vessel_bol_number))
+            elif rec.env.context.get('display_by') == "name_and_vessel_bol_number":
+                name = '%s (%s)' % (rec.name, rec.vessel_bol_number)
+                res.append((rec.id, name))
+            else:
+                res.append((rec.id, rec.name))
         return res
+
+    @api.depends('name', 'vessel_bol_number')
+    def _compute_display_name(self):
+        for rec in self:
+            display_by = rec.env.context.get('display_by')
+            is_expenses = rec.env.context.get('search_default_my_expenses')
+            if display_by == "vessel_bol_number":
+                rec.display_name = rec.vessel_bol_number
+            elif display_by == "name_and_vessel_bol_number" or is_expenses:
+                rec.display_name = f"{rec.name} ({rec.vessel_bol_number})"
+            else:
+                rec.display_name = rec.name
+
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
+        # Custom search logic here
+        if name:
+            args = list(args or [])
+            domain = ['|', ('name', operator, name), ('vessel_bol_number', operator, name)]
+            return self._search(expression.AND([domain, args]), limit=limit, access_rights_uid=name_get_uid)
+            # args += ['|', ('name', operator, name), ('vessel_bol_number', operator, name)]
+
+        return super(FreightBilling, self)._name_search(name=name, args=args, operator=operator,
+                                                        limit=limit, name_get_uid=name_get_uid)
 
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})

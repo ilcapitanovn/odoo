@@ -82,6 +82,9 @@
 .o_report_profits_tree [data-name="display_cus"] {
     width: 70px !important;
     max-width: 70px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
 }
 .o_report_profits_tree [data-name="so_commission_total"] {
     white-space: normal !important;
@@ -96,6 +99,9 @@
 .o_report_profits_tree [data-name="display_line"] {
     width: 70px !important;
     max-width: 70px !important;
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
 }
 .o_report_profits_tree [data-name="po_commission_total"] {
     white-space: normal !important;
@@ -160,8 +166,22 @@
     word-break: normal;
     text-align: center !important;
 }
+.o_report_profits_tree [data-name="profit_after_tax_vat"] {
+    white-space: normal !important;
+    word-break: normal;
+    text-align: center !important;
+}
 
 .o_report_incentive_tree [name="display_target_sales"] {
+    opacity: 0 !important;
+}
+.o_report_incentive_tree [name="incentive"] {
+    opacity: 0 !important;
+}
+.o_report_incentive_tree [name="incentive_tax_amount"] {
+    opacity: 0 !important;
+}
+.o_report_incentive_tree [name="incentive_after_tax"] {
     opacity: 0 !important;
 }
 .o_report_incentive_tree [name="display_achieve"] {

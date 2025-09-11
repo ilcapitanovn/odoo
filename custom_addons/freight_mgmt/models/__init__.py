@@ -10,6 +10,7 @@ from . import freight_catalog_vehicle_supplier
 from . import freight_catalog_vessel
 from . import hr_employee
 from . import hr_employee_public
+from . import hr_expense
 from . import res_partner
 from . import res_users
 from . import restrict_menu
