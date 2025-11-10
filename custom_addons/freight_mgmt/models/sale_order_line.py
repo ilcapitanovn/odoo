@@ -146,7 +146,8 @@ class SaleOrderLine(models.Model):
             'price_total_display': price_total_display,
         }
 
-    @api.depends('price_subtotal', 'price_unit_input', 'product_uom_qty')
+    # Comment out depends because they are not necessary since this method is triggered in calling parent _compute_amount
+    #@api.depends('price_subtotal', 'price_unit_input', 'product_uom_qty')
     def _compute_amount_display(self):
         try:
             for rec in self:
@@ -158,6 +159,11 @@ class SaleOrderLine(models.Model):
                 })
         except Exception as e:
             _logger.exception("sale_order_line._compute_amount_display - Exception: %s" % e)
+
+    def _compute_amount(self):
+        """Extend Odoo's compute method to also recompute new display fields"""
+        super(SaleOrderLine, self)._compute_amount()
+        self._compute_amount_display()
 
     @api.model
     def action_automate_fix_price_subtotal_display_zero(self):
