@@ -448,6 +448,7 @@
         </record>
     </data>
     <data noupdate="1">
+        <!-- Automated Actions -->
         <record id="freight_automated_action_update_bl_number_invoice" model="base.automation">
             <field name="name">Freight: Automate Update BL Number in Invoice On Billing Change</field>
             <field name="model_id" ref="freight_mgmt.model_freight_billing"/>
@@ -469,6 +470,17 @@
                 action = model.automate_action_set_bl_number_on_invoice_creation(record)
             </field>
         </record>
+        <record id="freight_automated_action_notify_sales_follow_up_lead" model="base.automation">
+            <field name="name">Notify / CRM Created or Updated</field>
+            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
+            <field name="trigger">on_create_or_write</field> <!-- Trigger: On Creation & Update -->
+            <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__user_id')])]"/>
+            <field name="state">code</field> <!-- Action: Python Code -->
+            <field name="active">True</field>
+            <field name="code">
+                action = model.action_send_lead_creation_notification(record)
+            </field>
+        </record>
         <record id="freight_automated_action_generate_activities_on_lead_creation" model="base.automation">
             <field name="name">CRM: Automate Generate Activities On Lead Creation</field>
             <field name="model_id" ref="crm.model_crm_lead"/>
@@ -479,6 +491,18 @@
                 action = model.action_generate_activities_on_lead_creation(record)
             </field>
         </record>
+        <record id="freight_automated_action_update_debit_note_when_invoice_paid" model="base.automation">
+            <field name="name">Account: Update Debit Note When Invoice Paid</field>
+            <field name="model_id" ref="account.model_account_move"/> <!-- Model: account.move -->
+            <field name="trigger">on_write</field> <!-- Trigger: On Update -->
+            <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__payment_state')])]"/>
+            <field name="state">code</field> <!-- Action: Python Code -->
+            <field name="active">True</field>
+            <field name="code">
+                action = model.action_udate_debit_note_when_invoice_paid(record)
+            </field>
+        </record>
+        <!-- Scheduled Actions -->
         <record id="freight_scheduled_action_notify_sales_follow_up_lead_n_days" model="ir.cron">
             <field name="name">CRM: Notify / Nhắc sales follow up sau N ngày</field>
             <field name="model_id" ref="crm.model_crm_lead"/>
@@ -502,17 +526,6 @@
             <field name="numbercall">-1</field>
             <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 17:15:00')" />
             <field name="active">True</field>
-        </record>
-        <record id="freight_automated_action_notify_sales_follow_up_lead" model="base.automation">
-            <field name="name">Notify / CRM Created or Updated</field>
-            <field name="model_id" ref="crm.model_crm_lead"/> <!-- Model: crm.lead -->
-            <field name="trigger">on_create_or_write</field> <!-- Trigger: On Creation & Update -->
-            <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__user_id')])]"/>
-            <field name="state">code</field> <!-- Action: Python Code -->
-            <field name="active">True</field>
-            <field name="code">
-                action = model.action_send_lead_creation_notification(record)
-            </field>
         </record>
         <record id="freight_scheduled_action_automate_configure_mto_product" model="ir.cron">
             <field name="name">Product: Automate Configure MTO Product - Run Manually</field>
