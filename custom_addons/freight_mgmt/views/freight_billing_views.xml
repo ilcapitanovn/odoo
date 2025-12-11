@@ -139,6 +139,10 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="shipment_type" invisible="1" />
+                        <field name="show_required_error_vessel_bol_number" invisible="1" />
+                        <field name="show_required_error_shipper_id" invisible="1" />
+                        <field name="show_required_error_consignee_id" invisible="1" />
+
                         <field
                             name="company_id"
                             options="{'no_create': True}"
@@ -158,7 +162,8 @@
                         </group>
                         <group>
                             <field name="vessel_booking_number" />
-                            <field name="vessel_bol_number" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />
+<!--                            <field name="vessel_bol_number" attrs="{'readonly': [('state', 'in', ('completed','cancel'))]}" />-->
+                            <field name="vessel_bol_number" attrs="{'readonly': [('state', 'in', ('completed','cancel'))], 'required': [('state', '=', 'draft'), ('show_required_error_vessel_bol_number', '=', True)]}" />
                             <field name="bill_date" />
                             <field name="due_date" />
                             <field name="do_number"
@@ -193,7 +198,8 @@
                             <page string="Contact information" name="contact_info">
                                 <group col="2">
                                     <group>
-                                        <field name="shipper_id" />
+<!--                                        <field name="shipper_id" />-->
+                                        <field name="shipper_id" attrs="{'required': [('state', '=', 'draft'), ('show_required_error_shipper_id', '=', True)]}" />
                                         <field name="shipper_name" invisible="1" />
                                         <field name="shipper_email" invisible="1" />
                                         <field name="shipper_address" />
@@ -201,7 +207,8 @@
 
                                         <separator colspan="2"/>
 
-                                        <field name="consignee_id" />
+<!--                                        <field name="consignee_id" />-->
+                                        <field name="consignee_id" attrs="{'required': [('state', '=', 'draft'), ('show_required_error_consignee_id', '=', True)]}" />
                                         <field name="consignee_name" invisible="1" />
                                         <field name="consignee_email" invisible="1" />
                                         <field name="consignee_address" />

@@ -37,35 +37,20 @@
 <!--                    name="year"-->
 <!--                    domain="[('date_order','&lt;=', time.strftime('%%Y-12-31')),('date_order','&gt;=',time.strftime('%%Y-01-01'))]"-->
 <!--                />-->
-                <filter name="filter_date_order" date="date_order" default_period="this_year"/>
+                <filter name="filter_date_order" date="date_order" string="Order Date" default_period="this_year"/>
                 <filter name="filter_etd" date="etd" default_period="this_year"/>
                 <filter name="filter_invoice_date" date="invoice_date" default_period="this_year"/>
+                <filter name="filter_payment_date" date="payment_date" default_period="this_year"/>
                 <separator />
                 <filter name="filter_order_closed" string="Paid" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
                 <separator />
                 <filter name="filter_nominated" string="Nominated" domain="[('order_type', '=', 'nominated')]"/>
                 <filter name="filter_freehand" string="Freehand" domain="[('order_type', '=', 'freehand')]"/>
-<!--                <filter-->
-<!--                    name="Draft"-->
-<!--                    string="Draft"-->
-<!--                    domain="[('invoice_state','=','draft')]"-->
-<!--                />-->
-<!--                <filter-->
-<!--                    name="Invoiced"-->
-<!--                    string="Invoiced"-->
-<!--                    domain="[('invoice_state','not in',('draft', 'cancel'))]"-->
-<!--                />-->
                 <separator />
                 <field name="customer_id" />
                 <field name="sale_partner_id" />
                 <field name="bill_no" />
-<!--                <group expand="0" string="Extended Filters">-->
-<!--                    <field-->
-<!--                        name="categ_id"-->
-<!--                        filter_domain="[('categ_id', 'child_of', self)]"-->
-<!--                    />-->
-<!--                    <field name="company_id" groups="base.group_multi_company" />-->
-<!--                </group>-->
+                <field name="booking_no" />
                 <group expand="1" string="Group By">
                     <filter
                         string="Customer"
@@ -90,7 +75,7 @@
                     />
                     <separator />
                     <filter
-                        string="Date Order"
+                        string="Order Date"
                         name="group_by_date_order"
                         context="{'group_by':'date_order'}"
                     />
@@ -104,6 +89,11 @@
                         name="group_by_invoice_date"
                         context="{'group_by':'invoice_date'}"
                     />
+                    <filter
+                        string="Payment Date"
+                        name="group_by_payment_date"
+                        context="{'group_by':'payment_date'}"
+                    />
                 </group>
             </search>
         </field>
@@ -113,8 +103,8 @@
          <field name="model">sale.profit.forwarder.analysis.report</field>
          <field name="arch" type="xml">
              <graph string="Sale Analysis" stacked="1" type="bar" sample="1">
-                 <field name="po_amount_untaxed" type="measure" invisible="1"/>
-                 <field name="po_amount_total" type="measure" invisible="1"/>
+                 <field name="po_amount_untaxed_vnd" type="measure" invisible="1"/>
+                 <field name="po_amount_total_vnd" type="measure" invisible="1"/>
                  <field name="so_amount_untaxed" type="measure" invisible="1"/>
                  <field name="so_amount_total" type="measure" invisible="1"/>
                  <field name="po_exchange_rate" type="measure" invisible="1"/>
@@ -142,12 +132,14 @@
                 <field name="bill_id" invisible="1"/>
                 <field name="sale_partner_id" invisible="1"/>
 <!--                <field name="customer_id" widget="many2one_avatar"/>-->
+                <field name="booking_no" optional="hide"/>
                 <field name="bill_no"/>
                 <field name="order_number" optional="hide"/>
                 <field name="volumes" optional="hide"/>
                 <field name="display_pod" string="POL/D" />
                 <field name="etd_formatted" optional="show"/>
                 <field name="invoice_date" optional="hide"/>
+                <field name="payment_date" optional="hide"/>
                 <field name="display_sale_name" string="SALE" optional="show"/>
                 <field name="order_type" string="Freehand or Nominated" optional="show"/>
                 <field name="po_amount_untaxed_vnd" placeholder="COST Input (No_VAT)" string="CHI_PHÍ ĐẦU_VÀO (Chưa_VAT)" digits="[12,0]" optional="show"/>
@@ -194,11 +186,12 @@
                   import="false">
                 <field name="bill_id" invisible="1"/>
                 <field name="sale_partner_id" invisible="1"/>
-<!--                <field name="customer_id" widget="many2one_avatar"/>-->
+                <field name="booking_no" optional="hide"/>
                 <field name="bill_no"/>
                 <field name="display_pod" string="POL/D" />
                 <field name="etd" optional="show"/>
-                <field name="invoice_date" optional="show"/>
+                <field name="invoice_date" optional="hide"/>
+                <field name="payment_date" optional="hide"/>
                 <field name="order_type" string="Order Type" optional="show"/>
                 <field name="profit_after_tax_vat" string="Profit" optional="show"/>
             </tree>

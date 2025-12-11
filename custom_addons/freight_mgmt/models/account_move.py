@@ -96,11 +96,13 @@ class AccountMove(models.Model):
                 return False
 
             new_exchange_rate = record.payment_id.exchange_rate
-            if not new_exchange_rate:
+            payment_date = record.payment_id.date
+            if not new_exchange_rate or not payment_date:
                 domain = [('communication', '=', record.name)]
                 account_payment_register = self.env["account.payment.register"].sudo().search(domain, limit=1)
                 if account_payment_register:
                     new_exchange_rate = account_payment_register.exchange_rate
+                    payment_date = account_payment_register.payment_date
 
             if new_exchange_rate:
                 record.exchange_rate = new_exchange_rate
@@ -112,12 +114,14 @@ class AccountMove(models.Model):
                 if record.is_sale_document(include_receipts=True):  # Customer Invoice
                     for debit_note in related_billing.debit_note_ids:
                         debit_note.write({
-                            'exchange_rate': new_exchange_rate
+                            'exchange_rate': new_exchange_rate,
+                            'payment_date': payment_date
                         })
                 elif record.is_purchase_document(include_receipts=True):  # Vendor Bill
                     for credit_note in related_billing.credit_note_ids:
                         credit_note.write({
-                            'exchange_rate': new_exchange_rate
+                            'exchange_rate': new_exchange_rate,
+                            'payment_date': payment_date
                         })
 
             _logger.info("action_udate_debit_note_when_invoice_paid executed successful")

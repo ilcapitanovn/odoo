@@ -29,7 +29,7 @@
         <field name="inherit_id" ref="sale_commission.invoice_line_agent_tree" />
         <field name="arch" type="xml">
             <field name="amount" position="after">
-                <field name="amount_custom" widget="monetary"
+                <field name="amount_custom" widget="monetary" string="Commission Amount Custom (USD)"
                        options="{'currency_field': 'currency_id', 'field_digits': True}" />
             </field>
         </field>

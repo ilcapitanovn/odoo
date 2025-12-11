@@ -126,6 +126,7 @@ class FreightCreditNote(models.Model):
 
     payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
                                      readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
+    payment_date = fields.Date(string="Payment Date", readonly=True, store=True, compute='_compute_payment_state')
     invoice_date = fields.Date(string="Bill Date", readonly=True, store=True, compute='_compute_payment_state', tracking=True)
     payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
@@ -341,6 +342,7 @@ class FreightCreditNote(models.Model):
     @api.depends('purchase_order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):
         for rec in self:
+            rec.payment_date = None     # Will be updated later in account_move when creating payment
             if rec.purchase_order_id and rec.purchase_order_id.invoice_ids:
                 for invoice in rec.purchase_order_id.invoice_ids:
                     rec.payment_state = invoice.payment_state

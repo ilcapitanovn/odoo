@@ -151,6 +151,7 @@ class FreightDebitNote(models.Model):
 
     payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
                                      readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
+    payment_date = fields.Date(string="Payment Date", readonly=True, store=True, compute='_compute_payment_state')
     invoice_date = fields.Date(string="Invoice Date", readonly=True, store=True, compute='_compute_payment_state')
     payment_term = fields.Char(compute="_compute_payment_term", string="Payment Term", readonly=True, store=False)
 
@@ -381,11 +382,17 @@ class FreightDebitNote(models.Model):
     @api.depends('order_id.invoice_ids.payment_state')
     def _compute_payment_state(self):
         for rec in self:
+            rec.payment_date = None     # Will be updated later in account_move when creating payment
             if rec.order_id and rec.order_id.invoice_ids:
                 for invoice in rec.order_id.invoice_ids:
                     rec.payment_state = invoice.payment_state
                     rec.invoice_date = invoice.invoice_date
                     if invoice.payment_state == 'paid':
+                        domain = [('communication', '=', invoice.payment_reference)]
+                        account_payment_register = self.env["account.payment.register"].sudo().search(
+                            domain, order='create_date desc', limit=1)
+                        if account_payment_register:
+                            rec.payment_date = account_payment_register.payment_date
                         break
             else:
                 rec.payment_state = 'not_paid'

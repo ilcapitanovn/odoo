@@ -192,6 +192,10 @@ class FreightBilling(models.Model):
     )
     active = fields.Boolean(default=True, tracking=True)
 
+    show_required_error_vessel_bol_number = fields.Boolean(compute='_compute_show_required_errors', store=False)
+    show_required_error_shipper_id = fields.Boolean(compute='_compute_show_required_errors', store=False)
+    show_required_error_consignee_id = fields.Boolean(compute='_compute_show_required_errors', store=False)
+
     def name_get(self):
         res = []
         for rec in self:
@@ -232,11 +236,155 @@ class FreightBilling(models.Model):
     def assign_to_me(self):
         self.write({"user_id": self.env.user.id})
 
-    def action_confirm(self):
-        if not self.vessel_bol_number:
-            raise UserError(_("A B/L Number is required in order to confirm a bill."))
+    @api.depends('show_required_error_vessel_bol_number', 'show_required_error_shipper_id', 'show_required_error_consignee_id')
+    def _compute_show_required_errors(self):
+        for rec in self:
+            rec.show_required_error_vessel_bol_number = False
+            rec.show_required_error_shipper_id = False
+            rec.show_required_error_consignee_id = False
 
-        self.write({'state': 'posted'})
+    def action_confirm(self):
+        result = self._required_fields_validation()
+        if result:
+            return self.write({'state': 'posted'})
+        else:
+            return False
+
+        # if not self.vessel_bol_number:
+        #     raise UserError(_("A B/L Number is required in order to confirm a bill."))
+        # error_message = _("Please fill the following required fields before confirming:\n")
+        # is_valid = True
+        #
+        # if not self.vessel_bol_number:
+        #     self.show_required_error_vessel_bol_number = True
+        #     is_valid = False
+        #     error_message += _("- Required B/L Number\n")
+        # else:
+        #     self.show_required_error_vessel_bol_number = False
+        #
+        # if not self.shipper_id:
+        #     self.show_required_error_shipper_id = True
+        #     is_valid = False
+        #     error_message += _("- Required Shipper\n")
+        # else:
+        #     self.show_required_error_shipper_id = False
+        #
+        # if not self.consignee_id:
+        #     self.show_required_error_consignee_id = True
+        #     is_valid = False
+        #     error_message += _("- Required Consignee\n")
+        # else:
+        #     self.show_required_error_consignee_id = False
+        #
+        # if not is_valid:
+        #     return {
+        #         'type': 'ir.actions.client',
+        #         'tag': 'display_notification',
+        #         'params': {
+        #             'type': 'warning',
+        #             'message': error_message,
+        #             'sticky': True,  # Make the notification stay until dismissed
+        #         }
+        #     }
+        #
+        # self.state = 'posted'
+        # self.show_required_error_vessel_bol_number = False
+        # self.show_required_error_shipper_id = False
+        # self.show_required_error_consignee_id = False
+        # return True
+
+        # for rec in self:
+        #     if not self.shipper_id:
+        #         # raise UserError(_("Shipper's information is required in order to confirm a bill."))
+        #         rec.show_required_error = True
+        #         return {
+        #             'type': 'ir.actions.client',
+        #             'tag': 'display_notification',
+        #             'params': {
+        #                 'type': 'warning',
+        #                 'message': 'Please fill the required field before confirming.',
+        #                 'sticky': True,  # Make the notification stay until dismissed
+        #             }
+        #         }
+        #     # if not self.shipper_id:
+        #     #     raise UserError(_("Shipper's information is required in order to confirm a bill."))
+        #     rec.state = 'posted'
+        #
+        # # return self.write({'state': 'posted'})
+        # return True
+
+    def _required_fields_validation(self):
+        is_valid = True
+        error_message = _("Please fill the following required fields before confirming:\n")
+
+        for rec in self:
+            if not rec.vessel_bol_number:
+                rec.show_required_error_vessel_bol_number = True
+                is_valid = False
+                error_message += _("- B/L Number\n")
+            else:
+                rec.show_required_error_vessel_bol_number = False
+
+            if not rec.shipper_id:
+                rec.show_required_error_shipper_id = True
+                is_valid = False
+                error_message += _("- Contact  Information / Shipper\n")
+            else:
+                rec.show_required_error_shipper_id = False
+
+            if not rec.consignee_id:
+                rec.show_required_error_consignee_id = True
+                is_valid = False
+                error_message += _("- Contact  Information / Consignee\n")
+            else:
+                rec.show_required_error_consignee_id = False
+
+            if not rec.party_id:
+                is_valid = False
+                error_message += _("- Contact  Information / Party Notification\n")
+
+            if not rec.vessel_id:
+                is_valid = False
+                error_message += _("- Booking Information / Ocean Vessel\n")
+
+            if not rec.port_loading_id:
+                is_valid = False
+                error_message += _("- Booking Information / Port of Loading\n")
+
+            if not rec.port_discharge_id:
+                is_valid = False
+                error_message += _("- Booking Information / Port of Discharge\n")
+
+            if not rec.billing_line:
+                is_valid = False
+                error_message += _("- Item Lines / Container and Seals\n")
+            else:
+                for line in rec.billing_line:
+                    if not line.container_no:
+                        is_valid = False
+                        error_message += _("- Item Lines / Container No.")
+
+                    if not line.seal_nos:
+                        is_valid = False
+                        error_message += _("- Item Lines / Seal No.")
+
+                    if line.packages_number <= 0:
+                        is_valid = False
+                        error_message += _("- Item Lines / No. of Pkgs")
+
+                    if not line.gross_weight:
+                        is_valid = False
+                        error_message += _("- Item Lines / Gross Weight.")
+
+                    if line.measurement_cbm <= 0:
+                        is_valid = False
+                        error_message += _("- Item Lines / No. of Measurement (CBM")
+
+            if not is_valid:
+                raise ValidationError(error_message)
+
+        return True
+
 
     # ---------------------------------------------------
     # Create Debit Note Action
@@ -368,7 +516,7 @@ class FreightBilling(models.Model):
         credit_vals = {
             'bill_id': billing.id,
             'booking_id': billing.booking_id,
-            'sale_order_id': billing.order_id,
+            # 'sale_order_id': billing.order_id,
         }
 
         if purchase_order_id:
@@ -456,33 +604,58 @@ class FreightBilling(models.Model):
             result['res_id'] = self.order_id.id
         return result
 
+    # def action_view_purchase_order(self):
+    #     self.ensure_one()
+    #     purchase_orders = self.env['purchase.order'].search([
+    #         ("origin", "=", self.order_id.name)
+    #     ])
+    #     if not purchase_orders:
+    #         return
+    #
+    #     purchase_order_view_form = self.env.ref('freight_mgmt.freight_purchase_order_view_form_from_billing_inherited', False)
+    #
+    #     action = {
+    #         'res_model': 'purchase.order',
+    #         'type': 'ir.actions.act_window'
+    #     }
+    #     if len(purchase_orders) == 1:
+    #         action.update({
+    #             'res_id': purchase_orders.id,
+    #             'view_type': 'tree',
+    #             'view_mode': 'form',
+    #             'views': [(purchase_order_view_form.id, 'form')],
+    #             'view_id': purchase_order_view_form.id
+    #         })
+    #     else:
+    #         action.update({
+    #             'name': _("Purchase Order generated from %s", self.order_id.name),
+    #             'domain': [('id', 'in', purchase_orders.ids)],
+    #             'view_mode': 'tree,form'
+    #         })
+    #     return action
+
     def action_view_purchase_order(self):
         self.ensure_one()
-        purchase_orders = self.env['purchase.order'].search([
-            ("origin", "=", self.order_id.name)
-        ])
+        purchase_orders = self.env["purchase.order"].sudo().search([("origin", "=", self.order_id.name)])
         if not purchase_orders:
             return
 
-        purchase_order_view_form = self.env.ref('freight_mgmt.freight_purchase_order_view_form_from_billing_inherited', False)
+        purchase_order_ids = purchase_orders.ids
 
         action = {
             'res_model': 'purchase.order',
-            'type': 'ir.actions.act_window'
+            'type': 'ir.actions.act_window',
         }
-        if len(purchase_orders) == 1:
+        if len(purchase_order_ids) == 1:
             action.update({
-                'res_id': purchase_orders.id,
-                'view_type': 'tree',
                 'view_mode': 'form',
-                'views': [(purchase_order_view_form.id, 'form')],
-                'view_id': purchase_order_view_form.id
+                'res_id': purchase_order_ids[0],
             })
         else:
             action.update({
                 'name': _("Purchase Order generated from %s", self.order_id.name),
-                'domain': [('id', 'in', purchase_orders.ids)],
-                'view_mode': 'tree,form'
+                'domain': [('id', 'in', purchase_order_ids)],
+                'view_mode': 'tree,form',
             })
         return action
 
@@ -856,8 +1029,8 @@ class FreightBilling(models.Model):
     def write(self, vals):
         for item in self:
             now = fields.Datetime.now()
-            if vals.get("state") in ['posted', 'completed'] and not item.vessel_bol_number:
-                raise UserError(_("A B/L Number is required in order to update a bill."))
+            if vals.get("state") in ['posted', 'completed']:
+                self._required_fields_validation()
 
             # if vals.get("stage_id"):
             #     stage = self.env["freight.catalog.stage"].browse([vals["stage_id"]])

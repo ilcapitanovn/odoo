@@ -1,14 +1,25 @@
 # Copyright 2022 Bao Thinh Software - Tuan Huynh
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+import logging
 import pytz
 import itertools
-from datetime import datetime
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 from psycopg2.extensions import AsIs
 
 from odoo import api, fields, models, tools
 from odoo.exceptions import UserError
 from odoo.tools import float_round
+
+_logger = logging.getLogger(__name__)
+
+
+def _to_tuple(domain):
+    """Convert domain lists to tuples recursively."""
+    if isinstance(domain, list):
+        return tuple(_to_tuple(d) for d in domain)
+    return domain
 
 
 class SaleIncentiveAnalysisReport(models.Model):
@@ -25,19 +36,20 @@ class SaleIncentiveAnalysisReport(models.Model):
     # incentive_section_id = fields.Many2one("sale.incentive.section", "Incentive Section", readonly=True)
     tax_income_id = fields.Many2one("account.tax.income", "Tax Income", readonly=True)
     # tax_income_section_id = fields.Many2one("account.tax.income.section", "Tax Income Section", readonly=True)
-
+    booking_no = fields.Char("Booking NO", readonly=True)
     bill_no = fields.Char("BILL NO", readonly=True)
     pod_id = fields.Many2one("freight.catalog.port", "POL/D", readonly=True)
     date_order = fields.Date("Order Date", readonly=True)
     etd = fields.Date("ETD", readonly=True)
     etd_formatted = fields.Char(compute="_compute_format_etd", string="ETD", readonly=True, store=False)
     invoice_date = fields.Date("Invoice Date", readonly=True)
+    payment_date = fields.Date("Payment Date", readonly=True)
     payment_state = fields.Char("Payment Status", readonly=True)
 
     incentive_name = fields.Char("Incentive Type", readonly=True)
     target_sales = fields.Float("Target Sales", readonly=True)
 
-    po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
+    # po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
     so_amount_untaxed = fields.Float("Chua VAT (O)", readonly=True)
     margin = fields.Float("Margin", readonly=True)
 
@@ -68,7 +80,7 @@ class SaleIncentiveAnalysisReport(models.Model):
     display_achieve = fields.Integer(compute="_compute_display_achieve", string="Achieve", readonly=True)
 
     @api.model
-    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=False):
         '''
         Calculate to display total if using group by
         '''
@@ -92,13 +104,113 @@ class SaleIncentiveAnalysisReport(models.Model):
         if is_level_1:
             fields_to_calculate_total = ['incentive']
 
-        for field in fields_to_calculate_total:
-            if field in fields:
-                for line in res:
-                    if '__domain' in line:
-                        records = self.search(line['__domain'])
+        # for field in fields_to_calculate_total:
+        #     if field in fields:
+        #         for line in res:
+        #             if '__domain' in line:
+        #                 records = self.search(line['__domain'])
+        #                 if is_level_1:      # Only column incentive need to calculate
+        #                     total = 0.0
+        #                     if records:
+        #                         # Sort the recordset by the grouping field (here is partner name)
+        #                         # For Many2one fields, you often need to sort by the actual value/name
+        #                         # or the ID if the field is defined with sortable=False
+        #                         sorted_records = records.sorted(key=lambda r: r.display_name if r.display_name else '')
+        #
+        #                         # Group using itertools.groupby
+        #                         grouped_items = {}
+        #                         for key, group in itertools.groupby(sorted_records, key=lambda r: r.partner_id):
+        #                             category_name = key.name if key else 'No Category'
+        #                             grouped_items[category_name] = list(group)  # Convert group iterator to a list of records
+        #
+        #                         for salesman, items in grouped_items.items():
+        #                             sum_freehand_total = 0.0
+        #                             sum_nominated_total = 0.0
+        #                             sum_all_total = 0.0
+        #                             target_sales_vnd = 0.0
+        #                             incentive_record = None
+        #                             if len(items) > 0:
+        #                                 target_sales_vnd = items[0].target_sales * exchange_rate
+        #                                 incentive_record = items[0].incentive_id
+        #
+        #                             for item in items:
+        #                                 sum_freehand_total += item.sum_freehand
+        #                                 sum_nominated_total += item.sum_nominated
+        #                                 sum_all_total += item.sum_all
+        #
+        #                             # incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+        #                             #                                         sum_freehand_total, sum_nominated_total,
+        #                             #                                         sum_all_total, exchange_rate)
+        #                             incentive = self.calculate_incentive_v3(items[0], incentive_record, target_sales_vnd,
+        #                                                                     sum_freehand_total, sum_nominated_total,
+        #                                                                     sum_all_total, exchange_rate)
+        #                             total += incentive
+        #                     line[field] = total
+        #
+        #                 else:
+        #                     total = 0.0
+        #                     for record in records:
+        #                         if field == 'display_target_sales':
+        #                             total = record['target_sales'] * exchange_rate  # Only need first record, no sum
+        #                             break
+        #                         elif field == 'display_achieve':
+        #                             break
+        #                         elif field == 'incentive':
+        #                             incentive_record = records[0].incentive_id if len(records) > 0 else None
+        #                             target_sales_vnd = line['display_target_sales']
+        #                             sum_freehand = line['sum_freehand']
+        #                             sum_nominated = line['sum_nominated']
+        #                             sum_all = line['sum_all']
+        #                             # incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+        #                             #                                         sum_freehand, sum_nominated, sum_all,
+        #                             #                                         exchange_rate)
+        #                             incentive = self.calculate_incentive_v3(record, incentive_record, target_sales_vnd,
+        #                                                                     sum_freehand, sum_nominated, sum_all,
+        #                                                                     exchange_rate)
+        #                             total = incentive
+        #                             break
+        #                         elif field == 'incentive_tax_amount':
+        #                             tax_record = records[0].tax_income_id if len(records) > 0 else None
+        #                             incentive = line['incentive']
+        #                             incentive_tax_amount = self.calculate_incentive_tax_amount_v3(tax_record, incentive)
+        #                             total = incentive_tax_amount
+        #                             break
+        #                         elif field == 'incentive_after_tax':
+        #                             incentive = line['incentive']
+        #                             incentive_tax_amount = line['incentive_tax_amount']
+        #                             incentive_after_tax = incentive - incentive_tax_amount
+        #                             total = incentive_after_tax
+        #                             break
+        #                         else:
+        #                             total += record[field]
+        #                     line[field] = total
+        #
+        #                     if field == 'display_achieve':
+        #                         sum_all = line['sum_all']
+        #                         target = line['display_target_sales']
+        #                         val = 1 if sum_all > target * 0.5 else 0
+        #                         line[field] = val
+        # return res
+
+        group_field = groupby[0] if isinstance(groupby, (list, tuple)) else groupby
+
+        # Filter out groups with no matching records after applying user domain
+        filtered_res = []
+        for line in res:
+            if '__domain' in line:
+                new_domain = self._revise_args_domain(line.get('__domain', []))
+                # full_domain = line.get('__domain', []) + domain  # Combine group domain + user filter
+                records = self.search(new_domain)
+
+                if not records:
+                    continue  # Skip this group if no records match
+
+                line[f'{group_field}_count'] = len(records)
+                # Calculate totals for each field
+                for field in fields_to_calculate_total:
+                    if field in fields:
+                        total = 0.0
                         if is_level_1:      # Only column incentive need to calculate
-                            total = 0.0
                             if records:
                                 # Sort the recordset by the grouping field (here is partner name)
                                 # For Many2one fields, you often need to sort by the actual value/name
@@ -126,14 +238,16 @@ class SaleIncentiveAnalysisReport(models.Model):
                                         sum_nominated_total += item.sum_nominated
                                         sum_all_total += item.sum_all
 
-                                    incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                    # incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                    #                                         sum_freehand_total, sum_nominated_total,
+                                    #                                         sum_all_total, exchange_rate)
+                                    incentive = self.calculate_incentive_v3(items[0], incentive_record, target_sales_vnd,
                                                                             sum_freehand_total, sum_nominated_total,
                                                                             sum_all_total, exchange_rate)
                                     total += incentive
                             line[field] = total
 
                         else:
-                            total = 0.0
                             for record in records:
                                 if field == 'display_target_sales':
                                     total = record['target_sales'] * exchange_rate  # Only need first record, no sum
@@ -146,7 +260,10 @@ class SaleIncentiveAnalysisReport(models.Model):
                                     sum_freehand = line['sum_freehand']
                                     sum_nominated = line['sum_nominated']
                                     sum_all = line['sum_all']
-                                    incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                    # incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                    #                                         sum_freehand, sum_nominated, sum_all,
+                                    #                                         exchange_rate)
+                                    incentive = self.calculate_incentive_v3(record, incentive_record, target_sales_vnd,
                                                                             sum_freehand, sum_nominated, sum_all,
                                                                             exchange_rate)
                                     total = incentive
@@ -154,7 +271,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                                 elif field == 'incentive_tax_amount':
                                     tax_record = records[0].tax_income_id if len(records) > 0 else None
                                     incentive = line['incentive']
-                                    incentive_tax_amount = self.calculate_incentive_tax_amount_v2(tax_record, incentive)
+                                    incentive_tax_amount = self.calculate_incentive_tax_amount_v3(tax_record, incentive)
                                     total = incentive_tax_amount
                                     break
                                 elif field == 'incentive_after_tax':
@@ -173,7 +290,121 @@ class SaleIncentiveAnalysisReport(models.Model):
                                 val = 1 if sum_all > target * 0.5 else 0
                                 line[field] = val
 
-        return res
+                # Keep this line if it has records
+                filtered_res.append(line)
+
+        return filtered_res
+
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+
+        # new_args = self._revise_args_domain(args)
+
+        _logger.info(f"old args = {args}")
+
+        new_args = _to_tuple(args)
+        new_args = self._replace_month_filter(new_args)
+
+        _logger.info(f"new args = {new_args}")
+
+        return super().search(new_args, offset=offset, limit=limit, order=order, count=count)
+
+    def _revise_args_domain(self, args):
+        ctx = (self.env.context or {})
+
+        months = ctx.get("selected_month") or []
+        years = ctx.get("selected_year") or []
+
+        new_args = args
+        if months or years:
+
+            # ensure both are lists
+            if isinstance(months, int):
+                months = [months]
+            if isinstance(years, int):
+                years = [years]
+
+            # Case 1: No year selected → use current year
+            if not years:
+                years = [date.today().year]
+
+            date_ranges = []
+
+            # Case 2: No month selected → use entire year(s)
+            if not months:
+                for y in years:
+                    start = date(y, 1, 6)
+                    end = date(y + 1, 1, 5)
+                    date_ranges.append(['&',
+                                        ('payment_date', '>=', start.strftime("%Y-%m-%d")),
+                                        ('payment_date', '<=', end.strftime("%Y-%m-%d"))
+                                        ])
+
+            # Case 3: Months + Years selected → specific months of selected years
+            else:
+                # Case 3: Months + Years selected → specific months
+                for y in years:
+                    for m in months:
+                        start = date(y, m, 6)
+                        if m == 12:
+                            end = date(y + 1, 1, 5)
+                        else:
+                            end = date(y, m + 1, 5)
+                        date_ranges.append(['&',
+                                            ('payment_date', '>=', start.strftime("%Y-%m-%d")),
+                                            ('payment_date', '<=', end.strftime("%Y-%m-%d"))
+                                            ])
+
+            # Combine all ranges with OR
+            if date_ranges:
+                date_domain = date_ranges[0]
+                for r in date_ranges[1:]:
+                    date_domain = ['|', date_domain, r]
+
+                # Combine with existing args (whatever args already contains)
+                if new_args:
+                    new_args = ['&'] + new_args + date_domain
+                else:
+                    new_args = date_domain
+
+        return new_args
+
+    def _replace_month_filter(self, args):
+        new_args = []
+
+        is_predefined_payment_date_filter = self.env.context.get("is_predefined_payment_date_filter")
+        if is_predefined_payment_date_filter:
+            for domain in args:
+
+                if isinstance(domain, (list, tuple)) and domain[0] == 'payment_date':
+                    field, operator, value = domain
+
+                    # Odoo usually passes date strings in ISO format
+                    if isinstance(value, str):
+                        try:
+                            value_date = datetime.strptime(value, "%Y-%m-%d").date()
+                        except ValueError:
+                            # Not a valid date → skip
+                            new_args.append(domain)
+                            continue
+                    else:
+                        value_date = value
+
+                    # Detect Odoo’s built-in monthly domain
+                    # Example: ('date_order', '>=', '2025-08-01')
+                    if operator == '>=':
+                        month = value_date.month
+                        year = value_date.year
+                        period_start = date(year, month, 6)
+                        domain = ('payment_date', '>=', period_start.strftime('%Y-%m-%d'))
+                    elif operator == '<=':
+                        period_end = (value_date + relativedelta(months=1)).replace(day=5)
+                        domain = ('payment_date', '<=', period_end.strftime('%Y-%m-%d'))
+
+                new_args.append(domain)
+        else:
+            new_args = args
+
+        return new_args
 
     @api.depends('pod_id')
     def _compute_display_pod(self):
@@ -245,7 +476,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             rec.incentive_tax_amount = 0
             rec.incentive_after_tax = 0
 
-    @api.depends('so_amount_untaxed', 'po_amount_untaxed', 'margin')
+    @api.depends('so_amount_untaxed_vnd', 'po_amount_untaxed_vnd', 'margin')
     def _compute_sums(self):
         ''' Business Income Tax - default is 20% if no configuration in system parameters '''
         biz_tax_percentage = float(
@@ -255,7 +486,16 @@ class SaleIncentiveAnalysisReport(models.Model):
 
         biz_income_tax = biz_tax_percentage / 100
 
+        date_6th_update = date(2025, 11, 1)
+
         for rec in self:
+            '''
+            Updated 2025/12/08: From update 6, skip deduct business income tax
+            '''
+            new_biz_income_tax = biz_income_tax
+            if rec.payment_date and rec.payment_date >= date_6th_update:
+                new_biz_income_tax = 0
+
             sum_freehand = sum_nominated = sum_activities = 0.0
 
             po_commission_total_vnd = rec.po_commission_total * exchange_rate
@@ -267,7 +507,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             )
             untaxed_profit_before_tax = rec.so_amount_untaxed_vnd - rec.po_amount_untaxed_vnd
             vat_payable = rec.so_amount_tax_vnd - rec.po_amount_tax_vnd
-            income_tax_amount = untaxed_profit_before_tax * biz_income_tax if untaxed_profit_before_tax > 0 else 0
+            income_tax_amount = untaxed_profit_before_tax * new_biz_income_tax if untaxed_profit_before_tax > 0 else 0
             final_real_profit_after_tax = real_profit_before_tax - vat_payable - income_tax_amount
 
             if rec.order_type == 'freehand':
@@ -278,8 +518,73 @@ class SaleIncentiveAnalysisReport(models.Model):
             rec.sum_freehand = sum_freehand
             rec.sum_nominated = sum_nominated
             rec.sum_activities = sum_activities
-            rec.sum_all = sum_freehand + sum_nominated + sum_nominated
+            rec.sum_all = sum_freehand + sum_nominated + sum_activities
 
+    '''
+    Current Active Method - Updated to support separated rules version
+    '''
+    @staticmethod
+    def calculate_incentive_v3(data_record, incentive_record, target_sales_vnd, sum_freehand, sum_nominated, sum_all,
+                               exchange_rate_vnd):
+        incentive = 0.0
+
+        if incentive_record:
+            paid_date = data_record.payment_date
+            if paid_date and len(incentive_record.section_ids_3rd_update) > 0 \
+                    and incentive_record.section_ids_3rd_update[0].date_start <= paid_date \
+                    and (paid_date <= incentive_record.section_ids_3rd_update[0].date_end
+                         or not incentive_record.section_ids_3rd_update[0].date_end):
+                active_section = incentive_record.section_ids_3rd_update
+
+            elif paid_date and len(incentive_record.section_ids_5th_update) > 0 \
+                    and incentive_record.section_ids_5th_update[0].date_start <= paid_date \
+                    and (paid_date <= incentive_record.section_ids_5th_update[0].date_end
+                         or not incentive_record.section_ids_5th_update[0].date_end):
+                active_section = incentive_record.section_ids_5th_update
+
+            else:
+                active_section = incentive_record.section_ids
+
+            if active_section:
+                for sec in active_section:
+                    amount_from = sec.percent_from * target_sales_vnd / 100
+                    amount_to = sec.percent_to * target_sales_vnd / 100
+                    if amount_from <= sum_all < amount_to or target_sales_vnd == 0.0 and amount_from == 0.0:
+                        incentive = (sec.incentive_percent_month / 100) * \
+                                    ((sum_freehand * incentive_record.target_freehand / 100) +
+                                     (sum_nominated * incentive_record.target_nominated / 100))
+                        break
+
+        return incentive
+
+    '''
+    Current Active Method - Updated to support separated rules version
+    '''
+    @staticmethod
+    def calculate_incentive_tax_amount_v3(tax_record, incentive):
+        tax_amount = 0.0
+
+        if incentive and tax_record and tax_record.section_ids:
+            incentive_tmp = incentive
+            if tax_record.tax_income_type == 'section':
+                if len(tax_record.section_ids) > 1:
+                    sortedDescSections = sorted(tax_record.section_ids, key=lambda x: x.amount_to, reverse=True)
+                else:
+                    sortedDescSections = tax_record.section_ids
+
+                for sec in sortedDescSections:
+                    if sec.amount_from < incentive_tmp <= sec.amount_to:
+                        incentive_to_tax = incentive_tmp - sec.amount_from
+                        tax_amount += incentive_to_tax * sec.tax_rate_percent / 100
+                        incentive_tmp -= incentive_to_tax
+            else:  # 'fixed'
+                tax_amount = incentive_tmp * tax_record.fix_percent / 100
+
+        return tax_amount
+
+    '''
+    TODO: This method is deprecated
+    '''
     @staticmethod
     def calculate_incentive_v2(incentive_record, target_sales_vnd, sum_freehand, sum_nominated, sum_all, exchange_rate_vnd):
         incentive = 0.0
@@ -296,6 +601,9 @@ class SaleIncentiveAnalysisReport(models.Model):
 
         return incentive
 
+    '''
+    TODO: This method is deprecated
+    '''
     @staticmethod
     def calculate_incentive_tax_amount_v2(tax_record, incentive):
         tax_amount = 0.0
@@ -396,8 +704,108 @@ class SaleIncentiveAnalysisReport(models.Model):
         else:
             raise UserError("Please select a record to view its details.")
 
+    # ---------------------------------------------------
+    # Old Rule - Time 5th - Deprecated
+    # ---------------------------------------------------
+
+    # @staticmethod
+    # def _select_v2():
+    #     '''
+    #     New incentive policy is available since 01 June 2023.
+    #      Updates to make it more similar excel file from accounting
+    #     '''
+    #     select_str = """
+    #         SELECT DISTINCT
+    #             tblSum.id AS id,
+    #             u.id AS user_id,
+    #             u.company_id AS company_id,
+    #             u.partner_id AS partner_id,
+    #             si.id AS incentive_id,
+    #             ati.id AS tax_income_id,
+    #
+    #             si.name AS incentive_name,
+    #             p.target_sales AS target_sales,
+    #
+    #             tblSum.bill_no AS bill_no,
+    #             tblSum.pod_id AS pod_id,
+    #             tblSum.date_order AS date_order,
+    #             tblSum.etd AS etd,
+    #             tblSum.invoice_date AS invoice_date,
+    #             tblSum.payment_state AS payment_state,
+    #
+    #             tblSum.po_amount_untaxed AS po_amount_untaxed,
+    #             tblSum.so_amount_untaxed AS so_amount_untaxed,
+    #             tblSum.margin AS margin,
+    #
+    #             tblSum.order_type AS order_type,
+    #             tblSum.po_amount_untaxed_vnd AS po_amount_untaxed_vnd,
+    #             tblSum.po_amount_total_vnd AS po_amount_total_vnd,
+    #             tblSum.po_amount_tax_vnd AS po_amount_tax_vnd,
+    #             tblSum.cost_no_vat AS cost_no_vat,
+    #             tblSum.po_commission_total AS po_commission_total,
+    #             tblSum.so_commission_total AS so_commission_total,
+    #             tblSum.so_amount_untaxed_vnd AS so_amount_untaxed_vnd,
+    #             tblSum.so_amount_total_vnd AS so_amount_total_vnd,
+    #             tblSum.so_amount_tax_vnd AS so_amount_tax_vnd,
+    #             tblSum.revenue_no_vat AS revenue_no_vat
+    #     """
+    #
+    #     return select_str
+    #
+    # @staticmethod
+    # def _subquery_profit_forwarder_report():
+    #     subquery_str = f"""
+    #         SELECT id
+    #             , user_id
+    #             , bill_no
+    #             , pod_id
+    #             , date_order
+    #             , etd
+    #             , invoice_date
+    #             , payment_state
+    #             , po_amount_untaxed
+    #             , so_amount_untaxed
+    #             , margin
+    #             , order_type
+    #             , po_amount_untaxed_vnd
+    #             , po_amount_total_vnd
+    #             , po_amount_tax_vnd
+    #             , cost_no_vat
+    #             , po_commission_total
+    #             , so_commission_total
+    #             , so_amount_untaxed_vnd
+    #             , so_amount_total_vnd
+    #             , so_amount_tax_vnd
+    #             , revenue_no_vat
+    #         FROM sale_profit_forwarder_analysis_report
+    #     """
+    #
+    #     return subquery_str
+    #
+    # def _from_v2(self):
+    #     from_str = f"""
+    #         ({self._subquery_profit_forwarder_report()}) tblSum
+    #         INNER JOIN res_users u ON tblSum.user_id = u.id
+    #         INNER JOIN res_partner p ON u.partner_id = p.id
+    #         LEFT JOIN sale_incentive si ON p.incentive_id = si.id
+    #         LEFT JOIN sale_incentive_section sic ON sic.incentive_id = si.id
+    #         LEFT JOIN account_tax_income ati ON si.tax_id = ati.id
+    #         LEFT JOIN account_tax_income_section atis ON ati.id = atis.tax_id
+    #     """
+    #     return from_str
+    #
+    # def _where_v2(self):
+    #     where_str = """
+    #         WHERE si.target_freehand * sum_freehand + si.target_nominated * sum_nominated + si.target_activities * sum_activities > 0
+    #     """
+    #     return where_str
+
+    # ---------------------------------------------------
+    # Update Time 6th
+    # ---------------------------------------------------
+
     @staticmethod
-    def _select_v2():
+    def _select_v3():
         '''
         New incentive policy is available since 01 June 2023.
          Updates to make it more similar excel file from accounting
@@ -410,21 +818,22 @@ class SaleIncentiveAnalysisReport(models.Model):
                 u.partner_id AS partner_id,
                 si.id AS incentive_id,
                 ati.id AS tax_income_id,
-                
+
                 si.name AS incentive_name,
                 p.target_sales AS target_sales,
 
+                tblSum.booking_no AS booking_no,
                 tblSum.bill_no AS bill_no,
                 tblSum.pod_id AS pod_id,
                 tblSum.date_order AS date_order,
                 tblSum.etd AS etd,
                 tblSum.invoice_date AS invoice_date,
+                tblSum.payment_date AS payment_date,
                 tblSum.payment_state AS payment_state,
-                
-                tblSum.po_amount_untaxed AS po_amount_untaxed,
+
                 tblSum.so_amount_untaxed AS so_amount_untaxed,
                 tblSum.margin AS margin,
-                
+
                 tblSum.order_type AS order_type,
                 tblSum.po_amount_untaxed_vnd AS po_amount_untaxed_vnd,
                 tblSum.po_amount_total_vnd AS po_amount_total_vnd,
@@ -437,44 +846,21 @@ class SaleIncentiveAnalysisReport(models.Model):
                 tblSum.so_amount_tax_vnd AS so_amount_tax_vnd,
                 tblSum.revenue_no_vat AS revenue_no_vat
         """
-
         return select_str
 
     @staticmethod
-    def _subquery_profit_forwarder_report():
-        # subquery_str = f"""
-        #     SELECT id
-        #         , user_id
-        #         , bill_no
-        #         , pod_id
-        #         , date_order
-        #         , etd
-        #         , invoice_date
-        #         , payment_state
-        #         , CASE WHEN order_type = 'freehand' THEN
-        #                 ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-        #                 - (so_amount_tax_vnd - po_amount_tax_vnd)
-        #                 - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.2)
-        #                 ELSE 0 END as sum_freehand
-        #         , CASE WHEN order_type = 'nominated' THEN
-        #                 ((so_amount_total_vnd + revenue_no_vat) - (po_amount_total_vnd + cost_no_vat + po_commission_total * 22000 + so_commission_total * 22000))
-        #                 - (so_amount_tax_vnd - po_amount_tax_vnd)
-        #                 - ((so_amount_untaxed_vnd - po_amount_untaxed_vnd) * 0.2)
-        #                 ELSE 0 END as sum_nominated
-        #         , 0 as sum_activities
-        #     FROM sale_profit_forwarder_analysis_report
-        # """
-
+    def _subquery_profit_forwarder_report_v3():
         subquery_str = f"""
             SELECT id
                 , user_id
+                , booking_no
                 , bill_no
                 , pod_id
                 , date_order
                 , etd
                 , invoice_date
+                , payment_date
                 , payment_state
-                , po_amount_untaxed
                 , so_amount_untaxed
                 , margin
                 , order_type
@@ -490,12 +876,11 @@ class SaleIncentiveAnalysisReport(models.Model):
                 , revenue_no_vat
             FROM sale_profit_forwarder_analysis_report
         """
-
         return subquery_str
 
-    def _from_v2(self):
+    def _from_v3(self):
         from_str = f"""
-            ({self._subquery_profit_forwarder_report()}) tblSum
+            ({self._subquery_profit_forwarder_report_v3()}) tblSum
             INNER JOIN res_users u ON tblSum.user_id = u.id
             INNER JOIN res_partner p ON u.partner_id = p.id
             LEFT JOIN sale_incentive si ON p.incentive_id = si.id
@@ -505,7 +890,8 @@ class SaleIncentiveAnalysisReport(models.Model):
         """
         return from_str
 
-    def _where_v2(self):
+    @staticmethod
+    def _where_v3():
         where_str = """
             WHERE si.target_freehand * sum_freehand + si.target_nominated * sum_nominated + si.target_activities * sum_activities > 0
         """
@@ -518,8 +904,8 @@ class SaleIncentiveAnalysisReport(models.Model):
             "CREATE or REPLACE VIEW %s AS ( %s FROM ( %s ) )",
             (
                 AsIs(self._table),
-                AsIs(self._select_v2()),
-                AsIs(self._from_v2()),
+                AsIs(self._select_v3()),
+                AsIs(self._from_v3()),
                 # AsIs(self._where_v2()),
                 # AsIs(self._group_by()),
             ),
@@ -582,10 +968,13 @@ class ReportSaleIncentiveAnalysis(models.AbstractModel):
                             years.append(year)
 
                 sum_all = salesman_sum_freehand_total + salesman_sum_nominated_total
-                incentive_amount = SaleIncentiveAnalysisReport.calculate_incentive_v2(
-                    incentive_record, display_target_sales, salesman_sum_freehand_total,
+                # incentive_amount = SaleIncentiveAnalysisReport.calculate_incentive_v2(
+                #     incentive_record, display_target_sales, salesman_sum_freehand_total,
+                #     salesman_sum_nominated_total, sum_all, exchange_rate)
+                incentive_amount = SaleIncentiveAnalysisReport.calculate_incentive_v3(
+                    incentives[0], incentive_record, display_target_sales, salesman_sum_freehand_total,
                     salesman_sum_nominated_total, sum_all, exchange_rate)
-                incentive_tax_amount = SaleIncentiveAnalysisReport.calculate_incentive_tax_amount_v2(
+                incentive_tax_amount = SaleIncentiveAnalysisReport.calculate_incentive_tax_amount_v3(
                     tax_record, incentive_amount)
                 incentive_after_tax = incentive_amount - incentive_tax_amount
                 salesman_incentive_after_tax_total += incentive_after_tax

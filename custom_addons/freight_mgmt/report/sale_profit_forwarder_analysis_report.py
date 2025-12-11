@@ -29,12 +29,12 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     user_id = fields.Many2one("res.users", "Sale User", readonly=True)
     sale_partner_id = fields.Many2one("res.partner", "Sale", readonly=True)
     sale_order_id = fields.Many2one("sale.order", "Sale Order", readonly=True)
-    purchase_order_id = fields.Many2one("purchase.order", "Purchase Order", readonly=True)
+    # purchase_order_id = fields.Many2one("purchase.order", "Purchase Order", readonly=True)
     booking_id = fields.Many2one("freight.booking", "Booking", readonly=True)
     bill_id = fields.Many2one("freight.billing", "Bill", readonly=True)
     pod_id = fields.Many2one("freight.catalog.port", "POL/D", readonly=True)
     line_id = fields.Many2one("freight.catalog.vessel", "Line", readonly=True)
-
+    booking_no = fields.Char("Booking NO", readonly=True)
     # date_invoice = fields.Date("Date Invoice", readonly=True)
     bill_no = fields.Char("BILL NO", readonly=True)
     volumes = fields.Char("CONT", readonly=True)
@@ -45,11 +45,12 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     order_number = fields.Char("Order", readonly=True)
 
     payment_state = fields.Char("Payment Status", readonly=True)
+    payment_date = fields.Date("Payment Date", readonly=True)
     invoice_date = fields.Date("Invoice Date", readonly=True)
 
-    po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
-    po_amount_total = fields.Float("Co VAT (I)", readonly=True)
-    po_amount_tax = fields.Float("VAT (I)", readonly=True)
+    # po_amount_untaxed = fields.Float("Chua VAT (I)", readonly=True)
+    # po_amount_total = fields.Float("Co VAT (I)", readonly=True)
+    # po_amount_tax = fields.Float("VAT (I)", readonly=True)
 
     po_amount_untaxed_vnd = fields.Float("COST Input (No_VAT)", readonly=True)
     po_amount_total_vnd = fields.Float("COST Input (With_VAT)", readonly=True)
@@ -93,7 +94,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
     # )
     # commission_id = fields.Many2one("sale.commission", "Sale commission", readonly=True)
 
-    @api.depends('so_amount_untaxed', 'po_amount_untaxed', 'margin')
+    @api.depends('so_amount_untaxed_vnd', 'po_amount_untaxed_vnd', 'margin')
     def _compute_profits(self):
         ''' Business Income Tax - default is 20% if no configuration in system parameters '''
         biz_tax_percentage = float(
@@ -215,6 +216,50 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             amount_vnd = record.po_commission_total * exchange_rate
             record.po_commission_total_vnd = amount_vnd
 
+    # @api.model
+    # def search(self, args, offset=0, limit=None, order=None, count=False):
+    #     args = _to_tuple(args)
+    #     args = self._replace_month_filter(args)
+    #     return super().search(args, offset=offset, limit=limit, order=order, count=count)
+    #
+    # def _replace_month_filter(self, args):
+    #     new_args = []
+    #
+    #     is_predefined_payment_date_filter = self.env.context.get("is_predefined_payment_date_filter")
+    #     if is_predefined_payment_date_filter:
+    #         for domain in args:
+    #
+    #             if isinstance(domain, (list, tuple)) and domain[0] == 'payment_date':
+    #                 field, operator, value = domain
+    #
+    #                 # Odoo usually passes date strings in ISO format
+    #                 if isinstance(value, str):
+    #                     try:
+    #                         value_date = datetime.strptime(value, "%Y-%m-%d").date()
+    #                     except ValueError:
+    #                         # Not a valid date → skip
+    #                         new_args.append(domain)
+    #                         continue
+    #                 else:
+    #                     value_date = value
+    #
+    #                 # Detect Odoo’s built-in monthly domain
+    #                 # Example: ('date_order', '>=', '2025-08-01')
+    #                 if operator == '>=':
+    #                     month = value_date.month
+    #                     year = value_date.year
+    #                     period_start = date(year, month, 5)
+    #                     domain = ('payment_date', '>=', period_start.strftime('%Y-%m-%d'))
+    #                 elif operator == '<=':
+    #                     period_end = (value_date + relativedelta(months=1)).replace(day=5)
+    #                     domain = ('payment_date', '<=', period_end.strftime('%Y-%m-%d'))
+    #
+    #             new_args.append(domain)
+    #     else:
+    #         new_args = args
+    #
+    #     return new_args
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         '''
@@ -245,7 +290,93 @@ class SaleProfitForwarderAnalysisReport(models.Model):
 
         return res
 
-    def _select(self):
+    # ---------------------------------------------------
+    # This query is based on separated PO, thus if a SO has multiple POs (= multiple credit notes),
+    # it will make duplicate records. Therefore, it needs to refactor to combine these POs as well as Credit Notes
+    # into one.
+    # ---------------------------------------------------
+
+    # def _select(self):
+    #     select_str = """
+    #         SELECT
+    #         fbl.id AS id,
+    #         fbl.id AS bill_id,
+    #         fbl.booking_id AS booking_id,
+    #         fbl.partner_id AS customer_id,
+    #         fbl.company_id AS company_id,
+    #         fbl.user_id AS user_id,
+    #         usale.partner_id AS sale_partner_id,
+    #         fbl.order_id AS sale_order_id,
+    #         po.id AS purchase_order_id,
+    #         fbk.port_discharge_id AS pod_id,
+    #         fbk.vessel_id AS line_id,
+    #
+    #         fbl.vessel_bol_number AS bill_no,
+    #         '' AS volumes,
+    #         DATE(fbk.etd_revised) AS etd,
+    #         fdn.payment_state AS payment_state,
+    #         DATE(fdn.invoice_date) AS invoice_date,
+    #         CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
+    #         so.date_order AS date_order,
+    #         so.name AS order_number,
+    #
+    #         CASE WHEN po.amount_untaxed IS NULL THEN 0 ELSE po.amount_untaxed END AS po_amount_untaxed,
+    #         CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
+    #         CASE WHEN po.amount_total - po.amount_untaxed IS NULL THEN 0 ELSE po.amount_total - po.amount_untaxed END AS po_amount_tax,
+    #
+    #         ROUND((CASE WHEN fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_untaxed_vnd,
+	# 		ROUND((CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END)::numeric, 2)::numeric AS po_amount_total_vnd,
+    #         ROUND((CASE WHEN fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_tax_vnd,
+    #
+    #         CASE WHEN so.amount_untaxed IS NULL THEN 0 ELSE so.amount_untaxed END AS so_amount_untaxed,
+    #         CASE WHEN so.amount_total IS NULL THEN 0 ELSE so.amount_total END AS so_amount_total,
+    #         CASE WHEN so.amount_total - so.amount_untaxed IS NULL THEN 0 ELSE so.amount_total - so.amount_untaxed END AS so_amount_tax,
+    #
+    #         ROUND((CASE WHEN fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_untaxed_vnd,
+	# 		ROUND((CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END)::numeric, 2)::numeric AS so_amount_total_vnd,
+    #         ROUND((CASE WHEN fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_tax_vnd,
+	#
+	# 		CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
+	# 		CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,
+    #
+    #         0 AS cost_no_vat,
+    #         0 AS revenue_no_vat,
+    #
+    #         CASE WHEN po.commission_total IS NULL THEN 0 ELSE po.commission_total END AS po_commission_total,
+    #         CASE WHEN so.commission_total IS NULL THEN 0 ELSE so.commission_total END AS so_commission_total,
+    #         CASE WHEN so.margin IS NULL THEN 0 ELSE so.margin END AS margin
+    #     """
+    #     return select_str
+    #
+    # def _from(self):
+    #     from_str = """
+    #         freight_billing fbl
+    #         INNER JOIN freight_booking fbk ON fbk.id = fbl.booking_id
+    #         LEFT JOIN res_partner cus ON cus.id = fbl.partner_id
+    #         LEFT JOIN freight_catalog_port pod ON fbk.port_discharge_id = pod.id
+    #         LEFT JOIN freight_catalog_vessel fline ON fbk.vessel_id = fline.id
+    #         LEFT JOIN res_users usale ON usale.id = fbl.user_id
+    #         INNER JOIN res_partner psale ON usale.partner_id = psale.id
+    #         LEFT JOIN sale_order so ON fbl.order_id = so.id
+    #         LEFT JOIN freight_debit_note fdn ON fbl.id = fdn.bill_id AND fdn.active = true
+	# 		LEFT JOIN freight_credit_note fcn ON fbl.id = fcn.bill_id AND fcn.active = true
+    #         LEFT JOIN purchase_order po on fcn.purchase_order_id = po.id
+    #     """
+    #     return from_str
+    #
+    # def _where(self):
+    #     where_str = """
+    #         WHERE
+    #             so.state in ('sale', 'done') AND po.state in ('purchase', 'done')
+    #     """
+    #     return where_str
+
+    # ---------------------------------------------------
+    # Version 2 - Update query to accept multiple POs (= multiple credit notes).
+    # ---------------------------------------------------
+
+    @staticmethod
+    def _select_v2():
         select_str = """
             SELECT
             fbl.id AS id,
@@ -256,49 +387,76 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             fbl.user_id AS user_id,
             usale.partner_id AS sale_partner_id,
             fbl.order_id AS sale_order_id,
-            po.id AS purchase_order_id,
             fbk.port_discharge_id AS pod_id,
             fbk.vessel_id AS line_id,
-            
+            fbk.vessel_booking_number AS booking_no,
             fbl.vessel_bol_number AS bill_no,
             '' AS volumes,
             DATE(fbk.etd_revised) AS etd,
             fdn.payment_state AS payment_state,
+            DATE(fdn.payment_date) AS payment_date,
             DATE(fdn.invoice_date) AS invoice_date,
             CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
             so.date_order AS date_order,
             so.name AS order_number,
-            
-            CASE WHEN po.amount_untaxed IS NULL THEN 0 ELSE po.amount_untaxed END AS po_amount_untaxed,
-            CASE WHEN po.amount_total IS NULL THEN 0 ELSE po.amount_total END AS po_amount_total,
-            CASE WHEN po.amount_total - po.amount_untaxed IS NULL THEN 0 ELSE po.amount_total - po.amount_untaxed END AS po_amount_tax,
 
             ROUND((CASE WHEN fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_untaxed_vnd,
-			ROUND((CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END)::numeric, 2)::numeric AS po_amount_total_vnd,
+            ROUND((CASE WHEN fcn.amount_total_vnd IS NULL THEN 0 ELSE fcn.amount_total_vnd END)::numeric, 2)::numeric AS po_amount_total_vnd,
             ROUND((CASE WHEN fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fcn.amount_total_vnd - fcn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS po_amount_tax_vnd,
-            
+
             CASE WHEN so.amount_untaxed IS NULL THEN 0 ELSE so.amount_untaxed END AS so_amount_untaxed,
             CASE WHEN so.amount_total IS NULL THEN 0 ELSE so.amount_total END AS so_amount_total,
             CASE WHEN so.amount_total - so.amount_untaxed IS NULL THEN 0 ELSE so.amount_total - so.amount_untaxed END AS so_amount_tax,
-            
+
             ROUND((CASE WHEN fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_untaxed_vnd,
-			ROUND((CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END)::numeric, 2)::numeric AS so_amount_total_vnd,
+            ROUND((CASE WHEN fdn.amount_total_vnd IS NULL THEN 0 ELSE fdn.amount_total_vnd END)::numeric, 2)::numeric AS so_amount_total_vnd,
             ROUND((CASE WHEN fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed IS NULL THEN 0 ELSE fdn.amount_total_vnd - fdn.amount_total_vnd_untaxed END)::numeric, 2)::numeric AS so_amount_tax_vnd,
-			
-			CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
-			CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,
-            
-            0 AS cost_no_vat,
+
+            CASE WHEN fcn.exchange_rate IS NULL THEN 0 ELSE fcn.exchange_rate END AS po_exchange_rate,
+            CASE WHEN fdn.exchange_rate IS NULL THEN 0 ELSE fdn.exchange_rate END AS so_exchange_rate,
+
+            sub_exp.expense_amount AS cost_no_vat,
             0 AS revenue_no_vat,
-            
-            CASE WHEN po.commission_total IS NULL THEN 0 ELSE po.commission_total END AS po_commission_total,
+
+            CASE WHEN fcn.commission_total IS NULL THEN 0 ELSE fcn.commission_total END AS po_commission_total,
             CASE WHEN so.commission_total IS NULL THEN 0 ELSE so.commission_total END AS so_commission_total,
             CASE WHEN so.margin IS NULL THEN 0 ELSE so.margin END AS margin
         """
         return select_str
 
-    def _from(self):
-        from_str = """
+    @staticmethod
+    def _sub_freight_credit_note():
+        subquery_str = f"""
+            SELECT
+                sub_fbl.id AS bill_id,
+                sub_fbl.vessel_bol_number AS bill_no,
+                sub_fcn.exchange_rate AS exchange_rate,
+                SUM(sub_fcn.amount_total_vnd_untaxed) AS amount_total_vnd_untaxed,
+                SUM(sub_fcn.amount_total_vnd) AS amount_total_vnd,
+                SUM(sub_po.commission_total) AS commission_total
+            FROM
+                freight_billing sub_fbl
+                LEFT JOIN freight_credit_note sub_fcn ON sub_fbl.id = sub_fcn.bill_id AND sub_fcn.active = true
+                LEFT JOIN purchase_order sub_po on sub_fcn.purchase_order_id = sub_po.id
+            WHERE 
+                sub_po.state in ('purchase', 'done')
+            GROUP BY 
+                sub_fbl.id, sub_fbl.vessel_bol_number, sub_fcn.exchange_rate
+        """
+        return subquery_str
+
+    @staticmethod
+    def _sub_freight_hr_expense():
+        subquery_str = f"""
+            SELECT billing_id AS bill_id, SUM(total_amount) AS expense_amount
+            FROM hr_expense
+            WHERE state = 'approved' or state = 'done'
+            GROUP BY billing_id
+        """
+        return subquery_str
+
+    def _from_v2(self):
+        from_str = f"""
             freight_billing fbl
             INNER JOIN freight_booking fbk ON fbk.id = fbl.booking_id
             LEFT JOIN res_partner cus ON cus.id = fbl.partner_id
@@ -308,15 +466,16 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             INNER JOIN res_partner psale ON usale.partner_id = psale.id
             LEFT JOIN sale_order so ON fbl.order_id = so.id
             LEFT JOIN freight_debit_note fdn ON fbl.id = fdn.bill_id AND fdn.active = true
-			LEFT JOIN freight_credit_note fcn ON fbl.id = fcn.bill_id AND fcn.active = true
-            LEFT JOIN purchase_order po on fcn.purchase_order_id = po.id
+            LEFT JOIN ({self._sub_freight_credit_note()}) fcn ON fbl.id = fcn.bill_id
+            LEFT JOIN ({self._sub_freight_hr_expense()}) sub_exp ON fbl.id = sub_exp.bill_id
         """
         return from_str
 
-    def _where(self):
+    @staticmethod
+    def _where_v2():
         where_str = """
             WHERE
-                so.state in ('sale', 'done') AND po.state in ('purchase', 'done')
+                so.state in ('sale', 'done')
         """
         return where_str
 
@@ -346,9 +505,9 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             "CREATE or REPLACE VIEW %s AS ( %s FROM ( %s ) %s )",
             (
                 AsIs(self._table),
-                AsIs(self._select()),
-                AsIs(self._from()),
-                AsIs(self._where()),
+                AsIs(self._select_v2()),
+                AsIs(self._from_v2()),
+                AsIs(self._where_v2()),
                 # AsIs(self._group_by()),
             ),
         )

@@ -27,6 +27,9 @@
 <!--                                    confirm="This will update exchange and re-calculate amount in VND." />-->
                         </div>
                     </xpath>
+                    <xpath expr="//field[@name='date']" position="attributes">
+                        <attribute name="attrs">{'readonly': [('state', '=', 'False')]}</attribute>
+                    </xpath>
             </field>
     </record>
 

@@ -101,16 +101,16 @@ class FreightAccountPaymentRegister(models.TransientModel):
                 amount_payment_currency = wizard.source_amount * wizard.exchange_rate
                 wizard.amount = amount_payment_currency
 
-    @api.depends('amount')
-    def _compute_payment_difference(self):
-        """
-        Set difference constantly zero to skip checking different
-        """
-        self.ensure_one()
-        super()._compute_payment_difference()
-
-        for wizard in self:
-            wizard.payment_difference = 0
+    # @api.depends('amount')
+    # def _compute_payment_difference(self):
+    #     """
+    #     Set difference constantly zero to skip checking different
+    #     """
+    #     self.ensure_one()
+    #     super()._compute_payment_difference()
+    #
+    #     for wizard in self:
+    #         wizard.payment_difference = 0
 
     @api.onchange("amount")
     def _onchange_amount(self):
@@ -118,6 +118,44 @@ class FreightAccountPaymentRegister(models.TransientModel):
             if self.source_amount_currency:
                 new_exchange_rate = self.amount / self.source_amount_currency
                 self.exchange_rate = new_exchange_rate
+
+    def default_get(self, fields_list):
+        """
+        Override to set "Mark as fully paid" is automatically selected
+        """
+        res = super().default_get(fields_list)
+
+        # Force default option to "Mark as fully paid"
+        # Only override if the field exists in the form
+        if 'payment_difference_handling' in fields_list:
+            res['payment_difference_handling'] = 'reconcile'
+
+        # Set default for “Post Difference In”
+        if 'writeoff_account_id' in fields_list:
+            # Find your preferred default write-off account
+            # Example: use company’s account for exchange gain/loss
+            # Priority 1: specially named writeoff account
+            account = self.env['account.account'].search([
+                ('company_id', '=', self.env.company.id),
+                ('name', 'ilike', 'Vietnamese'),
+            ], limit=1)
+
+            # If not found, pick another logic
+            # Priority 2: company default writeoff
+            if not account:
+                # fallback: use the company's default writeoff account if configured
+                account = self.env.company.default_writeoff_account_id
+
+            # Priority 3: first account in list (as fallback)
+            if not account:
+                account = self.env['account.account'].search([
+                    ('company_id', '=', self.env.company.id),
+                ], order="code asc", limit=1)
+
+            if account:
+                res['writeoff_account_id'] = account.id
+
+        return res
 
     def update_exchange_rate(self):
         self.ensure_one()
