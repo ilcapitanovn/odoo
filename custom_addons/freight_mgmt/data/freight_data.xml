@@ -499,7 +499,7 @@
             <field name="state">code</field> <!-- Action: Python Code -->
             <field name="active">True</field>
             <field name="code">
-                action = model.action_udate_debit_note_when_invoice_paid(record)
+                action = model.action_update_debit_note_when_invoice_paid(record)
             </field>
         </record>
         <!-- Scheduled Actions -->

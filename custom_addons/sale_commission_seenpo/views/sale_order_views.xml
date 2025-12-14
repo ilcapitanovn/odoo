@@ -10,6 +10,9 @@
             <xpath expr="//group[@name='group_recompute_commission']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='commission_total']" position="attributes">
+                <attribute name="string">Commissions (USD)</attribute>
+            </xpath>
 <!--            <xpath expr="//button[@name='action_confirm']" position="before">-->
 <!--                <button-->
 <!--                    name="recompute_lines_agents"-->

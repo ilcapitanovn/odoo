@@ -30,6 +30,7 @@
             <field name="tax_totals_json" position="after">
                 <field
                     name="commission_total"
+                    string="Commissions (USD)"
                     widget="monetary"
                     options="{'currency_field': 'currency_id'}"
                 />

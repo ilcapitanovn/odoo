@@ -67,7 +67,8 @@ class FreightCreditNote(models.Model):
         domain="[('origin', '=', origin_name), ('id', 'not in', related_purchase_order_ids), ('state', 'in', ['purchase', 'done'])]"
     )
     partner_id = fields.Many2one(related="purchase_order_id.partner_id", string="Partner", readonly=True)
-    user_id = fields.Many2one(related="purchase_order_id.user_id", string="S.I.C")
+    # TODO: Updated 14/12/2025 because sales now handle creation of PO
+    user_id = fields.Many2one(related="sale_order_id.user_id", string="S.I.C")
     invoice_count = fields.Integer(related="purchase_order_id.invoice_count", string='Bill Count', copy=False)
     invoice_ids = fields.Many2many(related="purchase_order_id.invoice_ids", string='Bills', copy=False)
     invoice_status = fields.Selection(related="purchase_order_id.invoice_status", string="Invoice Status", store=True)

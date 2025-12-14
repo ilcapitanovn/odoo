@@ -112,7 +112,7 @@
                             <field name="amount_total_vnd" widget='monetary'
                                    attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
                             <field name="total_amount_vnd_summary" widget='monetary'
-                                   attrs="{'invisible': [('has_tax_totals_vnd', '!=', True)]}" />
+                                   attrs="{'invisible': [('has_tax_totals_usd', '!=', True)]}" />
                         </xpath>
                         <xpath expr="//label[@for='margin']" position="replace">
                             <div class="text-nowrap">
@@ -202,9 +202,9 @@
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_shipment_type" optional="hide" />
                         </xpath>
-                        <xpath expr="//field[@name='amount_total']" position="after">
-                            <field name="margin" widget="monetary" optional="show"/>
-                        </xpath>
+<!--                        <xpath expr="//field[@name='amount_total']" position="after">-->
+<!--                            <field name="margin" widget="monetary" optional="show"/>-->
+<!--                        </xpath>-->
                         <xpath expr="//tree" position="attributes">
                             <attribute name="decoration-danger">(margin &lt; 0)</attribute>
                         </xpath>
@@ -222,9 +222,9 @@
                         <xpath expr="//field[@name='activity_ids']" position="before">
                             <field name="order_shipment_type" optional="hide" />
                         </xpath>
-                        <xpath expr="//field[@name='amount_total']" position="after">
-                            <field name="margin" widget="monetary" optional="show"/>
-                        </xpath>
+<!--                        <xpath expr="//field[@name='amount_total']" position="after">-->
+<!--                            <field name="margin" widget="monetary" optional="show"/>-->
+<!--                        </xpath>-->
                         <xpath expr="//tree" position="attributes">
                             <attribute name="decoration-danger">(margin &lt; 0)</attribute>
                         </xpath>

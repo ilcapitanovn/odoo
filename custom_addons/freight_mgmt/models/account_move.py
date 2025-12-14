@@ -72,36 +72,38 @@ class AccountMove(models.Model):
             _logger.exception("automate_action_set_bl_number_on_creation - Exception: %s" % e)
 
     @api.model
-    def action_udate_debit_note_when_invoice_paid(self, record):
+    def action_update_debit_note_when_invoice_paid(self, record):
         try:
             if not record or record.payment_state != "paid":
                 return False
 
-            _logger.info("action_udate_debit_note_when_invoice_paid is triggered")
+            _logger.info("action_update_debit_note_when_invoice_paid is triggered")
 
             odoodbot = self.env.ref('base.user_root')
             self = self.with_user(odoodbot)
             record = record.with_user(odoodbot)
 
             if not record.vessel_bol_number:
-                _logger.info("action_udate_debit_note_when_invoice_paid of record ID = %s - vessel_bol_number is empty"
+                _logger.info("action_update_debit_note_when_invoice_paid of record ID = %s - vessel_bol_number is empty"
                              , record.id)
                 return False
 
             domain = [('vessel_bol_number', '=', record.vessel_bol_number)]
             related_billing = self.env["freight.billing"].sudo().search(domain, limit=1)
             if not related_billing or not related_billing.debit_note_ids:
-                _logger.info("action_udate_debit_note_when_invoice_paid - not found debit note of vessel_bol_number: %s"
+                _logger.info("action_update_debit_note_when_invoice_paid - not found debit note of vessel_bol_number: %s"
                              , record.vessel_bol_number)
                 return False
 
             new_exchange_rate = record.payment_id.exchange_rate
+            amount_paid = record.payment_id.amount
             payment_date = record.payment_id.date
             if not new_exchange_rate or not payment_date:
                 domain = [('communication', '=', record.name)]
                 account_payment_register = self.env["account.payment.register"].sudo().search(domain, limit=1)
                 if account_payment_register:
                     new_exchange_rate = account_payment_register.exchange_rate
+                    amount_paid = account_payment_register.amount
                     payment_date = account_payment_register.payment_date
 
             if new_exchange_rate:
@@ -109,24 +111,42 @@ class AccountMove(models.Model):
                 domain = [('ref', '=', record.name)]
                 account_payment = self.search(domain, limit=1)
                 if account_payment:
+                    # in some cases, account payment is empty, so update it to have it synced.
                     account_payment.exchange_rate = new_exchange_rate
 
+                notes = None
                 if record.is_sale_document(include_receipts=True):  # Customer Invoice
-                    for debit_note in related_billing.debit_note_ids:
-                        debit_note.write({
-                            'exchange_rate': new_exchange_rate,
-                            'payment_date': payment_date
-                        })
+                    notes = related_billing.debit_note_ids
                 elif record.is_purchase_document(include_receipts=True):  # Vendor Bill
-                    for credit_note in related_billing.credit_note_ids:
-                        credit_note.write({
-                            'exchange_rate': new_exchange_rate,
-                            'payment_date': payment_date
-                        })
+                    notes = related_billing.credit_note_ids
 
-            _logger.info("action_udate_debit_note_when_invoice_paid executed successful")
+                if notes:
+                    for note in notes:
+                        update_change_rate = None
+                        if note.amount_total_vnd != amount_paid:
+                            '''
+                            Re-calculate exchange_rate in debit note to make sure total amount (VND) in debit note
+                            matches the amount paid.
+                            '''
+                            if not note.amount_subtotal_vnd:    # in case of no product item in VND
+                                update_change_rate = new_exchange_rate
+                            else:
+                                amount_vnd_by_usd_exchange = amount_paid - note.amount_subtotal_vnd
+                                update_change_rate = amount_vnd_by_usd_exchange / note.amount_total
+
+                        if update_change_rate:
+                            note.write({
+                                'exchange_rate': update_change_rate,
+                                'payment_date': payment_date
+                            })
+                        else:
+                            note.write({
+                                'payment_date': payment_date
+                            })
+
+            _logger.info("action_update_debit_note_when_invoice_paid executed successful")
         except Exception as e:
-            _logger.exception("action_udate_debit_note_when_invoice_paid - Exception: %s" % e)
+            _logger.exception("action_update_debit_note_when_invoice_paid - Exception: %s" % e)
 
     @api.model_create_multi
     def create(self, vals_list):
