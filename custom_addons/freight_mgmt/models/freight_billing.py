@@ -550,7 +550,7 @@ class FreightBilling(models.Model):
                     "name": item.name,
                     "quantity": item.product_uom_qty,
                     "uom": item.product_uom.display_name,
-                    "unit_price": item.price_unit,
+                    "unit_price": item.price_unit_input,
                     "currency_id": item.order_line_currency_id.id if item.order_line_currency_id else False,
                     "tax_id": item.taxes_id,
                     "price_subtotal": item.price_subtotal_display,
