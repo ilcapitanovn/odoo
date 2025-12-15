@@ -15,7 +15,7 @@
 <!--                <filter name="filter_date_order" date="date_order" string="Order Date" default_period="last_month"/>-->
                 <filter name="filter_etd" date="etd" default_period="last_month"/>
 <!--                <filter name="filter_invoice_date" date="invoice_date" default_period="this_month"/>-->
-                <filter name="filter_payment_date" date="payment_date" default_period="this_month"
+                <filter name="filter_payment_date" date="payment_date" default_period="last_month"
                         context="{'is_predefined_payment_date_filter': True}"
                         help="From day 6 of this month to day 5 of next month"/>
 <!--                <filter string="January" name="filter_fiscal_jan"  context="{'selected_month': 1}"/>-->

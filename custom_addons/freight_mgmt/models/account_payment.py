@@ -136,19 +136,25 @@ class FreightAccountPaymentRegister(models.TransientModel):
             # Example: use company’s account for exchange gain/loss
             # Priority 1: specially named writeoff account
             account = self.env['account.account'].search([
-                ('company_id', '=', self.env.company.id),
+                # ('company_id', '=', self.env.company.id),
+                '|',
                 ('name', 'ilike', 'Vietnamese'),
+                ('name', 'ilike', 'Việt Nam')
             ], limit=1)
 
             # If not found, pick another logic
             # Priority 2: company default writeoff
             if not account:
                 # fallback: use the company's default writeoff account if configured
-                account = self.env.company.default_writeoff_account_id
+                journal = self.env['account.journal'].sudo().browse(
+                    self.env.context.get('default_journal_id')
+                )
+                if journal:
+                    account = journal.default_account_id
 
             # Priority 3: first account in list (as fallback)
             if not account:
-                account = self.env['account.account'].search([
+                account = self.env['account.account'].sudo().search([
                     ('company_id', '=', self.env.company.id),
                 ], order="code asc", limit=1)
 
