@@ -7,6 +7,15 @@ from odoo.tools import float_round
 
 _logger = logging.getLogger(__name__)
 
+PAYMENT_STATE_SELECTION = [
+        ('not_paid', 'Not Paid'),
+        ('in_payment', 'In Payment'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('reversed', 'Reversed'),
+        ('invoicing_legacy', 'Invoicing App Legacy'),
+]
+
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -34,6 +43,9 @@ class PurchaseOrder(models.Model):
                                        compute='_amount_all_usd_vnd', currency_field='vnd_currency_id')
     has_tax_totals_usd = fields.Boolean(compute='_amount_all_usd_vnd')
     has_tax_totals_vnd = fields.Boolean(compute='_amount_all_usd_vnd')
+
+    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
+                                     readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
 
     vnd_currency_id = fields.Many2one('res.currency', 'Vietnamese Currency', compute="_compute_vnd_currency_id")
     total_amount_vnd_summary = fields.Monetary(string='Total Amount (VND)', store=True,
@@ -66,6 +78,17 @@ class PurchaseOrder(models.Model):
     def _compute_total_amount_vnd_summary(self):
         for rec in self:
             rec.total_amount_vnd_summary = rec.amount_total_usd * rec.exchange_rate + rec.amount_total_vnd
+
+    @api.depends('invoice_ids.payment_state')
+    def _compute_payment_state(self):
+        for rec in self:
+            if rec.invoice_ids:
+                for invoice in rec.invoice_ids:
+                    rec.payment_state = invoice.payment_state
+                    if invoice.payment_state == 'paid':
+                        break
+            else:
+                rec.payment_state = 'not_paid'
 
     @api.depends('amount_untaxed', 'amount_tax', 'amount_total')
     def _amount_all_usd_vnd(self):

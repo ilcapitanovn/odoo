@@ -181,6 +181,66 @@
         </field>
     </record>
 
+    <record id="freight_purchase_order_tree_inherit" model="ir.ui.view">
+        <field name="name">freight.purchase.order.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="payment_state"
+                       widget="badge"
+                       decoration-danger="payment_state == 'not_paid'"
+                       decoration-warning="payment_state in ('partial', 'in_payment')"
+                       decoration-success="payment_state in ('paid', 'reversed')"
+                       attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
+                       optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_purchase_order_view_tree_inherit" model="ir.ui.view">
+        <field name="name">freight.purchase.order.view.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="payment_state"
+                       widget="badge"
+                       decoration-danger="payment_state == 'not_paid'"
+                       decoration-warning="payment_state in ('partial', 'in_payment')"
+                       decoration-success="payment_state in ('paid', 'reversed')"
+                       attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
+                       optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="freight_purchase_order_kpis_tree_inherit" model="ir.ui.view">
+        <field name="name">freight.purchase.order.kpis.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="payment_state"
+                       widget="badge"
+                       decoration-danger="payment_state == 'not_paid'"
+                       decoration-warning="payment_state in ('partial', 'in_payment')"
+                       decoration-success="payment_state in ('paid', 'reversed')"
+                       attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
+                       optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="freight_action_purchase_recalculate_margin" model="ir.actions.server">
         <field name="name">Recalculate Margin After Purchase Updated</field>
         <field name="model_id" ref="purchase.model_purchase_order"/>

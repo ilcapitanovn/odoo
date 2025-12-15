@@ -13,6 +13,14 @@ _logger = logging.getLogger(__name__)
 
 MARGIN_BY_PRODUCT_COST = "(by Product Cost)"
 MARGIN_BY_PURCHASE_COST = "(by Purchase Cost)"
+PAYMENT_STATE_SELECTION = [
+        ('not_paid', 'Not Paid'),
+        ('in_payment', 'In Payment'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('reversed', 'Reversed'),
+        ('invoicing_legacy', 'Invoicing App Legacy'),
+]
 
 
 class SaleOrder(models.Model):
@@ -65,6 +73,9 @@ class SaleOrder(models.Model):
     has_tax_totals_usd = fields.Boolean(compute='_amount_all_usd_vnd', store=True)
     has_tax_totals_vnd = fields.Boolean(compute='_amount_all_usd_vnd', store=True)
 
+    payment_state = fields.Selection(PAYMENT_STATE_SELECTION, string="Payment Status", store=True,
+                                     readonly=True, copy=False, tracking=True, compute='_compute_payment_state')
+
     vnd_currency_id = fields.Many2one('res.currency', 'Vietnamese Currency', compute="_compute_vnd_currency_id")
     total_amount_vnd_summary = fields.Monetary(string='Total Amount (VND)', store=True,
                                                currency_field='vnd_currency_id',
@@ -106,6 +117,17 @@ class SaleOrder(models.Model):
             order.booking_count = self.env['freight.booking'].search_count([
                 ('order_id', '=', order.id)
             ])
+
+    @api.depends('invoice_ids.payment_state')
+    def _compute_payment_state(self):
+        for rec in self:
+            if rec.invoice_ids:
+                for invoice in rec.invoice_ids:
+                    rec.payment_state = invoice.payment_state
+                    if invoice.payment_state == 'paid':
+                        break
+            else:
+                rec.payment_state = 'not_paid'
 
     @api.depends('amount_total_usd', 'amount_total_vnd')
     def _compute_total_amount_vnd_summary(self):
