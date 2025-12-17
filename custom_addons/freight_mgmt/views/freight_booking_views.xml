@@ -31,6 +31,12 @@
                 />
                 <filter string="Open" name="open" domain="[('completed', '=', False )]" />
                 <separator />
+                <filter string="Draft" name="draft_booking" domain="[('stage_id', '=', 1)]"/>
+                <filter string="Submitted" name="submitted_booking" domain="[('stage_id', '=', 2)]"/>
+                <filter string="Confirmed" name="confirmed_booking" domain="[('stage_id', '=', 3)]"/>
+                <filter string="Completed" name="completed_booking" domain="[('stage_id', '=', 4)]"/>
+                <filter string="Cancelled" name="cancelled_booking" domain="[('stage_id', '=', 5)]"/>
+                <separator />
                 <filter string="Original ETD" name="etd" date="etd"/>
                 <filter string="Revised ETD" name="etd_revised" date="etd_revised"/>
                 <separator />
@@ -318,7 +324,7 @@
                 <field name="order_type" optional="show"/>
                 <field name="amount_total" optional="hide" groups="freight_mgmt.group_freight_manager"/>
                 <field name="margin" optional="show" groups="freight_mgmt.group_freight_manager"/>
-                <field name="stage_id" decoration-success="confirmed or completed" decoration-info="stage_name == 'Draft' or stage_name == 'Submitted'" widget="badge" optional="show" />
+                <field name="stage_id" decoration-success="completed" decoration-warning="confirmed" decoration-info="stage_name == 'Draft' or stage_name == 'Submitted'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

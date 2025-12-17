@@ -90,7 +90,7 @@ class AccountMove(models.Model):
 
             domain = [('vessel_bol_number', '=', record.vessel_bol_number)]
             related_billing = self.env["freight.billing"].sudo().search(domain, limit=1)
-            if not related_billing or not related_billing.debit_note_ids:
+            if not related_billing:
                 _logger.info("action_update_debit_note_when_invoice_paid - not found debit note of vessel_bol_number: %s"
                              , record.vessel_bol_number)
                 return False
@@ -137,16 +137,110 @@ class AccountMove(models.Model):
                         if update_change_rate:
                             note.write({
                                 'exchange_rate': update_change_rate,
+                                'state': 'completed',
                                 'payment_date': payment_date
                             })
                         else:
                             note.write({
+                                'state': 'completed',
                                 'payment_date': payment_date
                             })
+
+                        is_both_debit_credit_paid = False
+                        if record.is_sale_document(include_receipts=True):  # Debit Note
+                            credit_notes = related_billing.credit_note_ids
+                            if credit_notes:
+                                for credit in credit_notes:
+                                    if credit.payment_state == 'paid':  # if credit note already paid before
+                                        is_both_debit_credit_paid = True
+
+                        elif record.is_purchase_document(include_receipts=True):    # Credit Note
+                            debit_notes = related_billing.debit_note_ids
+                            if debit_notes:
+                                for debit in debit_notes:
+                                    if debit.payment_state == 'paid':  # if debit note already paid before
+                                        is_both_debit_credit_paid = True
+
+                        # Update state of booking and bill to 'completed'
+                        if is_both_debit_credit_paid:
+                            related_billing.with_context(skip_required_validation=True).write({'state': 'completed'})
+                            if related_billing.booking_id:
+                                stage = self.env["freight.catalog.stage"]\
+                                    .sudo().search([('completed', '=', True)], limit=1)
+                                if stage:
+                                    related_billing.booking_id\
+                                        .with_context(skip_required_validation=True).write({'stage_id': stage.id})
 
             _logger.info("action_update_debit_note_when_invoice_paid executed successful")
         except Exception as e:
             _logger.exception("action_update_debit_note_when_invoice_paid - Exception: %s" % e)
+
+    @api.model
+    def action_scheduled_manual_update_states(self):
+        ''' Cron '''
+        try:
+            _logger.info("action_scheduled_manual_update_states is triggered")
+
+            domain = [
+                ('payment_state', '=', 'paid')
+            ]
+            records = self.env['account.move'].sudo().search(domain)
+
+            for rec in records:
+                if rec.vessel_bol_number:
+                    _logger.info(f"*** processing update states related to account.move with id = {rec.id} ***")
+
+                    domain = [('vessel_bol_number', '=', rec.vessel_bol_number)]
+                    related_billing = self.env["freight.billing"].sudo().search(domain, limit=1)
+
+                    if related_billing:
+                        is_both_debit_credit_paid = False
+                        if rec.is_sale_document(include_receipts=True):  # Customer Invoice
+                            debit_notes = related_billing.debit_note_ids
+                            if debit_notes:
+                                for debit in debit_notes:
+                                    if debit.state != 'completed':
+                                        debit.write({
+                                            'payment_state': 'paid',
+                                            'state': 'completed'
+                                        })
+
+                            credit_notes = related_billing.credit_note_ids
+                            if credit_notes:
+                                for credit in credit_notes:
+                                    if credit.payment_state == 'paid':
+                                        is_both_debit_credit_paid = True
+
+                        elif rec.is_purchase_document(include_receipts=True):  # Vendor Bill
+                            credit_notes = related_billing.credit_note_ids
+                            if credit_notes:
+                                for credit in credit_notes:
+                                    if credit.state != 'completed':
+                                        credit.write({
+                                            'payment_state': 'paid',
+                                            'state': 'completed'
+                                        })
+
+                            debit_notes = related_billing.debit_note_ids
+                            if debit_notes:
+                                for debit in debit_notes:
+                                    if debit.payment_state == 'paid':
+                                        is_both_debit_credit_paid = True
+
+                        # Update state of booking and bill to 'completed'
+                        if is_both_debit_credit_paid:
+                            related_billing.with_context(skip_required_validation=True).write(
+                                {'state': 'completed'})
+                            if related_billing.booking_id:
+                                stage = self.env["freight.catalog.stage"].sudo().search(
+                                    [('completed', '=', True)], limit=1)
+                                if stage:
+                                    related_billing.booking_id.with_context(skip_required_validation=True)\
+                                        .write({'stage_id': stage.id})
+
+            _logger.info("action_scheduled_manual_update_states executed successful")
+        except Exception as e:
+            _logger.exception("action_scheduled_manual_update_states - Exception: %s" % e)
 
     @api.model_create_multi
     def create(self, vals_list):

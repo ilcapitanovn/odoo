@@ -318,6 +318,9 @@ class FreightBilling(models.Model):
         error_message = _("Please fill the following required fields before confirming:\n")
 
         for rec in self:
+            if rec.env.context.get('skip_required_validation'):
+                continue
+
             if not rec.vessel_bol_number:
                 rec.show_required_error_vessel_bol_number = True
                 is_valid = False

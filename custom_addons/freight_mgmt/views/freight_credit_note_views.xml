@@ -17,6 +17,11 @@
                 <filter string="Paid" name="paid_credit_notes" domain="[('payment_state', 'in', ('in_payment', 'paid'))]"/>
                 <filter string="Not Paid" name="unpaid_credit_notes" domain="[('payment_state', 'not in', ('in_payment', 'paid'))]"/>
                 <separator />
+                <filter string="Draft" name="draft_credit_notes" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="posted_credit_notes" domain="[('state', '=', 'posted')]"/>
+                <filter string="Completed" name="completed_credit_notes" domain="[('state', '=', 'completed')]"/>
+                <filter string="Cancelled" name="cancelled_credit_notes" domain="[('state', '=', 'cancelled')]"/>
+                <separator />
                 <group expand="0" string="Group By">
                     <!-- Cannot group_by by supplier_id field because it is not stored field. -->
                     <filter
@@ -257,7 +262,7 @@
                        decoration-success="payment_state in ('paid', 'reversed')"
                        attrs="{'invisible': [('payment_state', 'in', ('invoicing_legacy'))]}"
                        optional="show"/>
-                <field name="state" decoration-success="state in ['posted', 'completed']" decoration-info="state == 'draft'" widget="badge" optional="show" />
+                <field name="state" decoration-success="state in ['completed']" decoration-warning="state in ['posted']" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

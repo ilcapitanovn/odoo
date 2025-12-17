@@ -15,6 +15,11 @@
                     domain="[('user_id','=',uid)]"
                 />
                 <separator />
+                <filter string="Draft" name="draft_billing" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="posted_billing" domain="[('state', '=', 'posted')]"/>
+                <filter string="Completed" name="completed_billing" domain="[('state', '=', 'completed')]"/>
+                <filter string="Cancelled" name="cancelled_billing" domain="[('state', '=', 'cancelled')]"/>
+                <separator />
                 <group expand="0" string="Group By">
                     <!--
                     <filter
@@ -296,7 +301,7 @@
                 <field name="user_id" string="S.I.C" widget="many2one_avatar_user" optional="show" />
                 <field name="branch_id" optional="hide" />
                 <field name="create_date" widget="date" optional="show" />
-                <field name="state" decoration-success="state in ['posted', 'completed']" decoration-info="state == 'draft'" widget="badge" optional="show" />
+                <field name="state" decoration-success="state in ['completed']" decoration-warning="state in ['posted']" decoration-info="state == 'draft'" widget="badge" optional="show" />
             </tree>
         </field>
     </record>

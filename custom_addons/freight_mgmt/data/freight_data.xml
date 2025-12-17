@@ -560,6 +560,17 @@
             <field name="numbercall">-1</field>
             <field name="active">False</field>
         </record>
+        <record id="freight_scheduled_action_manual_update_states" model="ir.cron">
+            <field name="name">Freight: Accounting - Manual Update States</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">model.action_scheduled_manual_update_states()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">False</field>
+        </record>
         <record id="freight_scheduled_action_manual_update_exchange_rate_vnd_credit_note" model="ir.cron">
             <field name="name">Freight: Credit Note - Manual Update Exchange Rate</field>
             <field name="model_id" ref="freight_mgmt.model_freight_credit_note"/>
