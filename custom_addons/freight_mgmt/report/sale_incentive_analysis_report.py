@@ -8,7 +8,7 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from psycopg2.extensions import AsIs
 
-from odoo import api, fields, models, tools
+from odoo import _, api, fields, models, tools
 from odoo.exceptions import UserError
 from odoo.tools import float_round
 
@@ -53,6 +53,7 @@ class SaleIncentiveAnalysisReport(models.Model):
     so_amount_untaxed = fields.Float("Chua VAT (O)", readonly=True)
     margin = fields.Float("Margin", readonly=True)
 
+    order_category = fields.Char("Order Category", readonly=True)   # No need to display in view
     order_type = fields.Char("Freehand or Nominated", readonly=True)
     po_amount_untaxed_vnd = fields.Float("COST Input (No_VAT)", readonly=True)
     po_amount_total_vnd = fields.Float("COST Input (With_VAT)", readonly=True)
@@ -79,6 +80,42 @@ class SaleIncentiveAnalysisReport(models.Model):
 
     display_achieve = fields.Integer(compute="_compute_display_achieve", string="Achieve", readonly=True)
 
+    # ------------------------------------------------------------
+    # Groupby normalization
+    # ------------------------------------------------------------
+    # def _normalize_groupby(self, groupby):
+    #     # Fixed / permanent groupby order
+    #     permanent_groupby = [
+    #         'incentive_name',
+    #         'order_category',
+    #         'partner_id',
+    #     ]
+    #
+    #     if not groupby:
+    #         groupby = []
+    #
+    #     if isinstance(groupby, str):
+    #         groupby = [groupby]
+    #
+    #     # Ensure permanent groupby fields exist
+    #     for field in permanent_groupby:
+    #         if field not in groupby:
+    #             groupby.append(field)
+    #
+    #     # Enforce canonical order
+    #     ordered = [
+    #         field for field in permanent_groupby
+    #         if field in groupby
+    #     ]
+    #
+    #     # Append any extra groupby fields
+    #     extras = [
+    #         field for field in groupby
+    #         if field not in permanent_groupby
+    #     ]
+    #
+    #     return ordered + extras
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=False):
         '''
@@ -89,7 +126,23 @@ class SaleIncentiveAnalysisReport(models.Model):
         res = super(SaleIncentiveAnalysisReport, self).read_group(domain, fields, groupby, offset=offset,
                                                                   limit=limit, orderby=orderby, lazy=lazy)
         # Check read_group is on level 1 (grouping by incentive) or level 2 (grouping by salesman)
-        is_level_1 = 'incentive_name' in res[0].keys() if len(res) > 0 else False
+        is_level_1 = False
+        is_level_order_category = False
+        if len(res) > 0:
+            is_level_1 = 'incentive_name' in res[0].keys()
+            is_level_order_category = 'order_category' in res[0].keys()
+
+            if is_level_order_category:
+                '''
+                fields_get can get label of a selection with translation terms
+                '''
+                fields_info = self.env['sale.order'].fields_get(
+                    allfields=['order_category']
+                )
+                selection_map = dict(fields_info['order_category']['selection'])
+                for group in res:
+                    key = group.get('order_category')
+                    group['order_category'] = selection_map.get(key, key)
 
         fields_to_calculate_total = [   # level 2
             'display_target_sales',
@@ -101,7 +154,7 @@ class SaleIncentiveAnalysisReport(models.Model):
             'incentive_after_tax',
             'display_achieve'
         ]
-        if is_level_1:
+        if is_level_1 or is_level_order_category:
             fields_to_calculate_total = ['incentive']
 
         # for field in fields_to_calculate_total:
@@ -211,6 +264,43 @@ class SaleIncentiveAnalysisReport(models.Model):
                     if field in fields:
                         total = 0.0
                         if is_level_1:      # Only column incentive need to calculate
+                            if records:
+                                # Sort the recordset by the grouping field (here is partner name)
+                                # For Many2one fields, you often need to sort by the actual value/name
+                                # or the ID if the field is defined with sortable=False
+                                sorted_records = records.sorted(key=lambda r: r.display_name if r.display_name else '')
+
+                                # Group using itertools.groupby
+                                grouped_items = {}
+                                for key, group in itertools.groupby(sorted_records, key=lambda r: r.partner_id):
+                                    category_name = key.name if key else 'No Category'
+                                    grouped_items[category_name] = list(group)  # Convert group iterator to a list of records
+
+                                for salesman, items in grouped_items.items():
+                                    sum_freehand_total = 0.0
+                                    sum_nominated_total = 0.0
+                                    sum_all_total = 0.0
+                                    target_sales_vnd = 0.0
+                                    incentive_record = None
+                                    if len(items) > 0:
+                                        target_sales_vnd = items[0].target_sales * exchange_rate
+                                        incentive_record = items[0].incentive_id
+
+                                    for item in items:
+                                        sum_freehand_total += item.sum_freehand
+                                        sum_nominated_total += item.sum_nominated
+                                        sum_all_total += item.sum_all
+
+                                    # incentive = self.calculate_incentive_v2(incentive_record, target_sales_vnd,
+                                    #                                         sum_freehand_total, sum_nominated_total,
+                                    #                                         sum_all_total, exchange_rate)
+                                    incentive = self.calculate_incentive_v3(items[0], incentive_record, target_sales_vnd,
+                                                                            sum_freehand_total, sum_nominated_total,
+                                                                            sum_all_total, exchange_rate)
+                                    total += incentive
+                            line[field] = total
+
+                        elif is_level_order_category:      # Only column incentive need to calculate
                             if records:
                                 # Sort the recordset by the grouping field (here is partner name)
                                 # For Many2one fields, you often need to sort by the actual value/name
@@ -465,16 +555,26 @@ class SaleIncentiveAnalysisReport(models.Model):
 
     @api.depends('sum_freehand', 'sum_nominated', 'sum_activities', 'sum_all', 'target_sales')
     def _compute_incentive_and_tax(self):
-        # exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
+        exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
         for rec in self:
             # res = self.calculate_incentive_and_tax(rec, exchange_rate)
             # rec.incentive = res['incentive']
             # rec.incentive_tax_amount = res['incentive_tax_amount']
             # rec.incentive_after_tax = res['incentive_after_tax']
-            rec.incentive = 0
-            rec.incentive_tax_amount = 0
-            rec.incentive_after_tax = 0
+            if rec.order_category == 'fruits':
+                incentive_amount = SaleIncentiveAnalysisReport.calculate_incentive_v3(
+                    rec, rec.incentive_id, rec.display_target_sales, rec.sum_freehand,
+                    rec.sum_nominated, rec.sum_all, exchange_rate)
+                tax_record = rec.tax_income_id
+                incentive_tax_amount = self.calculate_incentive_tax_amount_v3(tax_record, incentive_amount)
+                rec.incentive = incentive_amount
+                rec.incentive_tax_amount = incentive_tax_amount
+                rec.incentive_after_tax = incentive_amount - incentive_tax_amount
+            else:
+                rec.incentive = 0
+                rec.incentive_tax_amount = 0
+                rec.incentive_after_tax = 0
 
     @api.depends('so_amount_untaxed_vnd', 'po_amount_untaxed_vnd', 'margin')
     def _compute_sums(self):
@@ -530,30 +630,50 @@ class SaleIncentiveAnalysisReport(models.Model):
 
         if incentive_record:
             paid_date = data_record.payment_date
-            if paid_date and len(incentive_record.section_ids_3rd_update) > 0 \
-                    and incentive_record.section_ids_3rd_update[0].date_start <= paid_date \
-                    and (paid_date <= incentive_record.section_ids_3rd_update[0].date_end
-                         or not incentive_record.section_ids_3rd_update[0].date_end):
-                active_section = incentive_record.section_ids_3rd_update
+            order_category = data_record.order_category
+            if order_category == "fruits":      # Incentive is calculated by exception section
+                active_section_fruits = incentive_record.section_ids_exception.filtered(
+                    lambda r: r.category_tag == order_category
+                )
+                if active_section_fruits:
+                    for sec in active_section_fruits:
+                        sum_profit_vnd = sum_freehand + sum_nominated
+                        if paid_date and sec.date_start <= paid_date \
+                                and (not sec.date_end or paid_date <= sec.date_end):
+                            '''
+                            Value of a 'fruits' booking not larger than 300M VND
+                            '''
+                            if sum_profit_vnd > sec.amount_vnd_to:
+                                sum_profit_vnd = sec.amount_vnd_to
 
-            elif paid_date and len(incentive_record.section_ids_5th_update) > 0 \
-                    and incentive_record.section_ids_5th_update[0].date_start <= paid_date \
-                    and (paid_date <= incentive_record.section_ids_5th_update[0].date_end
-                         or not incentive_record.section_ids_5th_update[0].date_end):
-                active_section = incentive_record.section_ids_5th_update
+                            incentive = (sec.incentive_percent_month / 100) * sum_profit_vnd
+                            break
 
-            else:
-                active_section = incentive_record.section_ids
+            else:   # Incentive is calculated as common section(s)
+                if paid_date and len(incentive_record.section_ids_3rd_update) > 0 \
+                        and incentive_record.section_ids_3rd_update[0].date_start <= paid_date \
+                        and (paid_date <= incentive_record.section_ids_3rd_update[0].date_end
+                             or not incentive_record.section_ids_3rd_update[0].date_end):
+                    active_section = incentive_record.section_ids_3rd_update
 
-            if active_section:
-                for sec in active_section:
-                    amount_from = sec.percent_from * target_sales_vnd / 100
-                    amount_to = sec.percent_to * target_sales_vnd / 100
-                    if amount_from <= sum_all < amount_to or target_sales_vnd == 0.0 and amount_from == 0.0:
-                        incentive = (sec.incentive_percent_month / 100) * \
-                                    ((sum_freehand * incentive_record.target_freehand / 100) +
-                                     (sum_nominated * incentive_record.target_nominated / 100))
-                        break
+                elif paid_date and len(incentive_record.section_ids_5th_update) > 0 \
+                        and incentive_record.section_ids_5th_update[0].date_start <= paid_date \
+                        and (paid_date <= incentive_record.section_ids_5th_update[0].date_end
+                             or not incentive_record.section_ids_5th_update[0].date_end):
+                    active_section = incentive_record.section_ids_5th_update
+
+                else:
+                    active_section = incentive_record.section_ids
+
+                if active_section:
+                    for sec in active_section:
+                        amount_from = sec.percent_from * target_sales_vnd / 100
+                        amount_to = sec.percent_to * target_sales_vnd / 100
+                        if amount_from <= sum_all < amount_to or target_sales_vnd == 0.0 and amount_from == 0.0:
+                            incentive = (sec.incentive_percent_month / 100) * \
+                                        ((sum_freehand * incentive_record.target_freehand / 100) +
+                                         (sum_nominated * incentive_record.target_nominated / 100))
+                            break
 
         return incentive
 
@@ -835,6 +955,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                 tblSum.margin AS margin,
 
                 tblSum.order_type AS order_type,
+                tblSum.order_category AS order_category,
                 tblSum.po_amount_untaxed_vnd AS po_amount_untaxed_vnd,
                 tblSum.po_amount_total_vnd AS po_amount_total_vnd,
                 tblSum.po_amount_tax_vnd AS po_amount_tax_vnd,
@@ -864,6 +985,7 @@ class SaleIncentiveAnalysisReport(models.Model):
                 , so_amount_untaxed
                 , margin
                 , order_type
+                , order_category
                 , po_amount_untaxed_vnd
                 , po_amount_total_vnd
                 , po_amount_tax_vnd
@@ -921,11 +1043,15 @@ class ReportSaleIncentiveAnalysis(models.AbstractModel):
         docs = self.env["sale.incentive.analysis.report"].browse(docids)
         exchange_rate = int(self.env['ir.config_parameter'].sudo().get_param('freight_mgmt.default_usd_vnd_exchange_rate', -1))
 
+        TRADING_FRUITS_SUFFIX = " (Thương Mại Trái Cây)"
+
         ''' Method 1: Manual Nested Grouping (More Control) '''
         grouped_incentives = {}
         for doc in docs:
             grouping_incentive_name = doc.incentive_name
             grouping_sale_name = doc.display_name
+            if doc.order_category == 'fruits':
+                grouping_sale_name = doc.display_name + TRADING_FRUITS_SUFFIX
 
             if grouping_incentive_name not in grouped_incentives:
                 grouped_incentives[grouping_incentive_name] = {}

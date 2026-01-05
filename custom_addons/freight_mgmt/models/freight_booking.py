@@ -50,6 +50,8 @@ class FreightBooking(models.Model):
     #     string="Shipment Type", default="fcl-exp", help='Type of Shipment')
     shipment_type = fields.Selection(related="order_id.order_shipment_type", string="Shipment Type", store=True,
                                      readonly=True, help='Type of Shipment')
+    order_category = fields.Selection(related="order_id.order_category", string="Order Category", store=True,
+                                      readonly=True, help='A category to distinguish goods like trading fruits')
 
     order_id = fields.Many2one(
         comodel_name="sale.order", string="Sale Order Reference",

@@ -1,5 +1,20 @@
 <?xml version="1.0"?>
 <odoo>
+        <record id="freight_sale_order_view_search_inherited" model="ir.ui.view">
+            <field name="name">freight.sale.order.view.search.inherited</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/filter[@name='order_month']" position="before">
+                    <separator/>
+                    <filter name="group_order_category" domain="[]" context="{'group_by':'order_category'}"/>
+                </xpath>
+                <xpath expr="//group/filter[@name='order_month']" position="after">
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="freight_sale_order_view_form_inherited" model="ir.ui.view">
                 <field name="name">freight.sale.order.view.form.inherited</field>
                 <field name="model">sale.order</field>
@@ -83,6 +98,7 @@
                                         confirm="This will update exchange and re-calculate total amount in VND." />
                             </div>
                             <field name="order_print_with_images" />
+                            <field name="order_category" />
                         </xpath>
                 </field>
         </record>
@@ -186,6 +202,9 @@
                             <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
                         </xpath>
                         <xpath expr="//field[@name='order_shipment_type']" position="attributes">
+                            <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
+                        </xpath>
+                        <xpath expr="//field[@name='order_category']" position="attributes">
                             <attribute name="attrs">{'readonly':[('state','in',['cancel'])]}</attribute>
                         </xpath>
                 </field>

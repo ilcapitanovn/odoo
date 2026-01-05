@@ -52,7 +52,27 @@
                                         <field name="incentive_percent_year" />
                                         <field name="date_start" />
                                         <field name="date_end" />
+                                        <field name="category_tag" />
                                         <field name="revision_no">6</field>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Current Rule (Exception)" name="active_exception">
+                                <field
+                                    name="section_ids_exception"
+                                    widget="one2many_list"
+                                    colspan="4"
+                                    nolabel="1"
+                                    domain="[('revision_no', '=', 1000)]"
+                                >
+                                    <tree string="Sections" editable="bottom">
+                                        <field name="amount_vnd_from" digits="[12,0]" />
+                                        <field name="amount_vnd_to" digits="[12,0]" />
+                                        <field name="incentive_percent_month" />
+                                        <field name="date_start" />
+                                        <field name="date_end" />
+                                        <field name="category_tag" />
+                                        <field name="revision_no">1000</field>
                                     </tree>
                                 </field>
                             </page>
@@ -71,6 +91,7 @@
                                         <field name="incentive_percent_year" />
                                         <field name="date_start" />
                                         <field name="date_end" />
+                                        <field name="category_tag" />
                                         <field name="revision_no">5</field>
                                     </tree>
                                 </field>
@@ -90,6 +111,7 @@
                                         <field name="incentive_percent_year" />
                                         <field name="date_start" />
                                         <field name="date_end" />
+                                        <field name="category_tag" />
                                         <field name="revision_no">3</field>
                                     </tree>
                                 </field>

@@ -121,6 +121,11 @@
                         context="{'group_by':'incentive_name'}"
                     />
                     <filter
+                        string="Category"
+                        name="group_by_order_category"
+                        context="{'group_by':'order_category'}"
+                    />
+                    <filter
                         string="Employee"
                         name="group_by_employee"
                         context="{'group_by':'partner_id'}"
@@ -172,7 +177,7 @@
         <field name="res_model">sale.incentive.analysis.report</field>
         <field name="view_mode">tree</field>
         <field name="binding_view_types">list</field>
-        <field name="context">{'search_default_filter_payment_date': 1, 'search_default_group_by_incentive': 1, 'search_default_group_by_employee': 1}</field>
+        <field name="context">{'search_default_filter_payment_date': 1, 'search_default_group_by_incentive': 1, 'search_default_group_by_order_category': 1, 'search_default_group_by_employee': 1}</field>
         <field name="search_view_id" ref="view_sale_incentive_analysis_search" />
         <field name="view_id" ref="view_sale_incentive_analysis_view_list" />
         <field

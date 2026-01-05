@@ -10,21 +10,27 @@ class SaleIncentive(models.Model):
 
     name = fields.Char("Name", required=True)
     section_ids = fields.One2many(      # 6th Update
-        string="Active Sections",
+        string="Active Section",
         comodel_name="sale.incentive.section",
         inverse_name="incentive_id",
         domain=[('revision_no', '=', 6)]
     )
+    section_ids_exception = fields.One2many(  # exceptional section
+        string="Active Exceptional Section",
+        comodel_name="sale.incentive.section",
+        inverse_name="incentive_id",
+        domain=[('revision_no', '=', 1000)]
+    )
     section_ids_5th_update = fields.One2many(
         "sale.incentive.section",
         "incentive_id",
-        string="Old Sections  5th Update",
+        string="Old Section - 5th Update",
         domain=[('revision_no', '=', 5)]
     )
     section_ids_3rd_update = fields.One2many(
         "sale.incentive.section",
         "incentive_id",
-        string="Old Sections - 3rd Update",
+        string="Old Section - 3rd Update",
         domain=[('revision_no', '=', 3)]
     )
 
@@ -64,19 +70,19 @@ class SaleIncentive(models.Model):
                     _("The activity rates cannot be greater than 100%.")
                 )
 
-    @api.depends("section_ids")
-    def _compute_section_ids_5th_update(self):
-        for rec in self:
-            rec.section_ids_5th_update = rec.section_ids.filtered(
-                lambda r: r.revision_no == 5
-            )
-
-    @api.depends("section_ids")
-    def _compute_section_ids_3rd_update(self):
-        for rec in self:
-            rec.section_ids_3rd_update = rec.section_ids.filtered(
-                lambda r: r.revision_no == 3
-            )
+    # @api.depends("section_ids")
+    # def _compute_section_ids_5th_update(self):
+    #     for rec in self:
+    #         rec.section_ids_5th_update = rec.section_ids.filtered(
+    #             lambda r: r.revision_no == 5
+    #         )
+    #
+    # @api.depends("section_ids")
+    # def _compute_section_ids_3rd_update(self):
+    #     for rec in self:
+    #         rec.section_ids_3rd_update = rec.section_ids.filtered(
+    #             lambda r: r.revision_no == 3
+    #         )
 
 
 class SaleIncentiveSection(models.Model):
@@ -87,10 +93,14 @@ class SaleIncentiveSection(models.Model):
 
     percent_from = fields.Float(string="From (%)")
     percent_to = fields.Float(string="To (%)")
+    amount_vnd_from = fields.Float(string="Amount From (VND)")
+    amount_vnd_to = fields.Float(string="Amount To (VND)")
     incentive_percent_month = fields.Float(string="Incentive By Month (%)", required=True)
     incentive_percent_year = fields.Float(string="Incentive By Year (%)")
     date_start = fields.Date(string='Date Start', copy=False)
     date_end = fields.Date(string='Date End', copy=False)
+    category_tag = fields.Char(string='Categories Tag', copy=False,
+                               help="This field is used to classify for exceptional incentives")
     revision_no = fields.Integer(string="Revision No.", default=6,
                                  help="Revision number of the incentive rule. Increase when rule is updated.")
 

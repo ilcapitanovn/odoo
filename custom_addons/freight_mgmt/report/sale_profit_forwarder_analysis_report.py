@@ -397,6 +397,7 @@ class SaleProfitForwarderAnalysisReport(models.Model):
             DATE(fdn.payment_date) AS payment_date,
             DATE(fdn.invoice_date) AS invoice_date,
             CASE WHEN so.order_type IS NULL THEN 'freehand' ELSE so.order_type END AS order_type,
+            CASE WHEN so.order_category IS NULL THEN 'common' ELSE so.order_category END AS order_category,
             so.date_order AS date_order,
             so.name AS order_number,
 

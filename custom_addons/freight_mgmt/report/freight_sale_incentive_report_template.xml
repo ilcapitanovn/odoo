@@ -98,6 +98,7 @@
                                     <t t-set="etd" t-value="line.etd"/>
                                     <t t-set="sum_freehand" t-value="line.sum_freehand"/>
                                     <t t-set="sum_nominated" t-value="line.sum_nominated"/>
+                                    <t t-set="amount_incentive" t-value="line.incentive"/>
 
                                     <tr>
                                         <td class="stt"><span t-esc="i"/></td>
@@ -125,7 +126,12 @@
                                         </t>
 
                                         <td></td>
-                                        <td></td>
+                                        <t t-if="amount_incentive > 0">
+                                            <td class="monetary"><span t-esc="'{:,.0f}'.format(amount_incentive).replace(',', '.')"/></td>
+                                        </t>
+                                        <t t-else="">
+                                            <td></td>
+                                        </t>
                                         <td></td>
                                     </tr>
                                     <t t-set="i" t-value="i + 1"/>

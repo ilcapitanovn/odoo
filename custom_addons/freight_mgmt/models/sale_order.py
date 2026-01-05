@@ -44,6 +44,12 @@ class SaleOrder(models.Model):
     ], string='Order Type', readonly=True, tracking=True,
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
+    order_category = fields.Selection([
+        ('common', _('Logistic Common Goods')),
+        ('fruits', _('Trading Fruits Goods')),
+    ], string='Order Category', readonly=True, tracking=True, default='common',
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+
     order_shipment_type = fields.Selection(
         selection=[("fcl-exp", "FCL Export"), ("fcl-imp", "FCL Import"), ("lcl-exp", "LCL Export"),
                    ("lcl-imp", "LCL Import"), ("air-imp", "Air Import"), ("air-exp", "Air Export")],
