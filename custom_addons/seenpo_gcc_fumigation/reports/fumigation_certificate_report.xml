@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report action (unchanged) -->
+<!--    <report-->
+<!--        id="seenpo_action_report_fumigation_certificate"-->
+<!--        string="Certificate of Fumigation"-->
+<!--        model="seenpo.fumigation.certificate"-->
+<!--        report_type="qweb-pdf"-->
+<!--        name="seenpo_gcc_fumigation.report_fumigation_certificate"-->
+<!--        file="seenpo_gcc_fumigation.report_fumigation_certificate"-->
+<!--        print_report_name="'Certificate_of_Fumigation_' + object.name"-->
+<!--        paperformat_id="seenpo_fumigation_paperformat_bol"-->
+<!--    />-->
+
+    <record id="seenpo_action_report_fumigation_certificate" model="ir.actions.report">
+        <field name="name">Certificate of Fumigation</field>
+        <field name="model">seenpo.fumigation.certificate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">seenpo_gcc_fumigation.report_fumigation_certificate</field>
+        <field name="report_file">seenpo_gcc_fumigation.report_fumigation_certificate</field>
+        <field name="print_report_name">'Certificate_of_Fumigation_' + object.name</field>
+        <field name="paperformat_id" ref="seenpo_fumigation_paperformat_bol"/>
+    </record>
+
+    <!-- QWeb template -->
+    <template id="report_fumigation_certificate">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="doc">
+            <div class="page" style="font-size:20px; font-family:'Times New Roman', Times, serif; color:#000; position:relative; padding:10px 20px 0 20px;">
+
+                <!-- WATERMARK + diagonal crosshatch background.
+                     Built with SVG rather than CSS `background-image` /
+                     `transform`: tested directly against wkhtmltopdf 0.12.x,
+                     stacking two CSS repeating-linear-gradient layers renders
+                     as a broken solid-dark block (a known old-WebKit gradient/
+                     transparency bug), and plain CSS `transform: rotate()` on
+                     the watermark text was not being applied at all in the
+                     previous version. SVG `transform="rotate(...)"` on a
+                     <text> element, and an SVG <pattern> for the crosshatch,
+                     both render correctly and consistently instead. -->
+                <t t-if="doc.state in ['draft','submitted']">
+                <svg style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;"
+                     viewBox="0 0 800 1120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="gcc_hatch" width="12" height="12" patternUnits="userSpaceOnUse">
+                            <path d="M0,12 L12,0" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,3 L3,-3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,15 L15,9" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M0,0 L12,12" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,9 L3,15" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,-3 L15,3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="0" width="800" height="1120" fill="url(#gcc_hatch)"/>
+                    <text x="420" y="620" font-family="Arial, Helvetica, sans-serif" font-size="200"
+                          font-weight="bold" fill="#dcebe2" text-anchor="middle"
+                          transform="rotate(-30 420 620)">
+                        DRAFT
+                    </text>
+                </svg>
+                </t>
+                <t t-if="doc.state == 'cancelled'">
+                <svg style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;"
+                     viewBox="0 0 800 1120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="gcc_hatch" width="12" height="12" patternUnits="userSpaceOnUse">
+                            <path d="M0,12 L12,0" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,3 L3,-3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,15 L15,9" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M0,0 L12,12" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,9 L3,15" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,-3 L15,3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="0" width="800" height="1120" fill="url(#gcc_hatch)"/>
+                    <text x="420" y="620" font-family="Arial, Helvetica, sans-serif" font-size="150"
+                          font-weight="bold" fill="#dcebe2" text-anchor="middle"
+                          transform="rotate(-30 420 620)">
+                        CANCELLED
+                    </text>
+                </svg>
+                </t>
+                <t t-if="doc.state == 'approved'">
+                    <svg style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:0;"
+                     viewBox="0 0 800 1120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="gcc_hatch" width="12" height="12" patternUnits="userSpaceOnUse">
+                            <path d="M0,12 L12,0" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,3 L3,-3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,15 L15,9" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M0,0 L12,12" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M-3,9 L3,15" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                            <path d="M9,-3 L15,3" stroke="#1f5c3d" stroke-width="0.7" stroke-opacity="0.05"/>
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="0" width="800" height="1120" fill="url(#gcc_hatch)"/>
+                    <text x="420" y="620" font-family="Arial, Helvetica, sans-serif" font-size="250"
+                          font-weight="bold" fill="#dcebe2" text-anchor="middle"
+                          transform="rotate(-30 420 620)">
+                        GCC
+                    </text>
+                </svg>
+                </t>
+
+                <!-- Everything below sits above the watermark -->
+                <div style="position:relative; z-index:1;">
+
+                    <!-- HEADER: logo | company block | QR code -->
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr>
+                            <td style="width:15%; vertical-align:middle;">
+<!--                                <t t-if="doc.env.company.logo">-->
+<!--                                    <img t-att-src="image_data_uri(doc.env.company.logo)" style="max-height:60px;"/>-->
+<!--                                </t>-->
+<!--                                <t t-else="">-->
+<!--                                    <div style="font-size:26px; font-weight:bold; color:#1f5c3d; line-height:1;">GCC</div>-->
+<!--                                    <div style="border-top:3px solid #b8952f; width:40px; margin-top:3px;"/>-->
+<!--                                </t>-->
+                                <img class="logo-img" src="/seenpo_gcc_fumigation/static/img/gcc_logo.png" style="max-height:60px;"/>
+                            </td>
+                            <td style="width:65%; vertical-align:middle; padding-left:100px;">
+                                <div style="font-size:20px; font-weight:bold; color:#1f5c3d;">
+                                    GLOBAL CARGO CONTROL CO., LTD
+                                </div>
+                                <div style="font-size:14px; margin-top:2px;">
+                                    Add.: 72/41, Road 16, Binh Hung Hoa Ward, Ho Chi Minh City, Vietnam<br/>
+                                    Tel: 0903952171 | Fax: 08.37657083<br/>
+                                    Email: info@giamdinhtoancau.com | Website: giamdinhtoancau.com
+                                </div>
+                            </td>
+                            <td style="width:20%; text-align:right; vertical-align:middle;">
+                                <t t-set="qr_code_value" t-value="'https://giamdinhtoancau.com/chungthu/' + doc.qr_token"/>
+<!--                                <span t-field="doc.qr_token" widget="barcode"-->
+<!--                                      options="{'type': 'QR', 'width': 90, 'height': 90}"/>-->
+<!--                                <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', doc.qr_token, 100, 100)" style="width:100px; height:100px;"/>-->
+                                <img t-att-src="'/report/qr/?value=%s&amp;version=%s&amp;fill_color=%s' % (qr_code_value, 5, '%231f5c3d')" style="width:100px; height:100px;"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Header separator: thick green rule + thin gold rule -->
+                    <div style="border-top:3px solid #1f5c3d; margin-top:4px;"/>
+                    <div style="border-top:1px solid #b8952f; margin-top:2px; margin-bottom:10px;"/>
+
+                    <!-- TITLE -->
+                    <h3 style="text-align:center; margin:6px 0; text-transform:uppercase; font-weight:bold;
+                               color:#1f5c3d; letter-spacing:1px; font-size:30px;">
+                        Certificate of Fumigation
+                    </h3>
+
+                    <br/>
+
+                    <!-- CERTIFICATE NUMBER -->
+                    <p style="margin:10px 0 6px 0;">
+                        <strong>Certificate No.: <span t-esc="doc.name"/></strong>
+                    </p>
+
+                    <p style="font-style:italic; margin:0 0 8px 0;">
+                        We hereby certify that the cargo with following details:
+                    </p>
+
+                    <!-- CARGO / SHIPMENT DETAILS (single continuous list, uniform bullet) -->
+                    <table style="width:100%; border-collapse:collapse; font-size:18px; margin-left: 30px; margin-right:30px;">
+                        <tr>
+                            <td style="width:30%; color:#1f5c3d; font-weight:bold; vertical-align:top; padding:2px 0;">
+                                <span style="color:red;">▪</span> Shipper:
+                            </td>
+                            <td style="font-weight:bold; vertical-align:top; padding:2px 0;">
+                                <t t-esc="doc.shipper_id.name or ''"/><br/>
+                                ADD: <t t-esc="doc.shipper_address or ''"/><br/>
+                                TEL: <t t-esc="doc.shipper_phone or ''"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; vertical-align:top; padding:2px 0;">
+                                <span style="color:red;">▪</span> Consignee:
+                            </td>
+                            <td style="font-weight:bold; vertical-align:top; padding:2px 0;">
+                                <t t-esc="doc.consignee_id.name or ''"/><br/>
+                                ADD: <t t-esc="doc.consignee_address or ''"/><br/>
+                                TEL: <t t-esc="doc.consignee_phone or ''"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Name of commodity:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.cargo_name"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Total quantity:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.quantity"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Total weight:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.gross_weight"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Name of vessel:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.vessel_name"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Bill of loading:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.bl_number"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Port of loading:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.port_loading or ''"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Port of discharge:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.port_discharge or ''"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Date of shipment:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.shipment_date or ''"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Date of fumigation:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.fumigation_date or ''"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Fumigant used:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.chemical"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Dosage:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.dosage"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Time of exposure:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.exposure_time"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Place of fumigation:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.fumigation_place"/>
+                        </tr>
+                        <tr>
+                            <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
+                                <span style="color:red;">▪</span> Container No./ Seal No.:
+                            </td>
+                            <td style="font-weight:bold; padding:2px 0;" t-esc="doc.container_no"/>
+                        </tr>
+                    </table>
+
+                    <!-- Hình ảnh đính kèm -->
+                    <t t-if="doc.image_attachment">
+                        <div style="margin-top:10px;">
+                            <strong>Attachments:</strong><br/>
+                            <img t-att-src="'data:image/png;base64,%s' % doc.image_attachment.decode('utf-8')"
+                                 style="width:120px; border:1px solid #ccc; padding:5px;"/>
+                        </div>
+                    </t>
+
+                    <!-- FOOTER: right-aligned date + title + signature block -->
+                    <div style="margin-top:36px; width:100%; overflow:hidden;">
+                        <div style="float:right; width:400px; text-align:center;">
+                            <div style="font-style:italic;">
+                                HO CHI MINH,
+                                <t t-if="doc.fumigation_date">
+                                    <t t-esc="doc.fumigation_date.strftime('%B %d, %Y')"/>
+                                </t>
+                            </div>
+                            <div style="font-weight:bold; margin-top:4px; color:#1f5c3d;">
+                                Manager of Fumigation Dept.
+                            </div>
+                            <div style="height:100px;"/>
+                            <div style="width:350px; text-align:center; padding-left:40px;">
+                              <hr style="border: none; border-top: 1px solid black; margin-bottom: 5px;" />
+                            </div>
+                            <span style="font-weight:bold; padding-top:4px; text-align:center;">
+                                <t t-esc="doc.signer"/>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

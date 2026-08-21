@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record model="ir.module.category" id="module_seenpo_gcc_fumigation_category">
+            <field name="name">GCC Fumigation</field>
+            <field name="description">Helps you handle your module in settings.</field>
+            <field name="sequence">10</field>
+        </record>
+    </data>
+</odoo>

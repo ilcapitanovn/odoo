@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- USER -->
+        <record id="group_seenpo_fumigation_user" model="res.groups">
+            <field name="name">Fumigation User</field>
+            <field name="category_id" ref="module_seenpo_gcc_fumigation_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- MANAGER -->
+        <record id="group_seenpo_fumigation_manager" model="res.groups">
+            <field name="name">Fumigation Manager</field>
+            <field name="category_id" ref="module_seenpo_gcc_fumigation_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_seenpo_fumigation_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+    </data>
+</odoo>

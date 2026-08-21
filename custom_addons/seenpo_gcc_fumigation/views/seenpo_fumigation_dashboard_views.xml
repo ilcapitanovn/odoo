@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Kanban Dashboard -->
+    <record id="view_fumigation_dashboard_kanban" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.dashboard.kanban</field>
+        <field name="model">seenpo.fumigation.dashboard</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="o_kanban_record">
+
+                            <!-- Chọn tháng -->
+                            <div class="oe_kanban_global_click" style="margin-bottom:16px;">
+                                <field name="month_filter"/>
+                            </div>
+
+                            <!-- Hàng 1: 3 ô -->
+                            <div class="row">
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Certificates Issued</div>
+                                        <h2 t-esc="record.certificate_count.value"/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Container / Cont</div>
+                                        <h2 t-esc="record.container_count.value"/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Sea Route</div>
+                                        <h2 t-esc="record.sea_count.value"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hàng 2: 3 ô -->
+                            <div class="row" style="margin-top:12px;">
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Road Route</div>
+                                        <h2 t-esc="record.road_count.value"/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Wooden Pallet</div>
+                                        <h2 t-esc="record.pallet_count.value"/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="background:#3498DB;color:#fff;border-radius:8px;padding:12px;">
+                                        <div>Air Route</div>
+                                        <h2 t-esc="record.air_count.value"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng chứng thư trong tháng -->
+                            <div style="margin-top:20px;">
+                                <h3>Certificates in selected month</h3>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Certificate</th>
+                                            <th>Customer</th>
+                                            <th>Transport</th>
+                                            <th>Container</th>
+                                            <th>Fumigation Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="record.certificate_ids.raw_value" t-as="cert">
+                                            <tr>
+                                                <td><t t-esc="cert.name"/></td>
+                                                <td><t t-esc="cert.customer_id and cert.customer_id.name or ''"/></td>
+                                                <td><t t-esc="cert.transport_type"/></td>
+                                                <td><t t-esc="cert.container_no or ''"/></td>
+                                                <td><t t-esc="cert.fumigation_date or ''"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_seenpo_fumigation_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">seenpo.fumigation.dashboard</field>
+        <field name="view_mode">kanban</field>
+        <field name="help">Fumigation dashboard by month</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_seenpo_fumigation_dashboard"
+              name="Dashboard"
+              parent="menu_seenpo_fumigation_root"
+              action="action_seenpo_fumigation_dashboard"
+              sequence="20"/>
+
+</odoo>

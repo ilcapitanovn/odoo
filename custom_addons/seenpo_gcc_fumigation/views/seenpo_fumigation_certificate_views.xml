@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action & Menu -->
+    <record id="action_seenpo_fumigation_certificate" model="ir.actions.act_window">
+        <field name="name">Fumigation Certificates</field>
+        <field name="res_model">seenpo.fumigation.certificate</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                Manage fumigation certificates for GCC / Global Cargo Control.
+            </p>
+        </field>
+    </record>
+
+    <!-- Tree View (Danh sách chứng thư) -->
+    <record id="view_seenpo_fumigation_certificate_tree" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.certificate.tree</field>
+        <field name="model">seenpo.fumigation.certificate</field>
+        <field name="arch" type="xml">
+            <tree string="Certificates of Fumigation">
+                <field name="name" string="Certificate No."/>
+                <field name="customer_id" string="Customer"/>
+                <field name="chemical" string="Chemical"/>
+                <field name="fumigation_place" string="Fumigation Place"/>
+                <field name="cargo_name" string="Cargo"/>
+                <field name="quantity" string="Quantity"/>
+                <field name="fumigation_date" widget="date" string="Fumigation Date"/>
+                <field name="state" string="Status"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View (Tạo chứng thư mới) -->
+    <record id="view_seenpo_fumigation_certificate_form" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.certificate.form</field>
+        <field name="model">seenpo.fumigation.certificate</field>
+        <field name="arch" type="xml">
+            <form string="Certificate of Fumigation">
+                <header>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,cancelled"/>
+                    <button name="%(seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate)d"
+                            string="Download PDF"
+                            type="action"
+                            class="btn-primary"/>
+                    <button name="action_submit" string="Submit" type="object"
+                            states="draft" class="btn-primary"
+                            groups="seenpo_gcc_fumigation.group_seenpo_fumigation_user,seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            states="submitted" class="btn-success"
+                            groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            states="submitted,approved" class="btn-danger"
+                            groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="qr_token" readonly="1"/>
+                            <field name="customer_id" placeholder="Chon Khach Hang"/>
+                        </group>
+                        <group>
+                            <field name="transport_type" widget="radio"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- 2. Shipper & Consignee -->
+                        <page string="Shipper &amp; Consignee">
+                            <group>
+                                <group string="Shipper">
+                                    <field name="shipper_id"/>
+                                    <field name="shipper_address"/>
+                                    <field name="shipper_phone"/>
+                                </group>
+                                <group string="Consignee">
+                                    <field name="consignee_id"/>
+                                    <field name="consignee_address"/>
+                                    <field name="consignee_phone"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- 3. Cargo Information -->
+                        <page string="Cargo Information">
+                            <group>
+                                <group>
+                                    <field name="cargo_name" placeholder="DRAGON FRUIT..."/>
+                                    <field name="quantity" placeholder="694 BAGS"/>
+                                    <field name="gross_weight"/>
+                                </group>
+                                <group>
+                                    <field name="vessel_name"/>
+                                    <field name="bl_number"/>
+                                    <field name="port_loading"/>
+                                    <field name="port_discharge"/>
+                                    <field name="shipment_date"/>
+                                    <field name="container_no"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- 4. Fumigation Parameters -->
+                        <page string="Fumigation Parameters">
+                            <group>
+                                <group>
+                                    <field name="chemical"/>
+                                    <field name="fumigation_place"/>
+                                    <field name="fumigation_date"/>
+                                </group>
+                                <group>
+                                    <field name="dosage"/>
+                                    <field name="exposure_time"/>
+                                    <field name="signer"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Attachments">
+                            <group>
+                                <group>
+                                    <field name="image_attachment" widget="image"/>
+                                </group>
+                                <group>
+                                    <field name="scan_attachment" filename="scan_filename"/>
+                                </group>
+                            </group>
+
+<!--                            <group string="Attachments" col="2">-->
+<!--                                <field name="image_attachment" widget="image"/>-->
+<!--                                <field name="scan_attachment" filename="scan_filename"/>-->
+<!--                            </group>-->
+                        </page>
+
+                        <!-- 5. Other -->
+                        <page string="Other">
+                            <group>
+                                <field name="note"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field
+                        name="message_ids"
+                        widget="mail_thread"
+                        options="{'post_refresh': 'recipients', 'open_attachments': True}"
+                    />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_seenpo_fumigation_customers" model="ir.actions.client">
+        <field name="name">Customers</field>
+        <field name="tag">seenpo_fumigation_customers_empty</field>
+    </record>
+
+    <record id="action_seenpo_fumigation_reporting" model="ir.actions.client">
+        <field name="name">Reporting</field>
+        <field name="tag">seenpo_fumigation_reporting_empty</field>
+    </record>
+
+    <record id="action_seenpo_fumigation_setting" model="ir.actions.client">
+        <field name="name">Setting</field>
+        <field name="tag">seenpo_fumigation_setting_empty</field>
+    </record>
+
+    <record id="action_seenpo_fumigation_empty" model="ir.actions.client">
+    <field name="name">Coming soon</field>
+    <field name="tag">display_notification</field>
+    <field name="params">
+        {
+            "title": "Coming soon",
+            "message": "This feature is under development.",
+            "type": "info"
+        }
+    </field>
+</record>
+
+
+    <menuitem id="menu_seenpo_fumigation_root"
+              name="Fumigation"
+              web_icon="seenpo_gcc_fumigation,static/description/gcc_icon.png"
+              sequence="10"
+              groups="seenpo_gcc_fumigation.group_seenpo_fumigation_user,seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
+
+    <!-- Certificate -->
+    <menuitem id="menu_seenpo_fumigation_certificate"
+              name="Certificates"
+              parent="menu_seenpo_fumigation_root"
+              action="action_seenpo_fumigation_certificate"
+              groups="seenpo_gcc_fumigation.group_seenpo_fumigation_user,seenpo_gcc_fumigation.group_seenpo_fumigation_manager"
+              sequence="10"/>
+
+    <menuitem id="menu_seenpo_fumigation_customers"
+          name="Customers"
+          parent="menu_seenpo_fumigation_root"
+          action="action_seenpo_fumigation_empty"
+          sequence="30"/>
+
+    <menuitem id="menu_seenpo_fumigation_reporting"
+              name="Reporting"
+              parent="menu_seenpo_fumigation_root"
+              action="action_seenpo_fumigation_empty"
+              sequence="40"/>
+
+    <menuitem id="menu_seenpo_fumigation_setting"
+              name="Setting"
+              parent="menu_seenpo_fumigation_root"
+              action="action_seenpo_fumigation_empty"
+              groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"
+              sequence="50"/>
+
+</odoo>

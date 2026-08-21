@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seenpo_fumigation_certificate_sequence" model="ir.sequence">
+        <field name="name">Fumigation Certificate</field>
+        <field name="code">seenpo.fumigation.certificate.sequence</field>
+        <field name="prefix">%(y)s%(month)s%(woy)s</field>
+        <field name="suffix">/FUM</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="use_date_range">True</field>
+        <field name="implementation">no_gap</field>
+        <field name="company_id" />
+    </record>
+</odoo>

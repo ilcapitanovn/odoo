@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="seenpo_fumigation_empty_page">
+        <t t-name="seenpo_fumigation_empty_page">
+            <div class="o_form_view">
+                <h2>Coming soon...</h2>
+            </div>
+        </t>
+    </template>
+</odoo>
