@@ -146,7 +146,12 @@
                     <!-- TITLE -->
                     <h3 style="text-align:center; margin:6px 0; text-transform:uppercase; font-weight:bold;
                                color:#1f5c3d; letter-spacing:1px; font-size:30px;">
-                        Certificate of Fumigation
+                        <t t-if="doc.heading">
+                            <span t-esc="doc.heading"/>
+                        </t>
+                        <t t-else="">
+                            Certificate of Fumigation
+                        </t>
                     </h3>
 
                     <br/>
@@ -162,110 +167,169 @@
 
                     <!-- CARGO / SHIPMENT DETAILS (single continuous list, uniform bullet) -->
                     <table style="width:100%; border-collapse:collapse; font-size:18px; margin-left: 30px; margin-right:30px;">
+                        <t t-if="doc.is_shipper_name_printing or doc.is_shipper_address_printing or doc.is_shipper_phone_printing">
                         <tr>
                             <td style="width:30%; color:#1f5c3d; font-weight:bold; vertical-align:top; padding:2px 0;">
                                 <span style="color:red;">▪</span> Shipper:
                             </td>
                             <td style="font-weight:bold; vertical-align:top; padding:2px 0;">
-                                <t t-esc="doc.shipper_id.name or ''"/><br/>
-                                ADD: <t t-esc="doc.shipper_address or ''"/><br/>
-                                TEL: <t t-esc="doc.shipper_phone or ''"/>
+                                <t t-if="doc.is_shipper_name_printing">
+                                    <t t-esc="doc.shipper_id.name or ''"/><br/>
+                                </t>
+                                <t t-if="doc.is_shipper_address_printing">
+                                    ADD: <t t-esc="doc.shipper_address or ''"/><br/>
+                                </t>
+                                <t t-if="doc.is_shipper_phone_printing">
+                                    TEL: <t t-esc="doc.shipper_phone or ''"/>
+                                </t>
                             </td>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_consignee_name_printing or doc.is_consignee_address_printing or doc.is_consignee_phone_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; vertical-align:top; padding:2px 0;">
                                 <span style="color:red;">▪</span> Consignee:
                             </td>
                             <td style="font-weight:bold; vertical-align:top; padding:2px 0;">
-                                <t t-esc="doc.consignee_id.name or ''"/><br/>
-                                ADD: <t t-esc="doc.consignee_address or ''"/><br/>
-                                TEL: <t t-esc="doc.consignee_phone or ''"/>
+                                <t t-if="doc.is_consignee_name_printing">
+                                    <t t-esc="doc.consignee_id.name or ''"/><br/>
+                                </t>
+                                <t t-if="doc.is_consignee_address_printing">
+                                    ADD: <t t-esc="doc.consignee_address or ''"/><br/>
+                                </t>
+                                <t t-if="doc.is_consignee_phone_printing">
+                                    TEL: <t t-esc="doc.consignee_phone or ''"/>
+                                </t>
                             </td>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_cargo_name_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Name of commodity:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.cargo_name"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_quantity_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Total quantity:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.quantity"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_gross_weight_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Total weight:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.gross_weight"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_vessel_name_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Name of vessel:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.vessel_name"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_bl_number_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Bill of loading:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.bl_number"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_port_loading_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Port of loading:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.port_loading or ''"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_port_discharge_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Port of discharge:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.port_discharge or ''"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_shipment_date_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Date of shipment:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.shipment_date or ''"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_fumigation_date_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Date of fumigation:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.fumigation_date or ''"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_chemical_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Fumigant used:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.chemical"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_dosage_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Dosage:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.dosage"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_exposure_time_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Time of exposure:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.exposure_time"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_fumigation_place_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Place of fumigation:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.fumigation_place"/>
                         </tr>
+                        </t>
+
+                        <t t-if="doc.is_container_no_printing">
                         <tr>
                             <td style="color:#1f5c3d; font-weight:bold; padding:2px 0;">
                                 <span style="color:red;">▪</span> Container No./ Seal No.:
                             </td>
                             <td style="font-weight:bold; padding:2px 0;" t-esc="doc.container_no"/>
                         </tr>
+                        </t>
                     </table>
 
                     <!-- Hình ảnh đính kèm -->

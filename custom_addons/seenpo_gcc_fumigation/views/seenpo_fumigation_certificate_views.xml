@@ -106,11 +106,35 @@
                             groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
                 </header>
                 <sheet>
+                    <style>
+                        .padding-right-20 {
+                            padding-right: 20px;
+                        }
+
+                        td:has(> .min-width-150) {
+                            /* Giữ độ rộng 150px như bạn đã cấu hình thành công */
+                            min-width: 150px !important;
+                            width: 150px !important;
+
+                            /* Thêm đường kẻ dọc màu xám nhạt ở cạnh phải */
+                            border-right: 1px solid #ddd !important;
+
+                            /* Tạo khoảng trống nhỏ giữa text/checkbox với đường kẻ để không bị dính sát */
+                            padding-right: 10px !important;
+                        }
+
+                        /* Thêm khoảng cách thụt lề cho ô dữ liệu bên phải để chữ không chạm vào đường kẻ */
+                        td:has(&gt; .min-width-150) + td {
+                            padding-left: 10px !important;
+                        }
+                    </style>
+
                     <group>
                         <group>
                             <field name="name" readonly="1"/>
                             <field name="qr_token" readonly="1"/>
-                            <field name="customer_id" placeholder="Chon Khach Hang"/>
+                            <field name="heading"/>
+                            <field name="customer_id" placeholder="Choose customer"/>
                         </group>
                         <group>
                             <field name="transport_type" widget="radio"/>
@@ -121,15 +145,52 @@
                         <!-- 2. Shipper & Consignee -->
                         <page string="Shipper &amp; Consignee">
                             <group>
-                                <group string="Shipper">
-                                    <field name="shipper_id"/>
-                                    <field name="shipper_address"/>
-                                    <field name="shipper_phone"/>
+                                <group string="Shipper" col="10" class="m-0 p-0">
+                                    <!-- Cột 1: Chiếm 3 cột (Tương đương 30% chiều rộng) -->
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_shipper_name_printing" class="mr-2"/>
+                                        <label for="shipper_id" string="Shipper" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <!-- Cột 2: Chiếm 7 cột (Tương đương 70% chiều rộng) -->
+                                    <field name="shipper_id" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_shipper_name_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_shipper_address_printing" class="mr-2"/>
+                                        <label for="shipper_address" string="Shipper's Address" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="shipper_address" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_shipper_address_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_shipper_phone_printing" class="mr-2"/>
+                                        <label for="shipper_phone" string="Shipper's Phone" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="shipper_phone" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_shipper_phone_printing', '=', True)]}"/>
                                 </group>
-                                <group string="Consignee">
-                                    <field name="consignee_id"/>
-                                    <field name="consignee_address"/>
-                                    <field name="consignee_phone"/>
+
+                                <group string="Consignee" col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_consignee_name_printing" class="mr-2"/>
+                                        <label for="consignee_id" string="Consignee" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="consignee_id" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_consignee_name_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_consignee_address_printing" class="mr-2"/>
+                                        <label for="consignee_address" string="Consignee's Address" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="consignee_address" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_consignee_address_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_consignee_phone_printing" class="mr-2"/>
+                                        <label for="consignee_phone" string="Consignee's Phone" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="consignee_phone" nolabel="1" colspan="7" class="padding-right-20"
+                                           attrs="{'required': [('is_consignee_phone_printing', '=', True)]}"/>
                                 </group>
                             </group>
                         </page>
@@ -137,18 +198,72 @@
                         <!-- 3. Cargo Information -->
                         <page string="Cargo Information">
                             <group>
-                                <group>
-                                    <field name="cargo_name" placeholder="DRAGON FRUIT..."/>
-                                    <field name="quantity" placeholder="694 BAGS"/>
-                                    <field name="gross_weight"/>
+                                <group col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_cargo_name_printing" class="mr-2"/>
+                                        <label for="cargo_name" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="cargo_name" placeholder="DRAGON FRUIT..." nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_cargo_name_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_quantity_printing" class="mr-2"/>
+                                        <label for="quantity" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="quantity" placeholder="694 BAGS" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_quantity_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_gross_weight_printing" class="mr-2"/>
+                                        <label for="gross_weight" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="gross_weight" placeholder="7,009,400 KGS (GROSS WEIGHT)" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_gross_weight_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_container_no_printing" class="mr-2"/>
+                                        <label for="container_no" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="container_no" placeholder="SNBU8452813 / NP15710" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_container_no_printing', '=', True)]}"/>
+
                                 </group>
-                                <group>
-                                    <field name="vessel_name"/>
-                                    <field name="bl_number"/>
-                                    <field name="port_loading"/>
-                                    <field name="port_discharge"/>
-                                    <field name="shipment_date"/>
-                                    <field name="container_no"/>
+
+                                <group col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_vessel_name_printing" class="mr-2"/>
+                                        <label for="vessel_name" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="vessel_name" placeholder="OPTIMA 2517N" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_vessel_name_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_bl_number_printing" class="mr-2"/>
+                                        <label for="bl_number" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="bl_number" placeholder="SNLFHMCL011555" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_bl_number_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_port_loading_printing" class="mr-2"/>
+                                        <label for="port_loading" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="port_loading" placeholder="HO CHI MINH" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_port_loading_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_port_discharge_printing" class="mr-2"/>
+                                        <label for="port_discharge" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="port_discharge" placeholder="NANSHA" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_port_discharge_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_shipment_date_printing" class="mr-2"/>
+                                        <label for="shipment_date" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="shipment_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_shipment_date_printing', '=', True)]}"/>
                                 </group>
                             </group>
                         </page>
@@ -156,23 +271,61 @@
                         <!-- 4. Fumigation Parameters -->
                         <page string="Fumigation Parameters">
                             <group>
-                                <group>
-                                    <field name="chemical"/>
-                                    <field name="fumigation_place"/>
-                                    <field name="fumigation_date"/>
+                                <group col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_chemical_printing" class="mr-2"/>
+                                        <label for="chemical" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="chemical" nolabel="1" colspan="7"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_fumigation_place_printing" class="mr-2"/>
+                                        <label for="fumigation_place" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="fumigation_place" placeholder="HO CHI MINH CITY, VIETNAM" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_fumigation_place_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_fumigation_date_printing" class="mr-2"/>
+                                        <label for="fumigation_date" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="fumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_fumigation_date_printing', '=', True)]}"/>
+
                                 </group>
-                                <group>
-                                    <field name="dosage"/>
-                                    <field name="exposure_time"/>
-                                    <field name="signer"/>
+
+                                <group col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_dosage_printing" class="mr-2"/>
+                                        <label for="dosage" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="dosage" placeholder="50 G/M³" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_dosage_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_exposure_time_printing" class="mr-2"/>
+                                        <label for="exposure_time" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="exposure_time" placeholder="48 HOURS AT 25°C" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_exposure_time_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_signer_printing" class="mr-2"/>
+                                        <label for="signer" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="signer" nolabel="1" colspan="7"/>
                                 </group>
                             </group>
                         </page>
 
                         <page string="Attachments">
                             <group>
-                                <group>
-                                    <field name="image_attachment" widget="image"/>
+                                <group col="10" class="m-0 p-0">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_image_attachment_printing" class="mr-2"/>
+                                        <label for="image_attachment" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="image_attachment" nolabel="1" colspan="7"/>
                                 </group>
                                 <group>
                                     <field name="scan_attachment" filename="scan_filename"/>
@@ -188,7 +341,7 @@
                         <!-- 5. Other -->
                         <page string="Other">
                             <group>
-                                <field name="note"/>
+                                <field name="note" placeholder="Internal notes..."/>
                             </group>
                         </page>
                     </notebook>

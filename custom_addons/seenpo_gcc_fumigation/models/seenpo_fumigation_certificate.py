@@ -20,6 +20,8 @@ class SeenpoFumigationCertificate(models.Model):
         copy=False,
         default=lambda self: _('New'),
     )
+    heading = fields.Char(string="Certificate Heading", required=True,
+                          default="Certificate of Fumigation", tracking=True)
 
     qr_token = fields.Char(
         string='QR Token',
@@ -32,6 +34,7 @@ class SeenpoFumigationCertificate(models.Model):
         string='Customer',
         required=True,
     )
+    is_customer_printing = fields.Boolean(default=True)
     partner_id = fields.Many2one('res.partner', string="Partner")
 
     transport_type = fields.Selection([
@@ -42,30 +45,36 @@ class SeenpoFumigationCertificate(models.Model):
     ], string='Transport Type', default='sea', required=True)
 
     # Shipper & Consignee
-    shipper_id = fields.Many2one(comodel_name="res.partner", required=True,
+    shipper_id = fields.Many2one(comodel_name="res.partner",
                                  domain=["|", ("category_id.name", "=", "Shipper"),
                                          ('category_id.name', 'ilike', 'Người giao hàng')],
                                  string="Shipper", tracking=True)
     shipper_name = fields.Char(string="Shipper's Name")
     shipper_email = fields.Char(string="Shipper's Email")
-    shipper_address = fields.Char(string="Shipper's Address", tracking=True, required=True)
+    shipper_address = fields.Char(string="Shipper's Address", tracking=True)
     shipper_phone = fields.Char(string="Shipper's Phone", tracking=True)
+    is_shipper_name_printing = fields.Boolean(default=True)
+    is_shipper_address_printing = fields.Boolean(default=True)
+    is_shipper_phone_printing = fields.Boolean(default=True)
 
-    consignee_id = fields.Many2one(comodel_name="res.partner", required=True,
+    consignee_id = fields.Many2one(comodel_name="res.partner",
                                    domain=["|", ("category_id.name", "=", "Consignee"),
                                            ('category_id.name', 'ilike', 'Người nhận hàng')],
                                    string="Consignee", tracking=True)
     consignee_name = fields.Char()
     consignee_email = fields.Char(string="Consignee's Email")
-    consignee_address = fields.Char(string="Consignee's Address", tracking=True, required=True)
+    consignee_address = fields.Char(string="Consignee's Address", tracking=True)
     consignee_phone = fields.Char(string="Consignee's Phone", tracking=True)
+    is_consignee_name_printing = fields.Boolean(default=True)
+    is_consignee_address_printing = fields.Boolean(default=True)
+    is_consignee_phone_printing = fields.Boolean(default=True)
 
     # Cargo information
-    cargo_name = fields.Char(string='Cargo Name', required=True)
-    quantity = fields.Char(string='Total Quantity', required=True)
-    gross_weight = fields.Char(string='Gross Weight', required=True)
-    vessel_name = fields.Char(string='Vessel Name', required=True)
-    bl_number = fields.Char(string='Bill of Lading', required=True)
+    cargo_name = fields.Char(string='Cargo Name')
+    quantity = fields.Char(string='Total Quantity')
+    gross_weight = fields.Char(string='Gross Weight')
+    vessel_name = fields.Char(string='Vessel Name')
+    bl_number = fields.Char(string='Bill of Lading')
     # port_loading_id = fields.Many2one(
     #     comodel_name="freight.catalog.port", string="Port of loading",
     #     required=True, tracking=True, index=True
@@ -74,19 +83,35 @@ class SeenpoFumigationCertificate(models.Model):
     #     comodel_name="freight.catalog.port", string="Port of discharge",
     #     required=True, tracking=True, index=True
     # )
-    port_loading = fields.Char(string='Port of loading', required=True)
-    port_discharge = fields.Char(string='Port of discharge', required=True)
+    port_loading = fields.Char(string='Port of loading')
+    port_discharge = fields.Char(string='Port of discharge')
     shipment_date = fields.Date(string='Date of shipment')
-    container_no = fields.Char(string='Container / Seal No.', required=True)
-    # seal_no = fields.Char(string='Seal No.')
+    container_no = fields.Char(string='Container / Seal No.')
+
+    is_cargo_name_printing = fields.Boolean(default=True)
+    is_quantity_printing = fields.Boolean(default=True)
+    is_gross_weight_printing = fields.Boolean(default=True)
+    is_vessel_name_printing = fields.Boolean(default=True)
+    is_bl_number_printing = fields.Boolean(default=True)
+    is_port_loading_printing = fields.Boolean(default=True)
+    is_port_discharge_printing = fields.Boolean(default=True)
+    is_shipment_date_printing = fields.Boolean(default=True)
+    is_container_no_printing = fields.Boolean(default=True)
 
     # Fumigation parameters
     chemical = fields.Char(string='Chemical', default="METHYL BROMIDE (CH₃Br)", readonly=True)
-    fumigation_place = fields.Char(string='Fumigation Place', required=True)
-    fumigation_date = fields.Date(string='Fumigation Date', default=date.today(), required=True)
-    dosage = fields.Char(string='Dosage', required=True)
-    exposure_time = fields.Char(string='Exposure Time', required=True)
-    signer = fields.Char(string='Signer', default="TRIEU CHAT HAN", readonly=False)
+    fumigation_place = fields.Char(string='Fumigation Place')
+    fumigation_date = fields.Date(string='Fumigation Date', default=date.today())
+    dosage = fields.Char(string='Dosage')
+    exposure_time = fields.Char(string='Exposure Time')
+    signer = fields.Char(string='Signer', default="TRIEU CHAT HAN", readonly=True)
+
+    is_chemical_printing = fields.Boolean(default=True, readonly=True)
+    is_fumigation_place_printing = fields.Boolean(default=True)
+    is_fumigation_date_printing = fields.Boolean(default=True)
+    is_dosage_printing = fields.Boolean(default=True)
+    is_exposure_time_printing = fields.Boolean(default=True)
+    is_signer_printing = fields.Boolean(default=True, readonly=True)
 
     # Other
     note = fields.Text(string='Internal Notes')
@@ -95,6 +120,7 @@ class SeenpoFumigationCertificate(models.Model):
         attachment=True,
         help="Upload image"
     )
+    is_image_attachment_printing = fields.Boolean(default=True)
 
     scan_attachment = fields.Binary(
         string="File scan",
@@ -114,6 +140,7 @@ class SeenpoFumigationCertificate(models.Model):
         default='draft',
         tracking=True,
     )
+    active = fields.Boolean(default=True, tracking=True)
 
     def action_submit(self):
         self.state = 'submitted'
@@ -127,6 +154,34 @@ class SeenpoFumigationCertificate(models.Model):
         if not self.env.user.has_group('seenpo_gcc_fumigation.group_seenpo_fumigation_manager'):
             raise UserError("Only manager can cancel.")
         self.state = 'cancelled'
+
+    @api.onchange("shipper_id")
+    def _onchange_shipper_id(self):
+        if self.shipper_id:
+            self.shipper_name = self.shipper_id.name
+            self.shipper_email = self.shipper_id.email
+            self.shipper_address = self.shipper_id.contact_address
+            self.shipper_phone = self.shipper_id.phone
+
+            if self.shipper_address:
+                self.shipper_address = self.shipper_address.replace(self.shipper_name, '')
+
+            if not self.shipper_phone:
+                self.shipper_phone = self.shipper_id.mobile
+
+    @api.onchange("consignee_id")
+    def _onchange_consignee_id(self):
+        if self.consignee_id:
+            self.consignee_name = self.consignee_id.name
+            self.consignee_email = self.consignee_id.email
+            self.consignee_address = self.consignee_id.contact_address
+            self.consignee_phone = self.consignee_id.phone
+
+            if self.consignee_address:
+                self.consignee_address = self.consignee_address.replace(self.consignee_name, '')
+
+            if not self.consignee_phone:
+                self.consignee_phone = self.consignee_id.mobile
 
     @api.model
     def create(self, vals):
