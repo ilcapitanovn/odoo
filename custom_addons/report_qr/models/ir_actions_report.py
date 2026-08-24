@@ -2,7 +2,7 @@ import io
 
 import qrcode
 from qrcode.image import pil, svg
-from qrcode.image.pil import PilImage
+from qrcode.image.pil import PilImage, Image, ImageDraw
 
 from odoo import api, models
 
@@ -19,7 +19,7 @@ class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
     @api.model
-    def qr_generate(self, value, box_size=3, border=5, factory="png", **kwargs):
+    def qr_generate(self, value, box_size=30, border=5, factory="png", **kwargs):
         factories = {
             "png": pil.PilImage,
             "svg": svg.SvgImage,
@@ -37,11 +37,29 @@ class IrActionsReport(models.Model):
             qr.add_data(value)
             qr.make()
             img = qr.make_image(fill_color=fill_color, back_color=back_color)
-            # img = qr.make_image(
-            #     image_factory=ForceRGBImage,
-            #     fill_color=(55, 95, 35),  # Dark Green
-            #     back_color=(255, 195, 235)  # Light Pink
-            # )
+
+            # 2. Lấy kích thước và vẽ viền bo góc bằng Pillow
+            width, height = img.size
+            draw = ImageDraw.Draw(img)
+
+            # Thiết lập khoảng cách từ viền khung đến mép ngoài của ảnh (Pixel)
+            # Bạn có thể tinh chỉnh số này để viền sát hơn hoặc rộng hơn
+            padding = 25
+
+            # Tọa độ góc trên bên trái (x0, y0) và góc dưới bên phải (x1, y1) của khung viền
+            x0, y0 = padding, padding
+            x1, y1 = width - padding, height - padding
+
+            # Vẽ đường viền hình chữ nhật bo góc (Rounded Rectangle)
+            # - radius: độ bo tròn của góc
+            # - width: độ dày của đường viền thanh mảnh
+            draw.rounded_rectangle(
+                [x0, y0, x1, y1],
+                radius=45,
+                outline=fill_color,
+                width=15
+            )
+
             arr = io.BytesIO()
             img.save(arr)
             return arr.getvalue()

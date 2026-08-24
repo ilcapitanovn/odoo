@@ -72,12 +72,15 @@
             <tree string="Certificates of Fumigation">
                 <field name="name" string="Certificate No."/>
                 <field name="customer_id" string="Customer"/>
-                <field name="chemical" string="Chemical"/>
+                <field name="chemical_list" string="Chemical"/>
                 <field name="fumigation_place" string="Fumigation Place"/>
                 <field name="cargo_name" string="Cargo"/>
                 <field name="quantity" string="Quantity"/>
                 <field name="fumigation_date" widget="date" string="Fumigation Date"/>
-                <field name="state" string="Status"/>
+                <field name="state" string="Status" widget="badge" optional="show"
+                       decoration-success="state in ['approved']"
+                       decoration-warning="state in ['submitted']"
+                       decoration-info="state == 'draft'" />
             </tree>
         </field>
     </record>
@@ -89,6 +92,9 @@
         <field name="arch" type="xml">
             <form string="Certificate of Fumigation">
                 <header>
+                    <field name="active" invisible="1" />
+                    <field name="chemical" invisible="1" />
+                    <field name="defumigation_date" invisible="1" />
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,approved,cancelled"/>
                     <button name="%(seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate)d"
@@ -106,6 +112,12 @@
                             groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
                 </header>
                 <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
                     <style>
                         .padding-right-20 {
                             padding-right: 20px;
@@ -206,6 +218,37 @@
                                     <field name="cargo_name" placeholder="DRAGON FRUIT..." nolabel="1" colspan="7"
                                            attrs="{'required': [('is_cargo_name_printing', '=', True)]}"/>
 
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', '=', 'pallet')]}">
+                                        <field name="is_vessel_name_printing" class="mr-2"/>
+                                        <label for="vessel_name" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="vessel_name" placeholder="OPTIMA 2517N" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_vessel_name_printing', '=', True)], 'invisible': [('transport_type', '=', 'pallet')]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', '!=', 'sea')]}">
+                                        <field name="is_container_no_printing" class="mr-2"/>
+                                        <label for="container_no" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="container_no" placeholder="SNBU8452813 / NP15710" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_container_no_printing', '=', True)], 'invisible': [('transport_type', '!=', 'sea')]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', 'not in', ['sea','air'])]}">
+                                        <field name="is_bl_number_printing" class="mr-2"/>
+                                        <!-- Conditional Labels targeting the same field -->
+                                        <label for="bl_number" string="Bill of lading" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'sea')]}"/>
+                                        <label for="bl_number" string="House Airway Bill" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'air')]}"/>
+                                    </div>
+                                    <field name="bl_number" placeholder="SNLFHMCL011555" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_bl_number_printing', '=', True)], 'invisible': [('transport_type', 'not in', ['sea','air'])]}"/>
+
+                                </group>
+
+                                <group col="10" class="m-0 p-0">
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_quantity_printing" class="mr-2"/>
                                         <label for="quantity" class="font-weight-bold m-0"/>
@@ -213,57 +256,47 @@
                                     <field name="quantity" placeholder="694 BAGS" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_quantity_printing', '=', True)]}"/>
 
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', '=', 'pallet')]}">
                                         <field name="is_gross_weight_printing" class="mr-2"/>
                                         <label for="gross_weight" class="font-weight-bold m-0"/>
                                     </div>
                                     <field name="gross_weight" placeholder="7,009,400 KGS (GROSS WEIGHT)" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_gross_weight_printing', '=', True)]}"/>
+                                           attrs="{'required': [('is_gross_weight_printing', '=', True)], 'invisible': [('transport_type', '=', 'pallet')]}"/>
 
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
-                                        <field name="is_container_no_printing" class="mr-2"/>
-                                        <label for="container_no" class="font-weight-bold m-0"/>
-                                    </div>
-                                    <field name="container_no" placeholder="SNBU8452813 / NP15710" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_container_no_printing', '=', True)]}"/>
-
-                                </group>
-
-                                <group col="10" class="m-0 p-0">
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
-                                        <field name="is_vessel_name_printing" class="mr-2"/>
-                                        <label for="vessel_name" class="font-weight-bold m-0"/>
-                                    </div>
-                                    <field name="vessel_name" placeholder="OPTIMA 2517N" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_vessel_name_printing', '=', True)]}"/>
-
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
-                                        <field name="is_bl_number_printing" class="mr-2"/>
-                                        <label for="bl_number" class="font-weight-bold m-0"/>
-                                    </div>
-                                    <field name="bl_number" placeholder="SNLFHMCL011555" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_bl_number_printing', '=', True)]}"/>
-
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', '=', 'pallet')]}">
                                         <field name="is_port_loading_printing" class="mr-2"/>
-                                        <label for="port_loading" class="font-weight-bold m-0"/>
+                                        <label for="port_loading" string="Port of lading" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'sea')]}"/>
+                                        <label for="port_loading" string="From" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'road')]}"/>
+                                        <label for="port_loading" string="Airport of departure" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'air')]}"/>
                                     </div>
                                     <field name="port_loading" placeholder="HO CHI MINH" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_port_loading_printing', '=', True)]}"/>
+                                           attrs="{'required': [('is_port_loading_printing', '=', True)], 'invisible': [('transport_type', '=', 'pallet')]}"/>
 
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', '=', 'pallet')]}">
                                         <field name="is_port_discharge_printing" class="mr-2"/>
-                                        <label for="port_discharge" class="font-weight-bold m-0"/>
+                                        <label for="port_discharge" string="Port of discharge" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'sea')]}"/>
+                                        <label for="port_discharge" string="To" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'road')]}"/>
+                                        <label for="port_discharge" string="Airport of destination" class="font-weight-bold m-0"
+                                               attrs="{'invisible': [('transport_type', '!=', 'air')]}"/>
                                     </div>
                                     <field name="port_discharge" placeholder="NANSHA" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_port_discharge_printing', '=', True)]}"/>
+                                           attrs="{'required': [('is_port_discharge_printing', '=', True)], 'invisible': [('transport_type', '=', 'pallet')]}"/>
 
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3"
+                                         attrs="{'invisible': [('transport_type', 'in', ['road','pallet'])]}">
                                         <field name="is_shipment_date_printing" class="mr-2"/>
                                         <label for="shipment_date" class="font-weight-bold m-0"/>
                                     </div>
                                     <field name="shipment_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
-                                           attrs="{'required': [('is_shipment_date_printing', '=', True)]}"/>
+                                           attrs="{'required': [('is_shipment_date_printing', '=', True)], 'invisible': [('transport_type', 'in', ['road','pallet'])]}"/>
                                 </group>
                             </group>
                         </page>
@@ -273,10 +306,10 @@
                             <group>
                                 <group col="10" class="m-0 p-0">
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
-                                        <field name="is_chemical_printing" class="mr-2"/>
-                                        <label for="chemical" class="font-weight-bold m-0"/>
+                                        <field name="is_chemical_list_printing" class="mr-2"/>
+                                        <label for="chemical_list" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="chemical" nolabel="1" colspan="7"/>
+                                    <field name="chemical_list" nolabel="1" colspan="7"/>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_fumigation_place_printing" class="mr-2"/>
@@ -291,6 +324,13 @@
                                     </div>
                                     <field name="fumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_fumigation_date_printing', '=', True)]}"/>
+
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_defumigation_date_printing" class="mr-2"/>
+                                        <label for="defumigation_date" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="defumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                           attrs="{'required': [('is_defumigation_date_printing', '=', True)]}"/>
 
                                 </group>
 
@@ -331,11 +371,6 @@
                                     <field name="scan_attachment" filename="scan_filename"/>
                                 </group>
                             </group>
-
-<!--                            <group string="Attachments" col="2">-->
-<!--                                <field name="image_attachment" widget="image"/>-->
-<!--                                <field name="scan_attachment" filename="scan_filename"/>-->
-<!--                            </group>-->
                         </page>
 
                         <!-- 5. Other -->

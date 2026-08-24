@@ -1,0 +1,28 @@
+/* Regular */
+@font-face {
+    font-family: 'Times New Roman';
+    src: url('/seenpo_gcc_fumigation/static/fonts/times.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+/* Bold */
+@font-face {
+    font-family: 'Times New Roman';
+    src: url('/seenpo_gcc_fumigation/static/fonts/timesbd.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+* {
+    font-family: "Times New Roman";
+    font-weight: normal;
+}
+#tbl-content {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#tbl-ippc {
+    border-collapse: collapse;
+}
+#tbl-ippc th, #tbl-ippc td {
+    border: 2px solid #416fc0;
+}
