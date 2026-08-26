@@ -3,7 +3,7 @@
 
 {
     "name": "Sales commissions from salesman with customization",
-    "version": "15.0.1.5.1",
+    "version": "15.0.1.5.2",
     "author": "Tuan Huynh, " "Odoo Community Association (OCA)",
     "category": "Sales",
     "website": "https://github.com/OCA/commission",

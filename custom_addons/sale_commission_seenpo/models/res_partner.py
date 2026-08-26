@@ -15,13 +15,26 @@ class ResPartner(models.Model):
     )
 
     def write(self, vals):
+        # Which records will end up being an agent *after* this write —
+        # computed with filtered(), which works on any recordset size
+        # (unlike self.agent, which requires exactly one record).
         if 'agent' in vals:
-            is_agent = vals['agent']
+            will_be_agent = self if vals['agent'] else self.browse()
         else:
-            is_agent = self.agent
+            will_be_agent = self.filtered('agent')
 
-        if is_agent and not ('agent_ids' in vals) and not self.agent_ids:
-            vals['agent_ids'] = [(6, 0, self.ids)]
+        # Snapshot, before the write, which of those still need the
+        # self-link (i.e. don't already have agent_ids set).
+        partners_needing_self_link = will_be_agent.filtered(lambda p: not p.agent_ids)
 
         res = super(ResPartner, self).write(vals)
+
+        # Only auto-default agent_ids when the caller isn't already setting
+        # it explicitly in this same write. Looped per-record on purpose:
+        # each partner must link to *itself*, which a single shared vals
+        # dict can't express for a batched multi-record write.
+        if 'agent_ids' not in vals:
+            for partner in partners_needing_self_link:
+                partner.agent_ids = [(6, 0, partner.ids)]
+
         return res
