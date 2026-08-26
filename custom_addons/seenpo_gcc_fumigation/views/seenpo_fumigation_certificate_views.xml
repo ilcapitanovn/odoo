@@ -94,7 +94,6 @@
                 <header>
                     <field name="active" invisible="1" />
                     <field name="chemical" invisible="1" />
-                    <field name="defumigation_date" invisible="1" />
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,approved,cancelled"/>
                     <button name="%(seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate)d"

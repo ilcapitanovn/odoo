@@ -27,7 +27,7 @@
     <template id="report_fumigation_certificate">
         <t t-call="web.basic_layout">
             <t t-foreach="docs" t-as="doc">
-            <div class="page" style="font-size:20px; color:#000; position:relative; padding: 10px 40px; height: 365mm !important;">
+            <div class="page" style="font-size:20px; color:#000; position:relative; padding: 10px 40px; height: 345mm !important;">
                 <link rel="stylesheet" href="/seenpo_gcc_fumigation/static/src/css/fumigation_certificate_report.css"/>
 
                 <!-- Set once per certificate so both the top and bottom ribbon
@@ -185,13 +185,13 @@
                     </p>
 
                     <!-- CARGO / SHIPMENT DETAILS (single continuous list, uniform bullet) -->
-                    <table id="tbl-content" style="width:100%; border-collapse:collapse; font-size:22px;">
+                    <table id="tbl-content" style="width:100%; border-collapse:collapse; font-size:18px;">
                         <t t-if="doc.is_shipper_name_printing or doc.is_shipper_address_printing or doc.is_shipper_phone_printing">
                         <tr>
                             <td style="width:35%; color:#1f5c3d; vertical-align:top; padding:2px 0;">
                                 <span style="color:red;">▪</span> Shipper:
                             </td>
-                            <td style="vertical-align:top; padding:2px 0;">
+                            <td class="content-value" style="vertical-align:top; padding:2px 0;">
                                 <t t-if="doc.is_shipper_name_printing">
                                     <t t-esc="doc.shipper_id.name or ''"/><br/>
                                 </t>
@@ -210,7 +210,7 @@
                             <td style="color:#1f5c3d; vertical-align:top; padding:2px 0;">
                                 <span style="color:red;">▪</span> Consignee:
                             </td>
-                            <td style="vertical-align:top; padding:2px 0;">
+                            <td class="content-value" style="vertical-align:top; padding:2px 0;">
                                 <t t-if="doc.is_consignee_name_printing">
                                     <t t-esc="doc.consignee_id.name or ''"/><br/>
                                 </t>
@@ -229,7 +229,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Name of commodity:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.cargo_name"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.cargo_name"/>
                         </tr>
                         </t>
 
@@ -238,7 +238,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Total quantity:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.quantity"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.quantity"/>
                         </tr>
                         </t>
 
@@ -247,7 +247,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Total weight:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.gross_weight"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.gross_weight"/>
                         </tr>
                         </t>
 
@@ -256,7 +256,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Means of transport:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.vessel_name"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.vessel_name"/>
                         </tr>
                         </t>
 
@@ -271,7 +271,7 @@
                                     House airway bill:
                                 </t>
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.bl_number"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.bl_number"/>
                         </tr>
                         </t>
 
@@ -289,7 +289,7 @@
                                     Airport of departure:
                                 </t>
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.port_loading or ''"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_loading or ''"/>
                         </tr>
                         </t>
 
@@ -307,7 +307,7 @@
                                     Airport of destination:
                                 </t>
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.port_discharge or ''"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_discharge or ''"/>
                         </tr>
                         </t>
 
@@ -316,7 +316,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Date of shipment:
                             </td>
-                            <td style="padding:2px 0;">
+                            <td class="content-value" style="padding:2px 0;">
                                 <t t-if="doc.shipment_date">
                                   <span class="issue-date" t-esc="doc.shipment_date.strftime('%B %d, %Y')"/>
                                 </t>
@@ -329,9 +329,22 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Date of fumigation:
                             </td>
-                            <td style="padding:2px 0;">
+                            <td class="content-value" style="padding:2px 0;">
                                 <t t-if="doc.fumigation_date">
                                   <span class="issue-date" t-esc="doc.fumigation_date.strftime('%B %d, %Y')"/>
+                                </t>
+                            </td>
+                        </tr>
+                        </t>
+
+                        <t t-if="doc.is_defumigation_date_printing">
+                        <tr>
+                            <td style="color:#1f5c3d; padding:2px 0;">
+                                <span style="color:red;">▪</span> Date of defumigation:
+                            </td>
+                            <td class="content-value" style="padding:2px 0;">
+                                <t t-if="doc.defumigation_date">
+                                  <span class="issue-date" t-esc="doc.defumigation_date.strftime('%B %d, %Y')"/>
                                 </t>
                             </td>
                         </tr>
@@ -342,7 +355,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Fumigant used:
                             </td>
-                            <td style="padding:2px 0;">
+                            <td class="content-value" style="padding:2px 0;">
                                 <span t-field="doc.chemical_list"/>
                             </td>
                         </tr>
@@ -353,7 +366,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Dosage:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.dosage"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.dosage"/>
                         </tr>
                         </t>
 
@@ -362,7 +375,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Time of exposure:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.exposure_time"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.exposure_time"/>
                         </tr>
                         </t>
 
@@ -371,16 +384,25 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Place of fumigation:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.fumigation_place"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.fumigation_place"/>
                         </tr>
                         </t>
+
+                        <tr>
+                            <td style="color:#1f5c3d; padding:2px 0;">
+                                <span style="color:red;">▪</span> Results of fumigation:
+                            </td>
+                            <td class="content-value" style="padding:2px 0;">
+                                INSECTS HAVE COMPLETELY BEEN DESTROYED
+                            </td>
+                        </tr>
 
                         <t t-if="doc.is_container_no_printing">
                         <tr>
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Container No./ Seal No.:
                             </td>
-                            <td style="padding:2px 0;" t-esc="doc.container_no"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.container_no"/>
                         </tr>
                         </t>
                     </table>
@@ -395,7 +417,7 @@
 
                     <!-- FOOTER: right-aligned date + title + signature block -->
                     <div style="margin-top:36px; width:100%; overflow:hidden;">
-                        <div style="float:left; width:420px; color:#1f5c3d; text-align:left; font-size:18px;">
+                        <div style="float:left; width:400px; color:#1f5c3d; text-align:left; font-size:18px;">
                             <div>
                                 All wood packaging materials and commodity have been fumigated and stamped in accordance with ISPM15 standard.
                             </div>
