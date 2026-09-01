@@ -143,16 +143,16 @@ class CrmLead(models.Model):
         follow up with leads after N days
         """
         try:
-            days_alert = [5, 10, 20, 30]
+            days_alert = [5, 10, 20, 30, 40, 50, 60]
 
             now = datetime.now()
             domain = [
                 ('active', '=', True),
-                ('write_date', '>=', (now - timedelta(days=30)))  # Get records not older than 30 days
+                ('write_date', '>=', (now - timedelta(days=60)))  # Get records not older than 60 days
             ]
             records = self.env['crm.lead'].sudo().search(domain)
             for record in records:
-                days_passed = (now - record.create_date).days
+                days_passed = (now - record.write_date).days
                 if days_passed in days_alert:
                     self._send_notifications(record, days_passed)
 
