@@ -602,5 +602,85 @@
                 </tbody></table>
             </field>
         </record>
+
+        <!-- Follow-up email for debt reminder -->
+        <record id="freight_email_template_debt_followup_reminder" model="mail.template">
+            <field name="name">Customer Debt Follow-up Reminder</field>
+            <field name="model_id" ref="partner_aging.model_res_partner_aging_customer"/>
+            <field name="email_from">noreply@viet-toan.com</field>
+            <field name="subject">Nhắc thanh toán – đơn hàng {{object.bl_number or 'N/A'}} - Nợ quá hạn {{object.max_days_overdue or '#'}} ngày</field>
+            <field name="email_to">${object.salesman.email}</field>
+            <field name="email_cc">david.le@viet-toan.com;longntk@viet-toan.com;john@viet-toan.com;tam.ptm@viet-toan.com;khuong@viet-toan.com</field>
+            <field name="reply_to">noreply@viet-toan.com</field>
+            <field name="body_html" type="html">
+
+<!-- Phiên bản tiếng Việt -->
+<table border="0" cellpadding="0" cellspacing="0" style="box-sizing:border-box;padding-top:16px;background-color:#f5f5f5;font-family:Verdana,Arial,sans-serif;color:#333;width:100%;border-collapse:separate;" width="100%">
+  <tbody>
+    <tr>
+      <td align="center">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="box-sizing:border-box;padding:24px;background-color:white;color:#333;border-radius:8px;border-collapse:separate;">
+          <tbody>
+            <!-- CONTENT -->
+            <tr>
+              <td style="font-size:14px;line-height:1.6;">
+                  <p>Kính gửi Quý Công ty <strong><t t-out="object.partner_id.name"/></strong>,</p><br/>
+
+                  <p>VIET TOAN JSC xin gửi lời chào trân trọng đến Quý Công ty.</p><br/>
+
+                  <p>Theo ghi nhận của chúng tôi, hóa đơn <strong><t t-out="object.invoice_ref or 'N/A'"/></strong> với số tiền <strong><t t-out="format_amount(object.total, object.env.company.currency_id) or ''"/></strong> đã đến hạn thanh toán vào ngày <strong><t t-out="object.date_due.strftime('%B %d, %Y')"/></strong> và hiện vẫn đang được ghi nhận là chưa thanh toán.</p><br/>
+
+                  <p>Kính mong Quý Công ty vui lòng kiểm tra và sắp xếp thanh toán trong thời gian sớm nhất có thể. Trong trường hợp Quý Công ty đã hoàn tất thanh toán, xin vui lòng bỏ qua thông báo này. Chúng tôi thành thật xin lỗi nếu thông báo này gây bất tiện cho Quý khách.</p><br/>
+
+                  <p>Nếu cần thêm thông tin hoặc hỗ trợ, xin vui lòng liên hệ với chúng tôi.</p>
+
+                  <p style="margin-top:16px;">Trân trọng,<br/>
+                  <strong><t t-out="object.salesman.name"/></strong><br/>
+                  <t t-out="object.salesman.company_id.name"/><br/>
+                  <a t-att-href="'mailto:%s' % object.salesman.email" style="color:#875A7B;text-decoration:none;"><t t-out="object.salesman.email"/></a>
+                  </p>
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td align="center" style="padding-top:16px;">
+                <hr style="border:none;height:1px;background-color:#ccc;margin:16px 0;"/>
+                <b style="font-size:14px;"><t t-out="object.salesman.company_id.name"/></b>
+                <div style="font-size:13px;opacity:0.7;">
+                  <t t-out="object.salesman.company_id.phone or ''"/>
+                  <t t-if="object.salesman.company_id.email">
+                    | <a t-att-href="'mailto:%s' % object.salesman.company_id.email" style="color:inherit;text-decoration:none;" t-out="object.salesman.company_id.email"/>
+                  </t>
+                  <t t-if="object.salesman.company_id.website">
+                    | <a t-att-href="'%s' % object.salesman.company_id.website" style="color:inherit;text-decoration:none;" t-out="object.salesman.company_id.website"/>
+                  </t>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+
+    <!-- POWERED BY -->
+    <tr>
+      <td align="center" style="min-width:590px;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="box-sizing:border-box;min-width:590px;background-color:#f5f5f5;color:#454748;padding:8px;border-collapse:separate;">
+          <tbody>
+            <tr>
+              <td style="text-align:center;font-size:13px;">
+                Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" style="text-decoration:none;color:#875A7B;">Odoo</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            </field>
+        </record>
     </data>
 </odoo>

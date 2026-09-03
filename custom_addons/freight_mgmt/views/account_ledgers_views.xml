@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="freight_partner_ledger_view_account_move_line_filter_inherit" model="ir.ui.view">
+            <field name="name">freight.partner.ledger.view.account.move.line.filter.inherited</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+                    <xpath expr="//search//filter[@name='unreconciled']" position="after">
+                        <filter string="Reconciled" domain="[('account_id.reconcile', '=', True)]" help="Journal items where matching number isn't set" name="reconciled"/>
+                    </xpath>
+            </field>
+    </record>
+
+    <record id="base_accounting_kit.account_reports_partner" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="base_accounting_kit.menu_aged_trial_balance" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="account.menu_finance_entries_accounting_ledgers" model="ir.ui.menu">
+        <field name="parent_id" ref="account.menu_finance_reports"/>
+        <field name="sequence">4</field>
+    </record>
+</odoo>

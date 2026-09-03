@@ -57,3 +57,4 @@ access_freight_form_wo_line_account_user,freight.form.wo.line.account.user,model
 access_freight_hr_employee_manager,freight.hr.employee.manager,model_hr_employee,group_freight_manager,1,0,0,0
 access_freight_hr_employee_operation,freight.hr.employee.operation,model_hr_employee,group_freight_operation,1,0,0,0
 access_freight_hr_employee_user,freight.hr.employee.user,model_hr_employee,group_freight_user,1,0,0,0
+access_freight_res_partner_aging_customer_bot,freight.res.partner.aging.customer.bot,model_res_partner_aging_customer,base.group_system,1,1,1,1

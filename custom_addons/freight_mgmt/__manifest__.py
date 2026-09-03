@@ -21,14 +21,15 @@
 #############################################################################
 {
     'name': "Freight Management",
-    'version': '15.0.5.9.0',
+    'version': '15.0.6.0.0',
     'summary': """Create Freight Management System""",
     'description': """Create a module that allows management all freight operations (Air, Ocean, and Land).""",
     'author': 'Tuan Huynh',
     'company': 'Bao Thinh Software Ltd.',
     'maintainer': 'Bao Thinh Software Ltd.',
     'depends': ['mail', 'sale', 'sale_margin', 'portal', 'base', 'sale_purchase', 'website_slides',
-                'account', 'hr_expense', 'sale_commission_seenpo', 'seenpo_multi_branch_base'],
+                'account', 'base_accounting_kit', 'hr_expense', 'sale_commission_seenpo',
+                'seenpo_multi_branch_base', 'partner_aging', 'partner_aging_seenpo'],
     "data": [
         "data/freight_data.xml",
         "data/freight_demo.xml",
@@ -52,6 +53,7 @@
         "views/crm_lead_views.xml",
         "views/res_partner_views.xml",
         "views/sale_order_views.xml",
+        "views/account_ledgers_views.xml",
         "views/account_move_views.xml",
         "views/account_payment_views.xml",
         "views/product_views.xml",

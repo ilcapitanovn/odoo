@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="seenpo_view_partner_aging_receivable_search_inherit" model="ir.ui.view">
+        <field name="name">seenpo.partner.aging.receivable.search.inherit</field>
+        <field name="model">res.partner.aging.customer</field>
+        <field name="inherit_id" ref="partner_aging.view_customer_aging_ad_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="filter_today"
+                        string="Today"
+                        context="{'aging_filter': 'today'}"/>
+
+                <filter name="filter_end_last_month"
+                        string="End of Last Month"
+                        context="{'aging_filter': 'end_last_month'}"/>
+
+                <filter name="filter_end_last_year"
+                        string="End of Last Year"
+                        context="{'aging_filter': 'end_last_year'}"/>
+                <separator />
+                <filter
+                        string="Sales"
+                        name="group_by_sales"
+                        context="{'group_by':'salesman'}"
+                    />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="seenpo_view_customer_aging_graph" model="ir.ui.view">
+        <field name="name">seenpo.customer.aging.graph</field>
+        <field name="model">res.partner.aging.customer</field>
+        <field name="arch" type="xml">
+            <graph string="Aging Graph" stacked="1" type="bar" sample="1">
+                <field name="partner_id" type="row"/>
+                <field name="not_due" type="measure"/>
+                <field name="days_due_01to30" type="measure"/>
+                <field name="days_due_31to60" type="measure"/>
+                <field name="days_due_61to90" type="measure"/>
+                <field name="days_due_91to120" type="measure"/>
+                <field name="days_due_121togr" type="measure"/>
+                <field name="total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="seenpo_view_customer_aging_tree_inherit" model="ir.ui.view">
+        <field name="name">seenpo.customer.aging.tree.inherit</field>
+        <field name="model">res.partner.aging.customer</field>
+        <field name="inherit_id" ref="partner_aging.view_customer_aging_ad_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='salesman']" position="attributes">
+                <attribute name="string">Sales</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='invoice_ref']" position="attributes">
+                <attribute name="string">Invoice No.</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='partner_id']" position="before">
+                <!-- The currency field must be here for the widget to fetch the $ symbol -->
+                <field name="currency_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//tree//field[@name='date_due']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//tree//field[@name='not_due']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='days_due_01to30']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='days_due_31to60']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='days_due_61to90']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='days_due_91to120']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='days_due_121togr']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='total']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="seenpo_action_view_customer_aging_ad_tree_inherit" model="ir.actions.act_window">
+        <field name="name">Aged Receivable</field>
+        <field name="res_model">res.partner.aging.customer</field>
+        <field name="view_mode">tree,graph</field>
+        <field name="binding_view_types">list,graph</field>
+        <field name="search_view_id" ref="seenpo_view_partner_aging_receivable_search_inherit"/>
+        <field name="views">
+            [(ref('partner_aging.view_customer_aging_ad_tree'), 'tree'),
+             (ref('seenpo_view_customer_aging_graph'), 'graph')]
+        </field>
+        <field name="context">{'search_default_group_by_sales': 1, 'search_default_filter_today': 1}</field>
+        <field name="domain">[('total','!=',0.0000000)]</field>
+    </record>
+
+    <menuitem id="seenpo_menu_partner_aging_receivable_view"
+              name="Aged Receivable"
+              groups="account.group_account_manager"
+              parent="account.menu_finance_entries_accounting_ledgers"
+              action="seenpo_action_view_customer_aging_ad_tree_inherit"
+              sequence="51"/>
+</odoo>

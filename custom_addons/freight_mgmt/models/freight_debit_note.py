@@ -401,7 +401,9 @@ class FreightDebitNote(models.Model):
     @api.depends('partner_id')
     def _compute_payment_term(self):
         for rec in self:
-            if rec.partner_id and rec.partner_id.property_payment_term_id:
+            if rec.order_id and rec.order_id.payment_term_id:
+                rec.payment_term = rec.order_id.payment_term_id.display_name
+            elif rec.partner_id and rec.partner_id.property_payment_term_id:
                 rec.payment_term = rec.partner_id.property_payment_term_id.display_name
             else:
                 rec.payment_term = ''

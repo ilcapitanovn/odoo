@@ -617,5 +617,27 @@
             <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 19:15:00')" />
             <field name="active">True</field>
         </record>
+        <record id="freight_scheduled_action_debt_followup_reminder" model="ir.cron">
+            <field name="name">Automatic Customer Debt Follow-up Reminder</field>
+            <field name="model_id" ref="partner_aging.model_res_partner_aging_customer"/>
+            <field name="state">code</field>
+            <field name="code">model.run_followup_reminder()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 20:15:00')" />
+            <field name="active">True</field>
+        </record>
+        <record id="freight_scheduled_action_debt_followup_activity" model="ir.cron">
+            <field name="name">Create Customer Debt Follow-up Activities for Sales</field>
+            <field name="model_id" ref="partner_aging.model_res_partner_aging_customer"/>
+            <field name="state">code</field>
+            <field name="code">model.create_followup_activity()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 20:45:00')" />
+            <field name="active">True</field>
+        </record>
     </data>
 </odoo>

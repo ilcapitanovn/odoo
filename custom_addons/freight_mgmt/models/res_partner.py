@@ -8,6 +8,10 @@ import werkzeug.urls
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    # Overriding fields to enforce chatter history tracking of credit limit settings.
+    warning_stage = fields.Monetary(tracking=True)
+    blocking_stage = fields.Monetary(tracking=True)
+
     @api.model
     def default_get(self, fields):
         result = super(ResPartner, self).default_get(fields)

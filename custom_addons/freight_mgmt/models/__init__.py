@@ -12,6 +12,7 @@ from . import hr_employee
 from . import hr_employee_public
 from . import hr_expense
 from . import res_partner
+from . import res_partner_aging_customer
 from . import res_users
 from . import restrict_menu
 from . import sale_order

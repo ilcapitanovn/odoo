@@ -17,12 +17,13 @@ class ResPartnerAgingCustomer(models.Model):
     inv_date_due = fields.Date("Invoice Date", readonly=True)
     total = fields.Float(readonly=True)
     not_due = fields.Float("Not Due Yet", readonly=True)
-    days_due_01to30 = fields.Float("1/30", readonly=True)
-    days_due_31to60 = fields.Float("31/60", readonly=True)
-    days_due_61to90 = fields.Float("61/90", readonly=True)
-    days_due_91to120 = fields.Float("91/120", readonly=True)
-    days_due_121togr = fields.Float("+121", readonly=True)
+    days_due_01to30 = fields.Float("1-30", readonly=True)
+    days_due_31to60 = fields.Float("31-60", readonly=True)
+    days_due_61to90 = fields.Float("61-90", readonly=True)
+    days_due_91to120 = fields.Float("91-120", readonly=True)
+    days_due_121togr = fields.Float("Older", readonly=True)
     max_days_overdue = fields.Integer("Days Outstanding", readonly=True)
+    bl_number = fields.Char("B/L Number", readonly=True)
     invoice_ref = fields.Char("Our Invoice", size=25, readonly=True)
     invoice_id = fields.Many2one("account.move", "Invoice", readonly=True)
     salesman = fields.Many2one("res.users", "Sales Rep", readonly=True)
@@ -35,6 +36,7 @@ class ResPartnerAgingCustomer(models.Model):
                 SELECT aml.id, aml.partner_id as partner_id,
                 ai.invoice_user_id as salesman, aml.date as date, aml.date as
                 date_due, ai.name as invoice_ref,
+                ai.vessel_bol_number as bl_number,
                 days_due AS avg_days_overdue,
                 CASE WHEN (days_due BETWEEN 1 and 30) THEN
                     CASE WHEN (aml.full_reconcile_id is NULL and
@@ -155,7 +157,7 @@ class ResPartnerAgingCustomer(models.Model):
                 WHERE ac.user_type_id in
                     (select id from account_account_type where
                     type = 'receivable') and aml.date
-                    <= '{}' AND ai.state = 'posted' AND
+                    <= '{}' AND
                     (ai.payment_state != 'paid' OR
                     aml.full_reconcile_id IS NULL) AND
                     ai.move_type IN ('out_invoice', 'out_refund')
@@ -165,7 +167,7 @@ class ResPartnerAgingCustomer(models.Model):
                     SELECT aml.id, aml.partner_id as partner_id,
                     ai.invoice_user_id as
                     salesman, aml.date as date, aml.date as date_due,
-                    ai.name as invoice_ref,days_due AS avg_days_overdue,
+                    ai.name as invoice_ref,ai.vessel_bol_number as bl_number,days_due AS avg_days_overdue,
 
                 CASE WHEN (days_due BETWEEN 1 and 30) THEN
 
@@ -300,6 +302,7 @@ class ResPartnerAgingCustomer(models.Model):
                         aml.date as date,
                         aml.date as date_due,
                         ' ' as invoice_ref,
+                        ' ' as bl_number,
                         0 as avg_days_overdue,
                         0 as days_due_01to30,
                         0 as days_due_31to60,

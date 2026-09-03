@@ -18,11 +18,11 @@ class ResPartnerAgingSupplier(models.Model):
     inv_date_due = fields.Date("Invoice Date", readonly=True)
     total = fields.Float(readonly=True)
     not_due = fields.Float("Not Due Yet", readonly=True)
-    days_due_01to30 = fields.Float("1/30", readonly=True)
-    days_due_31to60 = fields.Float("31/60", readonly=True)
-    days_due_61to90 = fields.Float("61/90", readonly=True)
-    days_due_91to120 = fields.Float("91/120", readonly=True)
-    days_due_121togr = fields.Float("+121", readonly=True)
+    days_due_01to30 = fields.Float("1-30", readonly=True)
+    days_due_31to60 = fields.Float("31-60", readonly=True)
+    days_due_61to90 = fields.Float("61-90", readonly=True)
+    days_due_91to120 = fields.Float("91-120", readonly=True)
+    days_due_121togr = fields.Float("Older", readonly=True)
     invoice_ref = fields.Char("Their Invoice", size=25, readonly=True)
     invoice_id = fields.Many2one("account.move", "Invoice", readonly=True)
     salesman = fields.Many2one("res.users", "Sales Rep", readonly=True)
@@ -167,7 +167,7 @@ class ResPartnerAgingSupplier(models.Model):
                 ac.user_type_id in (select id from account_account_type where
                 type = 'payable')
                 AND aml.date <= '{}'
-                AND ai.state = 'posted' AND
+                AND
                 (ai.payment_state != 'paid' OR
                 aml.full_reconcile_id IS NULL)
                 AND ai.move_type IN ('in_invoice' , 'in_refund')

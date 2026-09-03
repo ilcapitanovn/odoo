@@ -17,6 +17,9 @@ class AccountMove(models.Model):
     related_billing_id = fields.Many2one("freight.billing", string="B/L Number", readonly=True,
                                          compute="_compute_related_billing_id", store=False)
 
+    # Overriding the default attribute to pass the current date function
+    invoice_date = fields.Date(default=fields.Date.today)
+
     @api.depends("vessel_bol_number")
     def _compute_related_billing_id(self):
         ''' This compute method makes a clickable link of vessel bol number in

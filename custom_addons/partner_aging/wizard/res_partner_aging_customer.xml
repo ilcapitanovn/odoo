@@ -21,6 +21,7 @@
                 <field name="partner_id" string="Customer" />
                 <field name="invoice_id" />
                 <field name="invoice_ref" />
+                <field name="bl_number" />
                 <field name="total" sum="Total" />
                 <group expand="0" string="Group By...">
                     <filter
@@ -45,6 +46,7 @@
                 decoration-danger="max_days_overdue > 0 and total > 0"
             >
                 <field name="partner_id" string="Customer" />
+                <field name="bl_number" />
                 <field name="salesman" />
                 <field name="date_due" string="Invoice Date" />
                 <field name="inv_date_due" string="Due Date" />
