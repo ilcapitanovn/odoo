@@ -17,7 +17,7 @@ ALLOWED_DOMAINS = [
 
 class FumigationCertificateController(http.Controller):
 
-    @http.route('/fumigation/api/v1/<string:token>', type='http', auth='none')
+    @http.route('/fumigation/api/v1/<string:token>', type='http', auth='public')
     def get_certificate_by_token(self, token=None, **kwargs):
 
         # Lấy Origin hoặc Referer
@@ -55,7 +55,7 @@ class FumigationCertificateController(http.Controller):
 
         # Render PDF
         pdf_content, _ = request.env.ref(
-            'seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate'
+            'seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate_with_sign'
         ).sudo()._render_qweb_pdf(certificate.id)
 
         # headers = [

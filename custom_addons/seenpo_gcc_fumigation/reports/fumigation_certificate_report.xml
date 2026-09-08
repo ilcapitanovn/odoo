@@ -1,41 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Report action (unchanged) -->
-<!--    <report-->
-<!--        id="seenpo_action_report_fumigation_certificate"-->
-<!--        string="Certificate of Fumigation"-->
-<!--        model="seenpo.fumigation.certificate"-->
-<!--        report_type="qweb-pdf"-->
-<!--        name="seenpo_gcc_fumigation.report_fumigation_certificate"-->
-<!--        file="seenpo_gcc_fumigation.report_fumigation_certificate"-->
-<!--        print_report_name="'Certificate_of_Fumigation_' + object.name"-->
-<!--        paperformat_id="seenpo_fumigation_paperformat_bol"-->
-<!--    />-->
-
     <record id="seenpo_action_report_fumigation_certificate" model="ir.actions.report">
-        <field name="name">Certificate of Fumigation</field>
+        <field name="name">Certificate of Fumigation Without Signature</field>
         <field name="model">seenpo.fumigation.certificate</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">seenpo_gcc_fumigation.report_fumigation_certificate</field>
         <field name="report_file">seenpo_gcc_fumigation.report_fumigation_certificate</field>
-        <field name="print_report_name">'Certificate_of_Fumigation_' + object.name</field>
         <field name="paperformat_id" ref="seenpo_fumigation_paperformat_bol"/>
+        <field name="print_report_name">
+            ('Draft_' + (object.cargo_name or 'Cert of Fumigation')).replace('/', '-') if object.state in ['draft','submitted'] else ('Cert_No.' + (object.name or '')).replace('/', '-')
+        </field>
+    </record>
+
+    <record id="seenpo_action_report_fumigation_certificate_with_sign" model="ir.actions.report">
+        <field name="name">Certificate of Fumigation With Signature</field>
+        <field name="model">seenpo.fumigation.certificate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">seenpo_gcc_fumigation.report_fumi_cert_with_sign</field>
+        <field name="report_file">seenpo_gcc_fumigation.report_fumi_cert_with_sign</field>
+        <field name="paperformat_id" ref="seenpo_fumigation_paperformat_bol"/>
+        <field name="print_report_name">
+            ('Draft_' + (object.cargo_name or 'Cert of Fumigation')).replace('/', '-') if object.state in ['draft','submitted'] else ('Cert_No.' + (object.name or '')).replace('/', '-')
+        </field>
     </record>
 
     <!-- QWeb template -->
     <template id="report_fumigation_certificate">
         <t t-call="web.basic_layout">
+<!--        <t t-call="web.basic_layout">-->
             <t t-foreach="docs" t-as="doc">
-            <div class="page" style="font-size:20px; color:#000; position:relative; padding: 10px 40px; height: 345mm !important;">
-                <link rel="stylesheet" href="/seenpo_gcc_fumigation/static/src/css/fumigation_certificate_report.css"/>
-
+                <t t-set="container_count" t-value="len(doc.container_line)"/>
                 <!-- Set once per certificate so both the top and bottom ribbon
                      (which are siblings, not nested inside one another) can use it -->
                 <t t-set="ribbon_text" t-value="('GLOBAL CARGO CONTROL CO., LTD ' + (('  \u2022   CERTIFICATE OF FUMIGATION  \u2022   ' + doc.name) if doc.name and doc.name != '#' else '') + '   \u2022   ') * 12"/>
                 <t t-set="ribbon_text_footer" t-value="('LICENCE No.: 050/XHKT/BVTV-KD   \u2022   GLOBAL CARGO CONTROL CO., LTD ' + (('  \u2022   CERTIFICATE OF FUMIGATION  \u2022   ' + doc.name) if doc.name and doc.name != '#' else '') + '   \u2022   ') * 12"/>
 
                 <t t-set="wm_repeat_text" t-value="'GCC - Cert No.: ' + (doc.name or '')"/>
+<!--            <t t-call="seenpo_gcc_fumigation.report_fumigation_layout">-->
+            <div class="page" style="font-size:18px; color:#000; position:relative; padding: 10px 40px; height: 345mm !important;">
+                <link rel="stylesheet" href="/seenpo_gcc_fumigation/static/src/css/fumigation_certificate_report.css"/>
+
                 <!-- WATERMARK + diagonal crosshatch background.
                      Built with SVG rather than CSS `background-image` /
                      `transform`: tested directly against wkhtmltopdf 0.12.x,
@@ -136,11 +141,11 @@
                             <td style="width:15%; text-align:left;vertical-align:middle;">
                                 <img class="logo-img" src="/seenpo_gcc_fumigation/static/img/gcc_logo.png" style="max-height:60px;"/>
                             </td>
-                            <td style="width:75%; vertical-align:middle; padding-left: 15px; letter-spacing:1px;">
-                                <div style="font-size:20px; font-weight:bold; color:#1f5c3d;">
+                            <td style="width:75%; vertical-align:middle; padding-left: 15px; letter-spacing:0.5px;">
+                                <div t-attf-style="font-size:#{header_company_font_size} !important; font-weight:bold; color:#1f5c3d;">
                                     GLOBAL CARGO CONTROL CO., LTD
                                 </div>
-                                <div style="font-size:15px; margin-top:2px;">
+                                <div t-attf-style="font-size:#{header_address_font_size} !important; margin-top:2px;">
                                     Add.: 72/41, Road 16, Binh Hung Hoa Ward, Ho Chi Minh City, Vietnam<br/>
                                     Tel: 0903952171 | Email: info@giamdinhtoancau.com<br/>
                                     Website: https://www.giamdinhtoancau.com
@@ -155,11 +160,17 @@
                         </tr>
                     </table>
 
+                    <t t-if="doc.state in ['approved','cancelled'] and doc.name != '#'">
+                        <div class="original-stamp-box">
+                            <img src="/seenpo_gcc_fumigation/static/img/original_stamp.png" alt="ORIGINAL"/>
+                        </div>
+                    </t>
+
                     <!-- Header separator: thick green rule + thin gold rule -->
                     <div style="border-top:3px solid #1f5c3d; margin: 20px 0;"/>
 
                     <!-- TITLE -->
-                    <h3 style="text-align:center; padding-top:10px; text-transform:uppercase; font-weight:bold; color:#1f5c3d; font-size:30px; letter-spacing:2px;">
+                    <h3 t-attf-style="text-align:center; padding-top:10px; text-transform:uppercase; font-weight:bold; color:#1f5c3d; font-size:#{title_font_size} !important; letter-spacing:2px;">
                         <t t-if="doc.heading">
                             <span t-esc="doc.heading" style="font-weight:bold;"/>
                         </t>
@@ -185,11 +196,17 @@
                     </p>
 
                     <!-- CARGO / SHIPMENT DETAILS (single continuous list, uniform bullet) -->
-                    <table id="tbl-content" style="width:100%; border-collapse:collapse; font-size:18px;">
+                    <table id="tbl-content" t-attf-style="width:100%; border-collapse:collapse; font-size:#{content_font_size} !important;">
                         <t t-if="doc.is_shipper_name_printing or doc.is_shipper_address_printing or doc.is_shipper_phone_printing">
                         <tr>
-                            <td style="width:35%; color:#1f5c3d; vertical-align:top; padding:2px 0;">
-                                <span style="color:red;">▪</span> Shipper:
+                            <td style="width:30%; color:#1f5c3d; vertical-align:top; padding:2px 0;">
+                                <span style="color:red;">▪</span>
+                                <t t-if="doc.transport_type == 'pallet'">
+                                    Seller:
+                                </t>
+                                <t t-else="">
+                                    Shipper:
+                                </t>
                             </td>
                             <td class="content-value" style="vertical-align:top; padding:2px 0;">
                                 <t t-if="doc.is_shipper_name_printing">
@@ -208,7 +225,13 @@
                         <t t-if="doc.is_consignee_name_printing or doc.is_consignee_address_printing or doc.is_consignee_phone_printing">
                         <tr>
                             <td style="color:#1f5c3d; vertical-align:top; padding:2px 0;">
-                                <span style="color:red;">▪</span> Consignee:
+                                <span style="color:red;">▪</span>
+                                <t t-if="doc.transport_type == 'pallet'">
+                                    Buyer:
+                                </t>
+                                <t t-else="">
+                                    Consignee:
+                                </t>
                             </td>
                             <td class="content-value" style="vertical-align:top; padding:2px 0;">
                                 <t t-if="doc.is_consignee_name_printing">
@@ -229,7 +252,7 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Name of commodity:
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.cargo_name"/>
+                            <td class="content-value" style="padding:2px 0; white-space: pre-wrap;" t-esc="doc.cargo_name"/>
                         </tr>
                         </t>
 
@@ -289,7 +312,7 @@
                                     Airport of departure:
                                 </t>
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_loading or ''"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_loading_id or ''"/>
                         </tr>
                         </t>
 
@@ -307,7 +330,16 @@
                                     Airport of destination:
                                 </t>
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_discharge or ''"/>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_discharge_id or ''"/>
+                        </tr>
+                        </t>
+
+                        <t t-if="doc.is_delivery_place_printing">
+                        <tr>
+                            <td style="color:#1f5c3d; padding:2px 0;">
+                                <span style="color:red;">▪</span> Place of delivery:
+                            </td>
+                            <td class="content-value" style="padding:2px 0;" t-esc="doc.delivery_place"/>
                         </tr>
                         </t>
 
@@ -366,7 +398,15 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Dosage:
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.dosage"/>
+                            <td class="content-value" style="padding:2px 0;">
+                                <t t-set="dosage" t-value="str(doc.dosage_number)"/>
+                                <t t-if="doc.dosage_uom_id">
+                                    <t t-set="dosage" t-value="dosage + ' ' + (doc.dosage_uom_id.name or '')"/>
+                                </t>
+<!--                                <t t-set="dosage" t-value="f'{doc.dosage_number} {doc.dosage_uom_id.name or \'\'}'"/>-->
+
+                                <t t-esc="dosage"/>
+                            </td>
                         </tr>
                         </t>
 
@@ -375,7 +415,18 @@
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Time of exposure:
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.exposure_time"/>
+                            <td class="content-value" style="padding:2px 0;">
+                                <t t-set="exposure" t-value="str(doc.exposure_time_hour)"/>
+                                <t t-if="doc.exposure_time_hour_uom_id">
+                                    <t t-set="exposure" t-value="exposure + ' ' + (doc.exposure_time_hour_uom_id.name or '')"/>
+                                </t>
+                                <t t-set="exposure" t-value="exposure + ' AT ' + str(doc.exposure_time_degree)"/>
+                                <t t-if="doc.exposure_time_degree_uom_id">
+                                    <t t-set="exposure" t-value="exposure + (doc.exposure_time_degree_uom_id.name or '')"/>
+                                </t>
+
+                                <t t-esc="exposure"/>
+                            </td>
                         </tr>
                         </t>
 
@@ -388,6 +439,7 @@
                         </tr>
                         </t>
 
+                        <t t-if="doc.is_fumigation_results_printing">
                         <tr>
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Results of fumigation:
@@ -396,15 +448,38 @@
                                 INSECTS HAVE COMPLETELY BEEN DESTROYED
                             </td>
                         </tr>
+                        </t>
 
                         <t t-if="doc.is_container_no_printing">
-                        <tr>
-                            <td style="color:#1f5c3d; padding:2px 0;">
-                                <span style="color:red;">▪</span> Container No./ Seal No.:
-                            </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.container_no"/>
-                        </tr>
+                            <tr>
+                                <td style="color:#1f5c3d; padding:2px 0;">
+                                    <span style="color:red;">▪</span> Container No./ Seal No.:
+                                </td>
+                                <t t-if="container_count > 1">
+                                    <td class="content-value" style="padding:2px 0;">
+                                        <i>See attached list below</i>
+                                    </td>
+                                </t>
+                                <t t-if="container_count == 1">
+                                    <t t-set="container_seal_no" t-value="''"/>
+                                    <t t-set="line" t-value="doc.container_line[0]"/>
+                                    <t t-if="line.container_no or line.seal_no">
+                                        <t t-if="line.container_no">
+                                            <t t-set="container_seal_no" t-value="container_seal_no + line.container_no"/>
+                                        </t>
+                                        <t t-set="container_seal_no" t-value="container_seal_no + ' / '"/>
+                                        <t t-if="line.seal_no">
+                                            <t t-set="container_seal_no" t-value="container_seal_no + line.seal_no"/>
+                                        </t>
+                                    </t>
+
+                                    <td class="content-value" style="padding:2px 0;">
+                                        <span t-raw="container_seal_no"/>
+                                    </td>
+                                </t>
+                            </tr>
                         </t>
+
                     </table>
 
                     <!-- Hình ảnh đính kèm -->
@@ -417,9 +492,15 @@
 
                     <!-- FOOTER: right-aligned date + title + signature block -->
                     <div style="margin-top:36px; width:100%; overflow:hidden;">
-                        <div style="float:left; width:400px; color:#1f5c3d; text-align:left; font-size:18px;">
+                        <t t-if="doc.is_ispm15_printing">
+                        <div t-attf-style="float:left; width:400px; color:#1f5c3d; text-align:left; font-size:#{content_font_size} !important;">
                             <div>
-                                All wood packaging materials and commodity have been fumigated and stamped in accordance with ISPM15 standard.
+                                <t t-if="doc.transport_type == 'pallet'">
+                                    All wooden pallets have been fumigated and stamped in accordance with ISPM15 standard.
+                                </t>
+                                <t t-else="">
+                                    All wood packaging materials and commodity have been fumigated and stamped in accordance with ISPM15 standard.
+                                </t>
                             </div>
                             <div style="padding-top:20px;">
                                 ISPM15 STANDARD
@@ -429,44 +510,103 @@
                                     <td width="45%" style="text-align:center; vertical-align:middle;">
                                         <img class="logo-img" src="/seenpo_gcc_fumigation/static/img/ippc.png" style="max-height:90px;"/>
                                     </td>
-                                    <td style="text-align:left; font-size: 25px; font-weight:bold; color:#416fc0; padding-left: 20px;">
+                                    <td style="text-align:left; font-size: #{content_font_size} !important; font-weight:bold; color:#416fc0; padding-left: 20px;">
                                       VN - 050 <br/> <t t-esc="doc.chemical_list"/>
                                     </td>
                                 </tr>
                             </table>
                         </div>
-                        <div style="float:right; width:400px; text-align:center;">
+                        </t>
+                        <div t-attf-style="float:right; width:400px; text-align:center; font-size:#{signature_font_size} !important;">
                             <div style="font-style:italic;">
-                                HO CHI MINH,
-                                <t t-if="doc.fumigation_date">
-                                    <t t-esc="doc.fumigation_date.strftime('%B %d, %Y')"/>
+                                <t t-if="doc.branch_id and doc.branch_id.code == 'LS'">
+                                    Lang Son province, Date:
                                 </t>
+                                <t t-else="">
+                                    Ho Chi Minh City, Date:
+                                </t>
+                                <span style="text-transform:uppercase;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
                             </div>
-                            <div style="margin-top:4px; color:#1f5c3d;">
+                            <div style="margin-top:4px;">
                                 Manager of Fumigation Dept.
                             </div>
-                            <div style="height:100px;"/>
-                            <div style="width:350px; text-align:center; padding-left:40px;">
+
+<!--                            <t t-if="not print_no_sign and doc.state == 'approved'">-->
+<!--                                <div style="height:100px;">-->
+<!--                                    <img src="/seenpo_gcc_fumigation/static/img/signature_stamp.png"-->
+<!--                                         style="position:absolute; bottom:20px; right:150px; width:230px;"/>-->
+<!--                                </div>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <div style="height:100px;"/>-->
+<!--                            </t>-->
+                            <!-- Tạo một thẻ mỏ neo trống ở vị trí cuối trang để chèn chữ ký -->
+                            <div id="signature_section_anchor" style="height:100px;"></div>
+<!--                            <div style="height:100px;">-->
+<!--                                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp.png"-->
+<!--                                     style="position:absolute; bottom:20px; right:150px; width:230px;"/>-->
+<!--                            </div>-->
+
+                            <t t-if="not (doc.branch_id and doc.branch_id.code == 'LS')">
+                            <div style="width:300px; text-align:center; padding-left:100px;">
                               <hr style="border: none; border-top: 1px solid black; margin-bottom: 5px;"/>
                             </div>
                             <span style="padding-top:4px; text-align:center; font-weight:bold;">
                                 <t t-esc="doc.signer"/>
                             </span>
+                            </t>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Repeating letterhead ribbon (bottom).
                      A direct child of .page (not the content wrapper above), so
                      "bottom:0" anchors to the actual page edge rather than to
                      the bottom of the (shorter) content block. -->
-                <div style="position:absolute; bottom:0; left:0; width:100%; z-index:0;                             overflow:hidden; white-space:nowrap; font-size:10px; letter-spacing:1px;                             color:#1f5c3d;">
+                <div style="position:absolute; bottom:0; left:0; width:100%; z-index:0; overflow:hidden; white-space:nowrap; font-size:10px; letter-spacing:1px; color:#1f5c3d;">
                     <t t-esc="ribbon_text_footer"/>
                 </div>
             </div>
+
+<!--            </t>-->
+                <t t-if="container_count > 1">
+                    <div class="page" style="padding: 40px; font-size: 18px; page-break-before:always;">
+                        <h5 style="margin-bottom:20px;">
+                            Attached list <t t-esc="doc.name"/> Original <br/><br/>
+                            B/L NO: <t t-esc="doc.bl_number"/>
+                        </h5>
+
+                        <table style="width:100%; border-collapse:collapse; font-size: 18px;">
+                            <tr style="font-weight:bold; border-bottom:1px solid #ccc;">
+                                <td width="15%">Sequence</td>
+                                <td>Container / Seal No.</td>
+                            </tr>
+
+                            <t t-set="sequence" t-value="0"/>
+                            <t t-foreach="doc.container_line" t-as="row">
+                                <t t-set="sequence" t-value="sequence + 1"/>
+                                <tr>
+                                    <td><t t-esc="sequence"/></td>
+                                    <td><t t-esc="row.container_no"/> / <t t-esc="row.seal_no"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
             </t>
+<!--        </t>-->
         </t>
+    </template>
+
+    <!-- 2. MẪU BÁO CÁO KẾ THỪA: CÓ CHỮ KÝ -->
+    <!-- Thuộc tính primary="True" bắt buộc phải có để biến nó thành một template độc lập hoàn toàn -->
+    <template id="report_fumi_cert_with_sign" inherit_id="report_fumigation_certificate" primary="True">
+        <xpath expr="//div[@id='signature_section_anchor']" position="inside">
+            <t t-if="doc.state in ['approved','cancelled'] and doc.name != '#'">
+                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp.png"
+                         style="position:absolute; bottom:5px; right:150px; width:230px;"/>
+            </t>
+        </xpath>
     </template>
 
 </odoo>

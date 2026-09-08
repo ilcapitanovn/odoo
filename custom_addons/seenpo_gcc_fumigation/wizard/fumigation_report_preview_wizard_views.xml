@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_seenpo_fumigation_report_preview_wizard_form" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.report.preview.wizard.form</field>
+        <field name="model">fumigation.report.preview.wizard</field>
+        <field name="arch" type="xml">
+            <!-- Thêm class oe_chatter_disabled để ẩn bớt các thành phần không cần thiết -->
+            <form string="Print Preview">
+                <sheet style="padding: 0 !important; position: relative; min-height: 400px;">
+
+                    <!-- 1. HIỆU ỨNG XOAY LOADING (Tự động ẩn khi iframe phủ lên) -->
+                    <div class="pdf-loading-spinner" style="
+                        position: absolute;
+                        top: 30%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        text-align: center;
+                        z-index: 1;
+                        color: #714B67; /* Màu tím đặc trưng của Odoo hoặc đổi thành #3c78b4 màu xanh của bạn */
+                    ">
+                        <!-- Sử dụng icon xoay có sẵn của hệ thống font-awesome trong Odoo -->
+                        <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                        <div class="mt-2" style="font-weight: bold; font-size: 14px;">Loading PDF Preview...</div>
+                    </div>
+
+                    <!-- 2. KHUNG HIỂN THỊ FILE PDF -->
+                    <div class="row" style="position: relative; z-index: 2;">
+                        <div class="col-12">
+                            <!-- Đặt background trong suốt để nhìn thấy spinner phía sau khi chưa load xong -->
+                            <field name="pdf_iframe" widget="html" nolabel="1" readonly="1" class="w-100"/>
+                        </div>
+                    </div>
+
+                </sheet>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

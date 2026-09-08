@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Tạo View Form cấu hình riêng biệt -->
+    <record id="view_seenpo_fumigation_report_config_form" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.report.config.form</field>
+        <field name="model">seenpo.fumigation.report.config</field>
+        <field name="arch" type="xml">
+            <form string="Report Configuration" class="oe_form_configuration">
+                <header>
+                    <!-- Nút Save kích hoạt hàm execute trong Python -->
+                    <button string="Save" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </header>
+                <sheet>
+                    <h2>Fumigation Report Layout Configuration</h2>
+                    <div class="row mt16">
+                        <div class="col-12 col-lg-6">
+                            <group string="Header Settings">
+                                <label for="seenpo_fumigation_header_font_size"/>
+                                <div>
+                                    <field name="seenpo_fumigation_header_font_size" class="oe_inline"/> <span class="ml4">px</span>
+                                    <div class="text-muted text-sm">Applied to 'GLOBAL CARGO CONTROL CO., LTD' section.</div>
+                                </div>
+                            </group>
+                            <group string="Content Settings">
+                                <label for="seenpo_fumigation_content_font_size"/>
+                                <div>
+                                    <field name="seenpo_fumigation_content_font_size" class="oe_inline"/> <span class="ml4">px</span>
+                                    <div class="text-muted text-sm">Applied to report body starting from 'Certificate No.'.</div>
+                                </div>
+                            </group>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            <group string="Title Settings">
+                                <label for="seenpo_fumigation_title_font_size"/>
+                                <div>
+                                    <field name="seenpo_fumigation_title_font_size" class="oe_inline"/> <span class="ml4">px</span>
+                                    <div class="text-muted text-sm">Applied to 'Certificate of Fumigation' title text.</div>
+                                </div>
+                            </group>
+                            <group string="Signature Settings">
+                                <label for="seenpo_fumigation_signature_font_size"/>
+                                <div>
+                                    <field name="seenpo_fumigation_signature_font_size" class="oe_inline"/> <span class="ml4">px</span>
+                                    <div class="text-muted text-sm">Applied to 'HO CHI MINH City, date' and signature section.</div>
+                                </div>
+                            </group>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_seenpo_fumigation_report_config_settings" model="ir.actions.act_window">
+        <field name="name">Report Configuration</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">seenpo.fumigation.report.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+</odoo>

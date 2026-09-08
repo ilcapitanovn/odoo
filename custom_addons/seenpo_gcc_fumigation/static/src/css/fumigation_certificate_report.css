@@ -29,3 +29,39 @@
 #tbl-ippc th, #tbl-ippc td {
     border: 2px solid #416fc0;
 }
+.btn-space {
+    padding-right: 20px;
+}
+.pdf-icon {
+    color: #b30b00; /* Adobe PDF red */
+    font-size: 24px; /* Optional: adjust the size */
+}
+
+.original-stamp-box {
+    border: 2px solid #8498B7;
+    /*#3c78b4;*/
+    border-radius: 1px;
+    padding: 8px 16px;
+    box-sizing: border-box;
+
+    /* ---------------------------------------------------- */
+    /* ĐỊNH VỊ TUYỆT ĐỐI: KHÔNG LÀM XÊ DỊCH PHẦN TỬ KHÁC    */
+    /* ---------------------------------------------------- */
+    position: absolute;
+    /* Neo từ góc trên (top) và góc phải (right) của khung cha */
+    top: 130px;    /* Tăng/giảm số này để dịch con dấu LÊN hoặc XUỐNG */
+    right: 160px; /* Tăng/giảm số này để dịch con dấu SANG TRÁI hoặc SANG PHẢI */
+    /* ---------------------------------------------------- */
+
+    /* Hiệu ứng xoay mượt mà đã sửa từ bước trước */
+    -webkit-transform: rotate(-3deg);
+    transform: rotate(-3deg);
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
+}
+
+.original-stamp-box img {
+    height: 36px;
+    display: block;
+    width: auto;
+}
