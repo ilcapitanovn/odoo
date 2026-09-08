@@ -4,6 +4,7 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 from odoo.http import request
+from odoo import SUPERUSER_ID
 
 
 ALLOWED_DOMAINS = [
@@ -53,10 +54,16 @@ class FumigationCertificateController(http.Controller):
         if not certificate:
             return request.not_found()
 
+        # 2. TẠO MÔI TRƯỜNG SUPERUSER THUẦN TÚY (ĐÂY LÀ ĐIỂM QUAN TRỌNG)
+        # Thay vì dùng môi trường của public user, ta tạo hẳn một môi trường chạy bằng ID = 4 (OdooBot/Superuser)
+        su_env = request.env(user=SUPERUSER_ID)
+
         # Render PDF
-        pdf_content, _ = request.env.ref(
-            'seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate_with_sign'
-        ).sudo()._render_qweb_pdf(certificate.id)
+        report_service = su_env.ref('seenpo_gcc_fumigation.seenpo_action_report_fumigation_certificate_with_sign')
+
+        # Duyệt tìm lại record inside su_env để đảm bảo toàn bộ các trường liên kết (container_line, shipper_id)
+        # khi được gọi trong QWeb XML sẽ chạy hoàn toàn bằng quyền Superuser.
+        pdf_content, _ = report_service._render_qweb_pdf(certificate.with_env(su_env).ids)
 
         # headers = [
         #     ('Content-Type', 'application/pdf'),

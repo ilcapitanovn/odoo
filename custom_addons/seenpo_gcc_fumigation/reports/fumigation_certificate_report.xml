@@ -213,10 +213,10 @@
                                     <t t-esc="doc.shipper_id.name or ''"/><br/>
                                 </t>
                                 <t t-if="doc.is_shipper_address_printing">
-                                    ADD: <t t-esc="doc.shipper_address or ''"/><br/>
+                                    <t t-esc="doc.shipper_address or ''"/><br/>
                                 </t>
                                 <t t-if="doc.is_shipper_phone_printing">
-                                    TEL: <t t-esc="doc.shipper_phone or ''"/>
+                                    <t t-esc="doc.shipper_phone or ''"/>
                                 </t>
                             </td>
                         </tr>
@@ -238,10 +238,10 @@
                                     <t t-esc="doc.consignee_id.name or ''"/><br/>
                                 </t>
                                 <t t-if="doc.is_consignee_address_printing">
-                                    ADD: <t t-esc="doc.consignee_address or ''"/><br/>
+                                    <t t-esc="doc.consignee_address or ''"/><br/>
                                 </t>
                                 <t t-if="doc.is_consignee_phone_printing">
-                                    TEL: <t t-esc="doc.consignee_phone or ''"/>
+                                    <t t-esc="doc.consignee_phone or ''"/>
                                 </t>
                             </td>
                         </tr>
@@ -249,7 +249,7 @@
 
                         <t t-if="doc.is_cargo_name_printing">
                         <tr>
-                            <td style="color:#1f5c3d; padding:2px 0;">
+                            <td style="color:#1f5c3d; vertical-align:top; padding:2px 0;">
                                 <span style="color:red;">▪</span> Name of commodity:
                             </td>
                             <td class="content-value" style="padding:2px 0; white-space: pre-wrap;" t-esc="doc.cargo_name"/>
