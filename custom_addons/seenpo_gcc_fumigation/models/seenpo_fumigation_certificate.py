@@ -103,6 +103,7 @@ class SeenpoFumigationCertificate(models.Model):
 
     # Cargo information
     cargo_name = fields.Text(string='Name of commodity', tracking=True)
+    cargo_name_short = fields.Char(string='Name of commodity', compute='_compute_cargo_name_short')
     quantity = fields.Char(string='Total Quantity', tracking=True)
     gross_weight = fields.Char(string='Weight', tracking=True)
     vessel_name = fields.Char(string='Mean of Conveyance', tracking=True)
@@ -274,6 +275,16 @@ class SeenpoFumigationCertificate(models.Model):
         for rec in self:
             if rec.fumigation_date and rec.shipment_date and rec.fumigation_date > rec.shipment_date:
                 raise ValidationError("Date of fumigation must be before or on date of shipment.")
+
+    @api.depends('cargo_name')
+    def _compute_cargo_name_short(self):
+        for record in self:
+            if record.cargo_name:
+                # Cắt lấy 50 ký tự đầu tiên rồi thêm dấu ba chấm
+                record.cargo_name_short = record.cargo_name[:50] + '...' \
+                    if len(record.cargo_name) > 50 else record.cargo_name
+            else:
+                record.cargo_name_short = ''
 
     @api.onchange('branch_id')
     def _onchange_branch_id_update_name(self):
