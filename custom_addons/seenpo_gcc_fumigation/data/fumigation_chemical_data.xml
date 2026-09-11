@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="fumigation_chemical_mb" model="seenpo.fumigation.catalog.chemical">
+            <field name="code">MB</field>
+            <field name="name">METHYL BROMIDE (CH₃Br)</field>
+        </record>
+        <record id="fumigation_chemical_ac5" model="seenpo.fumigation.catalog.chemical">
+            <field name="code">AC5</field>
+            <field name="name">ACTELLIC 50EC</field>
+        </record>
+        <record id="fumigation_chemical_ec50" model="seenpo.fumigation.catalog.chemical">
+            <field name="code">EC50</field>
+            <field name="name">ACTELLIC 50EC (50% PRIMIPHOS-METHYL)</field>
+        </record>
+        <record id="fumigation_chemical_ap" model="seenpo.fumigation.catalog.chemical">
+            <field name="code">AP</field>
+            <field name="name">ALUMINUM PHOSPHIDE AT 56%</field>
+        </record>
+        <record id="fumigation_chemical_aip" model="seenpo.fumigation.catalog.chemical">
+            <field name="code">AIP</field>
+            <field name="name">ALUMINUM PHOSPHIDE 56% (AIP)</field>
+        </record>
+    </data>
+</odoo>

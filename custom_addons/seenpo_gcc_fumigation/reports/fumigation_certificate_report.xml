@@ -396,33 +396,60 @@
                         <t t-if="doc.is_dosage_printing">
                         <tr>
                             <td style="color:#1f5c3d; padding:2px 0;">
-                                <span style="color:red;">▪</span> Dosage:
+                                <span style="color:red;">▪</span>
+                                <t t-if="doc.transport_type == 'road'">
+                                    Dosage/Dilution ratio:
+                                </t>
+                                <t t-else="">
+                                    Dosage:
+                                </t>
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <t t-set="dosage" t-value="str(doc.dosage_number)"/>
-                                <t t-if="doc.dosage_uom_id">
-                                    <t t-set="dosage" t-value="dosage + ' ' + (doc.dosage_uom_id.name or '')"/>
+                                <t t-set="dosage" t-value="''"/>
+                                <t t-if="doc.dosage">
+                                    <t t-set="dosage" t-value="doc.dosage"/>
                                 </t>
-<!--                                <t t-set="dosage" t-value="f'{doc.dosage_number} {doc.dosage_uom_id.name or \'\'}'"/>-->
+                                <t t-else="">
+                                    <t t-set="dosage" t-value="str(doc.dosage_number)"/>
+                                    <t t-if="doc.dosage_uom_id">
+                                        <t t-set="dosage" t-value="dosage + ' ' + (doc.dosage_uom_id.name or '')"/>
+                                    </t>
+                                </t>
 
                                 <t t-esc="dosage"/>
                             </td>
                         </tr>
                         </t>
 
-                        <t t-if="doc.is_exposure_time_printing">
+                        <t t-if="doc.is_exposure_time_printing or doc.is_exposure_degree_printing">
                         <tr>
                             <td style="color:#1f5c3d; padding:2px 0;">
                                 <span style="color:red;">▪</span> Time of exposure:
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <t t-set="exposure" t-value="str(doc.exposure_time_hour)"/>
-                                <t t-if="doc.exposure_time_hour_uom_id">
-                                    <t t-set="exposure" t-value="exposure + ' ' + (doc.exposure_time_hour_uom_id.name or '')"/>
+                                <t t-set="exposure" t-value="''"/>
+                                <t t-if="doc.is_exposure_time_printing">
+                                    <t t-if="doc.exposure_time">
+                                        <t t-set="exposure" t-value="doc.exposure_time"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="exposure" t-value="str(doc.exposure_time_hour)"/>
+                                        <t t-if="doc.exposure_time_hour_uom_id">
+                                            <t t-set="exposure" t-value="exposure + ' ' + (doc.exposure_time_hour_uom_id.name or '')"/>
+                                        </t>
+                                    </t>
                                 </t>
-                                <t t-set="exposure" t-value="exposure + ' AT ' + str(doc.exposure_time_degree)"/>
-                                <t t-if="doc.exposure_time_degree_uom_id">
-                                    <t t-set="exposure" t-value="exposure + (doc.exposure_time_degree_uom_id.name or '')"/>
+
+                                <t t-if="doc.is_exposure_degree_printing">
+                                    <t t-if="doc.exposure_time_degree_text">
+                                        <t t-set="exposure" t-value="exposure + ' ' + doc.exposure_time_degree_text"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="exposure" t-value="exposure + ' AT ' + str(doc.exposure_time_degree)"/>
+                                        <t t-if="doc.exposure_time_degree_uom_id">
+                                            <t t-set="exposure" t-value="exposure + (doc.exposure_time_degree_uom_id.name or '')"/>
+                                        </t>
+                                    </t>
                                 </t>
 
                                 <t t-esc="exposure"/>
@@ -499,7 +526,7 @@
                                     All wooden pallets have been fumigated and stamped in accordance with ISPM15 standard.
                                 </t>
                                 <t t-else="">
-                                    All wood packaging materials and commodity have been fumigated and stamped in accordance with ISPM15 standard.
+                                    All wood packaging materials and/or commodities have been fumigated and stamped in accordance with ISPM15 standard.
                                 </t>
                             </div>
                             <div style="padding-top:20px;">
@@ -603,8 +630,8 @@
     <template id="report_fumi_cert_with_sign" inherit_id="report_fumigation_certificate" primary="True">
         <xpath expr="//div[@id='signature_section_anchor']" position="inside">
             <t t-if="doc.state in ['approved','cancelled'] and doc.name != '#'">
-                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp.png"
-                         style="position:absolute; bottom:5px; right:150px; width:230px;"/>
+                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp_pdf_safe.png"
+                         style="position:absolute; bottom:-10px; right:150px; width:230px;"/>
             </t>
         </xpath>
     </template>

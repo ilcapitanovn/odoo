@@ -3,7 +3,7 @@
 
 {
     "name": "Fumigation Certificates",
-    "version": "15.0.1.2.2",
+    "version": "15.0.1.3.1",
     "author": "Tuan Huynh, " "Odoo Community Association (OCA)",
     'summary': """ Manage fumigation certificates with QR and bilingual UI.""",
     'description': """
@@ -18,12 +18,14 @@
     "depends": ["base", "contacts", "seenpo_multi_branch_base", "report_qr", "freight_mgmt"],
     "data": [
         'data/fumigation_data.xml',
+        'data/fumigation_chemical_data.xml',
         'data/ir_sequence_data.xml',
         'security/fumigation_security.xml',
         'security/fumigation_public_acl.xml',
         'security/ir.model.access.csv',
         "reports/report_paperformat.xml",
         'reports/fumigation_certificate_report.xml',
+        'views/seenpo_fumigation_catalog_chemical_views.xml',
         'views/seenpo_fumigation_report_config_views.xml',
         'views/seenpo_fumigation_certificate_views.xml',
         'views/seenpo_fumigation_dashboard_views.xml',

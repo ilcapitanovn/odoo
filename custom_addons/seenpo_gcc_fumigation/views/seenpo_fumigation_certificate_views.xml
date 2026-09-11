@@ -72,7 +72,7 @@
             <tree string="Certificates of Fumigation">
                 <field name="name" string="Certificate No."/>
                 <field name="customer_id" string="Customer"/>
-                <field name="chemical_list" string="Chemical"/>
+                <field name="chemical_id" string="Chemical"/>
                 <field name="fumigation_place" string="Fumigation Place"/>
                 <field name="cargo_name_short" string="Cargo"/>
                 <field name="quantity" string="Quantity"/>
@@ -359,9 +359,9 @@
                                 <group col="10" class="m-0 p-0">
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_chemical_list_printing" class="mr-2"/>
-                                        <label for="chemical_list" class="font-weight-bold m-0"/>
+                                        <label for="chemical_id" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="chemical_list" nolabel="1" colspan="7"/>
+                                    <field name="chemical_id" nolabel="1" colspan="7"/>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_fumigation_place_printing" class="mr-2"/>
@@ -384,6 +384,12 @@
                                     <field name="defumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_defumigation_date_printing', '=', True)]}"/>
 
+                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
+                                        <field name="is_signer_printing" class="mr-2"/>
+                                        <label for="signer" class="font-weight-bold m-0"/>
+                                    </div>
+                                    <field name="signer" nolabel="1" colspan="7"/>
+
                                 </group>
 
                                 <group col="10" class="m-0 p-0">
@@ -396,7 +402,12 @@
                                                attrs="{'required': [('is_dosage_printing', '=', True)]}"/>
                                         <field name="dosage_uom_id" placeholder="G/M³" nolabel="1" class="oe_inline"
                                                options="{'no_open': True, 'no_create': True}"
+                                               domain="[('name', 'in', ['g/m³', 'Hours', '°C'])]"
                                                attrs="{'required': [('is_dosage_printing', '=', True)]}"/>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="dosage" placeholder="50 g/m³" nolabel="1" class="oe_inline"/>
                                     </div>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3">
@@ -408,7 +419,12 @@
                                                attrs="{'required': [('is_exposure_time_printing', '=', True)]}"/>
                                         <field name="exposure_time_hour_uom_id" placeholder="Hours" nolabel="1" class="oe_inline"
                                                options="{'no_open': True, 'no_create': True}"
+                                               domain="[('name', 'in', ['g/m³', 'Hours', '°C'])]"
                                                attrs="{'required': [('is_exposure_time_printing', '=', True)]}"/>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="exposure_time" placeholder="12HRS ABOVE" nolabel="1" class="oe_inline"/>
                                     </div>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3">
@@ -420,14 +436,14 @@
                                                attrs="{'required': [('is_exposure_degree_printing', '=', True)]}"/>
                                         <field name="exposure_time_degree_uom_id" placeholder="ºC" nolabel="1" class="oe_inline"
                                                options="{'no_open': True, 'no_create': True}"
+                                               domain="[('name', 'in', ['g/m³', 'Hours', '°C'])]"
                                                attrs="{'required': [('is_exposure_degree_printing', '=', True)]}"/>
                                     </div>
-
-                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3">
-                                        <field name="is_signer_printing" class="mr-2"/>
-                                        <label for="signer" class="font-weight-bold m-0"/>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="exposure_time_degree_text" placeholder="AT 25°C" nolabel="1" class="oe_inline"/>
                                     </div>
-                                    <field name="signer" nolabel="1" colspan="7"/>
+
                                 </group>
                             </group>
                         </page>
@@ -485,18 +501,6 @@
         <field name="tag">seenpo_fumigation_setting_empty</field>
     </record>
 
-    <record id="action_seenpo_fumigation_ports" model="ir.actions.act_window">
-        <field name="name">Ports</field>
-        <field name="res_model">freight.catalog.port</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <record id="action_seenpo_fumigation_containers" model="ir.actions.act_window">
-        <field name="name">Containers</field>
-        <field name="res_model">freight.catalog.container</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
     <record id="action_seenpo_fumigation_empty" model="ir.actions.client">
         <field name="name">Coming soon</field>
         <field name="tag">display_notification</field>
@@ -540,26 +544,17 @@
               name="Setting"
               parent="menu_seenpo_fumigation_root"
               action="action_seenpo_fumigation_empty"
-              groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"
               sequence="50"/>
 
     <menuitem id="menu_seenpo_fumigation_ports"
           name="Ports"
           parent="menu_seenpo_fumigation_setting"
-          action="action_seenpo_fumigation_ports"
-          sequence="10"
-          groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
-    <menuitem id="menu_seenpo_fumigation_containers"
-          name="Containers"
-          parent="menu_seenpo_fumigation_setting"
-          action="action_seenpo_fumigation_containers"
-          sequence="20"
-          groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"/>
+          action="freight_mgmt.freight_catalog_port_action"
+          sequence="10"/>
     <menuitem id="menu_seenpo_fumigation_report_config"
               name="Report Configuration"
               parent="menu_seenpo_fumigation_setting"
               action="action_seenpo_fumigation_report_config_settings"
-              groups="seenpo_gcc_fumigation.group_seenpo_fumigation_manager"
               sequence="30"/>
 
 </odoo>

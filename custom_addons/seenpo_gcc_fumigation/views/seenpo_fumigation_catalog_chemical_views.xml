@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_seenpo_fumigation_catalog_chemical_search" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.catalog.chemical.search</field>
+        <field name="model">seenpo.fumigation.catalog.chemical</field>
+        <field name="arch" type="xml">
+            <search string="Seenpo Fumigation Catalog Chemical Search">
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active','=',False)]"
+                />
+                <separator />
+                <field name="code" filter_domain="[('code', 'ilike', self)]" />
+                <field name="name" filter_domain="[('name', 'ilike', self)]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="view_seenpo_fumigation_catalog_chemical_form" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.catalog.chemical.form</field>
+        <field name="model">seenpo.fumigation.catalog.chemical</field>
+        <field name="arch" type="xml">
+            <form string="Tags">
+                <header>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <group name="main">
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <notebook>
+                            <page string="Description" name="description">
+                                <field name="description" widget="html" placeholder="Additional details or notes..."/>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_seenpo_fumigation_catalog_chemical_tree" model="ir.ui.view">
+        <field name="name">seenpo.fumigation.catalog.chemical.tree</field>
+        <field name="model">seenpo.fumigation.catalog.chemical</field>
+        <field name="arch" type="xml">
+            <tree string="Chemicals">
+                <field name="code" />
+                <field name="name" />
+                <field name="description" />
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_seenpo_fumigation_catalog_chemical" model="ir.actions.act_window">
+        <field name="name">Chemicals</field>
+        <field name="res_model">seenpo.fumigation.catalog.chemical</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_seenpo_fumigation_catalog_chemical"
+              name="Chemicals"
+              parent="seenpo_gcc_fumigation.menu_seenpo_fumigation_setting"
+              action="action_seenpo_fumigation_catalog_chemical"
+              sequence="20"/>
+</odoo>

@@ -85,7 +85,7 @@ class SeenpoFumigationCertificate(models.Model):
     shipper_email = fields.Char(string="Shipper's Email", tracking=True)
     shipper_address = fields.Char(string="Shipper's Address", tracking=True)
     shipper_phone = fields.Char(string="Shipper's Phone", tracking=True)
-    is_shipper_name_printing = fields.Boolean(default=True)
+    is_shipper_name_printing = fields.Boolean(default=True, help="Check to include this field in the PDF report.")
     is_shipper_address_printing = fields.Boolean(default=True)
     is_shipper_phone_printing = fields.Boolean(default=True)
 
@@ -142,23 +142,37 @@ class SeenpoFumigationCertificate(models.Model):
         ('MB', 'METHYL BROMIDE (CH₃Br)'),
         ('AC5', 'ACTELLIC 50EC'),
         ('AP', 'ALUMINUM PHOSPHIDE AT 56%')
-    ], string='Chemical', default='MB', required=True, tracking=True)
+    ], string='Chemical', default='MB', required=True, tracking=True)   # TODO: Deprecated
+    chemical_id = fields.Many2one(
+        'seenpo.fumigation.catalog.chemical',
+        string='Chemical',
+        compute='_compute_chemical_id',
+        store=True,
+        readonly=False,  # Allows users to manually set or edit values
+        tracking=True,
+        ondelete='restrict'
+    )
 
-    chemical = fields.Char(string='Chemical', default="METHYL BROMIDE (CH₃Br)", readonly=True)
+    chemical = fields.Char(string='Chemical', default="METHYL BROMIDE (CH₃Br)", readonly=True)  # TODO: Deprecated
     fumigation_place = fields.Char(string='Fumigation Place', tracking=True)
     fumigation_date = fields.Date(string='Date of fumigation', default=date.today(), tracking=True)
     defumigation_date = fields.Date(string='Date of defumigation', tracking=True)
-    dosage = fields.Char(string='Dosage', tracking=True)            # TODO: Deprecated
+    dosage = fields.Char(string='Dosage Custom Text', tracking=True,
+                         help="Enter a custom dosage text here to override the standard selection. If left blank, the system will default to the value selected in the dropdown list.")
     dosage_number = fields.Integer(string="Dosage", tracking=True)
     dosage_uom_id = fields.Many2one('uom.uom', string='Dosage UoM', ondelete="restrict",
                                     default=_default_dosage_uom, tracking=True)
-    exposure_time = fields.Char(string='Exposure Time', tracking=True)      # TODO: Deprecated
+
+    exposure_time = fields.Char(string='Exposure Time Custom Text', tracking=True,
+                                help="Enter a custom text of exposure time here to override the standard selection. If left blank, the system will default to the value selected in the dropdown list.")
     exposure_time_hour = fields.Integer(string="Exposure Time", tracking=True)
     exposure_time_hour_uom_id = fields.Many2one('uom.uom', string='Exposure Time UoM', ondelete="restrict",
                                                 default=_default_exposure_time_hour_uom, tracking=True)
     exposure_time_degree = fields.Integer(string="At Degree", tracking=True)
     exposure_time_degree_uom_id = fields.Many2one('uom.uom', string='At Degree UoM', ondelete="restrict",
                                                   default=_default_exposure_time_degree_uom, tracking=True)
+    exposure_time_degree_text = fields.Char(string='Exposure Degree Custom Text', tracking=True,
+                                help="Enter a custom text of exposure degree here to override the standard selection. If left blank, the system will default to the value selected in the dropdown list.")
     signer = fields.Char(string='Signer', default="TRIEU CHAT HAN", readonly=True)
 
     is_chemical_list_printing = fields.Boolean(default=True, readonly=True)
@@ -285,6 +299,16 @@ class SeenpoFumigationCertificate(models.Model):
                     if len(record.cargo_name) > 50 else record.cargo_name
             else:
                 record.cargo_name_short = ''
+
+    @api.depends('chemical_list')
+    def _compute_chemical_id(self):
+        """Map existing selection values to new Many2one records."""
+        chemicals = self.env['seenpo.fumigation.catalog.chemical'].search([])
+        chemical_map = {chem.code: chem.id for chem in chemicals}
+
+        for record in self:
+            if not record.chemical_id and record.chemical_list:
+                record.chemical_id = chemical_map.get(record.chemical_list)
 
     @api.onchange('branch_id')
     def _onchange_branch_id_update_name(self):
