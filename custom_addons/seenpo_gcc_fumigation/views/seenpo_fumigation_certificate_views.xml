@@ -265,7 +265,7 @@
                                         <!-- Conditional Labels targeting the same field -->
                                         <label for="bl_number" string="Bill of lading" class="font-weight-bold m-0"
                                                attrs="{'invisible': [('transport_type', '!=', 'sea')]}"/>
-                                        <label for="bl_number" string="House Airway Bill" class="font-weight-bold m-0"
+                                        <label for="bl_number" string="Air waybill" class="font-weight-bold m-0"
                                                attrs="{'invisible': [('transport_type', '!=', 'air')]}"/>
                                     </div>
                                     <field name="bl_number" placeholder="SNLFHMCL011555" nolabel="1" colspan="7"
@@ -283,8 +283,12 @@
                                         <field name="is_shipment_date_printing" class="mr-2"/>
                                         <label for="shipment_date" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="shipment_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                    <field name="shipment_date" widget="date" placeholder="Choose a date" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_shipment_date_printing', '=', True)], 'invisible': [('transport_type', 'in', ['road','pallet'])]}"/>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="shipment_date_text" placeholder="Custom text for date of shipment" nolabel="1" class="oe_inline"/>
+                                    </div>
 
                                     <separator colspan="10" />
 
@@ -361,7 +365,7 @@
                                         <field name="is_chemical_list_printing" class="mr-2"/>
                                         <label for="chemical_id" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="chemical_id" nolabel="1" colspan="7"/>
+                                    <field name="chemical_id" nolabel="1" colspan="7" class="padding-right-20"/>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_fumigation_place_printing" class="mr-2"/>
@@ -374,21 +378,29 @@
                                         <field name="is_fumigation_date_printing" class="mr-2"/>
                                         <label for="fumigation_date" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="fumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                    <field name="fumigation_date" widget="date" placeholder="Choose a date" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_fumigation_date_printing', '=', True)]}"/>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="fumigation_date_text" placeholder="Custom text for date of fumigation" nolabel="1" class="oe_inline"/>
+                                    </div>
 
                                     <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
                                         <field name="is_defumigation_date_printing" class="mr-2"/>
                                         <label for="defumigation_date" class="font-weight-bold m-0"/>
                                     </div>
-                                    <field name="defumigation_date" widget="date" placeholder="dd/mm/yyyy" nolabel="1" colspan="7"
+                                    <field name="defumigation_date" widget="date" placeholder="Choose a date" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_defumigation_date_printing', '=', True)]}"/>
-
-                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">
-                                        <field name="is_signer_printing" class="mr-2"/>
-                                        <label for="signer" class="font-weight-bold m-0"/>
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
+                                    <div class="o_row" colspan="7">
+                                        <field name="defumigation_date_text" placeholder="Custom text for date of defumigation" nolabel="1" class="oe_inline"/>
                                     </div>
-                                    <field name="signer" nolabel="1" colspan="7"/>
+
+<!--                                    <div class="d-flex align-items-center mb-1 min-width-150" colspan="3">-->
+<!--                                        <field name="is_signer_printing" class="mr-2"/>-->
+<!--                                        <label for="signer" class="font-weight-bold m-0"/>-->
+<!--                                    </div>-->
+<!--                                    <field name="signer" nolabel="1" colspan="7"/>-->
 
                                 </group>
 
@@ -466,8 +478,14 @@
                         <!-- 5. Other -->
                         <page string="Other">
                             <group>
-                                <field name="is_fumigation_results_printing"/>
-                                <field name="is_ispm15_printing"/>
+                                <group>
+                                    <field name="is_fumigation_results_printing"/>
+                                    <field name="is_ispm15_printing"/>
+                                </group>
+                                <group>
+                                    <field name="issued_address"/>
+                                    <field name="signer"/>
+                                </group>
                                 <field name="note" placeholder="Internal notes..."/>
                             </group>
                         </page>

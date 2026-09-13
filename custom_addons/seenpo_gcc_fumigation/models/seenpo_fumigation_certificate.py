@@ -120,6 +120,8 @@ class SeenpoFumigationCertificate(models.Model):
     port_discharge = fields.Char(string='Port of discharge', tracking=True)
     delivery_place = fields.Char(string='Place of delivery', tracking=True)
     shipment_date = fields.Date(string='Date of shipment', tracking=True)
+    shipment_date_text = fields.Char(string='Custom text for shipment date', tracking=True,
+                                     help="Enter a custom text of shipment date here to override the standard date selection. If left blank, the system will default to the value selected in the calendar above.")
     container_no = fields.Char(string='Container / Seal No.', tracking=True)
 
     container_line = fields.One2many('seenpo.fumigation.certificate.container', 'certificate_id',
@@ -156,7 +158,11 @@ class SeenpoFumigationCertificate(models.Model):
     chemical = fields.Char(string='Chemical', default="METHYL BROMIDE (CH₃Br)", readonly=True)  # TODO: Deprecated
     fumigation_place = fields.Char(string='Fumigation Place', tracking=True)
     fumigation_date = fields.Date(string='Date of fumigation', default=date.today(), tracking=True)
+    fumigation_date_text = fields.Char(string='Custom text for fumigation date', tracking=True,
+                                       help="Enter a custom text of fumigation date here to override the standard date selection. If left blank, the system will default to the value selected in the calendar above.")
     defumigation_date = fields.Date(string='Date of defumigation', tracking=True)
+    defumigation_date_text = fields.Char(string='Custom text for defumigation date', tracking=True,
+                                         help="Enter a custom text of defumigation date here to override the standard date selection. If left blank, the system will default to the value selected in the calendar above.")
     dosage = fields.Char(string='Dosage Custom Text', tracking=True,
                          help="Enter a custom dosage text here to override the standard selection. If left blank, the system will default to the value selected in the dropdown list.")
     dosage_number = fields.Integer(string="Dosage", tracking=True)
@@ -188,6 +194,7 @@ class SeenpoFumigationCertificate(models.Model):
     is_signer_printing = fields.Boolean(default=True, readonly=True)
 
     # Other
+    issued_address = fields.Char(string='Issued Address', default="Ho Chi Minh City", tracking=True)
     note = fields.Text(string='Internal Notes', tracking=True)
     image_attachment = fields.Binary(
         string="Image",
@@ -317,6 +324,27 @@ class SeenpoFumigationCertificate(models.Model):
             # Chỉ tự động đổi đuôi nếu chứng thư ĐÃ ĐƯỢC sinh số (khác draft/#)
             if rec.name and rec.name != '#':
                 rec.name = self._get_updated_sequence_name(rec.name, rec.branch_id)
+
+    @api.onchange('shipment_date')
+    def _onchange_shipment_date_update_text(self):
+        """Change value in the custom text for shipment date when the value selected in calendar changed"""
+        for rec in self:
+            if rec.shipment_date:
+                rec.shipment_date_text = rec.shipment_date.strftime('%B %d, %Y')
+
+    @api.onchange('fumigation_date')
+    def _onchange_fumigation_date_update_text(self):
+        """Change value in the custom text for fumigation date when the value selected in calendar changed"""
+        for rec in self:
+            if rec.fumigation_date:
+                rec.fumigation_date_text = rec.fumigation_date.strftime('%B %d, %Y')
+
+    @api.onchange('defumigation_date')
+    def _onchange_defumigation_date_update_text(self):
+        """Change value in the custom text for defumigation date when the value selected in calendar changed"""
+        for rec in self:
+            if rec.defumigation_date:
+                rec.defumigation_date_text = rec.defumigation_date.strftime('%B %d, %Y')
 
     @api.onchange("shipper_id")
     def _onchange_shipper_id(self):

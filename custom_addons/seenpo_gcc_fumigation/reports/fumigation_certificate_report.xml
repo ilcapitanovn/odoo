@@ -291,7 +291,7 @@
                                     Bill of lading:
                                 </t>
                                 <t t-if="doc.transport_type == 'air'">
-                                    House airway bill:
+                                    Air waybill:
                                 </t>
                             </td>
                             <td class="content-value" style="padding:2px 0;" t-esc="doc.bl_number"/>
@@ -312,7 +312,12 @@
                                     Airport of departure:
                                 </t>
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_loading_id or ''"/>
+                            <t t-if="doc.port_loading_id">
+                              <td class="content-value" style="padding:2px 0;" t-esc="doc.port_loading_id.name or ''"/>
+                            </t>
+                            <t t-else="">
+                              <td class="content-value" style="padding:2px 0;" t-esc="''"/>
+                            </t>
                         </tr>
                         </t>
 
@@ -330,7 +335,12 @@
                                     Airport of destination:
                                 </t>
                             </td>
-                            <td class="content-value" style="padding:2px 0;" t-esc="doc.port_discharge_id or ''"/>
+                            <t t-if="doc.port_discharge_id">
+                              <td class="content-value" style="padding:2px 0;" t-esc="doc.port_discharge_id.name or ''"/>
+                            </t>
+                            <t t-else="">
+                              <td class="content-value" style="padding:2px 0;" t-esc="''"/>
+                            </t>
                         </tr>
                         </t>
 
@@ -349,8 +359,13 @@
                                 <span style="color:red;">▪</span> Date of shipment:
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <t t-if="doc.shipment_date">
-                                  <span class="issue-date" t-esc="doc.shipment_date.strftime('%B %d, %Y')"/>
+                                <t t-if="doc.shipment_date_text">
+                                    <span class="issue-date" t-esc="doc.shipment_date_text"/>
+                                </t>
+                                <t t-else="">
+                                    <t t-if="doc.shipment_date">
+                                      <span class="issue-date" t-esc="doc.shipment_date.strftime('%B %d, %Y')"/>
+                                    </t>
                                 </t>
                             </td>
                         </tr>
@@ -362,8 +377,13 @@
                                 <span style="color:red;">▪</span> Date of fumigation:
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <t t-if="doc.fumigation_date">
-                                  <span class="issue-date" t-esc="doc.fumigation_date.strftime('%B %d, %Y')"/>
+                                <t t-if="doc.fumigation_date_text">
+                                    <span class="issue-date" t-esc="doc.fumigation_date_text"/>
+                                </t>
+                                <t t-else="">
+                                    <t t-if="doc.fumigation_date">
+                                      <span class="issue-date" t-esc="doc.fumigation_date.strftime('%B %d, %Y')"/>
+                                    </t>
                                 </t>
                             </td>
                         </tr>
@@ -375,8 +395,13 @@
                                 <span style="color:red;">▪</span> Date of defumigation:
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <t t-if="doc.defumigation_date">
-                                  <span class="issue-date" t-esc="doc.defumigation_date.strftime('%B %d, %Y')"/>
+                                <t t-if="doc.defumigation_date_text">
+                                    <span class="issue-date" t-esc="doc.defumigation_date_text"/>
+                                </t>
+                                <t t-else="">
+                                    <t t-if="doc.defumigation_date">
+                                      <span class="issue-date" t-esc="doc.defumigation_date.strftime('%B %d, %Y')"/>
+                                    </t>
                                 </t>
                             </td>
                         </tr>
@@ -388,7 +413,12 @@
                                 <span style="color:red;">▪</span> Fumigant used:
                             </td>
                             <td class="content-value" style="padding:2px 0;">
-                                <span t-field="doc.chemical_list"/>
+                                <t t-if="doc.chemical_id">
+                                  <t t-esc="doc.chemical_id.name or ''"/>
+                                </t>
+                                <t t-else="">
+                                  <t t-esc="''"/>
+                                </t>
                             </td>
                         </tr>
                         </t>
@@ -482,13 +512,21 @@
                                 <td style="color:#1f5c3d; padding:2px 0;">
                                     <span style="color:red;">▪</span> Container No./ Seal No.:
                                 </td>
+
+                                <t t-set="container_seal_no" t-value="''"/>
                                 <t t-if="container_count > 1">
-                                    <td class="content-value" style="padding:2px 0;">
-                                        <i>See attached list below</i>
-                                    </td>
+                                    <t t-set="container_seal_no" t-value="'AS PER B/L NO.: '"/>
+                                    <t t-set="container_seal_no" t-value="container_seal_no + (doc.bl_number or '') + ' DATED: '"/>
+                                    <t t-if="doc.shipment_date_text">
+                                      <t t-set="container_seal_no" t-value="container_seal_no + doc.shipment_date_text"/>
+                                    </t>
+                                    <t t-else="">
+                                      <t t-if="doc.shipment_date">
+                                          <t t-set="container_seal_no" t-value="container_seal_no + doc.shipment_date.strftime('%B %d, %Y')"/>
+                                      </t>
+                                    </t>
                                 </t>
                                 <t t-if="container_count == 1">
-                                    <t t-set="container_seal_no" t-value="''"/>
                                     <t t-set="line" t-value="doc.container_line[0]"/>
                                     <t t-if="line.container_no or line.seal_no">
                                         <t t-if="line.container_no">
@@ -499,11 +537,11 @@
                                             <t t-set="container_seal_no" t-value="container_seal_no + line.seal_no"/>
                                         </t>
                                     </t>
-
-                                    <td class="content-value" style="padding:2px 0;">
-                                        <span t-raw="container_seal_no"/>
-                                    </td>
                                 </t>
+
+                                <td class="content-value" style="padding:2px 0;">
+                                    <span t-raw="container_seal_no"/>
+                                </td>
                             </tr>
                         </t>
 
@@ -546,12 +584,7 @@
                         </t>
                         <div t-attf-style="float:right; width:400px; text-align:center; font-size:#{signature_font_size} !important;">
                             <div style="font-style:italic;">
-                                <t t-if="doc.branch_id and doc.branch_id.code == 'LS'">
-                                    Lang Son province, Date:
-                                </t>
-                                <t t-else="">
-                                    Ho Chi Minh City, Date:
-                                </t>
+                                <t t-esc="(doc.issued_address or '') + ', Date:'"/>
                                 <span style="text-transform:uppercase;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
                             </div>
                             <div style="margin-top:4px;">
@@ -568,20 +601,18 @@
 <!--                                <div style="height:100px;"/>-->
 <!--                            </t>-->
                             <!-- Tạo một thẻ mỏ neo trống ở vị trí cuối trang để chèn chữ ký -->
-                            <div id="signature_section_anchor" style="height:100px;"></div>
+                            <div id="signature_section_anchor" style="height:100px;"/>
 <!--                            <div style="height:100px;">-->
 <!--                                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp.png"-->
 <!--                                     style="position:absolute; bottom:20px; right:150px; width:230px;"/>-->
 <!--                            </div>-->
 
-                            <t t-if="not (doc.branch_id and doc.branch_id.code == 'LS')">
                             <div style="width:300px; text-align:center; padding-left:100px;">
                               <hr style="border: none; border-top: 1px solid black; margin-bottom: 5px;"/>
                             </div>
                             <span style="padding-top:4px; text-align:center; font-weight:bold;">
                                 <t t-esc="doc.signer"/>
                             </span>
-                            </t>
                         </div>
                     </div>
                 </div>
@@ -596,30 +627,30 @@
             </div>
 
 <!--            </t>-->
-                <t t-if="container_count > 1">
-                    <div class="page" style="padding: 40px; font-size: 18px; page-break-before:always;">
-                        <h5 style="margin-bottom:20px;">
-                            Attached list <t t-esc="doc.name"/> Original <br/><br/>
-                            B/L NO: <t t-esc="doc.bl_number"/>
-                        </h5>
+<!--                <t t-if="container_count > 1">-->
+<!--                    <div class="page" style="padding: 40px; font-size: 18px; page-break-before:always;">-->
+<!--                        <h5 style="margin-bottom:20px;">-->
+<!--                            Attached list <t t-esc="doc.name"/> Original <br/><br/>-->
+<!--                            B/L NO: <t t-esc="doc.bl_number"/>-->
+<!--                        </h5>-->
 
-                        <table style="width:100%; border-collapse:collapse; font-size: 18px;">
-                            <tr style="font-weight:bold; border-bottom:1px solid #ccc;">
-                                <td width="15%">Sequence</td>
-                                <td>Container / Seal No.</td>
-                            </tr>
+<!--                        <table style="width:100%; border-collapse:collapse; font-size: 18px;">-->
+<!--                            <tr style="font-weight:bold; border-bottom:1px solid #ccc;">-->
+<!--                                <td width="15%">Sequence</td>-->
+<!--                                <td>Container / Seal No.</td>-->
+<!--                            </tr>-->
 
-                            <t t-set="sequence" t-value="0"/>
-                            <t t-foreach="doc.container_line" t-as="row">
-                                <t t-set="sequence" t-value="sequence + 1"/>
-                                <tr>
-                                    <td><t t-esc="sequence"/></td>
-                                    <td><t t-esc="row.container_no"/> / <t t-esc="row.seal_no"/></td>
-                                </tr>
-                            </t>
-                        </table>
-                    </div>
-                </t>
+<!--                            <t t-set="sequence" t-value="0"/>-->
+<!--                            <t t-foreach="doc.container_line" t-as="row">-->
+<!--                                <t t-set="sequence" t-value="sequence + 1"/>-->
+<!--                                <tr>-->
+<!--                                    <td><t t-esc="sequence"/></td>-->
+<!--                                    <td><t t-esc="row.container_no"/> / <t t-esc="row.seal_no"/></td>-->
+<!--                                </tr>-->
+<!--                            </t>-->
+<!--                        </table>-->
+<!--                    </div>-->
+<!--                </t>-->
             </t>
 <!--        </t>-->
         </t>
