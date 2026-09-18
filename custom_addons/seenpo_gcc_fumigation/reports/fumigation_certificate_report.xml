@@ -41,6 +41,15 @@
             <div class="page" style="font-size:18px; color:#000; position:relative; padding: 10px 40px; height: 345mm !important;">
                 <link rel="stylesheet" href="/seenpo_gcc_fumigation/static/src/css/fumigation_certificate_report.css"/>
 
+                <!-- ABSOLUTE OVERLAY BANNER FOR CANCELLED STATE -->
+                <t t-if="doc.state == 'cancelled'">
+                    <div style="position: absolute; top: 20px; left: 0; right: 0; border-radius: 4px; width: 100%; z-index: 100; pointer-events: none; background-color: rgba(248, 215, 218, 0.95); border-top: 1px solid #f5c6cb; border-bottom: 1px solid #f5c6cb; padding: 8px 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
+                        <span style="color: #AA0000; font-weight: bold; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;">
+                            THIS FUMIGATION CERTIFICATE WAS CANCELLED
+                        </span>
+                    </div>
+                </t>
+
                 <!-- WATERMARK + diagonal crosshatch background.
                      Built with SVG rather than CSS `background-image` /
                      `transform`: tested directly against wkhtmltopdf 0.12.x,
@@ -116,7 +125,7 @@
                         </text>
                     </t>
                     <t t-if="doc.state == 'cancelled'">
-                        <text x="420" y="620" font-family="Times New Roman" font-size="150" font-weight="bold" fill="rgba(220, 235, 226, 0.3)" text-anchor="middle" transform="rotate(-30 420 620)">
+                        <text x="420" y="620" font-family="Times New Roman" font-size="150" font-weight="bold" fill="rgba(220, 53, 69, 0.35)" text-anchor="middle" transform="rotate(-30 420 620)">
                             CANCELLED
                         </text>
                     </t>
@@ -585,7 +594,22 @@
                         <div t-attf-style="float:right; width:400px; text-align:center; font-size:#{signature_font_size} !important;">
                             <div style="font-style:italic;">
                                 <t t-esc="(doc.issued_address or '') + ', Date:'"/>
-                                <span style="text-transform:uppercase;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
+                                <t t-if="doc.transport_type in ['sea','air'] or doc.issued_date">
+                                    <t t-if="doc.issued_date">
+                                      <span style="text-transform:uppercase;" t-esc="doc.issued_date.strftime('%B %d, %Y')"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-if="doc.shipment_date">
+                                            <span style="text-transform:uppercase;" t-esc="doc.shipment_date.strftime('%B %d, %Y')"/>
+                                        </t>
+                                        <t t-else="">   <!-- For any cert without shipment date, use current date -->
+                                            <span style="text-transform:uppercase;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-else="">       <!-- Other transport types, use current date -->
+                                    <span style="text-transform:uppercase;" t-esc="context_timestamp(datetime.datetime.now()).strftime('%B %d, %Y')"/>
+                                </t>
                             </div>
                             <div style="margin-top:4px;">
                                 Manager of Fumigation Dept.

@@ -20,6 +20,7 @@
             <search>
                 <field name="name" />
                 <field name="customer_id" />
+                <field name="province_id" />
                 <separator />
                 <filter string="Draft" name="draft_cert" domain="[('state', '=', 'draft')]"/>
                 <filter string="Pending" name="submitted_cert" domain="[('state', '=', 'submitted')]"/>
@@ -58,6 +59,13 @@
                         name="group_consignee"
                         domain="[]"
                         context="{'group_by':'consignee_id'}"
+                    />
+                    <separator />
+                    <filter
+                        string="Province/City"
+                        name="group_city"
+                        domain="[]"
+                        context="{'group_by':'province_id'}"
                     />
                 </group>
             </search>
@@ -174,7 +182,10 @@
                         </group>
                         <group>
                             <field name="transport_type" widget="radio"/>
-                            <field name="branch_id" placeholder="Choose branch"/>
+<!--                            <field name="branch_id" placeholder="Choose branch"/>-->
+                            <field name="province_id" placeholder="Choose a province or city"
+                                   context="{'order_by_fumigation_first': True}"
+                                   domain="[('country_id.code', '=', 'VN')]"/>
                         </group>
                     </group>
 
@@ -285,8 +296,9 @@
                                     </div>
                                     <field name="shipment_date" widget="date" placeholder="Choose a date" nolabel="1" colspan="7"
                                            attrs="{'required': [('is_shipment_date_printing', '=', True)], 'invisible': [('transport_type', 'in', ['road','pallet'])]}"/>
-                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"/>
-                                    <div class="o_row" colspan="7">
+                                    <div class="d-flex align-items-center mb-1 min-width-150 align-left" colspan="3"
+                                         attrs="{'invisible': [('transport_type', 'in', ['road','pallet'])]}"/>
+                                    <div class="o_row" colspan="7" attrs="{'invisible': [('transport_type', 'in', ['road','pallet'])]}">
                                         <field name="shipment_date_text" placeholder="Custom text for date of shipment" nolabel="1" class="oe_inline"/>
                                     </div>
 
@@ -484,6 +496,7 @@
                                 </group>
                                 <group>
                                     <field name="issued_address"/>
+                                    <field name="issued_date"/>
                                     <field name="signer"/>
                                 </group>
                                 <field name="note" placeholder="Internal notes..."/>

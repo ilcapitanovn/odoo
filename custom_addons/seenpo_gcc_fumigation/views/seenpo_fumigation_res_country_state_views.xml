@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_seenpo_fumigation_country_state_search_inherit" model="ir.ui.view">
+        <field name="name">view.seenpo.fumigation.country.state.search.inherit</field>
+        <field name="model">res.country.state</field>
+        <field name="inherit_id" ref="base.view_country_state_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter string="Active for Fumigation"
+                        name="filter_active_fumigation"
+                        domain="[('active_for_fumigation', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_seenpo_fumigation_country_state_form_inherit" model="ir.ui.view">
+        <field name="name">view.seenpo.fumigation.country.state.form.inherit</field>
+        <field name="model">res.country.state</field>
+        <field name="inherit_id" ref="base.view_country_state_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group string="Fumigation Details">
+                    <field name="fumi_cert_suffix"/>
+                    <field name="printing_name"/>
+                    <field name="active_for_fumigation" widget="boolean_toggle"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_seenpo_fumigation_country_state_tree_inherit" model="ir.ui.view">
+        <field name="name">view.seenpo.fumigation.country.state.tree.inherit</field>
+        <field name="model">res.country.state</field>
+        <field name="inherit_id" ref="base.view_country_state_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='country_id']" position="after">
+                <field name="fumi_cert_suffix"/>
+                <field name="printing_name"/>
+                <field name="active_for_fumigation" widget="boolean_toggle"/>
+            </xpath>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="default_order">active_for_fumigation desc</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

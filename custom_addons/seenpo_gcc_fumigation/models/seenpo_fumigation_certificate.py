@@ -5,6 +5,7 @@ from odoo import _, api, fields, models
 from datetime import date
 from odoo.exceptions import UserError, ValidationError
 import uuid
+import re
 
 
 class SeenpoFumigationCertificate(models.Model):
@@ -37,6 +38,10 @@ class SeenpoFumigationCertificate(models.Model):
         exposure_degree_uom = self.env['uom.uom'].search([('name', '=', '°C')], limit=1)
         return exposure_degree_uom.id if exposure_degree_uom else False
 
+    @api.model
+    def _default_issued_address(self):
+        return 'Ho Chi Minh City'
+
     name = fields.Char(
         string='Certificate Number',
         required=True,
@@ -68,6 +73,8 @@ class SeenpoFumigationCertificate(models.Model):
     branch_id = fields.Many2one("res.branch", string='Branch', tracking=True, store=True,
                                 domain=[('name', 'not ilike', 'Trading')],
                                 default=_default_branch_id)
+    province_id = fields.Many2one('res.country.state', string='Province/City', tracking=True,
+                                  domain="[('country_id.code', '=', 'VN')]")
 
     transport_type = fields.Selection([
         ('sea', 'Sea'),
@@ -190,11 +197,12 @@ class SeenpoFumigationCertificate(models.Model):
     is_exposure_time_printing = fields.Boolean(default=True)
     is_exposure_degree_printing = fields.Boolean(default=True)
     is_ispm15_printing = fields.Boolean(default=True, string="Show ISPM15")
-    is_fumigation_results_printing = fields.Boolean(default=True, string="Show Fumigation Results")
+    is_fumigation_results_printing = fields.Boolean(default=True, string="Show Fumi Results")
     is_signer_printing = fields.Boolean(default=True, readonly=True)
 
     # Other
-    issued_address = fields.Char(string='Issued Address', default="Ho Chi Minh City", tracking=True)
+    issued_address = fields.Char(string='Issued City', default=_default_issued_address, tracking=True)
+    issued_date = fields.Date(string='Issued Date', tracking=True)
     note = fields.Text(string='Internal Notes', tracking=True)
     image_attachment = fields.Binary(
         string="Image",
@@ -236,11 +244,14 @@ class SeenpoFumigationCertificate(models.Model):
             if rec.state == 'draft' or rec.state == 'submitted':
                 # Sinh số chứng thư
                 seq_name = self.env['ir.sequence'].next_by_code('seenpo.fumigation.certificate.sequence') or '#'
-                if rec.branch_id:
-                    if rec.branch_id.code == 'LS' and seq_name.endswith('/FUM'):
-                        seq_name = seq_name.replace('/FUM', '/FUM-LS')
-                    elif seq_name.endswith('/FUM-LS'):
-                        seq_name = seq_name.replace('/FUM-LS', '/FUM')
+                # if rec.branch_id:
+                #     if rec.branch_id.code == 'LS' and seq_name.endswith('/FUM'):
+                #         seq_name = seq_name.replace('/FUM', '/FUM-LS')
+                #     elif seq_name.endswith('/FUM-LS'):
+                #         seq_name = seq_name.replace('/FUM-LS', '/FUM')
+                if rec.province_id:
+                    suffix = rec.province_id.fumi_cert_suffix or ''
+                    seq_name = self._get_updated_sequence_name_v2(seq_name, suffix)
                 rec.name = seq_name
 
                 # Sinh mã QR
@@ -291,6 +302,28 @@ class SeenpoFumigationCertificate(models.Model):
         # Ghép phần số gốc với đuôi mới
         return f"{base_name}{target_suffix}"
 
+    @staticmethod
+    def _get_updated_sequence_name_v2(current_name, suffix):
+        """Hàm phụ trợ để hoán đổi đuôi mã dựa trên chi nhánh"""
+        if not current_name or current_name == '#':
+            return current_name
+
+        # Xác định đuôi cần hiển thị dựa trên chi nhánh mới
+        # Nếu là Lạng Sơn thì dùng đuôi /FUM-LS, ngược lại thì dùng mặc định /FUM
+        target_suffix = '/FUM'
+        if suffix:
+            target_suffix = target_suffix + '-' + suffix
+
+        # Cắt bỏ phần đuôi cũ (bất kể đang là /FUM hay /FUM-LS hay /FUM-ABCXYZ) để lấy phần số gốc
+        # base_name = re.sub(r'/FUM.*$', '', current_name)
+        if '/FUM' in current_name:
+            base_name = current_name.split('/FUM')[0]
+        else:
+            base_name = current_name
+
+        # Ghép phần số gốc với đuôi mới
+        return f"{base_name}{target_suffix}"
+
     @api.constrains('fumigation_date', 'shipment_date')
     def _check_fumigation_before_shipment(self):
         for rec in self:
@@ -317,7 +350,7 @@ class SeenpoFumigationCertificate(models.Model):
             if not record.chemical_id and record.chemical_list:
                 record.chemical_id = chemical_map.get(record.chemical_list)
 
-    @api.onchange('branch_id')
+    @api.onchange('branch_id')      # TODO: Deprecated
     def _onchange_branch_id_update_name(self):
         """Thay đổi đuôi mã NGAY LẬP TỨC trên giao diện khi user đổi chi nhánh"""
         for rec in self:
@@ -325,12 +358,30 @@ class SeenpoFumigationCertificate(models.Model):
             if rec.name and rec.name != '#':
                 rec.name = self._get_updated_sequence_name(rec.name, rec.branch_id)
 
+    @api.onchange('province_id')
+    def _onchange_province_id_update_name(self):
+        """Thay đổi đuôi mã NGAY LẬP TỨC trên giao diện khi user đổi tinh thanh"""
+        for rec in self:
+            # Chỉ tự động đổi đuôi nếu chứng thư ĐÃ ĐƯỢC sinh số (khác draft/#)
+            if rec.name and rec.name != '#':
+                suffix = rec.province_id.fumi_cert_suffix or '' if rec.province_id else ''
+                rec.name = self._get_updated_sequence_name_v2(rec.name, suffix)
+
+            if rec.province_id:
+                if rec.province_id.printing_name:
+                    rec.issued_address = rec.province_id.printing_name
+                else:
+                    rec.issued_address = rec.province_id.name
+            else:
+                rec.issued_address = self._default_issued_address()
+
     @api.onchange('shipment_date')
     def _onchange_shipment_date_update_text(self):
         """Change value in the custom text for shipment date when the value selected in calendar changed"""
         for rec in self:
             if rec.shipment_date:
                 rec.shipment_date_text = rec.shipment_date.strftime('%B %d, %Y')
+                rec.issued_date = rec.shipment_date
 
     @api.onchange('fumigation_date')
     def _onchange_fumigation_date_update_text(self):
@@ -552,12 +603,13 @@ class SeenpoFumigationCertificate(models.Model):
         """Đảm bảo dữ liệu được cập nhật chính xác vào Database khi bấm Save"""
         res = super(SeenpoFumigationCertificate, self).write(vals)
 
-        # Nếu user thay đổi trường branch_id, ta kiểm tra và cập nhật lại name
-        if 'branch_id' in vals:
+        # Nếu user thay đổi trường province_id, ta kiểm tra và cập nhật lại name
+        if 'province_id' in vals:
             for rec in self:
                 if rec.name and rec.name != '#':
-                    # Lấy đối tượng branch mới sau khi ghi dữ liệu
-                    new_name = rec._get_updated_sequence_name(rec.name, rec.branch_id)
+                    # new_name = rec._get_updated_sequence_name(rec.name, rec.branch_id)
+                    suffix = rec.province_id.fumi_cert_suffix or '' if rec.province_id else ''
+                    new_name = self._get_updated_sequence_name_v2(rec.name, suffix)
                     # Sử dụng super().write để tránh lặp hàm vô hạn (infinite loop)
                     super(SeenpoFumigationCertificate, rec).write({'name': new_name})
         return res

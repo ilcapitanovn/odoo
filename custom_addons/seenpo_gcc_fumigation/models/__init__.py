@@ -1,3 +1,4 @@
+from . import res_country_state
 from . import seenpo_fumigation_catalog_chemical
 from . import seenpo_fumigation_certificate
 from . import seenpo_fumigation_certificate_container
