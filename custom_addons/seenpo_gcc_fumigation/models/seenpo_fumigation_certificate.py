@@ -24,6 +24,16 @@ class SeenpoFumigationCertificate(models.Model):
         return branch.id if branch else False
 
     @api.model
+    def _default_province_id(self):
+        # Example A: Search by name or code
+        province = self.env['res.country.state'].search([
+            ('country_id.code', '=', 'VN'),
+            ('code', '=', 'VN-HCM')
+        ], limit=1)
+
+        return province.id if province else False
+
+    @api.model
     def _default_dosage_uom(self):
         dosage_uom = self.env['uom.uom'].search([('name', '=', 'g/m³')], limit=1)
         return dosage_uom.id if dosage_uom else False
@@ -74,7 +84,8 @@ class SeenpoFumigationCertificate(models.Model):
                                 domain=[('name', 'not ilike', 'Trading')],
                                 default=_default_branch_id)
     province_id = fields.Many2one('res.country.state', string='Province/City', tracking=True,
-                                  domain="[('country_id.code', '=', 'VN')]")
+                                  domain="[('country_id.code', '=', 'VN')]",
+                                  default=_default_province_id)
 
     transport_type = fields.Selection([
         ('sea', 'Sea'),
