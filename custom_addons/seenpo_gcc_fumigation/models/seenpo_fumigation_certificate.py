@@ -213,7 +213,7 @@ class SeenpoFumigationCertificate(models.Model):
 
     # Other
     issued_address = fields.Char(string='Issued City', default=_default_issued_address, tracking=True)
-    issued_date = fields.Date(string='Issued Date', tracking=True)
+    issued_date = fields.Date(string='Issued Date', tracking=True, default=date.today())
     note = fields.Text(string='Internal Notes', tracking=True)
     image_attachment = fields.Binary(
         string="Image",

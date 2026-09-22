@@ -496,7 +496,7 @@
                                 </group>
                                 <group>
                                     <field name="issued_address"/>
-                                    <field name="issued_date"/>
+                                    <field name="issued_date" attrs="{'required': True}"/>
                                     <field name="signer"/>
                                 </group>
                                 <field name="note" placeholder="Internal notes..."/>
