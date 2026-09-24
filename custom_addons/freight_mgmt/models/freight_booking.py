@@ -160,7 +160,7 @@ class FreightBooking(models.Model):
     active = fields.Boolean(default=True, tracking=True)
 
     _sql_constraints = [('uniq_booking_number', 'unique(number)',
-                         'A booking number already exists with this name. Please choose another one!')]
+                         'This booking number already exists. Please check under the Export or Import menus and choose a different number.')]
 
     def name_get(self):
         res = []

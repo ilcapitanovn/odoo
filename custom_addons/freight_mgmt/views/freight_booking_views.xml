@@ -177,12 +177,13 @@
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
                             attrs="{'invisible': [('billing_count', '=', 0)]}">
-                            <field name="billing_count" widget="statinfo" string="Bills"/>
+                            <field name="billing_count" widget="statinfo" string="Bill of lading"/>
                         </button>
                     </div>
                     <div class="oe_title">
                         <h1 class="oe_title">
-                            <field name="number" attrs="{'readonly' : [('number', '=', '#')]}" />
+                            <field name="number" attrs="{'readonly' : [('number', '=', '#')]}"
+                                   placeholder="e.g. LOG0926-001 or LOGMMYY-XXX"/>
                         </h1>
                     </div>
                     <group name="main">

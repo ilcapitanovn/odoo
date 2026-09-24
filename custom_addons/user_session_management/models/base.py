@@ -23,6 +23,8 @@ import logging
 from ast import literal_eval
 from odoo import api, models
 from odoo.http import request
+from odoo.exceptions import UserError, ValidationError
+import psycopg2
 
 _logger = logging.getLogger(__name__)
 
@@ -156,9 +158,22 @@ class Base(models.AbstractModel):
                                     }
                         self.env['user.session.activity'].create(log_vals)
                         return res
+                except (UserError, ValidationError):
+                    # Normal validation/user errors: no need to clutter logs with stack traces,
+                    # just let Odoo display them to the user.
+                    raise
+                except psycopg2.IntegrityError as e:
+                    # DB constraints (like your _sql_constraints): log if needed, then re-raise
+                    _logger.warning("Database constraint hit in user_session_management.base.write: %s", e)
+                    raise
                 except Exception as e:
-                    # Ignore logging if transaction blocked error occurred
-                    _logger.exception("Error in user_session_management.base.write - Exception: %s" % e)
+                    # Unexpected crashes/bugs: log full traceback with exc_info=True and re-raise
+                    _logger.error(
+                        "Unexpected error in user_session_management.base.write: %s",
+                        e,
+                        exc_info=True
+                    )
+                    raise
         return super().write(vals)
 
     def unlink(self):

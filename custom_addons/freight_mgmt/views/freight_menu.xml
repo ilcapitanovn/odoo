@@ -18,7 +18,7 @@
         <field name="domain" eval="[('branch_id','in',(False, ref('seenpo_multi_branch_base.seenpo_branch_saigon'))),('shipment_type','not in',('fcl-imp','lcl-imp','air-imp'))]"></field>
     </record>
     <record id="freight_billing_action" model="ir.actions.act_window">
-        <field name="name">Export - Bills</field>
+        <field name="name">Export - Bills of lading</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">freight.billing</field>
         <field name="view_mode">tree,kanban,form,pivot</field>
@@ -226,7 +226,7 @@
     />
     <menuitem
         id="freight_executive_bills_menu"
-        name="Bills"
+        name="Bills of lading"
         parent="freight_mgmt_executive_menu"
         action="freight_billing_action"
         sequence="25"

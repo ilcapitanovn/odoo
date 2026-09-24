@@ -10,8 +10,8 @@
                 <field name="user_id" />
                 <field name="name" />
                 <filter
-                    string="My Bills"
-                    name="my_bookings"
+                    string="My Bills of Lading"
+                    name="my_bills_of_lading"
                     domain="[('user_id','=',uid)]"
                 />
                 <separator />
