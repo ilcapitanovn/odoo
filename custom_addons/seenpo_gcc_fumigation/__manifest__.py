@@ -3,7 +3,7 @@
 
 {
     "name": "Fumigation Certificates",
-    "version": "15.0.1.3.4",
+    "version": "15.0.1.3.5",
     "author": "Tuan Huynh, " "Odoo Community Association (OCA)",
     'summary': """ Manage fumigation certificates with QR and bilingual UI.""",
     'description': """

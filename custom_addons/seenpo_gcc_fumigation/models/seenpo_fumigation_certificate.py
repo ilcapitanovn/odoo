@@ -611,6 +611,25 @@ class SeenpoFumigationCertificate(models.Model):
         return super(SeenpoFumigationCertificate, self).create(vals)
 
     def write(self, vals):
+        # 1. MANAGER PERMISSION CHECK FOR APPROVED / CANCELLED STATES
+        for rec in self:
+            if rec.state in ['approved', 'cancelled']:
+                # Allow Odoo system/chatter updates without triggering manager check
+                allowed_system_fields = {
+                    'message_follower_ids',
+                    'message_ids',
+                    'activity_ids',
+                    'website_message_ids'
+                }
+
+                # Check if any non-system field is being modified
+                if any(field not in allowed_system_fields for field in vals.keys()):
+                    # Verify if current user belongs to the Manager group
+                    if not self.env.user.has_group('seenpo_gcc_fumigation.group_seenpo_fumigation_manager'):
+                        raise UserError(_(
+                            "Only a Fumigation Manager is allowed to modify an Approved or Cancelled certificate."
+                        ))
+
         """Đảm bảo dữ liệu được cập nhật chính xác vào Database khi bấm Save"""
         res = super(SeenpoFumigationCertificate, self).write(vals)
 
