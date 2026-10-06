@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Server-rendered KPI banner, injected above the Control Tower kanban
+         board via the banner_route attribute on that kanban view (same core
+         mechanism Odoo itself uses for the Accounting / Sales dashboards).
+         Unlike those, this banner has no close/dismiss button: it is a
+         permanent summary, not a one-time setup panel. -->
+    <template id="freight_credit_dashboard_banner">
+        <div class="o_freight_credit_banner">
+            <style>
+                .o_freight_credit_banner {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    margin: 4px 0 16px 0;
+                }
+                .o_freight_credit_banner .fcb_card {
+                    flex: 1 1 200px;
+                    min-width: 180px;
+                    background: #ffffff;
+                    border: 1px solid #e3e3e3;
+                    border-radius: 2px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+                    overflow: hidden;
+                }
+                .o_freight_credit_banner .fcb_head {
+                    color: #ffffff;
+                    font-weight: 700;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: .02em;
+                    padding: 8px 14px;
+                }
+                .o_freight_credit_banner .fcb_body {
+                    padding: 14px;
+                }
+                .o_freight_credit_banner .fcb_value {
+                    font-size: 26px;
+                    font-weight: 500;
+                    line-height: 1.1;
+                    color: #212529;
+                }
+                .o_freight_credit_banner .fcb_caption {
+                    font-size: 12px;
+                    color: #6c757d;
+                    margin-top: 2px;
+                }
+                .o_freight_credit_banner .fcb_blocked .fcb_head { background: linear-gradient(90deg, #EF4444, #F87171); }
+                .o_freight_credit_banner .fcb_blocked .fcb_value { color: #DC2626; }
+                .o_freight_credit_banner .fcb_pending .fcb_head { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+                .o_freight_credit_banner .fcb_pending .fcb_value { color: #B45309; }
+                .o_freight_credit_banner .fcb_ready .fcb_head { background: linear-gradient(90deg, #10B981, #34D399); }
+                .o_freight_credit_banner .fcb_ready .fcb_value { color: #047857; }
+                .o_freight_credit_banner .fcb_overdue .fcb_head { background: linear-gradient(90deg, #64748B, #94A3B8); }
+            </style>
+            <div class="fcb_card fcb_blocked">
+                <div class="fcb_head">Blocked Shipments</div>
+                <div class="fcb_body">
+                    <div class="fcb_value"><t t-esc="blocked_count"/></div>
+                    <div class="fcb_caption">Overdue debt &#8226; Financial hold</div>
+                </div>
+            </div>
+            <div class="fcb_card fcb_pending">
+                <div class="fcb_head">Pending BOD Approvals</div>
+                <div class="fcb_body">
+                    <div class="fcb_value"><t t-esc="pending_count"/></div>
+                    <div class="fcb_caption">Awaiting decision &#8226; BOD review</div>
+                </div>
+            </div>
+            <div class="fcb_card fcb_ready">
+                <div class="fcb_head">Ready to Release</div>
+                <div class="fcb_body">
+                    <div class="fcb_value"><t t-esc="ready_count"/></div>
+                    <div class="fcb_caption">Cleared for DO &#8226; Paid / approved</div>
+                </div>
+            </div>
+            <div class="fcb_card fcb_overdue">
+                <div class="fcb_head">Overdue Balance</div>
+                <div class="fcb_body">
+                    <div class="fcb_value"><t t-esc="overdue_amount_formatted"/></div>
+                    <div class="fcb_caption">Total outstanding across blocked shipments</div>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>

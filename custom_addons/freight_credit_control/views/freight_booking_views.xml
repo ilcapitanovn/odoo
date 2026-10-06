@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- 1) Inherit the existing Booking form: header buttons + badge -->
+    <!--    + a "Credit & Release" notebook page                      -->
+    <!-- ============================================================ -->
+    <record id="freight_booking_view_form_credit_inherit" model="ir.ui.view">
+        <field name="name">freight.booking.view.form.credit.inherit</field>
+        <field name="model">freight.booking</field>
+        <field name="inherit_id" ref="freight_mgmt.freight_booking_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_over_credit_limit" invisible="1"/>
+                <button name="action_open_credit_release_wizard" type="object" string="Request Approval"
+                        class="btn-warning" data-hotkey="q"
+                        groups="freight_mgmt.group_freight_operation"
+                        attrs="{'invisible': [('credit_hold_state', '!=', 'blocked')]}"/>
+                <button name="action_approve_credit_release" type="object" string="Approve Release"
+                        class="btn-success" data-hotkey="w"
+                        groups="freight_credit_control.group_freight_credit_approver"
+                        attrs="{'invisible': [('credit_hold_state', '!=', 'pending_approval')]}"/>
+                <button name="action_open_credit_reject_wizard" type="object" string="Reject"
+                        class="btn-danger" data-hotkey="e"
+                        groups="freight_credit_control.group_freight_credit_approver"
+                        attrs="{'invisible': [('credit_hold_state', '!=', 'pending_approval')]}"/>
+<!--                <button name="action_print_delivery_order" type="object" string="Print Delivery Order (DO)"-->
+<!--                        class="btn-primary" data-hotkey="r"-->
+<!--                        attrs="{'invisible': ['&amp;', ('is_over_credit_limit', '=', True), ('credit_hold_state', '!=', 'released')]}"/>-->
+<!--                <field name="credit_hold_state" widget="badge"-->
+<!--                       decoration-danger="credit_hold_state == 'blocked'"-->
+<!--                       decoration-warning="credit_hold_state == 'pending_approval'"-->
+<!--                       decoration-success="credit_hold_state == 'released'"-->
+<!--                       attrs="{'invisible': [('credit_hold_state', '=', 'none')]}"/>-->
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Credit &amp; Release" name="credit_release">
+                    <group>
+                        <group string="Customer Credit Exposure">
+                            <field name="partner_due_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="partner_blocking_stage" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="partner_credit_overdue_days"/>
+                            <field name="is_over_credit_limit"/>
+                        </group>
+                        <group string="Hold Status">
+                            <field name="credit_hold_state"/>
+                            <field name="credit_requested_by" attrs="{'invisible': [('credit_requested_by', '=', False)]}"/>
+                            <field name="credit_requested_date" attrs="{'invisible': [('credit_requested_date', '=', False)]}"/>
+                            <field name="credit_approved_by" attrs="{'invisible': [('credit_approved_by', '=', False)]}"/>
+                            <field name="credit_approved_date" attrs="{'invisible': [('credit_approved_date', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="credit_release_note" attrs="{'invisible': [('credit_release_note', '=', False)]}"/>
+                        <field name="credit_reject_reason" attrs="{'invisible': [('credit_reject_reason', '=', False)]}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 2) Control Tower Kanban board: Blocked / Pending / Released  -->
+    <!-- ============================================================ -->
+    <record id="view_freight_booking_credit_kanban" model="ir.ui.view">
+        <field name="name">freight.booking.credit.kanban</field>
+        <field name="model">freight.booking</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="credit_hold_state"
+                    group_create="false" group_delete="false" group_edit="false" quick_create="false" sample="1"
+                    banner_route="/freight_credit_control/dashboard_banner">
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="etd"/>
+                <field name="etd_revised"/>
+                <field name="currency_id"/>
+                <field name="partner_due_amount"/>
+                <field name="partner_blocking_stage"/>
+                <field name="partner_credit_overdue_days"/>
+                <field name="credit_release_note"/>
+                <field name="credit_reject_reason"/>
+                <field name="credit_hold_state"/>
+                <field name="is_over_credit_limit"/>
+                <field name="billing_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record
+                            #{record.credit_hold_state.raw_value == 'blocked' ? 'border-left border-danger' :
+                              record.credit_hold_state.raw_value == 'pending_approval' ? 'border-left border-warning' :
+                              'border-left border-success'}"
+                             style="border-left-width: 4px !important; padding-left: 8px;">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        Booking #<field name="number"/>
+                                    </strong>
+                                </div>
+                                <span t-if="record.credit_hold_state.raw_value == 'blocked'" class="badge badge-danger">Financial Hold</span>
+                                <span t-if="record.credit_hold_state.raw_value == 'pending_approval'" class="badge badge-warning">BOD Review</span>
+                                <span t-if="record.credit_hold_state.raw_value == 'released'" class="badge badge-success">Cleared</span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div><strong>Customer:</strong> <field name="partner_id"/></div>
+                                <div><strong>Sales:</strong> <field name="user_id"/></div>
+                                <div><strong>ETD:</strong> <field name="etd_revised"/></div>
+                                <div t-if="record.credit_hold_state.raw_value != 'released'">
+                                    <strong>Overdue:</strong>
+                                    <field name="partner_due_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    (<field name="partner_credit_overdue_days"/> days)
+                                </div>
+                                <div t-if="record.credit_release_note.raw_value" class="text-muted">
+                                    <em>Note: <field name="credit_release_note"/></em>
+                                </div>
+                                <div t-if="record.credit_reject_reason.raw_value" class="text-muted">
+                                    <em>Rejected: <field name="credit_reject_reason"/></em>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_right">
+                                    <button name="action_open_credit_release_wizard" type="object" string="Request Approval"
+                                            class="btn btn-sm btn-warning"
+                                            groups="freight_mgmt.group_freight_operation"
+                                            attrs="{'invisible': [('credit_hold_state', '!=', 'blocked')]}"/>
+                                    <button name="action_approve_credit_release" type="object" string="Approve Release"
+                                            class="btn btn-sm btn-success"
+                                            groups="freight_credit_control.group_freight_credit_approver"
+                                            attrs="{'invisible': [('credit_hold_state', '!=', 'pending_approval')]}"/>
+                                    <button name="action_open_credit_reject_wizard" type="object" string="Reject"
+                                            class="btn btn-sm btn-danger"
+                                            groups="freight_credit_control.group_freight_credit_approver"
+                                            attrs="{'invisible': [('credit_hold_state', '!=', 'pending_approval')]}"/>
+                                    <button name="action_print_delivery_order" type="object" string="Print DO"
+                                            class="btn btn-sm btn-primary"
+                                            attrs="{'invisible': [('credit_hold_state', '!=', 'released')]}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 3) Search view with quick filters                            -->
+    <!-- ============================================================ -->
+    <record id="freight_booking_credit_search" model="ir.ui.view">
+        <field name="name">freight.booking.credit.search</field>
+        <field name="model">freight.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <filter string="Blocked" name="filter_blocked" domain="[('credit_hold_state', '=', 'blocked')]"/>
+                <filter string="Pending Approval" name="filter_pending" domain="[('credit_hold_state', '=', 'pending_approval')]"/>
+                <filter string="Ready to Release" name="filter_ready" domain="[('credit_hold_state', '=', 'released')]"/>
+                <separator/>
+                <filter string="My Bookings" name="filter_mine" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Credit Status" name="group_credit_state" domain="[]" context="{'group_by': 'credit_hold_state'}"/>
+                    <filter string="Customer" name="group_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Salesperson" name="group_user" domain="[]" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- 4) Action + explicit view binding + menu                     -->
+    <!-- ============================================================ -->
+    <record id="action_freight_credit_control_kanban" model="ir.actions.act_window">
+        <field name="name">Freight Dashboard</field>
+        <field name="res_model">freight.booking</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="freight_booking_credit_search"/>
+        <field name="domain">[('credit_hold_state', '!=', 'none')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No shipments are currently on financial hold.
+            </p>
+        </field>
+    </record>
+    <record id="action_freight_credit_control_kanban_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_freight_booking_credit_kanban"/>
+        <field name="act_window_id" ref="action_freight_credit_control_kanban"/>
+    </record>
+
+    <menuitem id="freight_credit_control_board_menu"
+              name="Dashboard"
+              parent="freight_mgmt.freight_mgmt_main_menu"
+              action="action_freight_credit_control_kanban"
+              sequence="5"
+              groups="freight_mgmt.group_freight_operation"/>
+
+</odoo>

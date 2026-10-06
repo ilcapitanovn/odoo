@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_freight_credit_release_wizard_user,freight.credit.release.wizard.user,model_freight_credit_release_wizard,freight_mgmt.group_freight_user,1,1,1,1
