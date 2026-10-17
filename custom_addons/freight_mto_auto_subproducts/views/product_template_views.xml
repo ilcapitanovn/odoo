@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_mto_subproduct" model="ir.ui.view">
+        <field name="name">product.template.form.mto.subproduct</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='purchase']" position="inside">
+                <separator string="MTO Auto PO Sub-Products"/>
+                <field name="mto_subproduct_ids" nolabel="1"
+                       context="{'active_test': False}">
+                    <tree editable="bottom">
+                        <field name="sequence" widget="handle"/>
+                        <field name="sub_product_id"
+                               domain="[('purchase_ok', '=', True)]"
+                               options="{'no_create': True}"/>
+                        <field name="vendor_id"
+                               context="{'res_partner_search_mode': 'supplier'}"
+                               options="{'no_create': True}"/>
+                        <field name="qty"/>
+                        <field name="uom_id"/>
+                        <field name="note" optional="hide"/>
+                        <field name="active" widget="boolean_toggle"/>
+                    </tree>
+                </field>
+                <div class="text-muted">
+                    When this product generates an MTO PO, also add these products
+                    to the PO (quantity = Default Qty x quantity of this product).
+                    A line with a Vendor different from the PO vendor goes to a
+                    separate draft PO for that vendor.
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
