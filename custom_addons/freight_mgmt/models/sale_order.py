@@ -37,6 +37,7 @@ class SaleOrder(models.Model):
         ('to booking', 'To Booking'),
         ('no', 'Nothing to Booking')
     ], string='Booking Status', compute='_get_booking_status', store=True)
+    vessel_bol_no = fields.Char(string="B/L Number", related="booking_id.vessel_bol_no", readonly=True)
 
     order_type = fields.Selection([
         ('freehand', 'Freehand'),
@@ -124,6 +125,11 @@ class SaleOrder(models.Model):
                 ('order_id', '=', order.id)
             ])
 
+    # @api.depends("booking_id")
+    # def _compute_vessel_bol_no(self):
+    #     for rec in self:
+    #         rec.vessel_bol_no = rec.booking_id.vessel_bol_no if rec.booking_id else False
+
     @api.depends('invoice_ids.payment_state')
     def _compute_payment_state(self):
         for rec in self:
@@ -175,15 +181,35 @@ class SaleOrder(models.Model):
     def _compute_margin(self):
         # Logging message as OdooBot. Need to check self.id to avoid error when temporary request
         # such as onchange or changes in order line but no saving yet.
-        if self.id:
-            self.message_post(author_id=self.env.ref('base.user_admin').id, body="Tính lại biên lợi nhuận")
-        self.recompute_margin()
+        # if self.id:
+        #     self.message_post(author_id=self.env.ref('base.user_admin').id, body="Tính lại biên lợi nhuận")
+        # self.recompute_margin()
+
+        # Updated - 2026-10-12: Fix issue singleton due to call self.id
+        bot_user = self.env.ref('base.user_admin', raise_if_not_found=False)
+        author_id = bot_user.id if bot_user else False
+
+        for order in self:
+            # Check if the individual record is saved in the database (not NewId / draft onchange)
+            if isinstance(order.id, int):
+                order.message_post(
+                    author_id=author_id,
+                    body="Tính lại biên lợi nhuận"
+                )
+
+            # If recompute_margin expects a single record, call it on 'order'
+            # If it handles recordsets natively, call order.recompute_margin()
+            order.recompute_margin()
 
     def recompute_margin_button(self):
         # Logging message as user clicked the button
-        if self.id:
-            self.message_post(body="Tính lại biên lợi nhuận")
-        self.recompute_margin()
+        for order in self:
+            # Check if record is saved in DB (not NewId)
+            if isinstance(order.id, int):
+                order.message_post(body="Tính lại biên lợi nhuận")
+
+            # Perform margin recomputation for the individual record
+            order.recompute_margin()
 
     def recompute_margin(self):
         '''

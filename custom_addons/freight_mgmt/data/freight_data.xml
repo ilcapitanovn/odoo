@@ -449,6 +449,17 @@
     </data>
     <data noupdate="1">
         <!-- Automated Actions -->
+        <record id="freight_automated_action_update_shipment_etd_invoice" model="base.automation">
+            <field name="name">Freight: Automate Update Shipment ETD in Invoice On Booking ETD Change</field>
+            <field name="model_id" ref="freight_mgmt.model_freight_booking"/>
+            <field name="trigger">on_write</field>
+            <field name="trigger_field_ids" eval="[(6, 0, [ref('freight_mgmt.field_freight_booking__etd_revised')])]"/>
+            <field name="state">code</field>
+            <field name="active">True</field>
+            <field name="code">
+                action = model.automate_action_update_shipment_etd_invoice(record)
+            </field>
+        </record>
         <record id="freight_automated_action_update_bl_number_invoice" model="base.automation">
             <field name="name">Freight: Automate Update BL Number in Invoice On Billing Change</field>
             <field name="model_id" ref="freight_mgmt.model_freight_billing"/>

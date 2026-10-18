@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Initial list, freely editable afterwards (kept on module upgrade). -->
+    <record id="ignore_word_entrusted_export" model="mto.subproduct.ignore.word">
+        <field name="name">Entrusted Export Service</field>
+    </record>
+    <record id="ignore_word_entrusted_import" model="mto.subproduct.ignore.word">
+        <field name="name">Entrusted Import Service</field>
+    </record>
+</odoo>

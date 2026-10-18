@@ -18,8 +18,8 @@ class ProductTemplate(models.Model):
                 tmpl.mto_subproduct_ids.filtered('active'))
 
     def action_suggest_mto_subproducts(self):
-        """Open the popup that proposes sub-products (PO history first,
-        then the sub-products of a similar product)."""
+        """Open the popup that proposes sub-products by name / vendor similarity
+        or from purchase history."""
         self.ensure_one()
         wizard = self.env['mto.subproduct.suggest.wizard'].create(
             {'template_id': self.id})

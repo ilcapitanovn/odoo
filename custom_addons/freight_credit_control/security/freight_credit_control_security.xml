@@ -6,11 +6,11 @@
              is also BOD only needs this one extra group; it does NOT imply
              Manager, since a BOD approver may not need full Freight Manager
              rights (e.g. an external Finance Director). -->
-        <record id="group_freight_credit_approver" model="res.groups">
-            <field name="name">BOD - Credit Approver</field>
-            <field name="category_id" ref="freight_mgmt.module_freight_category"/>
-            <field name="comment">Can approve or reject a customer credit release request on a Freight Booking.</field>
-            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
-        </record>
+<!--        <record id="group_freight_credit_approver" model="res.groups">-->
+<!--            <field name="name">BOD - Credit Approver</field>-->
+<!--            <field name="category_id" ref="freight_mgmt.module_freight_category"/>-->
+<!--            <field name="comment">Can approve or reject a customer credit release request on a Freight Booking.</field>-->
+<!--            <field name="users" eval="[(4, ref('base.user_admin'))]"/>-->
+<!--        </record>-->
     </data>
 </odoo>

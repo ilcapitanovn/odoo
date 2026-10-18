@@ -2,7 +2,7 @@
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
-from ..models.mto_subproduct_suggest import name_tokens, similarity
+from ..models.mto_subproduct_suggest import normalize, token_list
 
 
 @tagged('post_install', '-at_install')
@@ -12,18 +12,94 @@ class TestSuggestSubproducts(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         Product = cls.env['product.product']
-        Partner = cls.env['res.partner']
-        cls.main_vendor = Partner.create({'name': 'Main Vendor'})
-        cls.port_vendor = Partner.create({'name': 'Port Authority'})
         cls.prod_a = Product.create({
             'name': 'Entrusted Export Service, Banana, HCM - SHA, JJ ,HNT',
             'type': 'service'})
-        cls.prod_b = Product.create({'name': 'DOC - SJJ', 'type': 'service'})
-        cls.prod_c = Product.create({'name': 'THC - 40RH, SJJ', 'type': 'service'})
-        cls.prod_d = Product.create({'name': 'SEAL - SJJ', 'type': 'service'})
+        mk = lambda name: Product.create({'name': name, 'type': 'service'})
+        cls.of_ = mk('OF, VNHCM - CNSHA, 40RH, SJJ')
+        cls.doc = mk('DOC - SJJ')
+        cls.truck = mk('TRUCKING, 40RH, BAO AN - BAI PHUONG DONG, HNT')
+        cls.other_lane = mk('OF, VNHCM - CNNSS, 40HC, YML')
+        cls.other_main = mk('Entrusted Export Service, Apple, HCM - SHA, JJ, HNT')
+        cls.unrelated = mk('Office Chair Zzq')
+        cls.main_vendor = cls.env['res.partner'].create({'name': 'Main Vendor'})
+        cls.port_vendor = cls.env['res.partner'].create({'name': 'Port Authority'})
 
+    def _wizard(self):
+        wiz = self.env['mto.subproduct.suggest.wizard'].create(
+            {'template_id': self.prod_a.product_tmpl_id.id})
+        wiz._populate()
+        return wiz
+
+    def _products(self, wiz):
+        return {l.sub_product_id: l for l in wiz.line_ids}
+
+    # ---------------------------------------------------------- helpers
+    def test_tokens(self):
+        self.assertEqual(
+            [n for _r, n in token_list('Hồ Chí Minh - SHA, J')],
+            ['HO', 'CHI', 'MINH', 'SHA'])
+        self.assertEqual(normalize('Đường'), 'DUONG')
+
+    # ------------------------------------------------- similarity mode
+    def test_default_mode_and_keywords(self):
+        wiz = self._wizard()
+        self.assertEqual(wiz.mode, 'similar')
+        self.assertEqual(wiz.keywords.split(), ['Banana', 'HCM', 'SHA', 'JJ', 'HNT'])
+        self.assertTrue(wiz.ignore_word_ids)
+
+    def test_similarity_ranking_and_main_like_products_hidden(self):
+        wiz = self._wizard()
+        lines = self._products(wiz)
+        self.assertNotIn(self.unrelated, lines)
+        self.assertNotIn(self.other_main, lines)       # contains ignored phrase
+        self.assertEqual(wiz.line_ids[0].sub_product_id, self.of_)   # HCM+SHA+JJ
+        self.assertTrue(lines[self.of_].selected)
+        self.assertFalse(lines[self.doc].selected)                   # JJ only
+        self.assertIn(self.truck, lines)
+        self.assertIn('Banana', wiz.info)                            # no match
+
+    def test_ignore_word_added_by_user(self):
+        wiz = self._wizard()
+        self.assertIn(self.doc, self._products(wiz))
+        word = self.env['mto.subproduct.ignore.word'].create({'name': 'JJ'})
+        wiz.ignore_word_ids = [(4, word.id)]
+        wiz.action_reload()
+        self.assertNotIn(self.doc, self._products(wiz))   # only matched on JJ
+        self.assertIn(self.truck, self._products(wiz))    # HNT still matches
+
+    def test_vendor_name_match_and_override(self):
+        Partner = self.env['res.partner']
+        main_vendor = Partner.create({'name': 'Jiaxiang Lines'})
+        cand_vendor = Partner.create({'name': 'Jiaxiang Terminal Co'})
+        fee = self.env['product.product'].create(
+            {'name': 'Fuel Surcharge', 'type': 'service'})
+        Supplier = self.env['product.supplierinfo']
+        Supplier.create({'name': main_vendor.id, 'price': 1.0,
+                         'product_tmpl_id': self.prod_a.product_tmpl_id.id})
+        Supplier.create({'name': cand_vendor.id, 'price': 1.0,
+                         'product_tmpl_id': fee.product_tmpl_id.id})
+        wiz = self._wizard()
+        self.assertEqual(wiz.vendor_ids, main_vendor)
+        wiz.keywords = 'HCM Jiaxiang'
+        wiz.action_reload()
+        lines = self._products(wiz)
+        self.assertIn(fee, lines)                       # matched on vendor name
+        self.assertEqual(lines[fee].vendor_id, cand_vendor)
+
+    def test_same_vendor_as_main_needs_no_override(self):
+        Supplier = self.env['product.supplierinfo']
+        Supplier.create({'name': self.port_vendor.id, 'price': 1.0,
+                         'product_tmpl_id': self.prod_a.product_tmpl_id.id})
+        Supplier.create({'name': self.port_vendor.id, 'price': 1.0,
+                         'product_tmpl_id': self.doc.product_tmpl_id.id})
+        line = self._wizard().line_ids.filtered(
+            lambda l: l.sub_product_id == self.doc)
+        self.assertFalse(line.vendor_id)
+        self.assertTrue(line.selected)                  # favoured vendor
+
+    # ------------------------------------------------------ history mode
     def _booking(self, origin, a_qty, lines):
-        """Confirmed history: PO of A (main vendor) + POs for other vendors."""
         PO = self.env['purchase.order']
         po = PO.create({'partner_id': self.main_vendor.id, 'origin': origin})
         self._add_line(po, self.prod_a, a_qty)
@@ -39,73 +115,60 @@ class TestSuggestSubproducts(TransactionCase):
             'product_qty': qty, 'product_uom': product.uom_po_id.id,
             'price_unit': 1.0, 'date_planned': '2026-01-01 00:00:00'})
 
-    def _wizard(self):
-        wiz = self.env['mto.subproduct.suggest.wizard'].create(
-            {'template_id': self.prod_a.product_tmpl_id.id})
-        wiz._populate()
-        return wiz
-
-    def test_tokens_and_similarity(self):
-        self.assertEqual(name_tokens('Hồ Chí Minh - SHA, J'), {'HO', 'CHI', 'MINH', 'SHA'})
-        self.assertGreater(similarity(
-            'Entrusted Export Service, Banana, HCM - SHA, JJ ,HNT',
-            'Entrusted Export Service, Apple, HCM - SHA, JJ, HNT'), 0.6)
-        self.assertEqual(similarity('', 'abc'), 0.0)
-
-    def test_history_suggestions(self):
-        # B in all 3 bookings (main vendor), C in 1 booking (other vendor)
-        self._booking('S001', 2, [(self.prod_b, 2, self.main_vendor),
-                                  (self.prod_c, 4, self.port_vendor)])
-        self._booking('S002', 1, [(self.prod_b, 1, self.main_vendor)])
-        self._booking('S003', 1, [(self.prod_b, 1, self.main_vendor)])
+    def test_history_mode(self):
+        self._booking('S001', 2, [(self.doc, 2, self.main_vendor),
+                                  (self.of_, 4, self.port_vendor)])
+        self._booking('S002', 1, [(self.doc, 1, self.main_vendor)])
+        self._booking('S003', 1, [(self.doc, 1, self.main_vendor)])
         wiz = self._wizard()
-        lines = {l.sub_product_id: l for l in wiz.line_ids}
-        self.assertEqual(set(lines), {self.prod_b, self.prod_c})
-        line_b, line_c = lines[self.prod_b], lines[self.prod_c]
-        self.assertTrue(line_b.selected)           # 3/3 >= 50%
-        self.assertFalse(line_c.selected)          # 1/3 < 50%
-        self.assertEqual(line_b.qty, 1.0)
-        self.assertFalse(line_b.vendor_id)         # same vendor as the main PO
-        self.assertEqual(line_c.vendor_id, self.port_vendor)
-        self.assertEqual(line_c.qty, 2.0)          # 4 per 2 units of A
-        self.assertEqual(line_b.source, 'history')
+        wiz.mode = 'history'
+        wiz.action_reload()
+        lines = self._products(wiz)
+        self.assertEqual(set(lines), {self.doc, self.of_})
+        self.assertTrue(lines[self.doc].selected)        # 3/3
+        self.assertFalse(lines[self.of_].selected)       # 1/3
+        self.assertEqual(lines[self.doc].qty, 1.0)
+        self.assertFalse(lines[self.doc].vendor_id)
+        self.assertEqual(lines[self.of_].vendor_id, self.port_vendor)
+        self.assertEqual(lines[self.of_].qty, 2.0)       # 4 per 2 units of A
 
-    def test_similar_product_fallback_and_confirm(self):
-        other = self.env['product.product'].create({
-            'name': 'Entrusted Export Service, Apple, HCM - SHA, JJ, HNT',
-            'type': 'service'})
-        Cfg = self.env['product.template.mto.subproduct']
-        Cfg.create({'template_id': other.product_tmpl_id.id,
-                    'sub_product_id': self.prod_b.id, 'qty': 1.0})
-        Cfg.create({'template_id': other.product_tmpl_id.id,
-                    'sub_product_id': self.prod_d.id, 'qty': 3.0,
-                    'vendor_id': self.port_vendor.id})
+    def test_history_mode_without_history_has_no_fallback(self):
         wiz = self._wizard()
-        self.assertEqual(wiz.source_template_id, other.product_tmpl_id)
-        self.assertEqual(wiz.line_ids.mapped('source'), ['similar', 'similar'])
+        wiz.mode = 'history'
+        wiz.action_reload()
+        self.assertFalse(wiz.line_ids)
+        self.assertIn('No purchase history', wiz.info)
+
+    def test_switch_back_to_similarity(self):
+        wiz = self._wizard()
+        wiz.mode = 'history'
+        wiz.action_reload()
+        self.assertFalse(wiz.line_ids)
+        wiz.mode = 'similar'
+        wiz.action_reload()
+        self.assertIn(self.of_, self._products(wiz))
+
+    # ------------------------------------------------------------ confirm
+    def test_confirm_and_skip_existing(self):
+        wiz = self._wizard()
+        wiz.line_ids.write({'selected': False})
+        wiz.line_ids.filtered(lambda l: l.sub_product_id == self.of_).selected = True
         wiz.action_confirm()
         cfgs = self.prod_a.product_tmpl_id.mto_subproduct_ids
-        self.assertEqual(cfgs.mapped('sub_product_id'), self.prod_b | self.prod_d)
-        self.assertEqual(cfgs.filtered(
-            lambda c: c.sub_product_id == self.prod_d).qty, 3.0)
-        # nothing new to suggest for the same product afterwards
-        self.assertFalse(self._wizard().line_ids)
+        self.assertEqual(cfgs.mapped('sub_product_id'), self.of_)
+        self.assertNotIn(self.of_, self._products(self._wizard()))
 
     def test_cap_includes_existing_lines(self):
         self.env['ir.config_parameter'].sudo().set_param(
             'freight_mto_auto_subproducts.suggest_max', '2')
         self.env['product.template.mto.subproduct'].create({
             'template_id': self.prod_a.product_tmpl_id.id,
-            'sub_product_id': self.prod_d.id})
-        self._booking('S010', 1, [(self.prod_b, 1, self.main_vendor),
-                                  (self.prod_c, 1, self.main_vendor)])
+            'sub_product_id': self.unrelated.id})
         wiz = self._wizard()
         self.assertEqual(wiz.free_slots, 1)
-        self.assertEqual(len(wiz.line_ids), 1)      # trimmed to free slots
-        wiz.line_ids.write({'selected': True})
-        # forcing an extra line must be refused
+        self.assertEqual(len(wiz.line_ids), 1)          # trimmed to free slots
         wiz.write({'line_ids': [(0, 0, {
-            'source': 'history', 'sub_product_id': self.prod_c.id,
-            'qty': 1.0, 'selected': True})]})
+            'sub_product_id': self.doc.id, 'qty': 1.0, 'selected': True})]})
+        wiz.line_ids.write({'selected': True})
         with self.assertRaises(UserError):
             wiz.action_confirm()

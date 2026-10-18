@@ -59,7 +59,8 @@ class FreightBooking(models.Model):
         domain=lambda self: self._get_order_id_domain(),
         tracking=True, index=True
     )
-    currency_id = fields.Many2one("res.currency", string="Currency", readonly=True)
+    currency_id = fields.Many2one(related="order_id.currency_id", string="Currency", store=True, readonly=True,
+                                  default=lambda self: self.env.company.currency_id)
     amount_total = fields.Monetary(related="order_id.amount_total", string="Total",
                                    currency_field="currency_id", readonly=True, store=True)
     margin = fields.Monetary(related="order_id.margin", string="Profit",
@@ -357,6 +358,50 @@ class FreightBooking(models.Model):
         for booking in self:
             if booking.etd_revised and booking.etd and booking.etd_revised < booking.etd:
                 raise ValidationError(_('The revised ETD cannot be earlier than the original ETD.'))
+
+    @api.model
+    def automate_action_update_shipment_etd_invoice(self, record):
+        """
+        An automated action to update shipment ETD in invoice when the field etd_revised has just been updated.
+        This automated action is necessary because it doesn't automate update the field in invoice accordingly.
+
+        :param record: a booking record just updated (no need to trigger for creation)
+        """
+        try:
+            if not record or not record.etd_revised:
+                return False
+
+            related_so_name = record.order_id.name if record.order_id else ''
+            related_po_name = ''
+            if related_so_name:
+                related_purchase_order = self.env['purchase.order'].sudo().search([
+                    ('origin', '=', related_so_name)
+                ], limit=1)
+                if related_purchase_order:
+                    related_po_name = related_purchase_order.name
+
+            if related_so_name or related_po_name:
+                array_origins = []
+                if related_so_name:
+                    array_origins.append(related_so_name)
+                if related_po_name:
+                    array_origins.append(related_po_name)
+
+                related_invoices = self.env['account.move'].with_context(from_booking_automation=True).sudo().search([('invoice_origin', 'in', array_origins)])
+                if related_invoices:
+                    related_invoices.write({'shipment_etd': record.etd_revised})
+
+            print("automate_action_update_shipment_etd_invoice - executed successful.")
+        except Exception as e:
+            print("automate_action_update_shipment_etd_invoice - Exception: " + str(e))
+
+    def manual_action_update_existing_booking_currency(self):
+        # Re-evaluate and trigger store recomputation for all existing bookings
+        # TODO: Must remove once released to production
+        bookings = self.env['freight.booking'].search([('currency_id', '=', False)])
+        if bookings:
+            for b in bookings:
+                b.currency_id = b.order_id.currency_id or b.company_id.currency_id or self.env.company.currency_id
 
     # ---------------------------------------------------
     # CRUD

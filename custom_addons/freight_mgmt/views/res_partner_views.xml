@@ -17,6 +17,20 @@
             </field>
         </record>
 
+        <!-- Filter in Search View -->
+        <record id="freight_res_partner_filter_debt_inherit" model="ir.ui.view">
+            <field name="name">freight.res.partner.filter.debt.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="Customers with Debt"
+                            name="filter_has_debt"
+                            domain="[('has_debt', '=', True)]"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="freight_res_partner_view_form" model="ir.ui.view">
                 <field name="name">freight.res.partner.view.form.inherited</field>
                 <field name="model">res.partner</field>
@@ -60,6 +74,43 @@
                             <attribute name="invisible">0</attribute>
                         </xpath>
                 </field>
+        </record>
+
+        <record id="freight_res_partner_debt_basis_view_form" model="ir.ui.view">
+            <field name="name">freight.res.partner.debt.basis.view.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                    <field name="due_date_basis" widget="radio" options="{'horizontal': true}"/>
+                </xpath>
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="has_debt" invisible="1"/>
+                    <button name="action_view_partner_debt_details"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-money">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value" attrs="{'invisible': [('has_debt', '=', True)]}">
+                                <field name="total_due_amount" widget="monetary"/>
+                            </span>
+                            <!-- Red text when debtor -->
+                            <span class="o_stat_value text-danger fw-bold" attrs="{'invisible': [('has_debt', '=', False)]}">
+                                <field name="total_due_amount" widget="monetary"/>
+                            </span>
+
+                            <span class="o_stat_text" attrs="{'invisible': [('has_debt', '=', True)]}">
+                                Debt
+                            </span>
+                            <!-- Red label when debtor -->
+                            <span class="o_stat_text text-danger fw-bold" attrs="{'invisible': [('has_debt', '=', False)]}">
+                                Debt
+                            </span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
         </record>
 
         <!-- Partner kanban view inherit -->

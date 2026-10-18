@@ -10,11 +10,11 @@
                 <field name="id" invisible="1"/>
                 <div class="mb-2">
                     <button name="action_suggest_mto_subproducts" type="object"
-                            string="AI Suggest Sub-Products" icon="fa-magic"
+                            string="Suggest Sub-Products" icon="fa-magic"
                             class="btn-secondary"
                             groups="purchase.group_purchase_manager,stock.group_stock_manager"
                             attrs="{'invisible': [('id', '=', False)]}"
-                            help="Propose sub-products from PO history, then from a similar product"/>
+                            help="Suggest sub-products by name / vendor similarity or purchase history"/>
                 </div>
                 <field name="mto_subproduct_ids" nolabel="1"
                        context="{'active_test': False}">
@@ -38,6 +38,13 @@
                     A line with a Vendor different from the PO vendor goes to a
                     separate draft PO for that vendor.
                 </div>
+            </xpath>
+            <xpath expr="//group[@name='bill']/.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='description_purchase']/../.." position="attributes">
+                <!-- Hide the parent group of purchase description -->
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>

@@ -11,6 +11,19 @@
             </field>
     </record>
 
+    <record id="freight_view_move_line_tree_grouped_inherit" model="ir.ui.view">
+            <field name="name">freight.view.move.line.tree.grouped.inherit</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_move_line_tree_grouped_partner"/>
+            <field name="mode">primary</field>
+            <field eval="10" name="priority"/>
+            <field name="arch" type="xml">
+                    <xpath expr="//field[@name='account_id']" position="before">
+                        <field name="vessel_bol_number" />
+                    </xpath>
+            </field>
+    </record>
+
     <record id="base_accounting_kit.account_reports_partner" model="ir.ui.menu">
         <field name="active" eval="False"/>
     </record>
@@ -21,4 +34,5 @@
         <field name="parent_id" ref="account.menu_finance_reports"/>
         <field name="sequence">4</field>
     </record>
+    <!-- TODO: change ledgers label in Reporting to Partner Reports -->
 </odoo>

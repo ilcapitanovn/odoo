@@ -50,7 +50,7 @@
         <field name="inherit_id" ref="partner_aging.view_supplier_aging_ad_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//tree//field[@name='partner_id']" position="attributes">
-                <attribute name="string">Sales</attribute>
+                <attribute name="string">Supplier</attribute>
             </xpath>
             <xpath expr="//tree//field[@name='date_due']" position="attributes">
                 <attribute name="optional">hide</attribute>

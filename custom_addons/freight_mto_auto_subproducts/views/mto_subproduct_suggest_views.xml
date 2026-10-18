@@ -6,28 +6,33 @@
         <field name="arch" type="xml">
             <form string="Suggest Sub-Products">
                 <group>
-                    <group>
+                    <group string="Suggest by">
                         <field name="template_id" readonly="1" force_save="1"/>
-                        <field name="history_info"/>
+                        <field name="mode" widget="radio" nolabel="1" colspan="2"/>
                     </group>
-                    <group>
+                    <group string="Capacity">
                         <field name="existing_count"/>
                         <field name="max_count"/>
                         <field name="free_slots"/>
                     </group>
                 </group>
-                <group>
-                    <label for="source_template_id"/>
-                    <div class="o_row">
-                        <field name="source_template_id" options="{'no_create': True}"/>
-                        <button name="action_reload_similar" type="object"
-                                string="Reload" class="btn-secondary"
-                                attrs="{'invisible': [('source_template_id', '=', False)]}"/>
-                    </div>
+                <group attrs="{'invisible': [('mode', '!=', 'similar')]}">
+                    <field name="keywords" placeholder="e.g. HCM SHA JJ HNT 40RH"/>
+                    <field name="vendor_ids" widget="many2many_tags"
+                           options="{'no_create': True}"
+                           context="{'res_partner_search_mode': 'supplier'}"/>
+                    <field name="ignore_word_ids" widget="many2many_tags"
+                           options="{'no_open': True}"/>
                 </group>
+                <div class="mb-2">
+                    <button name="action_reload" type="object" string="Reload"
+                            icon="fa-refresh" class="btn-secondary"/>
+                    <span class="text-muted ml-2"><field name="info" nolabel="1"/></span>
+                </div>
                 <p class="text-muted">
-                    Tick the lines to add, adjust vendor / quantity if needed, then
-                    click "Add Selected". You can still edit everything in the
+                    Choose how to suggest, change keywords / ignored words if needed,
+                    then click Reload. Tick the lines to add, adjust vendor / quantity
+                    and click "Add Selected". Everything stays editable in the
                     product afterwards.
                 </p>
                 <field name="line_ids" nolabel="1">
@@ -41,7 +46,6 @@
                                options="{'no_create': True}"/>
                         <field name="qty"/>
                         <field name="uom_id"/>
-                        <field name="source"/>
                         <field name="evidence"/>
                         <field name="note" optional="hide"/>
                     </tree>

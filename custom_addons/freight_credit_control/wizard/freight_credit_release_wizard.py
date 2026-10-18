@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import logging
 from odoo import _, api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class FreightCreditReleaseWizard(models.TransientModel):
@@ -33,7 +36,7 @@ class FreightCreditReleaseWizard(models.TransientModel):
             })
             booking.message_post(body=_("Credit release requested by %s: %s") % (self.env.user.name, self.note))
 
-            approver_group = self.env.ref('freight_credit_control.group_freight_credit_approver', raise_if_not_found=False)
+            approver_group = self.env.ref('freight_mgmt.group_freight_manager', raise_if_not_found=False)
             if approver_group:
                 for user in approver_group.users:
                     booking.activity_schedule(
@@ -48,4 +51,32 @@ class FreightCreditReleaseWizard(models.TransientModel):
                 'credit_reject_reason': self.note,
             })
             booking.message_post(body=_("Credit release rejected by %s: %s") % (self.env.user.name, self.note))
-        return {'type': 'ir.actions.act_window_close'}
+
+        # A plain `ir.actions.act_window_close` only closes this dialog; the
+        # Kanban board's own button-click handler then just patches the one
+        # record's fields in place (Odoo's kanban controller does this via
+        # `_reloadAfterButtonClick`), it does NOT re-evaluate which column
+        # the card belongs to. Since this booking just changed
+        # `credit_hold_state` - and therefore needs to jump to a different
+        # Kanban column - we force a client-side reload instead, the same
+        # mechanism Odoo's own res.config.settings wizard uses whenever a
+        # change needs the current view to be re-fetched rather than
+        # patched in place.
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        # self.sudo().reload()
+        # return {'type': 'ir.actions.act_window_close'}
+
+    # def reload(self):
+    #     """
+    #     Notify the frontend to reload data.
+    #     """
+    #     _logger.info("Sending reload trigger to frontend")
+    #     # self.env["bus.bus"].sudo()._sendone(
+    #     #     "broadcast", "page_refresh", {"model_name": self._name}
+    #     # )
+    #     self.env["bus.bus"].sudo()._sendone(
+    #         "broadcast",
+    #         "page_refresh",
+    #         {"type": "page_refresh", "payload": {"model_name": self._name}}
+    #     )
+    #     _logger.info("Reload trigger sent successfully")

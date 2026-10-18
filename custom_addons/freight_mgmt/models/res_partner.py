@@ -12,6 +12,73 @@ class ResPartner(models.Model):
     warning_stage = fields.Monetary(tracking=True)
     blocking_stage = fields.Monetary(tracking=True)
 
+    due_date_basis = fields.Selection(
+        selection=[
+            ('invoice_date', 'Invoice Date'),
+            ('shipment_etd', 'Shipment ETD'),
+        ],
+        string='Due Date Basis',
+        default='invoice_date',
+        help="Reference date used to calculate this customer's invoice due date:\n"
+             "- Invoice Date: standard behaviour (Invoice Date + Payment Term).\n"
+             "- Shipment ETD: uses the Shipment ETD of the booking linked "
+             "to the invoice instead of the Invoice Date, keeping the same "
+             "Payment Term day offsets. If no booking / ETD is available on "
+             "the invoice, the Invoice Date is used automatically.",
+    )
+    total_due_amount = fields.Monetary(
+        string='Total Due',
+        compute='_compute_total_due_amount',
+        currency_field='currency_id'
+    )
+    has_debt = fields.Boolean(
+        string='Has Debt',
+        compute='_compute_has_debt',
+        search='_search_has_debt',
+    )
+
+    def _compute_total_due_amount(self):
+        for partner in self:
+            # Aggregate total overdue/due amount from aging model
+            aging_records = self.env['res.partner.aging.customer'].search([
+                ('partner_id', '=', partner.id)
+            ])
+            partner.total_due_amount = sum(aging_records.mapped('total'))
+
+    def compute_due_amount(self):
+        """ Override compute due_amount from credit_limit.py in base_accounting_kit to use
+        the aging model instead of credit/debit fields. """
+        for rec in self:
+            if not rec.id:
+                continue
+            rec.due_amount = rec.total_due_amount
+
+    @api.depends('total_due_amount')
+    def _compute_has_debt(self):
+        for partner in self:
+            partner.has_debt = partner.total_due_amount > 0
+
+    def _search_has_debt(self, operator, value):
+        """ Allows the filter in Search View to use standard ORM search """
+        aging_records = self.env['res.partner.aging.customer'].search([('total', '>', 0)])
+        partner_ids = aging_records.mapped('partner_id.id')
+
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return [('id', 'in', partner_ids)]
+        return [('id', 'not in', partner_ids)]
+
+    def action_view_partner_debt_details(self):
+        """ Opens the list of debt/aging details for this specific customer """
+        self.ensure_one()
+        return {
+            'name': f'Debt Details - {self.name}',
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner.aging.customer',
+            'view_mode': 'tree,form',
+            'domain': [('partner_id', '=', self.id)],
+            'context': {'default_partner_id': self.id},
+        }
+
     @api.model
     def default_get(self, fields):
         result = super(ResPartner, self).default_get(fields)
@@ -50,8 +117,18 @@ class ResPartner(models.Model):
                 rec.has_edit_salesperson = True
                 return
 
-    # def _default_category(self):
-    #     existing_tags = self.env['res.partner.category'].search([('name', '=like', 'Shipper')])
-    #     # default_tag = self._context.get('default_category_id')
-    #     return [(6, 0, existing_tags.ids)]
-    #     # return self.env['res.partner.category'].browse(self._context.get('category_id'))
+    def write(self, vals):
+        res = super(ResPartner, self).write(vals)
+        if "due_date_basis" in vals:
+            # Locate all draft invoices belonging to the modified partners
+            draft_invoices = self.env["account.move"].search([
+                ("partner_id", "in", self.ids),
+                ("state", "=", "draft"),
+                ("move_type", "in", ("out_invoice", "in_invoice", "out_refund", "in_refund")),
+            ])
+            # if draft_invoices:
+            # Force payment term lines and due date recomputations
+            # Iterate over each record individually to satisfy self.ensure_one()
+            for invoice in draft_invoices:
+                invoice._recompute_payment_terms_lines()
+        return res

@@ -77,11 +77,11 @@
                             attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <button name="create_debit_note" string="Create Debit Note"
                             type="object" data-hotkey="d"
-                            groups="freight_mgmt.group_freight_manager"
+                            groups="freight_mgmt.group_freight_csdoc"
                             attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('debit_count', '&gt;', 0)]}"/>
                     <button name="create_credit_note" string="Create Credit Notes"
                             type="object" data-hotkey="r"
-                            groups="freight_mgmt.group_freight_manager"
+                            groups="freight_mgmt.group_freight_csdoc"
                             attrs="{'invisible': ['|', ('state', 'not in', ['posted', 'completed']), ('show_create_credit_button', '=', False)]}"/>
                     <field
                         name="state"
@@ -123,7 +123,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
-                            groups="freight_mgmt.group_freight_manager"
+                            groups="freight_mgmt.group_freight_csdoc"
                             attrs="{'invisible': [('debit_count', '=', 0)]}">
                             <field name="debit_count" widget="statinfo" string="Debit Notes"/>
                         </button>
@@ -131,7 +131,7 @@
                             type="object"
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
-                            groups="freight_mgmt.group_freight_manager"
+                            groups="freight_mgmt.group_freight_csdoc"
                             attrs="{'invisible': [('credit_count', '=', 0)]}">
                             <field name="credit_count" widget="statinfo" string="Credit Notes"/>
                         </button>

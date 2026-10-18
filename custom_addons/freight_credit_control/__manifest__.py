@@ -23,12 +23,13 @@ Adds a financial hold / release workflow on top of Freight Management (freight_m
   (same core mechanism Odoo's own Accounting/Sales dashboards use) directly
   above the Kanban board - one screen, one action, no separate dashboard page.
     """,
-    'author': 'VietToanERP',
-    'website': 'https://www.viet-toan.com',
+    'author': 'Tuan Huynh',
+    'company': 'Bao Thinh Software Ltd.',
+    'maintainer': 'Bao Thinh Software Ltd.',
+    'website': 'https://app.viet-toan.com',
     'category': 'Inventory/Delivery',
     'depends': ['freight_mgmt', 'base_accounting_kit', 'sale', 'account', 'mail'],
     'data': [
-        'security/freight_credit_control_security.xml',
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'wizard/freight_credit_release_wizard_views.xml',

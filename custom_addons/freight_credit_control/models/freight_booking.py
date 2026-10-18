@@ -17,7 +17,7 @@ class FreightBooking(models.Model):
     # Fields
     # ---------------------------------------------------
     credit_hold_state = fields.Selection(
-        CREDIT_HOLD_STATES, string="Credit Status", default='none',
+        CREDIT_HOLD_STATES, string="Hold Status", default='none',
         tracking=True, copy=False, index=True,
         group_expand='_group_expand_credit_hold_state',
         help="Financial hold status of this booking, independent from the "
@@ -35,9 +35,24 @@ class FreightBooking(models.Model):
     credit_approved_by = fields.Many2one('res.users', string="Approved By", copy=False, tracking=True)
     credit_approved_date = fields.Datetime(string="Approved On", copy=False, tracking=True)
 
+    credit_hold_reason = fields.Selection(
+        selection=[
+            ('overdue_debt', 'Overdue Debt'),
+            ('payment_received', 'Payment Received'),
+            ('waiting_payment', 'Waiting Payment'),
+            ('financial_hold', 'Financial Hold'),
+            ('manager_review', 'Manager Review'),
+            ('other', 'Other')
+        ],
+        string="Hold Reason", default='other',
+        compute="_compute_credit_hold_reason",
+        help="Indicates why this booking has been placed on financial hold.",
+        store=False, readonly=True
+    )
+
     # Read-only, customer-level credit context surfaced on the booking/card for convenience.
     partner_due_amount = fields.Monetary(
-        related='partner_id.total_due_amount', string="Customer Overdue Balance", store=False)
+        related='partner_id.total_due_amount', string="Overdue Balance", store=False)
     partner_blocking_stage = fields.Monetary(
         related='partner_id.blocking_stage', string="Blocking Threshold", store=False)
     partner_credit_overdue_days = fields.Integer(
@@ -67,6 +82,48 @@ class FreightBooking(models.Model):
                 and partner.blocking_stage
                 and partner.due_amount >= partner.blocking_stage
             )
+
+    @api.depends('credit_hold_state', 'is_over_credit_limit', 'order_id.payment_state')
+    def _compute_credit_hold_reason(self):
+        for rec in self:
+            reason = 'other'
+
+            if rec.credit_hold_state == 'blocked':
+                if rec.is_over_credit_limit:
+                    reason = 'overdue_debt'
+                elif not rec.is_over_credit_limit and rec.order_id and rec.order_id.payment_state != 'paid':
+                    reason = 'waiting_payment'
+                else:
+                    reason = 'financial_hold'
+
+            elif rec.credit_hold_state == 'pending_approval':
+                if rec.is_over_credit_limit:
+                    reason = 'manager_review'
+                elif not rec.is_over_credit_limit and rec.order_id and rec.order_id.payment_state == 'paid':
+                    reason = 'payment_received'
+                elif not rec.is_over_credit_limit and rec.order_id and rec.order_id.payment_state != 'paid':
+                    reason = 'manager_review'
+                else:
+                    reason = 'other'
+
+            rec.credit_hold_reason = reason
+
+    # ---------------------------------------------------
+    # Override parent actions
+    # ---------------------------------------------------
+    def action_confirm(self):
+        res = super().action_confirm()
+
+        for booking in self:
+            if (booking.confirmed
+                    and booking.credit_hold_state == 'none'
+                    and booking.is_over_credit_limit):
+                booking.write({'credit_hold_state': 'blocked'})
+                booking.message_post(body=_(
+                    "This booking has been automatically placed on financial hold: "
+                    "customer's overdue balance has crossed the credit blocking threshold."
+                ))
+        return res
 
     # ---------------------------------------------------
     # Workflow actions
@@ -103,7 +160,7 @@ class FreightBooking(models.Model):
         """BOD approves a pending release request. Restricted to the
         Credit Approver (BOD) group via the button's `groups` attribute
         in the view, and double-checked here."""
-        approver_group = self.env.ref('freight_credit_control.group_freight_credit_approver', raise_if_not_found=False)
+        approver_group = self.env.ref('freight_mgmt.group_freight_manager', raise_if_not_found=False)
         for booking in self:
             if approver_group and approver_group not in self.env.user.groups_id:
                 raise UserError(_("Only BOD / Credit Approvers can approve a credit release."))
@@ -116,6 +173,13 @@ class FreightBooking(models.Model):
                 'credit_approved_date': fields.Datetime.now(),
             })
             booking.message_post(body=_("Credit hold released and approved by %s.") % self.env.user.name)
+
+        # Same reasoning as the wizard's action_confirm: this button changes
+        # credit_hold_state, which moves the card to a different Kanban
+        # column. Odoo's kanban controller only patches the clicked record's
+        # fields in place on a type="object" button click - it never
+        # re-groups the board - so force a client-side reload instead.
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
 
     def action_print_delivery_order(self):
         """Print the Delivery Order report (bound to freight.billing) for
@@ -134,6 +198,19 @@ class FreightBooking(models.Model):
         return report.report_action(self.billing_id[0])
 
     # ---------------------------------------------------
+    # CRUD
+    # ---------------------------------------------------
+    def write(self, vals):
+        if 'credit_hold_state' in vals:
+            has_manager_group = self.env.user.has_group('freight_mgmt.group_freight_manager')
+
+            # Allow system/superuser automated processes (e.g., cron or sudo) if needed
+            if not has_manager_group and not self.env.is_superuser():
+                raise UserError(_("Only Freight Administrators can manually update the Hold Status."))
+
+        return super().write(vals)
+
+    # ---------------------------------------------------
     # Automation
     # ---------------------------------------------------
     def _cron_flag_credit_holds(self):
@@ -143,12 +220,20 @@ class FreightBooking(models.Model):
         Bookings already Blocked / Pending / Released are left untouched -
         this cron only ever sets the *initial* hold, never overrides a
         BOD decision."""
+        aging_partners = self.env['res.partner.aging.customer'].search([('total', '>', 0)])
+        bl_numbers = {rec.bl_number for rec in aging_partners if rec.bl_number}
+
         candidates = self.search([
             ('confirmed', '=', True),
             ('completed', '=', False),
             ('credit_hold_state', '=', 'none'),
+            ('order_id.invoice_status', '=', 'invoiced'),
+            ('order_id.payment_state', 'not in', ('paid', 'in_payment', 'reversed'))
         ])
-        to_block = candidates.filtered(lambda b: b.is_over_credit_limit)
+        # Commenting out the original filter to block only those bookings whose customer is over
+        # the credit limit, but it's more useful to block only those have overdue invoices.
+        # to_block = candidates.filtered(lambda b: b.is_over_credit_limit)
+        to_block = candidates.filtered(lambda b: b.vessel_bol_no in bl_numbers)
         if to_block:
             to_block.write({'credit_hold_state': 'blocked'})
             for booking in to_block:
@@ -156,4 +241,20 @@ class FreightBooking(models.Model):
                     "This booking has been automatically placed on financial hold: "
                     "customer's overdue balance has crossed the credit blocking threshold."
                 ))
+
         return True
+
+    def manual_action_flag_credit_holds_release(self):
+        # TODO: Implement the logic for manually releasing credit holds. Delete after released to Production
+        candidates = self.search([
+            ('completed', '=', True),
+            ('credit_hold_state', '!=', 'released'),
+            ('order_id.payment_state', '=', 'paid')
+        ])
+        if candidates:
+            candidates.write({'credit_hold_state': 'released'})
+            for booking in candidates:
+                booking.message_post(body=_(
+                    "This booking has been automatically marked as released as the payment "
+                    "has been confirmed by accounting."
+                ))

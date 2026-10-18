@@ -8,19 +8,25 @@
     <template id="freight_credit_dashboard_banner">
         <div class="o_freight_credit_banner">
             <style>
+                /* 4 KPI cards: rounded corners, aligned as a strict row
+                   of equal columns, like the Accounting dashboard. */
                 .o_freight_credit_banner {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 12px;
-                    margin: 4px 0 16px 0;
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 16px;
+                    margin: 4px 0 20px 0;
+                }
+                @media (max-width: 991px) {
+                    .o_freight_credit_banner { grid-template-columns: repeat(2, 1fr); }
+                }
+                @media (max-width: 575px) {
+                    .o_freight_credit_banner { grid-template-columns: 1fr; }
                 }
                 .o_freight_credit_banner .fcb_card {
-                    flex: 1 1 200px;
-                    min-width: 180px;
                     background: #ffffff;
                     border: 1px solid #e3e3e3;
-                    border-radius: 2px;
-                    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+                    border-radius: 8px;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
                     overflow: hidden;
                 }
                 .o_freight_credit_banner .fcb_head {
@@ -29,10 +35,10 @@
                     font-size: 12px;
                     text-transform: uppercase;
                     letter-spacing: .02em;
-                    padding: 8px 14px;
+                    padding: 10px 16px;
                 }
                 .o_freight_credit_banner .fcb_body {
-                    padding: 14px;
+                    padding: 16px;
                 }
                 .o_freight_credit_banner .fcb_value {
                     font-size: 26px;
@@ -52,26 +58,75 @@
                 .o_freight_credit_banner .fcb_ready .fcb_head { background: linear-gradient(90deg, #10B981, #34D399); }
                 .o_freight_credit_banner .fcb_ready .fcb_value { color: #047857; }
                 .o_freight_credit_banner .fcb_overdue .fcb_head { background: linear-gradient(90deg, #64748B, #94A3B8); }
+
+                /* Control Tower kanban columns: full-width, 3 equal
+                   columns aligned with the 4 KPI cards above, each with
+                   a colored status dot in the header. This style block
+                   (from the banner) is the only reliable place to inject
+                   board-wide CSS: it always renders exactly once, while
+                   the per-record kanban-box template would never render
+                   at all for a column that currently has zero bookings. */
+                .o_freight_credit_kanban .o_kanban_group {
+                    background: #F7F8FA;
+                    border-radius: 8px;
+                    flex: 1 1 0;
+                    width: auto !important;
+                    max-width: none !important;
+                    margin: 0 6px;
+                }
+                .o_freight_credit_kanban .o_kanban_group:first-child { margin-left: 0; }
+                .o_freight_credit_kanban .o_kanban_group:last-child { margin-right: 0; }
+                .o_freight_credit_kanban .o_kanban_header {
+                    background: #ffffff;
+                    border-radius: 8px 8px 0 0;
+                    border: 1px solid #dee2e6;
+                    padding: 2px 4px;
+                }
+                .o_freight_credit_kanban .o_column_title {
+                    font-weight: 700;
+                    font-size: 13px;
+                    text-transform: uppercase;
+                    letter-spacing: .02em;
+                    color: #212529;
+                }
+                .o_freight_credit_kanban .o_column_title::before {
+                    content: '';
+                    display: inline-block;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    margin-right: 8px;
+                    vertical-align: middle;
+                    background: #9ca3af;
+                }
+                /* Column order is fixed by _group_expand_credit_hold_state:
+                   Blocked, Pending Approval, Released - in that order. */
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(1) .o_kanban_header {  }
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(1) .o_column_title::before { background: #EF4444; }
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(2) .o_kanban_header {  }
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(2) .o_column_title::before { background: #F59E0B; }
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(3) .o_kanban_header {  }
+                .o_freight_credit_kanban .o_kanban_group:nth-of-type(3) .o_column_title::before { background: #10B981; }
             </style>
             <div class="fcb_card fcb_blocked">
                 <div class="fcb_head">Blocked Shipments</div>
                 <div class="fcb_body">
                     <div class="fcb_value"><t t-esc="blocked_count"/></div>
-                    <div class="fcb_caption">Overdue debt &#8226; Financial hold</div>
+                    <div class="fcb_caption">Financial hold &#8226; Overdue debt / Waiting payment</div>
                 </div>
             </div>
             <div class="fcb_card fcb_pending">
-                <div class="fcb_head">Pending BOD Approvals</div>
+                <div class="fcb_head">Pending Approvals</div>
                 <div class="fcb_body">
                     <div class="fcb_value"><t t-esc="pending_count"/></div>
-                    <div class="fcb_caption">Awaiting decision &#8226; BOD review</div>
+                    <div class="fcb_caption">Manager review &#8226; Awaiting decision</div>
                 </div>
             </div>
             <div class="fcb_card fcb_ready">
                 <div class="fcb_head">Ready to Release</div>
                 <div class="fcb_body">
                     <div class="fcb_value"><t t-esc="ready_count"/></div>
-                    <div class="fcb_caption">Cleared for DO &#8226; Paid / approved</div>
+                    <div class="fcb_caption">Cleared roadblocks &#8226; Paid / Debt approved</div>
                 </div>
             </div>
             <div class="fcb_card fcb_overdue">

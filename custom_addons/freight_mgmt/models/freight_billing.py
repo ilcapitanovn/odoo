@@ -726,7 +726,7 @@ class FreightBilling(models.Model):
 
                 related_invoices = self.env['account.move'].sudo().search([('invoice_origin', 'in', array_origins)])
                 if related_invoices:
-                    related_invoices.write({'vessel_bol_number': record.vessel_bol_number})
+                    related_invoices.with_context(from_automated_action=True).write({'vessel_bol_number': record.vessel_bol_number})
 
             print("automate_action_update_bl_number_invoice - executed successful.")
         except Exception as e:

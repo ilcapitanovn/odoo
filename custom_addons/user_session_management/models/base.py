@@ -142,22 +142,49 @@ class Base(models.AbstractModel):
                     model_ids = self.env['ir.model'].sudo().browse(
                         literal_eval(models_to_track))
                     if model_ids and self._name in model_ids.mapped('model'):
+                        # 1. Execute the write operation first
                         res = super().write(vals)
-                        name = ''
-                        if self._context.get('params') and self._context[
-                            'params'].get('action'):
-                            name = self.env['ir.actions.act_window'].sudo().browse(
+
+                        # 2. Get action name from context if available
+                        action_name = ''
+                        if self._context.get('params') and self._context['params'].get('action'):
+                            action_name = self.env['ir.actions.act_window'].sudo().browse(
                                 self._context['params']['action']).name or ''
-                        if 'name' in self._fields.keys():
-                            name = self.name
-                        log_vals = {'name': name,
-                                    'model': self._name,
-                                    'record': self.id,
-                                    'action': 'modify',
-                                    'login_id': request.session.usm_session_id,
-                                    }
-                        self.env['user.session.activity'].create(log_vals)
+
+                        # 3. Iterate over each record to generate individual activity logs
+                        # The following refactored code fixes the issue of expected singleton when calling
+                        # 'self.name' on multiple records.
+                        has_name_field = 'name' in self._fields
+                        log_vals_list = []
+
+                        for record in self:
+                            # Fallback to record.name if available, else action_name
+                            rec_name = (record.name if has_name_field and record.name else action_name) or ''
+
+                            log_vals_list.append({
+                                'name': rec_name,
+                                'model': self._name,
+                                'record': record.id,
+                                'action': 'modify',
+                                'login_id': request.session.usm_session_id,
+                            })
+
+                        # 4. Batch create activity logs for performance
+                        if log_vals_list:
+                            self.env['user.session.activity'].create(log_vals_list)
+
                         return res
+
+                        # if 'name' in self._fields.keys():
+                        #     name = self.name
+                        # log_vals = {'name': name,
+                        #             'model': self._name,
+                        #             'record': self.id,
+                        #             'action': 'modify',
+                        #             'login_id': request.session.usm_session_id,
+                        #             }
+                        # self.env['user.session.activity'].create(log_vals)
+                        # return res
                 except (UserError, ValidationError):
                     # Normal validation/user errors: no need to clutter logs with stack traces,
                     # just let Odoo display them to the user.

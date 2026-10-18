@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_freight_credit_release_wizard_user,freight.credit.release.wizard.user,model_freight_credit_release_wizard,freight_mgmt.group_freight_user,1,1,1,1
+access_freight_credit_partner_aging_customer_user,freight.credit.partner.aging.customer.user,partner_aging.model_res_partner_aging_customer,freight_mgmt.group_freight_user,1,0,0,0
+access_freight_credit_partner_aging_customer_operation,freight.credit.partner.aging.customer.operation,partner_aging.model_res_partner_aging_customer,freight_mgmt.group_freight_operation,1,0,0,0
+access_freight_credit_partner_aging_customer_csdoc,freight.credit.partner.aging.customer.csdoc,partner_aging.model_res_partner_aging_customer,freight_mgmt.group_freight_csdoc,1,0,0,0

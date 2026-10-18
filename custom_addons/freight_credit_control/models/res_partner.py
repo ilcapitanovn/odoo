@@ -16,19 +16,23 @@ class ResPartner(models.Model):
 
     def _compute_credit_overdue_days(self):
         today = fields.Date.context_today(self)
-        AccountMove = self.env['account.move'].sudo()
+        # AccountMove = self.env['account.move'].sudo()
+        PartnerAgingCustomer = self.env['res.partner.aging.customer'].sudo()
         for partner in self:
             partner.credit_overdue_days = 0
             if not partner.id:
                 continue
             commercial_partner = partner.commercial_partner_id or partner
-            overdue_moves = AccountMove.search([
-                ('commercial_partner_id', '=', commercial_partner.id),
-                ('move_type', 'in', ('out_invoice', 'out_refund')),
-                ('state', '=', 'posted'),
-                ('payment_state', 'not in', ('paid', 'in_payment', 'reversed')),
-                ('invoice_date_due', '<', today),
+            # overdue_moves = AccountMove.search([
+            #     ('commercial_partner_id', '=', commercial_partner.id),
+            #     ('move_type', 'in', ('out_invoice', 'out_refund')),
+            #     ('state', '=', 'posted'),
+            #     ('payment_state', 'not in', ('paid', 'in_payment', 'reversed')),
+            #     ('invoice_date_due', '<', today),
+            # ])
+            overdue_moves = PartnerAgingCustomer.search([
+                ('partner_id', '=', commercial_partner.id),
             ])
             if overdue_moves:
-                oldest_due_date = min(overdue_moves.mapped('invoice_date_due'))
+                oldest_due_date = min(overdue_moves.mapped('inv_date_due'))
                 partner.credit_overdue_days = (today - oldest_due_date).days
