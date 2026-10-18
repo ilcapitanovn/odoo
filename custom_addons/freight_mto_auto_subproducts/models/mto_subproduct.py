@@ -27,8 +27,8 @@ class ProductTemplateMtoSubproduct(models.Model):
         help="Quantity of sub-product (in its purchase unit of measure) per "
              "1 unit of the main product.")
     uom_id = fields.Many2one(
-        'uom.uom', 'Unit of Measure',
-        help="Unit of measure used for stock operations.")
+        related='sub_product_id.uom_po_id', string='Unit of Measure',
+        readonly=True)
     note = fields.Char(
         string='Notes', help="Appended to the description of the generated PO line.")
     company_id = fields.Many2one(
@@ -46,32 +46,19 @@ class ProductTemplateMtoSubproduct(models.Model):
             sub_tmpl = rec.sub_product_id.product_tmpl_id
             if sub_tmpl == rec.template_id:
                 raise ValidationError(
-                    _("A product cannot be its own sub-product (%s).",
-                      rec.template_id.display_name))
+                    _("A product cannot be its own sub-product (%s).")
+                    % rec.template_id.display_name)
             # No nesting (avoid loops): a sub-product cannot have sub-products...
             if sub_tmpl.sudo().with_context(active_test=False).mto_subproduct_ids:
                 raise ValidationError(
                     _("'%s' has its own MTO sub-products, so it cannot be used as a "
-                      "sub-product of '%s'. Nested expansion is not supported.",
-                      sub_tmpl.display_name, rec.template_id.display_name))
+                      "sub-product of '%s'. Nested expansion is not supported.")
+                    % (sub_tmpl.display_name, rec.template_id.display_name))
             # ... and a product used as sub-product elsewhere cannot get sub-products.
             used_as_sub = self.sudo().with_context(active_test=False).search_count([
                 ('sub_product_id.product_tmpl_id', '=', rec.template_id.id)])
             if used_as_sub:
                 raise ValidationError(
                     _("'%s' is already used as a sub-product of another product, so "
-                      "it cannot have sub-products itself.",
-                      rec.template_id.display_name))
-
-    @api.onchange('sub_product_id')
-    def _onchange_sub_product_id(self):
-        """Populates the unit of measure, vendor, and price when the sub-product changes."""
-        if self.sub_product_id:
-            self.uom_id = self.sub_product_id.uom_po_id
-
-            if self.sub_product_id.seller_ids:
-                if len(self.sub_product_id.seller_ids) > 1:
-                    sorted_sellers = sorted(self.seller_ids, key=lambda x: x.sequence)
-                    self.vendor_id = self.sub_product_id.seller_ids[0]
-                else:
-                    self.vendor_id = self.sub_product_id.seller_ids.name
+                      "it cannot have sub-products itself.")
+                    % rec.template_id.display_name)

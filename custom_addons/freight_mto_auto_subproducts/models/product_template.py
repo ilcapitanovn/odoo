@@ -16,3 +16,12 @@ class ProductTemplate(models.Model):
         for tmpl in self:
             tmpl.mto_subproduct_count = len(
                 tmpl.mto_subproduct_ids.filtered('active'))
+
+    def action_suggest_mto_subproducts(self):
+        """Open the popup that proposes sub-products (PO history first,
+        then the sub-products of a similar product)."""
+        self.ensure_one()
+        wizard = self.env['mto.subproduct.suggest.wizard'].create(
+            {'template_id': self.id})
+        wizard._populate()
+        return wizard._reopen()

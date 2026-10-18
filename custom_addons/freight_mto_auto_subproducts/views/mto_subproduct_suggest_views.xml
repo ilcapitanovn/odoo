@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mto_subproduct_suggest_wizard_form" model="ir.ui.view">
+        <field name="name">mto.subproduct.suggest.wizard.form</field>
+        <field name="model">mto.subproduct.suggest.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Suggest Sub-Products">
+                <group>
+                    <group>
+                        <field name="template_id" readonly="1" force_save="1"/>
+                        <field name="history_info"/>
+                    </group>
+                    <group>
+                        <field name="existing_count"/>
+                        <field name="max_count"/>
+                        <field name="free_slots"/>
+                    </group>
+                </group>
+                <group>
+                    <label for="source_template_id"/>
+                    <div class="o_row">
+                        <field name="source_template_id" options="{'no_create': True}"/>
+                        <button name="action_reload_similar" type="object"
+                                string="Reload" class="btn-secondary"
+                                attrs="{'invisible': [('source_template_id', '=', False)]}"/>
+                    </div>
+                </group>
+                <p class="text-muted">
+                    Tick the lines to add, adjust vendor / quantity if needed, then
+                    click "Add Selected". You can still edit everything in the
+                    product afterwards.
+                </p>
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom" create="false"
+                          decoration-muted="not selected">
+                        <field name="sequence" widget="handle"/>
+                        <field name="selected"/>
+                        <field name="sub_product_id" readonly="1" force_save="1"/>
+                        <field name="vendor_id"
+                               context="{'res_partner_search_mode': 'supplier'}"
+                               options="{'no_create': True}"/>
+                        <field name="qty"/>
+                        <field name="uom_id"/>
+                        <field name="source"/>
+                        <field name="evidence"/>
+                        <field name="note" optional="hide"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object"
+                            string="Add Selected" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -27,3 +27,18 @@ product, one line per active sub-product is added:
 - Product A stays on the PO as its own line.
 - Reordering-rule (orderpoint) replenishments are not expanded.
 - Nested sub-products are blocked.
+
+## Suggest Sub-Products (v15.0.1.1.0)
+Product > Purchase tab > "Suggest Sub-Products" (Purchase / Stock managers).
+Opens a popup with proposed lines (tick, edit vendor/qty, then "Add Selected"):
+1. PO history: a booking = a source document (SO number) in the PO origin.
+   Products on confirmed POs sharing the origin of past POs of this product
+   (any vendor), ranked by how many bookings they appear in. Ticked by default
+   when seen in >= 50% of bookings. Qty = average per unit of the main product;
+   vendor = most frequent vendor (empty if same as the main PO vendor).
+   Auto-generated lines are ignored to avoid feedback loops.
+2. If slots remain: sub-products of the most similar product (name token
+   overlap, accent-insensitive; editable, press "Reload" after changing it).
+The 20-line maximum counts lines already in the grid (system parameter
+`freight_mto_auto_subproducts.suggest_max`). Already-present, non-purchasable,
+archived and "main" products are skipped.
