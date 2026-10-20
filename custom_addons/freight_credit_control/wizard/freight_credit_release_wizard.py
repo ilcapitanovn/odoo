@@ -38,6 +38,8 @@ class FreightCreditReleaseWizard(models.TransientModel):
 
             approver_group = self.env.ref('freight_mgmt.group_freight_manager', raise_if_not_found=False)
             if approver_group:
+                booking._send_credit_mail('freight_mail_template_credit_release_request',
+                                          approver_group.users.partner_id)
                 for user in approver_group.users:
                     booking.activity_schedule(
                         'mail.mail_activity_data_todo',
@@ -51,6 +53,7 @@ class FreightCreditReleaseWizard(models.TransientModel):
                 'credit_reject_reason': self.note,
             })
             booking.message_post(body=_("Credit release rejected by %s: %s") % (self.env.user.name, self.note))
+            booking._send_credit_mail('freight_mail_template_credit_release_rejected', booking._credit_requester_partners())
 
         # A plain `ir.actions.act_window_close` only closes this dialog; the
         # Kanban board's own button-click handler then just patches the one

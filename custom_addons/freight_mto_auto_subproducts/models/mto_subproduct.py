@@ -22,22 +22,34 @@ class ProductTemplateMtoSubproduct(models.Model):
              "the sub-product is added to a separate draft PO for this vendor. "
              "If empty, it is added to the same PO as the main product.")
     qty = fields.Float(
-        string='Default Qty', default=1.0, required=True,
+        string='Default Qty', default=1.0,
         digits='Product Unit of Measure',
         help="Quantity of sub-product (in its purchase unit of measure) per "
              "1 unit of the main product.")
+    standard_price_usd = fields.Float(
+        string="Cost (USD)",
+        digits='Product Price', groups="base.group_user",
+        help="""In Standard Price & AVCO: value of the product (automatically computed in AVCO).
+            In FIFO: value of the next unit that will leave the stock (automatically computed).
+            Used to value the product when the purchase cost is not known (e.g. inventory adjustment).
+            Used to compute margins on sale orders.""")
+    standard_price_vnd = fields.Float(
+        string="Cost (VND)",
+        digits='Product Price', groups="base.group_user")
     uom_id = fields.Many2one(
         related='sub_product_id.uom_po_id', string='Unit of Measure',
         readonly=True)
     note = fields.Char(
         string='Notes', help="Appended to the description of the generated PO line.")
+    currency_id = fields.Many2one(
+        related='template_id.currency_id', store=True, readonly=True)
     company_id = fields.Many2one(
         related='template_id.company_id', store=True, readonly=True)
 
     @api.constrains('qty')
     def _check_qty(self):
         for rec in self:
-            if rec.qty <= 0:
+            if rec.qty < 0:
                 raise ValidationError(_("Default Qty must be strictly positive."))
 
     @api.constrains('sub_product_id', 'template_id')
@@ -62,3 +74,19 @@ class ProductTemplateMtoSubproduct(models.Model):
                     _("'%s' is already used as a sub-product of another product, so "
                       "it cannot have sub-products itself.")
                     % rec.template_id.display_name)
+
+    @api.onchange('sub_product_id')
+    def _onchange_sub_product_id(self):
+        if self.sub_product_id:
+            if self.sub_product_id.seller_ids:
+                if len(self.sub_product_id.seller_ids) > 1:
+                    sorted_sellers = sorted(self.sub_product_id.seller_ids, key=lambda x: x.sequence)
+                    self.vendor_id = sorted_sellers[0].name
+                    self.qty = sorted_sellers[0].min_qty
+                    self.standard_price_usd = sorted_sellers[0].price
+                    self.standard_price_vnd = sorted_sellers[0].price_vnd
+                else:
+                    self.vendor_id = self.sub_product_id.seller_ids.name
+                    self.qty = self.sub_product_id.seller_ids.min_qty
+                    self.standard_price_usd = self.sub_product_id.seller_ids.price
+                    self.standard_price_vnd = self.sub_product_id.seller_ids.price_vnd

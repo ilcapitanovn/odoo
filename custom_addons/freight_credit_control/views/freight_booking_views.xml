@@ -57,6 +57,7 @@
                         </group>
                         <group string="Hold Status">
                             <field name="credit_hold_state" readonly="1"/>
+                            <field name="credit_hold_state" readonly="0" groups="base.group_no_one"/>
                             <field name="credit_hold_reason" readonly="1"/>
                             <field name="credit_requested_by" attrs="{'invisible': [('credit_requested_by', '=', False)]}"/>
                             <field name="credit_requested_date" attrs="{'invisible': [('credit_requested_date', '=', False)]}"/>
@@ -109,9 +110,8 @@
                              border-bottom-color: #dee2e6 !important;">
                             <div class="o_kanban_record_top">
                                 <div class="o_kanban_record_headings">
-                                    Booking <strong>
-                                        #<field name="number"/>
-                                    </strong>
+                                    Booking <strong>#<field name="number"/></strong>
+                                    (<field name="vessel_bol_no"/>)
                                 </div>
                                 <span t-if="record.credit_hold_state.raw_value == 'blocked'" class="badge badge-danger">
                                     <field name="credit_hold_reason"
@@ -131,10 +131,10 @@
                                 <div>Customer: <strong><field name="partner_id"/></strong></div>
                                 <div>Sales: <field name="user_id"/></div>
                                 <div>ETD: <field name="etd_revised"/></div>
-                                <div t-if="record.credit_hold_state.raw_value != 'released'">
+                                <div t-if="record.credit_hold_state.raw_value != 'released' and record.booking_due_amount > 0">
                                     Total overdue:
-                                    <strong><field name="partner_due_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    (<field name="partner_credit_overdue_days"/> days)</strong>
+                                    <strong><field name="booking_due_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/></strong>
+                                    (<field name="booking_due_days"/> days)
                                 </div>
                                 <div t-if="record.credit_release_note.raw_value" class="text-muted">
                                     <em>Note: <field name="credit_release_note"/></em>

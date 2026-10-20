@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="0">
+
+    <!-- Odoo 15 mail templates use Jinja syntax. Recipients are set from Python
+         (recipient_ids), so no partner_to / email_to is defined here. -->
+
+    <!-- 1) Request Approval -> sent to the BOD approvers -->
+    <record id="freight_mail_template_credit_release_request" model="mail.template">
+        <field name="name">Freight Credit: Release Requested</field>
+        <field name="model_id" ref="freight_mgmt.model_freight_booking"/>
+        <field name="subject">[Cần duyệt] Đề nghị giải phóng lô hàng {{object.number}} - {{object.partner_id.name}}</field>
+        <field name="email_from">{{user.email_formatted or ''}}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;" width="100%"><tbody><tr><td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+            <tbody>
+                <!-- CONTENT -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                            <tbody><tr><td valign="top" style="font-size: 13px;">
+                                <div style="box-sizing:border-box;font-size:13px;" bis_skin_checked="1">
+                                <br/>Kính gửi Ban Giám đốc,
+                                <br/><br/>
+                                    <p>
+                                        <strong><t t-out="object.credit_requested_by.name or user.name or ''" data-oe-t-inline="true" contenteditable="false">Người đề nghị</t></strong> đề nghị phê duyệt giải phóng lô hàng
+                                        <strong><t t-out="object.number or ''" data-oe-t-inline="true" contenteditable="false">Mã lô hàng</t></strong> của khách hàng
+                                        <strong><t t-out="object.partner_id.name or ''" data-oe-t-inline="true" contenteditable="false">Tên khách hàng</t></strong>
+                                        dù khách hàng đang có công nợ quá hạn.
+                                    </p>
+                                <br/>
+                                    <table style="border-collapse: collapse; margin: 12px 0;">
+                                        <tr><td style="padding: 4px 16px 4px 0; color: #6c757d;">Công nợ quá hạn</td>
+                                            <td style="padding: 4px 0;"><strong><t t-out="format_amount(object.partner_due_amount, object.currency_id)" data-oe-t-inline="true" contenteditable="false">Số tiền nợ</t></strong></td></tr>
+                                        <tr><td style="padding: 4px 16px 4px 0; color: #6c757d;">Số ngày quá hạn</td>
+                                            <td style="padding: 4px 0;"><t t-out="object.partner_credit_overdue_days" data-oe-t-inline="true" contenteditable="false">Số ngày quá hạn</t> ngày</td></tr>
+                                        <tr><td style="padding: 4px 16px 4px 0; color: #6c757d;">Sales phụ trách</td>
+                                            <td style="padding: 4px 0;"><t t-out="object.user_id.name or ''" data-oe-t-inline="true" contenteditable="false">Sales phụ trách</t></td></tr>
+                                        <tr><td style="padding: 4px 16px 4px 0; color: #6c757d; vertical-align: top;">Lý do đề nghị</td>
+                                            <td style="padding: 4px 0;"><t t-out="object.credit_release_note or ''" data-oe-t-inline="true" contenteditable="false">Lý do đề nghị</t></td></tr>
+                                    </table>
+                                <br/><br/>
+                                    <div style="box-sizing:border-box;font-size:13px;margin: 16px 0px 16px 0px;" bis_skin_checked="1">
+                                        <font color="#ffffff"><span style="background-color: #875a7b; padding: 8px 16px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; border-radius: 5px;">
+                                            <a t-att-href="'/mail/view?model=freight.booking&amp;res_id=' + str(object.id)" style="box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                            Xem và phê duyệt
+                                            </a>
+                                        </span></font>
+                                    <br/></div>
+                                </div>
+                            </td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <!-- FOOTER -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <hr width="100%" style="border-top-color:currentcolor;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-color:currentcolor;border-bottom-color:currentcolor;border-right-color:currentcolor;border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
+                        <b style="box-sizing:border-box;font-weight:bolder;"><t t-out="object.company_id.name or ''" data-oe-t-inline="true" contenteditable="false">YourCompany</t></b>
+                        <div style="box-sizing:border-box;font-size:13px;opacity: 0.7;" bis_skin_checked="1">
+                            <t t-out="object.company_id.phone or ''" data-oe-t-inline="true" contenteditable="false">+1 650-123-4567</t>
+                            <t t-if="object.company_id.email" data-oe-t-group-active="true" data-oe-t-group="0" data-oe-t-inline="true">
+                                | <a t-att-href="'mailto:%s' % object.company_id.email" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.email or ''" contenteditable="false">info@yourcompany.com</a>
+                            </t>
+                            <t t-if="object.company_id.website" data-oe-t-group-active="true" data-oe-t-group="1" data-oe-t-inline="true">
+                                | <a t-att-href="'%s' % object.company_id.website" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.website or ''" contenteditable="false">http://www.example.com</a>
+                            </t>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+            </td></tr>
+            <!-- POWERED BY -->
+            <tr><td align="center" style="min-width: 590px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+                  <tbody><tr><td style="text-align: center; font-size: 13px;">
+                    Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" style="text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;">Odoo</a>
+                  </td></tr>
+                </tbody></table>
+            </td></tr>
+            </tbody></table>
+
+        </field>
+    </record>
+
+    <!-- 2) Approve Release -> sent to the requester and the salesperson -->
+    <record id="freight_mail_template_credit_release_approved" model="mail.template">
+        <field name="name">Freight Credit: Release Approved</field>
+        <field name="model_id" ref="freight_mgmt.model_freight_booking"/>
+        <field name="subject">[Đã duyệt] Lô hàng {{object.number}} được giải phóng - {{object.partner_id.name}}</field>
+        <field name="email_from">{{user.email_formatted or ''}}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;" width="100%"><tbody><tr><td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+            <tbody>
+                <!-- CONTENT -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                            <tbody><tr><td valign="top" style="font-size: 13px;">
+                                <div style="box-sizing:border-box;font-size:13px;" bis_skin_checked="1">
+                                <br/>Xin chào <strong style="box-sizing:border-box;font-weight:bolder;"><i><t t-out="object.credit_requested_by.name or object.user_id.name or ''" data-oe-t-inline="true" contenteditable="false"></t></i></strong>
+                                <br/><br/><br/>
+                                    <p>
+                                        Đề nghị giải phóng lô hàng <t t-out="object.number or ''" data-oe-t-inline="true" contenteditable="false">Mã lô hàng</t> của khách hàng
+                                        <strong><t t-out="object.partner_id.name or ''" data-oe-t-inline="true" contenteditable="false">Tên khách hàng</t></strong> đã được
+                                        <strong><t t-out="user.name or ''" data-oe-t-inline="true" contenteditable="false">Tên quản lý</t></strong>
+                                        <span style="color: #DC2626;"><strong>PHÊ DUYỆT</strong></span>.
+                                    </p>
+                                <br/><br/>
+                                    <div style="box-sizing:border-box;font-size:13px;margin: 16px 0px 16px 0px;" bis_skin_checked="1">
+                                        <font color="#ffffff"><span style="background-color: #875a7b; padding: 8px 16px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; border-radius: 5px;">
+                                            <a t-att-href="'/mail/view?model=freight.booking&amp;res_id=' + str(object.id)" style="box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                            Mở lô hàng
+                                            </a>
+                                        </span></font>
+                                    <br/></div>
+                                </div>
+                            </td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <!-- FOOTER -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <hr width="100%" style="border-top-color:currentcolor;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-color:currentcolor;border-bottom-color:currentcolor;border-right-color:currentcolor;border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
+                        <b style="box-sizing:border-box;font-weight:bolder;"><t t-out="object.company_id.name or ''" data-oe-t-inline="true" contenteditable="false">YourCompany</t></b>
+                        <div style="box-sizing:border-box;font-size:13px;opacity: 0.7;" bis_skin_checked="1">
+                            <t t-out="object.company_id.phone or ''" data-oe-t-inline="true" contenteditable="false">+1 650-123-4567</t>
+                            <t t-if="object.company_id.email" data-oe-t-group-active="true" data-oe-t-group="0" data-oe-t-inline="true">
+                                | <a t-att-href="'mailto:%s' % object.company_id.email" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.email or ''" contenteditable="false">info@yourcompany.com</a>
+                            </t>
+                            <t t-if="object.company_id.website" data-oe-t-group-active="true" data-oe-t-group="1" data-oe-t-inline="true">
+                                | <a t-att-href="'%s' % object.company_id.website" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.website or ''" contenteditable="false">http://www.example.com</a>
+                            </t>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+            </td></tr>
+            <!-- POWERED BY -->
+            <tr><td align="center" style="min-width: 590px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+                  <tbody><tr><td style="text-align: center; font-size: 13px;">
+                    Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" style="text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;">Odoo</a>
+                  </td></tr>
+                </tbody></table>
+            </td></tr>
+            </tbody></table>
+
+        </field>
+    </record>
+
+    <!-- 3) Reject -> sent to the requester and the salesperson -->
+    <record id="freight_mail_template_credit_release_rejected" model="mail.template">
+        <field name="name">Freight Credit: Release Rejected</field>
+        <field name="model_id" ref="freight_mgmt.model_freight_booking"/>
+        <field name="subject">[Từ chối] Đề nghị giải phóng lô hàng {{object.number}} - {{object.partner_id.name}}</field>
+        <field name="email_from">{{user.email_formatted or ''}}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html" type="html">
+            <table border="0" cellpadding="0" cellspacing="0" style="box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;" width="100%"><tbody><tr><td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+            <tbody>
+                <!-- CONTENT -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                            <tbody><tr><td valign="top" style="font-size: 13px;">
+                                <div style="box-sizing:border-box;font-size:13px;" bis_skin_checked="1">
+                                <br/>Xin chào <strong style="box-sizing:border-box;font-weight:bolder;"><i><t t-out="object.credit_requested_by.name or object.user_id.name or ''" data-oe-t-inline="true" contenteditable="false"></t></i></strong>
+                                <br/><br/><br/>
+                                    <p>
+                                        Đề nghị giải phóng lô hàng <t t-out="object.number or ''" data-oe-t-inline="true" contenteditable="false">Mã lô hàng</t> của khách hàng
+                                        <strong><t t-out="object.partner_id.name or ''" data-oe-t-inline="true" contenteditable="false">Tên khách hàng</t></strong> đã bị
+                                        <strong><t t-out="user.name or ''" data-oe-t-inline="true" contenteditable="false">Tên quản lý</t></strong>
+                                        <span style="color: #DC2626;"><strong>TỪ CHỐI</strong></span>.
+                                    </p>
+                                <br/><br/>
+                                    <div style="box-sizing:border-box;font-size:13px;margin: 16px 0px 16px 0px;" bis_skin_checked="1">
+                                        <font color="#ffffff"><span style="background-color: #875a7b; padding: 8px 16px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; border-radius: 5px;">
+                                            <a t-att-href="'/mail/view?model=freight.booking&amp;res_id=' + str(object.id)" style="box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                                            Xem lô hàng
+                                            </a>
+                                        </span></font>
+                                    <br/></div>
+                                </div>
+                            </td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <!-- FOOTER -->
+                <tr>
+                    <td align="center" style="min-width: 590px;">
+                        <hr width="100%" style="border-top-color:currentcolor;border-image-width:1;border-image-source:none;border-image-slice:100%;border-image-repeat:stretch;border-image-outset:0;border-left-color:currentcolor;border-bottom-color:currentcolor;border-right-color:currentcolor;border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 4px 0px;"/>
+                        <b style="box-sizing:border-box;font-weight:bolder;"><t t-out="object.company_id.name or ''" data-oe-t-inline="true" contenteditable="false">YourCompany</t></b>
+                        <div style="box-sizing:border-box;font-size:13px;opacity: 0.7;" bis_skin_checked="1">
+                            <t t-out="object.company_id.phone or ''" data-oe-t-inline="true" contenteditable="false">+1 650-123-4567</t>
+                            <t t-if="object.company_id.email" data-oe-t-group-active="true" data-oe-t-group="0" data-oe-t-inline="true">
+                                | <a t-att-href="'mailto:%s' % object.company_id.email" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.email or ''" contenteditable="false">info@yourcompany.com</a>
+                            </t>
+                            <t t-if="object.company_id.website" data-oe-t-group-active="true" data-oe-t-group="1" data-oe-t-inline="true">
+                                | <a t-att-href="'%s' % object.company_id.website" style="color:inherit;box-sizing:border-box;background-color:transparent;text-decoration:none;" t-out="object.company_id.website or ''" contenteditable="false">http://www.example.com</a>
+                            </t>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+            </td></tr>
+            <!-- POWERED BY -->
+            <tr><td align="center" style="min-width: 590px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+                  <tbody><tr><td style="text-align: center; font-size: 13px;">
+                    Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth" style="text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;">Odoo</a>
+                  </td></tr>
+                </tbody></table>
+            </td></tr>
+            </tbody></table>
+        </field>
+    </record>
+
+</odoo>

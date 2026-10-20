@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Freight Credit Control Tower",
-    'version': '15.0.1.0.0',
+    'version': '15.0.2.0.1',
     'summary': "Credit hold, BOD approval and release workflow for Freight Bookings",
     'description': """
 Freight Credit Control Tower
@@ -32,6 +32,7 @@ Adds a financial hold / release workflow on top of Freight Management (freight_m
     'data': [
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
+        'data/mail_template_data.xml',
         'wizard/freight_credit_release_wizard_views.xml',
         'views/freight_credit_banner_templates.xml',
         'views/freight_booking_views.xml',

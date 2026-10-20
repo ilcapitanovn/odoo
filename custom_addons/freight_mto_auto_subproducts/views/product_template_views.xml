@@ -28,6 +28,12 @@
                                options="{'no_create': True}"/>
                         <field name="qty"/>
                         <field name="uom_id"/>
+                        <field name="standard_price_usd" class="oe_inline" widget='monetary'
+                               readonly="1" digits="[12,0]"
+                               options="{'currency_field': 'currency_id'}" />
+                        <field name="standard_price_vnd" class="oe_inline" widget='monetary'
+                               readonly="1" digits="[12,0]"
+                               options="{'currency_field': 'currency_id'}" />
                         <field name="note" optional="hide"/>
                         <field name="active" widget="boolean_toggle"/>
                     </tree>

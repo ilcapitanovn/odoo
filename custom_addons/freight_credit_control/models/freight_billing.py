@@ -16,11 +16,26 @@ class FreightBilling(models.Model):
             booking = billing.booking_id
             on_hold = (
                     booking.credit_hold_state in ('blocked', 'pending_approval')
-                    or (booking.credit_hold_state == 'none' and booking.is_over_credit_limit)
+                    and booking.is_over_credit_limit
+                    #or (booking.credit_hold_state == 'none' and booking.is_over_credit_limit)
             )
             if on_hold:
                 raise UserError(_(
                     "Booking %s is on financial hold (customer overdue balance $%.2f exceeds the blocking threshold"
                     " $%.2f). Please request BOD approval before confirming the Bill of Lading."
                 ) % (booking.number, booking.partner_due_amount, booking.partner_blocking_stage))
+
+                # if booking.credit_hold_reason == "overdue_debt":
+                #     msg = _(
+                #         "Booking %s is on financial hold (customer overdue balance $%.2f
+                #         exceeds the blocking threshold"
+                #         " $%.2f). Please request BOD approval before confirming the Bill of Lading."
+                #     ) % (booking.number, booking.partner_due_amount, booking.partner_blocking_stage)
+                # else:
+                #     msg = _(
+                #         "Booking %s is on financial hold (reason: %s). Please request "
+                #         "BOD approval before confirming the Bill of Lading."
+                #     ) % (booking.number, booking.credit_hold_reason)
+
+                # raise UserError(msg)
         return super(FreightBilling, self).action_confirm()
