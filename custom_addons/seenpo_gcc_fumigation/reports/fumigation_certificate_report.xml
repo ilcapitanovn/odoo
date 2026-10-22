@@ -570,10 +570,10 @@
                         <div t-attf-style="float:left; width:400px; color:#1f5c3d; text-align:left; font-size:#{content_font_size} !important;">
                             <div>
                                 <t t-if="doc.transport_type == 'pallet'">
-                                    All wooden pallets have been fumigated and stamped in accordance with ISPM15 standard.
+                                    All wooden pallets have been fumigated and/or stamped in accordance with ISPM15 standard.
                                 </t>
                                 <t t-else="">
-                                    All wood packaging materials and/or commodities have been fumigated and stamped in accordance with ISPM15 standard.
+                                    All wood packaging materials and/or commodities have been fumigated and/or stamped in accordance with ISPM15 standard.
                                 </t>
                             </div>
                             <div style="padding-top:20px;">
