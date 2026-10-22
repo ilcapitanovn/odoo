@@ -1,13 +1,30 @@
 <?xml version="1.0"?>
 <t t-name="web.external_layout_standard">
 	<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
-		<div class="row">
-			<div class="col-12 mb4">
-				<!--<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>-->
-				<img t-if="doc and doc.partner_id.lang == 'vi_VN'" t-att-src="'web/static/img/report_header_logo_vn.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
-				<img t-if="not doc or doc and doc.partner_id.lang != 'vi_VN'" t-att-src="'web/static/img/report_header_logo_en.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>
+<!--		<div class="row">-->
+<!--			<div class="col-12 mb4">-->
+<!--				&lt;!&ndash;<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>&ndash;&gt;-->
+<!--				<img t-if="doc and doc.partner_id.lang == 'vi_VN'" t-att-src="'web/static/img/report_header_logo_vn.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>-->
+<!--				<img t-if="not doc or doc and doc.partner_id.lang != 'vi_VN'" t-att-src="'web/static/img/report_header_logo_en.jpg'" style="max-height: 100px; width: 100%" alt="Logo"/>-->
+<!--			</div>-->
+<!--			&lt;!&ndash;<div class="col-9 text-right" style="margin-top:22px;" t-field="company.report_header" name="moto"/>&ndash;&gt;-->
+<!--		</div>-->
+		<div class="row align-items-center">
+			<!-- Left Side: Logo -->
+			<div class="col-4">
+				<img t-att-src="'web/static/img/logo.jpg'" style="max-height: 70px;" alt="Logo"/>
 			</div>
-			<!--<div class="col-9 text-right" style="margin-top:22px;" t-field="company.report_header" name="moto"/>-->
+			<!-- Right Side: Company Details -->
+			<div t-if="doc and doc.partner_id.lang == 'vi_VN'" class="col-8 text-left font-weight-bold" style="color: #28326E; font-size:14px; margin-left:20px;">
+				<span style="font-weight:bold;font-size:18px;">CÔNG TY CỔ PHẦN VIỆT TOẢN</span> <br/>
+				684/28A Trần Hưng Đạo, Phường Chợ Quán, Thành phố Hồ Chí Minh, Việt Nam <br/>
+				ĐT: (84) 28 3838 4168 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; MST: 0314859219
+			</div>
+			<div t-if="not doc or doc and doc.partner_id.lang != 'vi_VN'" class="col-7 text-left" style="color: #28326E; margin-left:20px;">
+				<span style="font-weight:bold;font-size:20px;">VIET TOAN JOINT STOCK COMPANY</span> <br/>
+				684/28A Tran Hung Dao, Cho Quan Ward, Ho Chi Minh, Vietnam <br/>
+				Tel: (84) 28 3838 4168 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; TIN: 0314859219
+			</div>
 		</div>
 		<div t-if="company.logo or company.report_header" class="row zero_min_height">
 			<div class="col-12">
