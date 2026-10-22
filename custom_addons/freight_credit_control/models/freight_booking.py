@@ -248,6 +248,41 @@ class FreightBooking(models.Model):
         report = self.env.ref('freight_mgmt.freight_delivery_order_report')
         return report.report_action(self.billing_id[0])
 
+    @api.model
+    def update_credit_hold_state_by_partner(self, partners):
+        """Called from res.partner.write() whenever a partner's credit limit is
+        enabled or disabled. Re-evaluates all confirmed bookings for that
+        partner and flags them Blocked or unblocks them as appropriate."""
+        if not partners:
+            return
+
+        bookings = self.sudo().search([
+            ('stage_id.name', 'not in', ('Draft', 'Cancelled')),
+            ('credit_hold_state', 'in', ('none', 'blocked')),
+            ('order_id.payment_state', 'not in', ('paid', 'in_payment', 'reversed')),
+            ('partner_id', 'child_of', partners.ids),
+        ])
+        to_block = bookings.filtered(
+            lambda b: b.credit_hold_state == 'none' and not b.is_within_credit_limit)
+        to_clear = bookings.filtered(
+            lambda b: b.credit_hold_state == 'blocked' and b.is_within_credit_limit)
+
+        if to_block:
+            to_block.write({'credit_hold_state': 'blocked'})
+            for booking in to_block:
+                booking.message_post(body=_(
+                    "This booking has been automatically placed on financial hold because "
+                    "customer's credit limit has changed."
+                ))
+
+        if to_clear:
+            to_clear.write({'credit_hold_state': 'none'})
+            for booking in to_clear:
+                booking.message_post(body=_(
+                    "This booking has been automatically removed from financial hold because "
+                    "customer's credit limit has changed."
+                ))
+
     # ---------------------------------------------------
     # CRUD
     # ---------------------------------------------------
@@ -267,10 +302,9 @@ class FreightBooking(models.Model):
     def _cron_flag_credit_holds(self):
         """Scheduled action: scan confirmed, not-yet-completed bookings whose
         credit status has never been evaluated ('none') and flag them
-        'Blocked' if their customer is over the credit blocking threshold.
-        Bookings already Blocked / Pending / Released are left untouched -
-        this cron only ever sets the *initial* hold, never overrides a
-        BOD decision."""
+        'Blocked' if their customer is not within credit limit (including over the credit blocking
+        threshold or unpaid). Bookings already Blocked / Pending / Released are left untouched -
+        this cron only ever sets the *initial* hold, never overrides a BOD decision."""
         candidates = self.search([
             ('stage_id.name', 'not in', ('Draft', 'Cancelled')),
             ('credit_hold_state', '=', 'none'),

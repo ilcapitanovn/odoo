@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Freight Credit Control Tower",
-    'version': '15.0.2.0.1',
+    'version': '15.0.2.0.2',
     'summary': "Credit hold, BOD approval and release workflow for Freight Bookings",
     'description': """
 Freight Credit Control Tower

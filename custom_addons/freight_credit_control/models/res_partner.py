@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import logging
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class ResPartner(models.Model):
@@ -36,3 +39,12 @@ class ResPartner(models.Model):
             if overdue_moves:
                 oldest_due_date = min(overdue_moves.mapped('inv_date_due'))
                 partner.credit_overdue_days = (today - oldest_due_date).days
+
+    def write(self, vals):
+        res = super(ResPartner, self).write(vals)
+        try:
+            if 'active_limit' in vals or 'blocking_stage' in vals:
+                self.env['freight.booking'].sudo().update_credit_hold_state_by_partner(self)
+        except Exception as e:
+            _logger.exception("Error occurred while updating credit flag: %s" % e)
+        return res
