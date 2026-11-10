@@ -14,14 +14,26 @@
     </record>
 
     <record id="seenpo_action_report_fumigation_certificate_with_sign" model="ir.actions.report">
-        <field name="name">Certificate of Fumigation With Signature</field>
+        <field name="name">Original Certificate of Fumigation With Signature</field>
         <field name="model">seenpo.fumigation.certificate</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">seenpo_gcc_fumigation.report_fumi_cert_with_sign</field>
         <field name="report_file">seenpo_gcc_fumigation.report_fumi_cert_with_sign</field>
         <field name="paperformat_id" ref="seenpo_fumigation_paperformat_bol"/>
         <field name="print_report_name">
-            ('Draft_' + (object.cargo_name or 'Cert of Fumigation')).replace('/', '-') if object.state in ['draft','submitted'] else ('Cert_No.' + (object.name or '')).replace('/', '-')
+            ('Draft_' + (object.cargo_name or 'Cert of Fumigation')).replace('/', '-') if object.state in ['draft','submitted'] else ('Original_Cert_No.' + (object.name or '')).replace('/', '-')
+        </field>
+    </record>
+
+    <record id="seenpo_action_report_fumigation_certificate_copy_with_sign" model="ir.actions.report">
+        <field name="name">Copy Certificate of Fumigation With Signature</field>
+        <field name="model">seenpo.fumigation.certificate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">seenpo_gcc_fumigation.report_fumi_cert_copy_with_sign</field>
+        <field name="report_file">seenpo_gcc_fumigation.report_fumi_cert_copy_with_sign</field>
+        <field name="paperformat_id" ref="seenpo_fumigation_paperformat_bol"/>
+        <field name="print_report_name">
+            ('Draft_' + (object.cargo_name or 'Cert of Fumigation')).replace('/', '-') if object.state in ['draft','submitted'] else ('Copy_Cert_No.' + (object.name or '')).replace('/', '-')
         </field>
     </record>
 
@@ -170,9 +182,8 @@
                     </table>
 
                     <t t-if="doc.state in ['approved','cancelled'] and doc.name != '#'">
-                        <div class="original-stamp-box">
-                            <img src="/seenpo_gcc_fumigation/static/img/original_stamp.png" alt="ORIGINAL"/>
-                        </div>
+                        <!-- Tạo một thẻ mỏ neo trống ở vị trí này để chèn dấu original hoặc copy -->
+                        <div id="original_copy_stamp_anchor"/>
                     </t>
 
                     <!-- Header separator: thick green rule + thin gold rule -->
@@ -680,7 +691,7 @@
         </t>
     </template>
 
-    <!-- 2. MẪU BÁO CÁO KẾ THỪA: CÓ CHỮ KÝ -->
+    <!-- 2. MẪU BÁO CÁO KẾ THỪA: CÓ CHỮ KÝ - Original -->
     <!-- Thuộc tính primary="True" bắt buộc phải có để biến nó thành một template độc lập hoàn toàn -->
     <template id="report_fumi_cert_with_sign" inherit_id="report_fumigation_certificate" primary="True">
         <xpath expr="//div[@id='signature_section_anchor']" position="inside">
@@ -688,6 +699,29 @@
                 <img src="/seenpo_gcc_fumigation/static/img/signature_stamp_pdf_safe.png"
                          style="position:absolute; bottom:-20px; right:150px; width:245px;"/>
             </t>
+        </xpath>
+
+        <xpath expr="//div[@id='original_copy_stamp_anchor']" position="inside">
+            <div class="original-stamp-box">
+                <img src="/seenpo_gcc_fumigation/static/img/original_stamp.svg" alt="ORIGINAL"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- 2. MẪU BÁO CÁO KẾ THỪA: CÓ CHỮ KÝ - Copy -->
+    <!-- Thuộc tính primary="True" bắt buộc phải có để biến nó thành một template độc lập hoàn toàn -->
+    <template id="report_fumi_cert_copy_with_sign" inherit_id="report_fumigation_certificate" primary="True">
+        <xpath expr="//div[@id='signature_section_anchor']" position="inside">
+            <t t-if="doc.state in ['approved','cancelled'] and doc.name != '#'">
+                <img src="/seenpo_gcc_fumigation/static/img/signature_stamp_pdf_safe.png"
+                         style="position:absolute; bottom:-20px; right:150px; width:245px;"/>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@id='original_copy_stamp_anchor']" position="inside">
+            <div class="original-stamp-box">
+                <img src="/seenpo_gcc_fumigation/static/img/copy_stamp.svg" alt="COPY"/>
+            </div>
         </xpath>
     </template>
 

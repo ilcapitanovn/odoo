@@ -71,4 +71,10 @@ class FumigationCertificateReport(models.AbstractModel):
 class FumigationCertificateReportWithSign(models.AbstractModel):
     _name = 'report.seenpo_gcc_fumigation.report_fumi_cert_with_sign'
     _inherit = 'report.seenpo_gcc_fumigation.report_fumigation_certificate'
-    _description = 'Fumigation Certificate Report With Sign - Get Values'
+    _description = 'Fumigation Certificate Report Original With Sign - Get Values'
+
+
+class FumigationCertificateReportCopyWithSign(models.AbstractModel):
+    _name = 'report.seenpo_gcc_fumigation.report_fumi_cert_copy_with_sign'
+    _inherit = 'report.seenpo_gcc_fumigation.report_fumigation_certificate'
+    _description = 'Fumigation Certificate Report Copy With Sign - Get Values'
