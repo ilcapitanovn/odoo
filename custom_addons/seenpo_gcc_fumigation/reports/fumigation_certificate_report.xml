@@ -205,7 +205,7 @@
                     </p>
 
                     <!-- CARGO / SHIPMENT DETAILS (single continuous list, uniform bullet) -->
-                    <table id="tbl-content" t-attf-style="width:100%; border-collapse:collapse; font-size:#{content_font_size} !important;">
+                    <table id="tbl-content" t-attf-style="line-height: 1.45; width:100%; border-collapse:collapse; font-size:#{content_font_size} !important;">
                         <t t-if="doc.is_shipper_name_printing or doc.is_shipper_address_printing or doc.is_shipper_phone_printing">
                         <tr>
                             <td style="width:30%; color:#1f5c3d; vertical-align:top; padding:2px 0;">
@@ -565,7 +565,7 @@
                     <!--</t>-->
 
                     <!-- FOOTER: right-aligned date + title + signature block -->
-                    <div style="margin-top:36px; width:100%; overflow:hidden;">
+                    <div style="margin-top:20px; width:100%; overflow:hidden;">
                         <t t-if="doc.is_ispm15_printing">
                         <div t-attf-style="float:left; width:400px; color:#1f5c3d; text-align:left; font-size:#{content_font_size} !important;">
                             <div>
